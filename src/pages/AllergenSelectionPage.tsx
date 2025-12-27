@@ -92,9 +92,11 @@ const AllergenSelectionPage = () => {
     loadLanguageAndTranslate();
   }, []);
 
-  const handleCheckboxChange = (allergenId: string, isChecked: boolean) => {
+  const handleToggleAllergen = (allergenId: string) => {
     setSelectedStandardAllergens(prev => 
-      isChecked ? [...prev, allergenId] : prev.filter(id => id !== allergenId)
+      prev.includes(allergenId) 
+        ? prev.filter(id => id !== allergenId)
+        : [...prev, allergenId]
     );
   };
 
@@ -181,73 +183,62 @@ const AllergenSelectionPage = () => {
           
           <div className="grid grid-cols-2 gap-4 w-full">
             {/* Standard Allergens */}
-            {ALLERGEN_OPTIONS.map((allergen) => (
-              <div 
-                key={allergen.id} 
-                className="flex items-center justify-between p-3 bg-white dark:bg-gray-800 rounded-lg shadow-sm cursor-pointer"
-                onClick={(e) => {
-                  const target = e.target as HTMLElement;
-                  if (target && (target === e.currentTarget || target.tagName === 'IMG')) {
-                    handleCheckboxChange(allergen.id, !selectedStandardAllergens.includes(allergen.id));
-                  }
-                }}
-              >
-                <div className="flex items-center space-x-3">
-                  <img src={allergen.image} alt={allergen.name} className="w-8 h-8 object-contain" />
-                  <Label htmlFor={allergen.id} className="text-lg md:text-xl font-medium text-gray-800 dark:text-gray-200 cursor-pointer">
-                    {allergen.name}
-                  </Label>
+            {ALLERGEN_OPTIONS.map((allergen) => {
+              const isSelected = selectedStandardAllergens.includes(allergen.id);
+              return (
+                <div 
+                  key={allergen.id} 
+                  className={`flex items-center justify-between p-3 rounded-lg shadow-sm cursor-pointer transition-colors ${
+                    isSelected 
+                      ? 'bg-gray-200 dark:bg-gray-700 border-2 border-red-500' 
+                      : 'bg-white dark:bg-gray-800 border-2 border-transparent hover:bg-gray-50 dark:hover:bg-gray-750'
+                  }`}
+                  onClick={() => handleToggleAllergen(allergen.id)}
+                >
+                  <div className="flex items-center space-x-3">
+                    <img src={allergen.image} alt={allergen.name} className="w-8 h-8 object-contain" />
+                    <span className="text-lg md:text-xl font-medium text-gray-800 dark:text-gray-200">
+                      {allergen.name}
+                    </span>
+                  </div>
                 </div>
-                <Checkbox
-                  id={allergen.id}
-                  checked={selectedStandardAllergens.includes(allergen.id)}
-                  onCheckedChange={(checked) => handleCheckboxChange(allergen.id, checked as boolean)}
-                  className="w-5 h-5"
-                />
-              </div>
-            ))}
+              );
+            })}
 
-            {/* Custom Allergens (rendered alongside standard allergens, with checkbox and red 'X' in image spot) */}
-            {Object.entries(customAllergens).map(([original, translations_map]) => (
-              <div 
-                key={original}
-                className="flex items-center justify-between p-3 bg-white dark:bg-gray-800 rounded-lg shadow-sm"
-                onClick={(e) => {
-                  // clicking the container should not remove; checkbox handles selection
-                  const target = e.target as HTMLElement;
-                  if (target && (target === e.currentTarget)) {
-                    // toggle selection when user clicks the tile itself
-                    handleCheckboxChange(original, !selectedStandardAllergens.includes(original));
-                  }
-                }}
-              >
-                <div className="flex items-center space-x-3">
-                  {/* Red X box in place of image to remove the custom allergen */}
-                  <button
-                    onClick={(ev) => {
-                      ev.stopPropagation();
-                      handleRemoveAllergen(original);
-                    }}
-                    aria-label={`Remove ${original}`}
-                    className="w-8 h-8 flex items-center justify-center bg-red-600 text-white rounded"
-                    title="Remove custom allergen"
-                  >
-                    <X className="h-4 w-4" />
-                  </button>
+            {/* Custom Allergens */}
+            {Object.entries(customAllergens).map(([original, translations_map]) => {
+              const isSelected = selectedStandardAllergens.includes(original);
+              return (
+                <div 
+                  key={original}
+                  className={`flex items-center justify-between p-3 rounded-lg shadow-sm cursor-pointer transition-colors ${
+                    isSelected 
+                      ? 'bg-gray-200 dark:bg-gray-700 border-2 border-red-500' 
+                      : 'bg-white dark:bg-gray-800 border-2 border-transparent hover:bg-gray-50 dark:hover:bg-gray-750'
+                  }`}
+                  onClick={() => handleToggleAllergen(original)}
+                >
+                  <div className="flex items-center space-x-3">
+                    {/* Red X box to remove the custom allergen */}
+                    <button
+                      onClick={(ev) => {
+                        ev.stopPropagation();
+                        handleRemoveAllergen(original);
+                      }}
+                      aria-label={`Remove ${original}`}
+                      className="w-8 h-8 flex items-center justify-center bg-red-600 text-white rounded hover:bg-red-700 transition-colors"
+                      title="Remove custom allergen"
+                    >
+                      <X className="h-4 w-4" />
+                    </button>
 
-                  <Label className="text-lg md:text-xl font-medium text-gray-800 dark:text-gray-200 ml-2">
-                    {original}
-                  </Label>
+                    <span className="text-lg md:text-xl font-medium text-gray-800 dark:text-gray-200 ml-2">
+                      {original}
+                    </span>
+                  </div>
                 </div>
-
-                <Checkbox
-                  id={original}
-                  checked={selectedStandardAllergens.includes(original)}
-                  onCheckedChange={(checked) => handleCheckboxChange(original, checked as boolean)}
-                  className="w-5 h-5"
-                />
-              </div>
-            ))}
+              );
+            })}
           </div>
 
           {/* Custom Allergen Input - moved below the allergen buttons as its own row */}
