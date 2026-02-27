@@ -251,7 +251,10 @@ const AllergyCard: React.FC<AllergyCardProps> = ({ languageCode, selectedAllerge
         )}
       </div>
 
-      <Link to="/select-allergens" className="absolute bottom-4 left-4 text-sm sm:text-base md:text-lg font-light opacity-80 text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-200 underline">
+      <Link 
+        to="/select-allergens" 
+        className="absolute bottom-4 left-4 text-xs sm:text-sm font-medium bg-gray-400/80 hover:bg-gray-500 text-white px-4 py-2 rounded-full transition-colors z-20"
+      >
         Select Allergen
       </Link>
 
@@ -274,7 +277,10 @@ const AllergyCard: React.FC<AllergyCardProps> = ({ languageCode, selectedAllerge
         </Button>
       </div>
 
-      <Link to="/select-language" className="absolute bottom-4 right-4 text-sm sm:text-base md:text-lg font-light opacity-80 text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-200 underline">
+      <Link 
+        to="/select-language" 
+        className="absolute bottom-4 right-4 text-xs sm:text-sm font-medium bg-gray-400/80 hover:bg-gray-500 text-white px-4 py-2 rounded-full transition-colors z-20"
+      >
         Select Language
       </Link>
     </div>
