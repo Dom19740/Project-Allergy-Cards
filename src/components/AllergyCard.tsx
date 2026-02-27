@@ -20,6 +20,10 @@ const AllergyCard: React.FC<AllergyCardProps> = ({ languageCode, selectedAllerge
   const [customAllergenTranslations, setCustomAllergenTranslations] = useState<{ [key: string]: { [lang: string]: string } }>({});
   const [translatedAllergens, setTranslatedAllergens] = useState<{ [key: string]: string }>({});
   const [isTranslating, setIsTranslating] = useState(false);
+  const [customMessages, setCustomMessages] = useState({
+    iAmAllergicTo: "I can not eat:",
+    theyMakeMeSick: "They make me very sick and I could die"
+  });
   const [translatedUIText, setTranslatedUIText] = useState({
     allergyAlert: "ALLERGY ALERT!",
     iAmAllergicTo: "I can not eat:",
@@ -29,7 +33,7 @@ const AllergyCard: React.FC<AllergyCardProps> = ({ languageCode, selectedAllerge
     theyMakeMeSick: "They make me very sick and I could die"
   });
 
-  // Load custom allergen translations from localStorage
+  // Load custom allergen translations and alert messages from localStorage
   useEffect(() => {
     const storedAllergens = localStorage.getItem('selectedAllergens');
     if (storedAllergens) {
@@ -38,22 +42,35 @@ const AllergyCard: React.FC<AllergyCardProps> = ({ languageCode, selectedAllerge
         const custom = parsed.custom || {};
         setCustomAllergenTranslations(custom);
       } catch (e) {
-        console.error("Failed to parse stored allergens from localStorage", e);
+        console.error("Failed to parse stored allergens", e);
+      }
+    }
+
+    const savedAlert = localStorage.getItem('customAlertMessages');
+    if (savedAlert) {
+      try {
+        const parsed = JSON.parse(savedAlert);
+        setCustomMessages({
+          iAmAllergicTo: parsed.iAmAllergicTo || "I can not eat:",
+          theyMakeMeSick: parsed.theyMakeMeSick || "They make me very sick and I could die"
+        });
+      } catch (e) {
+        console.error("Failed to parse custom alert messages", e);
       }
     }
   }, []);
 
-  // Translate all text when language code changes
+  // Translate all text when language code changes or custom messages change
   useEffect(() => {
     const translateAllContent = async () => {
       if (!languageCode || languageCode === 'en') {
         setTranslatedUIText({
           allergyAlert: "ALLERGY ALERT!",
-          iAmAllergicTo: "I can not eat:",
+          iAmAllergicTo: customMessages.iAmAllergicTo,
           pleaseBeCareful: "Please be careful with my food.",
           thankYou: "Thank you!",
           languageName: "English",
-          theyMakeMeSick: "They make me very sick and I could die"
+          theyMakeMeSick: customMessages.theyMakeMeSick
         });
 
         const allergenTranslations: { [key: string]: string } = {};
@@ -73,11 +90,11 @@ const AllergyCard: React.FC<AllergyCardProps> = ({ languageCode, selectedAllerge
       try {
         const [alert, allergicTo, careful, thankYou, langName, theyMakeMeSick] = await Promise.all([
           translateText("ALLERGY ALERT!", languageCode),
-          translateText("I can not eat:", languageCode),
+          translateText(customMessages.iAmAllergicTo, languageCode),
           translateText("Please be careful with my food.", languageCode),
           translateText("Thank you!", languageCode),
           translateText("English", languageCode),
-          translateText("They make me very sick and I could die", languageCode)
+          translateText(customMessages.theyMakeMeSick, languageCode)
         ]);
 
         setTranslatedUIText({
@@ -112,7 +129,7 @@ const AllergyCard: React.FC<AllergyCardProps> = ({ languageCode, selectedAllerge
     };
 
     translateAllContent();
-  }, [languageCode, selectedAllergens]);
+  }, [languageCode, selectedAllergens, customMessages]);
 
   const handleDownload = async () => {
     if (cardRef.current) {
@@ -165,17 +182,14 @@ const AllergyCard: React.FC<AllergyCardProps> = ({ languageCode, selectedAllerge
     }
   };
 
-  // Create translated allergen list for display
   const translatedAllergenList = selectedAllergens.map(allergen => 
     translatedAllergens[allergen] || allergen
   );
 
-  // Filter selected allergens to only include those with predefined images
   const allergensWithImages = selectedAllergens
     .map(id => ALLERGEN_OPTIONS.find(option => option.id === id))
     .filter(Boolean) as typeof ALLERGEN_OPTIONS;
 
-  // Determine grid classes based on the number of images
   let imageGridClasses = "";
   if (allergensWithImages.length === 1) {
     imageGridClasses = "grid grid-cols-1";
@@ -198,11 +212,10 @@ const AllergyCard: React.FC<AllergyCardProps> = ({ languageCode, selectedAllerge
 
   return (
     <div className="flex flex-col items-center justify-around w-full bg-white text-foreground p-4 sm:p-8 text-center relative overflow-hidden pb-20 flex-grow">
-      {/* This is the container we capture */}
-      <div ref={cardRef} className="flex flex-col items-center justify-center w-full h-full bg-white p-4">
+      <div ref={cardRef} className="flex flex-col items-center justify-center w-full h-full bg-white p-4 relative">
         <div className="absolute inset-0 bg-gradient-to-br from-red-100 via-white to-red-100 dark:from-red-950 dark:via-gray-900 dark:to-red-950 opacity-75"></div>
         
-        <h1 className="relative z-10 text-3xl sm:text-4xl md:text-5xl font-extrabold leading-tight mb-4 text-red-600 dark:text-red-400">
+        <h1 className="relative z-10 text-3xl sm:text-4xl md:text-5xl font-extrabold leading-tight mb-8 text-red-600 dark:text-red-400">
           {translatedUIText.allergyAlert}
         </h1>
         
@@ -229,7 +242,6 @@ const AllergyCard: React.FC<AllergyCardProps> = ({ languageCode, selectedAllerge
           {translatedUIText.thankYou}
         </p>
 
-        {/* Allergen Images with No Entry Overlay */}
         {allergensWithImages.length > 0 && (
           <div className="relative z-10 w-full max-w-[350px] max-h-[350px] aspect-square mx-auto my-4">
             <div className={`absolute inset-0 ${imageGridClasses} gap-1 p-1`}>
@@ -262,7 +274,6 @@ const AllergyCard: React.FC<AllergyCardProps> = ({ languageCode, selectedAllerge
         <Button
           onClick={handleShare}
           disabled={isSharing}
-          aria-label="Share card"
           className="bg-green-600 text-white hover:bg-green-700 w-10 h-10 p-0 rounded flex items-center justify-center"
         >
           {isSharing ? <Loader2 className="h-5 w-5 animate-spin" /> : <Share2 className="h-5 w-5" />}
@@ -270,7 +281,6 @@ const AllergyCard: React.FC<AllergyCardProps> = ({ languageCode, selectedAllerge
         <Button
           onClick={handleDownload}
           disabled={isDownloading}
-          aria-label="Download card"
           className="bg-blue-600 text-white hover:bg-blue-700 w-10 h-10 p-0 rounded flex items-center justify-center"
         >
           {isDownloading ? <Loader2 className="h-5 w-5 animate-spin" /> : <Download className="h-5 w-5" />}
