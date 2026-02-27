@@ -3,7 +3,7 @@ import { Link } from 'react-router-dom';
 import { toPng } from 'html-to-image';
 import { Button } from '@/components/ui/button';
 import { toast } from 'sonner';
-import { Share2, Download, Loader2 } from 'lucide-react';
+import { Share2, Download, Loader2, Edit } from 'lucide-react';
 import { LanguageCode } from '@/lib/types';
 import { ALLERGEN_OPTIONS } from '@/lib/allergens';
 import { translateText } from '@/lib/translator';
@@ -216,11 +216,11 @@ const AllergyCard: React.FC<AllergyCardProps> = ({ languageCode, selectedAllerge
         <h1 className="relative z-10 text-3xl sm:text-4xl md:text-5xl font-extrabold leading-tight mb-8 text-red-600 dark:text-red-400">
           {translatedUIText.allergyAlert}
         </h1>
-        
+
         <p className="relative z-10 text-xl sm:text-2xl md:text-3xl font-medium text-gray-700 dark:text-gray-300 mb-4">
           {translatedUIText.iAmAllergicTo}
         </p>
-        
+
         <div className="relative z-10 flex flex-wrap justify-center gap-2 mb-4">
           {translatedAllergenList.map((allergen, index) => (
             <span
@@ -244,52 +244,52 @@ const AllergyCard: React.FC<AllergyCardProps> = ({ languageCode, selectedAllerge
           <div className="relative z-10 w-full max-w-[350px] max-h-[350px] aspect-square mx-auto my-4">
             <div className={`absolute inset-0 ${imageGridClasses} gap-1 p-1`}>
               {allergensWithImages.map((allergen) => (
-                <img 
+                <img
                   key={allergen.id}
-                  src={allergen.image} 
-                  alt={allergen.name} 
-                  className="w-full h-full object-contain" 
+                  src={allergen.image}
+                  alt={allergen.name}
+                  className="w-full h-full object-contain"
                 />
               ))}
             </div>
-            <img 
-              src="/noentry.png" 
-              alt="No entry" 
+            <img
+              src="/noentry.png"
+              alt="No entry"
               className="absolute inset-0 w-full h-full object-contain z-10"
             />
           </div>
         )}
       </div>
 
-      <Link 
-        to="/select-allergens" 
+      <Link
+        to="/select-allergens"
         className="absolute bottom-4 left-4 text-xs sm:text-sm font-medium bg-gray-400/80 hover:bg-gray-500 text-white px-4 py-2 rounded-full transition-colors z-20"
       >
-        Select Allergen
+        <Edit className="inline-block w-4 h-4 mr-1" /> Allergen
       </Link>
 
       <div className="absolute bottom-4 left-1/2 transform -translate-x-1/2 flex space-x-2 z-20">
         <Button
           onClick={handleShare}
           disabled={isSharing}
-          className="bg-green-600 text-white hover:bg-green-700 w-10 h-10 p-0 rounded flex items-center justify-center"
+          className="bg-green-600 text-white hover:bg-green-700 w-8 h-8 p-0 rounded flex items-center justify-center"
         >
-          {isSharing ? <Loader2 className="h-5 w-5 animate-spin" /> : <Share2 className="h-5 w-5" />}
+          {isSharing ? <Loader2 className="h-4 w-4 animate-spin" /> : <Share2 className="h-4 w-4" />}
         </Button>
         <Button
           onClick={handleDownload}
           disabled={isDownloading}
-          className="bg-blue-600 text-white hover:bg-blue-700 w-10 h-10 p-0 rounded flex items-center justify-center"
+          className="bg-blue-600 text-white hover:bg-blue-700 w-8 h-8 p-0 rounded flex items-center justify-center"
         >
-          {isDownloading ? <Loader2 className="h-5 w-5 animate-spin" /> : <Download className="h-5 w-5" />}
+          {isDownloading ? <Loader2 className="h-4 w-4 animate-spin" /> : <Download className="h-4 w-4" />}
         </Button>
       </div>
 
-      <Link 
-        to="/select-language" 
+      <Link
+        to="/select-language"
         className="absolute bottom-4 right-4 text-xs sm:text-sm font-medium bg-gray-400/80 hover:bg-gray-500 text-white px-4 py-2 rounded-full transition-colors z-20"
       >
-        Select Language
+        <Edit className="inline-block w-4 h-4 mr-1" /> Language
       </Link>
     </div>
   );
