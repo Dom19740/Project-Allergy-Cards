@@ -335,6 +335,9 @@ const AllergyCard: React.FC<AllergyCardProps> = ({ languageCode, selectedAllerge
         {isSharing ? <Loader2 className="h-3 w-3 animate-spin" /> : <Share2 className="h-3 w-3" />}
       </Button>
 
+
+      
+
       <Link to="/select-language" className="absolute bottom-4 right-4 text-sm sm:text-base md:text-lg font-light opacity-80 text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-200 underline">
         Select Language
       </Link>
