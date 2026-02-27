@@ -23,13 +23,9 @@ const LanguageSelectionPage = () => {
     (async () => {
       const langs = await getAllGoogleLanguages();
       if (!mounted) return;
-      
-      // Explicitly sort by name to ensure alphabetical order in the UI
-      const sortedLangs = [...langs].sort((a, b) => a.name.localeCompare(b.name));
-      setSupportedLanguages(sortedLangs);
-      
+      setSupportedLanguages(langs);
       // If current selection isn't in list, keep 'en' as default
-      const hasSelected = sortedLangs.some(l => l.code === selectedLanguageCode);
+      const hasSelected = langs.some(l => l.code === selectedLanguageCode);
       if (!hasSelected) setSelectedLanguageCode("en");
     })();
     return () => { mounted = false; };
@@ -45,8 +41,6 @@ const LanguageSelectionPage = () => {
     }
   };
 
-  const selectedLanguage = supportedLanguages.find(l => l.code === selectedLanguageCode);
-
   return (
     <div className="flex flex-col min-h-screen bg-gray-100 dark:bg-gray-900">
       <FixedHeader />
@@ -61,13 +55,7 @@ const LanguageSelectionPage = () => {
                 <SelectTrigger
                   className="w-full py-4 text-lg md:text-xl h-auto bg-white text-gray-900 hover:bg-gray-50 border border-red-600 dark:border-red-500 mx-[0px]"
                 >
-                  <div className="flex items-center">
-                    {selectedLanguage ? (
-                      <span>{selectedLanguage.name} ({selectedLanguage.code})</span>
-                    ) : (
-                      <SelectValue placeholder={translatedTitle} />
-                    )}
-                  </div>
+                  <SelectValue placeholder={translatedTitle} />
                 </SelectTrigger>
                 <SelectContent className="bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-50 max-h-[50vh]">
                   {(supportedLanguages.length ? supportedLanguages : [{ code: "en", name: "English" }]).map((lang) => (
@@ -76,7 +64,7 @@ const LanguageSelectionPage = () => {
                       value={lang.code}
                       className="py-3 text-lg md:text-xl cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-700"
                     >
-                      {lang.name}
+                      {lang.name} ({lang.code})
                     </SelectItem>
                   ))}
                 </SelectContent>
