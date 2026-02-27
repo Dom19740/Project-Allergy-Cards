@@ -182,17 +182,14 @@ const AllergyCard: React.FC<AllergyCardProps> = ({ languageCode, selectedAllerge
     }
   };
 
-  // Create translated allergen list for display
   const translatedAllergenList = selectedAllergens.map(allergen => 
     translatedAllergens[allergen] || allergen
   );
 
-  // Filter selected allergens to only include those with predefined images
   const allergensWithImages = selectedAllergens
     .map(id => ALLERGEN_OPTIONS.find(option => option.id === id))
     .filter(Boolean) as typeof ALLERGEN_OPTIONS;
 
-  // Determine grid classes based on the number of images
   let imageGridClasses = "";
   if (allergensWithImages.length === 1) {
     imageGridClasses = "grid grid-cols-1";
@@ -215,8 +212,7 @@ const AllergyCard: React.FC<AllergyCardProps> = ({ languageCode, selectedAllerge
 
   return (
     <div className="flex flex-col items-center justify-around w-full bg-white text-foreground p-4 sm:p-8 text-center relative overflow-hidden pb-20 flex-grow">
-      {/* This is the container we capture */}
-      <div ref={cardRef} className="flex flex-col items-center justify-center w-full h-full bg-white p-4">
+      <div ref={cardRef} className="flex flex-col items-center justify-center w-full h-full bg-white p-4 relative">
         <div className="absolute inset-0 bg-gradient-to-br from-red-100 via-white to-red-100 dark:from-red-950 dark:via-gray-900 dark:to-red-950 opacity-75"></div>
         
         <h1 className="relative z-10 text-3xl sm:text-4xl md:text-5xl font-extrabold leading-tight mb-8 text-red-600 dark:text-red-400">
@@ -246,7 +242,6 @@ const AllergyCard: React.FC<AllergyCardProps> = ({ languageCode, selectedAllerge
           {translatedUIText.thankYou}
         </p>
 
-        {/* Allergen Images with No Entry Overlay */}
         {allergensWithImages.length > 0 && (
           <div className="relative z-10 w-full max-w-[350px] max-h-[350px] aspect-square mx-auto my-4">
             <div className={`absolute inset-0 ${imageGridClasses} gap-1 p-1`}>
@@ -279,7 +274,6 @@ const AllergyCard: React.FC<AllergyCardProps> = ({ languageCode, selectedAllerge
         <Button
           onClick={handleShare}
           disabled={isSharing}
-          aria-label="Share card"
           className="bg-green-600 text-white hover:bg-green-700 w-10 h-10 p-0 rounded flex items-center justify-center"
         >
           {isSharing ? <Loader2 className="h-5 w-5 animate-spin" /> : <Share2 className="h-5 w-5" />}
@@ -287,7 +281,6 @@ const AllergyCard: React.FC<AllergyCardProps> = ({ languageCode, selectedAllerge
         <Button
           onClick={handleDownload}
           disabled={isDownloading}
-          aria-label="Download card"
           className="bg-blue-600 text-white hover:bg-blue-700 w-10 h-10 p-0 rounded flex items-center justify-center"
         >
           {isDownloading ? <Loader2 className="h-5 w-5 animate-spin" /> : <Download className="h-5 w-5" />}
