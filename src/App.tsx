@@ -23,7 +23,7 @@ const App = () => (
           <Route path="/select-allergens" element={<AllergenSelectionPage />} />
           <Route path="/select-language" element={<LanguageSelectionPage />} />
           <Route path="/alert/:langCode" element={<AllergyAlertPage />} />
-          <Route path="/page-template" element={<PageTemplate />} /> {/* New route for PageTemplate */}
+          <Route path="/page-template" element={<PageTemplate />} />
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<NotFound />} />
         </Routes>
