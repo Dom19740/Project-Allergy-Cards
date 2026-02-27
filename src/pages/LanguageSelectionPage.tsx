@@ -41,6 +41,8 @@ const LanguageSelectionPage = () => {
     }
   };
 
+  const selectedLanguage = supportedLanguages.find(l => l.code === selectedLanguageCode);
+
   return (
     <div className="flex flex-col min-h-screen bg-gray-100 dark:bg-gray-900">
       <FixedHeader />
@@ -55,7 +57,13 @@ const LanguageSelectionPage = () => {
                 <SelectTrigger
                   className="w-full py-4 text-lg md:text-xl h-auto bg-white text-gray-900 hover:bg-gray-50 border border-red-600 dark:border-red-500 mx-[0px]"
                 >
-                  <SelectValue placeholder={translatedTitle} />
+                  <div className="flex items-center">
+                    {selectedLanguage ? (
+                      <span>{selectedLanguage.name} ({selectedLanguage.code})</span>
+                    ) : (
+                      <SelectValue placeholder={translatedTitle} />
+                    )}
+                  </div>
                 </SelectTrigger>
                 <SelectContent className="bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-50 max-h-[50vh]">
                   {(supportedLanguages.length ? supportedLanguages : [{ code: "en", name: "English" }]).map((lang) => (
@@ -64,7 +72,7 @@ const LanguageSelectionPage = () => {
                       value={lang.code}
                       className="py-3 text-lg md:text-xl cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-700"
                     >
-                      {lang.name} ({lang.code})
+                      {lang.name}
                     </SelectItem>
                   ))}
                 </SelectContent>
