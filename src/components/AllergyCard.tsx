@@ -223,8 +223,8 @@ const AllergyCard: React.FC<AllergyCardProps> = ({ languageCode, selectedAllerge
         document.body.removeChild(link);
         toast.success('Card downloaded');
         return;
-      } catch (e) {
-        console.error('[Share] Download fallback failed:', e);
+      } catch (error) {
+        console.error('[Share] Download fallback failed:', error);
         toast.error('Unable to share. Try again.');
       }
     } catch (error) {
@@ -240,22 +240,13 @@ const AllergyCard: React.FC<AllergyCardProps> = ({ languageCode, selectedAllerge
     translatedAllergens[allergen] || allergen
   );
 
-  // Create the title and body using translated text
-  const title = translatedUIText.allergyAlert;
-  const body = `${translatedUIText.iAmAllergicTo} ${translatedAllergenList.join(', ')}.`;
-
-  // Filter selected allergens to only include those with predefined images
-  const allergensWithImages = selectedAllergens
-    .map(id => ALLERGEN_OPTIONS.find(option => option.id === id))
-    .filter(Boolean) as typeof ALLERGEN_OPTIONS;
-
   // Determine grid classes based on the number of images
   let imageGridClasses = "";
-  if (allergensWithImages.length === 1) {
+  if (translatedAllergenList.length === 1) {
     imageGridClasses = "grid grid-cols-1";
-  } else if (allergensWithImages.length >= 2 && allergensWithImages.length <= 4) {
+  } else if (translatedAllergenList.length >= 2 && translatedAllergenList.length <= 4) {
     imageGridClasses = "grid grid-cols-2";
-  } else if (allergensWithImages.length >= 5) {
+  } else if (translatedAllergenList.length >= 5) {
     imageGridClasses = "grid grid-cols-3";
   }
 
@@ -302,14 +293,14 @@ const AllergyCard: React.FC<AllergyCardProps> = ({ languageCode, selectedAllerge
       </p>
 
       {/* Allergen Images with No Entry Overlay */}
-      {allergensWithImages.length > 0 && (
+      {translatedAllergenList.length > 0 && (
         <div className="relative z-10 w-full max-w-[350px] max-h-[350px] aspect-square mx-auto my-4">
           <div className={`absolute inset-0 ${imageGridClasses} gap-1 p-1`}>
-            {allergensWithImages.map((allergen) => (
+            {translatedAllergenList.map((allergen) => (
               <img 
-                key={allergen.id}
-                src={allergen.image} 
-                alt={allergen.name} 
+                key={allergen}
+                src={allergen} 
+                alt={allergen} 
                 className="w-full h-full object-contain" 
               />
             ))}
