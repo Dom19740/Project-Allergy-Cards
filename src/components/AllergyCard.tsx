@@ -20,6 +20,10 @@ const AllergyCard: React.FC<AllergyCardProps> = ({ languageCode, selectedAllerge
   const [customAllergenTranslations, setCustomAllergenTranslations] = useState<{ [key: string]: { [lang: string]: string } }>({});
   const [translatedAllergens, setTranslatedAllergens] = useState<{ [key: string]: string }>({});
   const [isTranslating, setIsTranslating] = useState(false);
+  const [customMessages, setCustomMessages] = useState({
+    iAmAllergicTo: "I can not eat:",
+    theyMakeMeSick: "They make me very sick and I could die"
+  });
   const [translatedUIText, setTranslatedUIText] = useState({
     allergyAlert: "ALLERGY ALERT!",
     iAmAllergicTo: "I can not eat:",
@@ -29,7 +33,7 @@ const AllergyCard: React.FC<AllergyCardProps> = ({ languageCode, selectedAllerge
     theyMakeMeSick: "They make me very sick and I could die"
   });
 
-  // Load custom allergen translations from localStorage
+  // Load custom allergen translations and alert messages from localStorage
   useEffect(() => {
     const storedAllergens = localStorage.getItem('selectedAllergens');
     if (storedAllergens) {
@@ -38,22 +42,35 @@ const AllergyCard: React.FC<AllergyCardProps> = ({ languageCode, selectedAllerge
         const custom = parsed.custom || {};
         setCustomAllergenTranslations(custom);
       } catch (e) {
-        console.error("Failed to parse stored allergens from localStorage", e);
+        console.error("Failed to parse stored allergens", e);
+      }
+    }
+
+    const savedAlert = localStorage.getItem('customAlertMessages');
+    if (savedAlert) {
+      try {
+        const parsed = JSON.parse(savedAlert);
+        setCustomMessages({
+          iAmAllergicTo: parsed.iAmAllergicTo || "I can not eat:",
+          theyMakeMeSick: parsed.theyMakeMeSick || "They make me very sick and I could die"
+        });
+      } catch (e) {
+        console.error("Failed to parse custom alert messages", e);
       }
     }
   }, []);
 
-  // Translate all text when language code changes
+  // Translate all text when language code changes or custom messages change
   useEffect(() => {
     const translateAllContent = async () => {
       if (!languageCode || languageCode === 'en') {
         setTranslatedUIText({
           allergyAlert: "ALLERGY ALERT!",
-          iAmAllergicTo: "I can not eat:",
+          iAmAllergicTo: customMessages.iAmAllergicTo,
           pleaseBeCareful: "Please be careful with my food.",
           thankYou: "Thank you!",
           languageName: "English",
-          theyMakeMeSick: "They make me very sick and I could die"
+          theyMakeMeSick: customMessages.theyMakeMeSick
         });
 
         const allergenTranslations: { [key: string]: string } = {};
@@ -73,11 +90,11 @@ const AllergyCard: React.FC<AllergyCardProps> = ({ languageCode, selectedAllerge
       try {
         const [alert, allergicTo, careful, thankYou, langName, theyMakeMeSick] = await Promise.all([
           translateText("ALLERGY ALERT!", languageCode),
-          translateText("I can not eat:", languageCode),
+          translateText(customMessages.iAmAllergicTo, languageCode),
           translateText("Please be careful with my food.", languageCode),
           translateText("Thank you!", languageCode),
           translateText("English", languageCode),
-          translateText("They make me very sick and I could die", languageCode)
+          translateText(customMessages.theyMakeMeSick, languageCode)
         ]);
 
         setTranslatedUIText({
@@ -112,7 +129,7 @@ const AllergyCard: React.FC<AllergyCardProps> = ({ languageCode, selectedAllerge
     };
 
     translateAllContent();
-  }, [languageCode, selectedAllergens]);
+  }, [languageCode, selectedAllergens, customMessages]);
 
   const handleDownload = async () => {
     if (cardRef.current) {
@@ -202,11 +219,11 @@ const AllergyCard: React.FC<AllergyCardProps> = ({ languageCode, selectedAllerge
       <div ref={cardRef} className="flex flex-col items-center justify-center w-full h-full bg-white p-4">
         <div className="absolute inset-0 bg-gradient-to-br from-red-100 via-white to-red-100 dark:from-red-950 dark:via-gray-900 dark:to-red-950 opacity-75"></div>
         
-        <h1 className="relative z-10 text-3xl sm:text-4xl md:text-5xl font-extrabold leading-tight mb-4 text-red-600 dark:text-red-400">
+        <h1 className="relative z-10 text-3xl sm:text-4xl md:text-5xl font-extrabold leading-tight mb-8 text-red-600 dark:text-red-400">
           {translatedUIText.allergyAlert}
         </h1>
         
-        <p className="relative z-10 text-xl sm:text-2xl md:text-3xl font-medium text-gray-700 dark:text-gray-300 mb-4">
+        <p className="relative z-10 text-xl sm:text-2xl md:text-3xl font-medium text-gray-700 dark:text-gray-300 mb-2">
           {translatedUIText.iAmAllergicTo}
         </p>
         

@@ -8,6 +8,7 @@ import NotFound from "./pages/NotFound";
 import LanguageSelectionPage from "./pages/LanguageSelectionPage";
 import AllergyAlertPage from "./pages/AllergyAlertPage";
 import AllergenSelectionPage from "./pages/AllergenSelectionPage";
+import SelectAlertPage from "./pages/SelectAlertPage";
 import PageTemplate from "./pages/PageTemplate";
 import { usePreloadImages } from "./hooks/usePreloadImages";
 
@@ -20,6 +21,7 @@ const AppContent = () => {
     <Routes>
       <Route path="/" element={<Home />} />
       <Route path="/select-allergens" element={<AllergenSelectionPage />} />
+      <Route path="/select-alert" element={<SelectAlertPage />} />
       <Route path="/select-language" element={<LanguageSelectionPage />} />
       <Route path="/alert/:langCode" element={<AllergyAlertPage />} />
       <Route path="/page-template" element={<PageTemplate />} />
