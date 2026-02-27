@@ -8,9 +8,25 @@ import NotFound from "./pages/NotFound";
 import LanguageSelectionPage from "./pages/LanguageSelectionPage";
 import AllergyAlertPage from "./pages/AllergyAlertPage";
 import AllergenSelectionPage from "./pages/AllergenSelectionPage";
-import PageTemplate from "./pages/PageTemplate"; // Import the new PageTemplate
+import PageTemplate from "./pages/PageTemplate";
+import { usePreloadImages } from "./hooks/usePreloadImages";
 
 const queryClient = new QueryClient();
+
+const AppContent = () => {
+  usePreloadImages();
+  
+  return (
+    <Routes>
+      <Route path="/" element={<Home />} />
+      <Route path="/select-allergens" element={<AllergenSelectionPage />} />
+      <Route path="/select-language" element={<LanguageSelectionPage />} />
+      <Route path="/alert/:langCode" element={<AllergyAlertPage />} />
+      <Route path="/page-template" element={<PageTemplate />} />
+      <Route path="*" element={<NotFound />} />
+    </Routes>
+  );
+};
 
 const App = () => (
   <QueryClientProvider client={queryClient}>
@@ -18,15 +34,7 @@ const App = () => (
       <Toaster />
       <Sonner />
       <BrowserRouter>
-        <Routes>
-          <Route path="/" element={<Home />} />
-          <Route path="/select-allergens" element={<AllergenSelectionPage />} />
-          <Route path="/select-language" element={<LanguageSelectionPage />} />
-          <Route path="/alert/:langCode" element={<AllergyAlertPage />} />
-          <Route path="/page-template" element={<PageTemplate />} />
-          {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
-          <Route path="*" element={<NotFound />} />
-        </Routes>
+        <AppContent />
       </BrowserRouter>
     </TooltipProvider>
   </QueryClientProvider>
