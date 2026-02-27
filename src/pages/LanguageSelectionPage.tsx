@@ -23,9 +23,13 @@ const LanguageSelectionPage = () => {
     (async () => {
       const langs = await getAllGoogleLanguages();
       if (!mounted) return;
-      setSupportedLanguages(langs);
+      
+      // Explicitly sort by name to ensure alphabetical order in the UI
+      const sortedLangs = [...langs].sort((a, b) => a.name.localeCompare(b.name));
+      setSupportedLanguages(sortedLangs);
+      
       // If current selection isn't in list, keep 'en' as default
-      const hasSelected = langs.some(l => l.code === selectedLanguageCode);
+      const hasSelected = sortedLangs.some(l => l.code === selectedLanguageCode);
       if (!hasSelected) setSelectedLanguageCode("en");
     })();
     return () => { mounted = false; };
