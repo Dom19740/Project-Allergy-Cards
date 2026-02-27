@@ -94,9 +94,18 @@ const AllergenSelectionPage = () => {
       <div className="flex flex-col flex-grow w-full max-w-2xl mx-auto px-4 pt-[126px]">
         <div className="flex-grow overflow-y-auto">
           <div className="flex flex-col items-center text-center space-y-3">
-            <h2 className="text-xl sm:text-2xl font-bold text-gray-700 dark:text-gray-200">
-              Select Allergens
-            </h2>
+            <div className="flex items-center space-x-2">
+              <button
+                onClick={() => navigate(-1)}
+                className="text-gray-600 dark:text-gray-300 hover:text-gray-800 dark:hover:text-gray-100"
+                aria-label="Go back"
+              >
+                ←
+              </button>
+              <h2 className="text-xl sm:text-2xl font-bold text-gray-700 dark:text-gray-200">
+                Select Allergens
+              </h2>
+            </div>
             
             <div className="grid grid-cols-2 gap-2 sm:gap-3 w-full">
               {ALLERGEN_OPTIONS.map((allergen) => (
