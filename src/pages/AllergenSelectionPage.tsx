@@ -3,27 +3,18 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
-import { Checkbox } from '@/components/ui/checkbox';
 import { Label } from '@/components/ui/label';
 import { Input } from '@/components/ui/input';
 import { toast } from 'sonner';
-import { X, Loader2 } from 'lucide-react';
+import { X } from 'lucide-react';
 import { ALLERGEN_OPTIONS } from '@/lib/allergens';
-import { translateText, getSupportedLanguages } from '@/lib/translator';
 import FixedHeader from '@/components/FixedHeader';
 
 const AllergenSelectionPage = () => {
   const navigate = useNavigate();
   const [selectedStandardAllergens, setSelectedStandardAllergens] = useState<string[]>([]);
-  const [customAllergens, setCustomAllergens] = useState<{ [key: string]: { [lang: string]: string } }>({});
+  const [customAllergens, setCustomAllergens] = useState<string[]>([]);
   const [customAllergenInput, setCustomAllergenInput] = useState<string>('');
-  const [isTranslating, setIsTranslating] = useState<boolean>(false);
-  const [translatedTitle, setTranslatedTitle] = useState("Select Allergens");
-  const [translatedContinue, setTranslatedContinue] = useState("Continue");
-  const [translatedAdd, setTranslatedAdd] = useState("Add");
-  const [translatedPlaceholder, setTranslatedPlaceholder] = useState("Add your own allergen");
-  const [currentLanguage, setCurrentLanguage] = useState<string>("en");
-  const [supportedLanguageCodes, setSupportedLanguageCodes] = useState<string[]>([]);
 
   // Load selected allergens from local storage on mount
   useEffect(() => {
@@ -31,68 +22,25 @@ const AllergenSelectionPage = () => {
     if (storedAllergens) {
       try {
         const parsed = JSON.parse(storedAllergens);
-        const standard = parsed.standard || [];
-        const custom = parsed.custom || {};
-        setSelectedStandardAllergens(standard);
-        setCustomAllergens(custom);
+        // Support both old and new storage formats
+        if (parsed.standard) {
+          setSelectedStandardAllergens(parsed.standard || []);
+          // If custom was an object of translations, just take the keys
+          const customData = parsed.custom || {};
+          setCustomAllergens(Array.isArray(customData) ? customData : Object.keys(customData));
+        } else if (Array.isArray(parsed)) {
+          // Fallback for very old format
+          const standardIds = ALLERGEN_OPTIONS.map(o => o.id);
+          setSelectedStandardAllergens(parsed.filter(id => standardIds.includes(id)));
+          setCustomAllergens(parsed.filter(id => !standardIds.includes(id)));
+        }
       } catch (e) {
         console.error("Failed to parse stored allergens from localStorage", e);
-        localStorage.removeItem('selectedAllergens');
       }
     }
   }, []);
 
-  // Load supported language codes for translating custom allergens
-  useEffect(() => {
-    let mounted = true;
-    (async () => {
-      try {
-        const langs = await getSupportedLanguages();
-        if (!mounted) return;
-        setSupportedLanguageCodes(langs.map(l => l.code));
-      } catch (e) {
-        console.error('Failed to load supported languages', e);
-        setSupportedLanguageCodes(['en']);
-      }
-    })();
-    return () => { mounted = false; };
-  }, []);
-
-  // Load current language from localStorage and translate interface
-  useEffect(() => {
-    const loadLanguageAndTranslate = async () => {
-      const storedLang = localStorage.getItem('selectedLanguage') || 'en';
-      setCurrentLanguage(storedLang);
-
-      if (storedLang === 'en') {
-        setTranslatedTitle("Select Allergens");
-        setTranslatedContinue("Continue");
-        setTranslatedAdd("Add");
-        setTranslatedPlaceholder("Add your own allergen");
-        return;
-      }
-
-      try {
-        const [title, continueBtn, addBtn, placeholder] = await Promise.all([
-          translateText("Select Allergens", storedLang),
-          translateText("Continue", storedLang),
-          translateText("Add", storedLang),
-          translateText("Add your own allergen", storedLang),
-        ]);
-
-        setTranslatedTitle(title);
-        setTranslatedContinue(continueBtn);
-        setTranslatedAdd(addBtn);
-        setTranslatedPlaceholder(placeholder);
-      } catch (error) {
-        console.error('Interface translation failed:', error);
-      }
-    };
-
-    loadLanguageAndTranslate();
-  }, []);
-
-  const handleToggleAllergen = (allergenId: string) => {
+  const handleToggleStandardAllergen = (allergenId: string) => {
     setSelectedStandardAllergens(prev => 
       prev.includes(allergenId) 
         ? prev.filter(id => id !== allergenId)
@@ -100,85 +48,54 @@ const AllergenSelectionPage = () => {
     );
   };
 
-  const handleAddCustomAllergen = async () => {
+  const handleAddCustomAllergen = () => {
     const trimmedInput = customAllergenInput.trim();
     if (!trimmedInput) {
       toast.error("Custom allergen cannot be empty.");
       return;
     }
 
-    const allSelected = [...selectedStandardAllergens, ...Object.keys(customAllergens)];
-    if (allSelected.some(allergen => allergen.toLowerCase() === trimmedInput.toLowerCase())) {
-      toast.warning("This allergen is already added.");
+    if (
+      ALLERGEN_OPTIONS.some(opt => opt.name.toLowerCase() === trimmedInput.toLowerCase()) ||
+      customAllergens.some(allergen => allergen.toLowerCase() === trimmedInput.toLowerCase())
+    ) {
+      toast.warning("This allergen is already in your list.");
       return;
     }
 
-    setIsTranslating(true);
-    const newCustomAllergens = { ...customAllergens };
-    newCustomAllergens[trimmedInput] = { en: trimmedInput }; // Store original as English
-
-    try {
-      // Translate for all supported languages
-      const langsToUse = supportedLanguageCodes.length ? supportedLanguageCodes : ['en'];
-      for (const lang of langsToUse) {
-        if (lang === 'en') continue; // Skip English as it's our source
-        newCustomAllergens[trimmedInput][lang] = await translateText(trimmedInput, lang);
-      }
-      setCustomAllergens(newCustomAllergens);
-      // Mark custom allergen as selected by default
-      setSelectedStandardAllergens(prev => [...prev, trimmedInput]);
-      toast.success(`"${trimmedInput}" added and translated.`);
-    } catch (error) {
-      console.error('Failed to translate custom allergen:', error);
-      toast.error("Failed to translate. Please try again.");
-    } finally {
-      setIsTranslating(false);
-      setCustomAllergenInput('');
-    }
+    setCustomAllergens(prev => [...prev, trimmedInput]);
+    setCustomAllergenInput('');
+    toast.success(`"${trimmedInput}" added.`);
   };
 
-  const handleRemoveAllergen = (allergenToRemove: string) => {
-    let updatedStandard = [...selectedStandardAllergens];
-    let updatedCustom = { ...customAllergens };
-    
-    const isStandard = ALLERGEN_OPTIONS.some(opt => opt.id === allergenToRemove);
-
-    if (isStandard) {
-      updatedStandard = updatedStandard.filter(id => id !== allergenToRemove);
-    } else {
-      // Remove custom allergen entry and also ensure it's removed from selection
-      delete updatedCustom[allergenToRemove];
-      updatedStandard = updatedStandard.filter(id => id !== allergenToRemove);
-    }
-    
-    setSelectedStandardAllergens(updatedStandard);
-    setCustomAllergens(updatedCustom);
+  const handleRemoveCustomAllergen = (allergenToRemove: string) => {
+    setCustomAllergens(prev => prev.filter(id => id !== allergenToRemove));
     toast.info(`"${allergenToRemove}" removed.`);
   };
 
   const handleContinue = () => {
-    const allSelected = [...selectedStandardAllergens];
-    if (allSelected.length === 0) {
+    if (selectedStandardAllergens.length === 0 && customAllergens.length === 0) {
       toast.error("Please select at least one allergen.");
       return;
     }
-    const dataToStore = { standard: selectedStandardAllergens, custom: customAllergens };
+    
+    // Save to localStorage - AllergyCard will handle the translation of these strings
+    const dataToStore = { 
+      standard: selectedStandardAllergens, 
+      custom: customAllergens 
+    };
     localStorage.setItem('selectedAllergens', JSON.stringify(dataToStore));
     navigate('/select-language');
   };
-
-  // Combine standard and custom allergens for rendering
-  const selectedStandardAllergenObjects = ALLERGEN_OPTIONS.filter(option => selectedStandardAllergens.includes(option.id));
 
   return (
     <div className="flex flex-col min-h-screen bg-gray-100 dark:bg-gray-900">
       <FixedHeader />
       
-      {/* Main Content Wrapper */}
       <div className="flex flex-col flex-grow w-full max-w-2xl mx-auto px-4 pt-[126px] overflow-y-auto">
         <div className="flex flex-col items-center text-center space-y-4 scale-[0.95]">
           <h2 className="text-2xl md:text-3xl font-bold text-gray-700 dark:text-gray-200">
-            {translatedTitle}
+            Select Allergens
           </h2>
           
           <div className="grid grid-cols-2 gap-4 w-full">
@@ -193,7 +110,7 @@ const AllergenSelectionPage = () => {
                       ? 'bg-gray-200 dark:bg-gray-700 border-2 border-red-500' 
                       : 'bg-white dark:bg-gray-800 border-2 border-transparent hover:bg-gray-50 dark:hover:bg-gray-750'
                   }`}
-                  onClick={() => handleToggleAllergen(allergen.id)}
+                  onClick={() => handleToggleStandardAllergen(allergen.id)}
                 >
                   <div className="flex items-center space-x-3">
                     <img src={allergen.image} alt={allergen.name} className="w-8 h-8 object-contain" />
@@ -206,47 +123,31 @@ const AllergenSelectionPage = () => {
             })}
 
             {/* Custom Allergens */}
-            {Object.entries(customAllergens).map(([original, translations_map]) => {
-              const isSelected = selectedStandardAllergens.includes(original);
-              return (
-                <div 
-                  key={original}
-                  className={`flex items-center justify-between p-3 rounded-lg shadow-sm cursor-pointer transition-colors ${
-                    isSelected 
-                      ? 'bg-gray-200 dark:bg-gray-700 border-2 border-red-500' 
-                      : 'bg-white dark:bg-gray-800 border-2 border-transparent hover:bg-gray-50 dark:hover:bg-gray-750'
-                  }`}
-                  onClick={() => handleToggleAllergen(original)}
-                >
-                  <div className="flex items-center space-x-3">
-                    {/* Red X box to remove the custom allergen */}
-                    <button
-                      onClick={(ev) => {
-                        ev.stopPropagation();
-                        handleRemoveAllergen(original);
-                      }}
-                      aria-label={`Remove ${original}`}
-                      className="w-8 h-8 flex items-center justify-center bg-red-600 text-white rounded hover:bg-red-700 transition-colors"
-                      title="Remove custom allergen"
-                    >
-                      <X className="h-4 w-4" />
-                    </button>
-
-                    <span className="text-lg md:text-xl font-medium text-gray-800 dark:text-gray-200 ml-2">
-                      {original}
-                    </span>
-                  </div>
+            {customAllergens.map((allergen) => (
+              <div 
+                key={allergen}
+                className="flex items-center justify-between p-3 rounded-lg shadow-sm bg-gray-200 dark:bg-gray-700 border-2 border-red-500"
+              >
+                <div className="flex items-center space-x-3">
+                  <button
+                    onClick={() => handleRemoveCustomAllergen(allergen)}
+                    className="w-8 h-8 flex items-center justify-center bg-red-600 text-white rounded hover:bg-red-700 transition-colors"
+                  >
+                    <X className="h-4 w-4" />
+                  </button>
+                  <span className="text-lg md:text-xl font-medium text-gray-800 dark:text-gray-200 ml-2">
+                    {allergen}
+                  </span>
                 </div>
-              );
-            })}
+              </div>
+            ))}
           </div>
 
-          {/* Custom Allergen Input - moved below the allergen buttons as its own row */}
           <div className="w-full mt-4">
             <div className="flex space-x-2 items-center justify-center">
               <Input
                 type="text"
-                placeholder={translatedPlaceholder}
+                placeholder="Add your own allergen"
                 value={customAllergenInput}
                 onChange={(e) => setCustomAllergenInput(e.target.value)}
                 className="flex-grow p-3 text-lg md:text-xl bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-700 rounded-lg shadow-sm text-gray-800 dark:text-gray-200"
@@ -255,22 +156,19 @@ const AllergenSelectionPage = () => {
                     handleAddCustomAllergen();
                   }
                 }}
-                disabled={isTranslating}
               />
-              <Button onClick={handleAddCustomAllergen} disabled={isTranslating} className="py-3 px-6 text-lg md:text-xl bg-blue-600 text-white hover:bg-blue-700 h-10">
-                {isTranslating ? <Loader2 className="h-5 w-5 animate-spin" /> : translatedAdd}
+              <Button onClick={handleAddCustomAllergen} className="py-3 px-6 text-lg md:text-xl bg-blue-600 text-white hover:bg-blue-700 h-10">
+                Add
               </Button>
             </div>
           </div>
 
-          {/* Bottom Section: Fixed height button area */}
           <div className="w-full flex justify-center items-center mt-4 mb-6">
             <Button
               onClick={handleContinue}
-              disabled={[...selectedStandardAllergens, ...Object.keys(customAllergens)].length === 0}
               className="py-3 text-lg md:text-xl h-auto transition-all duration-200 ease-in-out hover:scale-105 bg-red-600 text-white hover:bg-red-700 w-[280px]"
             >
-              {translatedContinue}
+              Continue
             </Button>
           </div>
         </div>
