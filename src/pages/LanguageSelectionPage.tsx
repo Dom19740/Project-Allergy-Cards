@@ -53,7 +53,7 @@ const LanguageSelectionPage = () => {
       <div className="flex flex-col flex-grow w-full max-w-2xl mx-auto px-4 pt-[126px]">
         <div className="flex-grow overflow-y-auto">
           <div className="flex flex-col items-center text-center space-y-8">
-            <h2 className="text-2xl md:text-3xl font-bold text-gray-700 dark:text-gray-200">
+            <h2 className="text-xl sm:text-2xl font-bold text-gray-700 dark:text-gray-200">
               {translatedTitle}
             </h2>
             <div className="w-full max-w-xs sm:max-w-sm md:max-w-md lg:max-w-lg">
