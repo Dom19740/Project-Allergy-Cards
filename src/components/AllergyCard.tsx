@@ -208,7 +208,7 @@ const AllergyCard: React.FC<AllergyCardProps> = ({ languageCode, selectedAllerge
         {title}
       </h1>
       
-      <p className="relative z-10 text-xl sm:text-2xl md:text-3xl font-semibold leading-relaxed text-gray-800 dark:text-gray-200">
+      <p className="relative z-10 text-xl sm:text-2xl md:text-3xl font-medium text-gray-700 dark:text-gray-300 mb-2">
         {translatedUIText.iAmAllergicTo}
       </p>
       
