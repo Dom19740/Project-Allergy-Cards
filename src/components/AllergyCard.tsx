@@ -256,13 +256,14 @@ const AllergyCard: React.FC<AllergyCardProps> = ({ languageCode, selectedAllerge
         Select Allergen
       </Link>
 
-      <button
+      <Button
         onClick={handleShare}
         disabled={isSharing}
-        className="absolute bottom-4 left-1/2 transform -translate-x-1/2 bg-green-600 text-white hover:bg-green-700 px-2 py-2 rounded text-xs font-semibold flex items-center gap-1"
+        aria-label="Share card"
+        className="absolute bottom-4 left-1/2 transform -translate-x-1/2 bg-green-600 text-white hover:bg-green-700 w-8 h-8 p-0 rounded flex items-center justify-center text-xs font-semibold z-20"
       >
-        {isSharing ? 'Sharing...' : <Share2 className="h-3 w-3" />}
-      </button>
+        {isSharing ? <Loader2 className="h-3 w-3 animate-spin" /> : <Share2 className="h-3 w-3" />}
+      </Button>
 
       <Link to="/select-language" className="absolute bottom-4 right-4 text-sm sm:text-base md:text-lg font-light opacity-80 text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-200 underline">
         Select Language
