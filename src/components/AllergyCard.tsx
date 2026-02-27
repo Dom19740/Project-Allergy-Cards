@@ -202,7 +202,7 @@ const AllergyCard: React.FC<AllergyCardProps> = ({ languageCode, selectedAllerge
       <div ref={cardRef} className="flex flex-col items-center justify-center w-full h-full bg-white p-4">
         <div className="absolute inset-0 bg-gradient-to-br from-red-100 via-white to-red-100 dark:from-red-950 dark:via-gray-900 dark:to-red-950 opacity-75"></div>
         
-        <h1 className="relative z-10 text-3xl sm:text-4xl md:text-5xl font-extrabold leading-tight mb-8 text-red-600 dark:text-red-400">
+        <h1 className="relative z-10 text-3xl sm:text-4xl md:text-5xl font-extrabold leading-tight mb-4 text-red-600 dark:text-red-400">
           {translatedUIText.allergyAlert}
         </h1>
         
