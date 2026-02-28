@@ -4,6 +4,7 @@ import React from 'react';
 import { Link } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import FixedHeader from '@/components/FixedHeader';
+import SavedCardsList from '@/components/SavedCardsList';
 
 const Home = () => {
   return (
@@ -14,15 +15,18 @@ const Home = () => {
       <div className="flex flex-col flex-grow w-full max-w-2xl mx-auto px-4 pt-[126px]">
         {/* Top Section: Flexible content area, scrollable */}
         <div className="flex-grow overflow-y-auto">
-          <div className="flex flex-col items-center text-center space-y-8"> {/* Adjusted spacing */}
+          <div className="flex flex-col items-center text-center space-y-8">
             <img 
               src="/logo_main.png" 
               alt="App Logo" 
               className="w-72 h-72 sm:w-96 sm:h-96 md:w-[30rem] md:h-[30rem] object-contain" 
             />
-            <p className="text-lg md:text-xl text-gray-700 dark:text-gray-300 max-w-md px-10"> {/* Changed px-9 to px-10 for increased horizontal padding */}
+            <p className="text-lg md:text-xl text-gray-700 dark:text-gray-300 max-w-md px-10">
               Create a personalized allergy alert in multiple languages to communicate your dietary restrictions easily and safely when traveling or dining out.
             </p>
+            
+            {/* Saved Cards Section */}
+            <SavedCardsList />
           </div>
         </div>
 

@@ -5,10 +5,11 @@ import { Link } from 'react-router-dom';
 import { toPng } from 'html-to-image';
 import { Button } from '@/components/ui/button';
 import { toast } from 'sonner';
-import { Share2, Download, Loader2, Edit } from 'lucide-react';
-import { LanguageCode } from '@/lib/types';
+import { Share2, Download, Loader2, Edit, Save } from 'lucide-react';
+import { LanguageCode, SelectedAllergens, CustomMessages } from '@/lib/types';
 import { ALLERGEN_OPTIONS } from '@/lib/allergens';
 import { translateText } from '@/lib/translator';
+import SaveCardDialog from './SaveCardDialog';
 
 interface AllergyCardProps {
   languageCode: LanguageCode;
@@ -19,10 +20,12 @@ const AllergyCard: React.FC<AllergyCardProps> = ({ languageCode, selectedAllerge
   const cardRef = useRef<HTMLDivElement>(null);
   const [isSharing, setIsSharing] = useState(false);
   const [isDownloading, setIsDownloading] = useState(false);
+  const [isSaveDialogOpen, setIsSaveDialogOpen] = useState(false);
   const [customAllergenTranslations, setCustomAllergenTranslations] = useState<{ [key: string]: { [lang: string]: string } }>({});
   const [translatedAllergens, setTranslatedAllergens] = useState<{ [key: string]: string }>({});
   const [isTranslating, setIsTranslating] = useState(false);
-  const [customMessages, setCustomMessages] = useState({
+  const [fullSelectedData, setFullSelectedData] = useState<SelectedAllergens | null>(null);
+  const [customMessages, setCustomMessages] = useState<CustomMessages>({
     iAmAllergicTo: "I can not eat:",
     theyMakeMeSick: "They make me very sick and I could die"
   });
@@ -41,6 +44,7 @@ const AllergyCard: React.FC<AllergyCardProps> = ({ languageCode, selectedAllerge
     if (storedAllergens) {
       try {
         const parsed = JSON.parse(storedAllergens);
+        setFullSelectedData(parsed);
         const custom = parsed.custom || {};
         setCustomAllergenTranslations(custom);
       } catch (e) {
@@ -279,6 +283,13 @@ const AllergyCard: React.FC<AllergyCardProps> = ({ languageCode, selectedAllerge
           {isSharing ? <Loader2 className="h-4 w-4 animate-spin" /> : <Share2 className="h-4 w-4" />}
         </Button>
         <Button
+          onClick={() => setIsSaveDialogOpen(true)}
+          className="bg-red-600 text-white hover:bg-red-700 w-8 h-8 p-0 rounded flex items-center justify-center"
+          title="Save Card"
+        >
+          <Save className="h-4 w-4" />
+        </Button>
+        <Button
           onClick={handleDownload}
           disabled={isDownloading}
           className="bg-blue-600 text-white hover:bg-blue-700 w-8 h-8 p-0 rounded flex items-center justify-center"
@@ -293,6 +304,16 @@ const AllergyCard: React.FC<AllergyCardProps> = ({ languageCode, selectedAllerge
       >
         <Edit className="inline-block w-4 h-4 mr-1" /> Language
       </Link>
+
+      {fullSelectedData && (
+        <SaveCardDialog
+          isOpen={isSaveDialogOpen}
+          onClose={() => setIsSaveDialogOpen(false)}
+          languageCode={languageCode}
+          selectedAllergens={fullSelectedData}
+          customMessages={customMessages}
+        />
+      )}
     </div>
   );
 };
