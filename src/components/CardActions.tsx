@@ -24,53 +24,53 @@ const CardActions: React.FC<CardActionsProps> = ({
   isDownloading
 }) => {
   return (
-    <div className="fixed bottom-6 left-1/2 transform -translate-x-1/2 flex items-center space-x-3 z-30 bg-white/80 backdrop-blur-sm p-3 rounded-full shadow-lg border border-gray-200">
-      
-      <Button
-        onClick={onToggleMenu}
-        variant="ghost"
-        size="icon"
-        className="text-gray-500 hover:bg-gray-100 rounded-full h-10 w-10"
-        title="Navigation Menu"
-      >
-        <Menu className="h-5 w-5" />
-      </Button>
+    <div className="w-full py-4 flex justify-center bg-white border-t border-gray-100 z-30">
+      <div className="flex items-center space-x-3 bg-white p-2 rounded-full shadow-md border border-gray-200">
+        
+        <Button
+          onClick={onToggleMenu}
+          variant="ghost"
+          size="icon"
+          className="text-gray-500 hover:bg-gray-100 rounded-full h-10 w-10"
+          title="Navigation Menu"
+        >
+          <Menu className="h-5 w-5" />
+        </Button>
 
-      
-      <Button
-        onClick={onSave}
-        variant="ghost"
-        size="icon"
-        className="text-red-600 hover:bg-red-50 rounded-full h-10 w-10"
-        title="Save Card"
-      >
-        <Save className="h-5 w-5" />
-      </Button>
-      
-      <Button
-        onClick={onShare}
-        disabled={isSharing}
-        variant="ghost"
-        size="icon"
-        className="text-green-600 hover:bg-green-50 rounded-full h-10 w-10"
-        title="Share Card"
-      >
-        {isSharing ? <Loader2 className="h-5 w-5 animate-spin" /> : <Share2 className="h-5 w-5" />}
-      </Button>
-      
-      <Button
-        onClick={onDownload}
-        disabled={isDownloading}
-        variant="ghost"
-        size="icon"
-        className="text-blue-600 hover:bg-blue-50 rounded-full h-10 w-10"
-        title="Download Image"
-      >
-        {isDownloading ? <Loader2 className="h-5 w-5 animate-spin" /> : <Download className="h-5 w-5" />}
-      </Button>
+        <Button
+          onClick={onSave}
+          variant="ghost"
+          size="icon"
+          className="text-red-600 hover:bg-red-50 rounded-full h-10 w-10"
+          title="Save Card"
+        >
+          <Save className="h-5 w-5" />
+        </Button>
+        
+        <Button
+          onClick={onShare}
+          disabled={isSharing}
+          variant="ghost"
+          size="icon"
+          className="text-green-600 hover:bg-green-50 rounded-full h-10 w-10"
+          title="Share Card"
+        >
+          {isSharing ? <Loader2 className="h-5 w-5 animate-spin" /> : <Share2 className="h-5 w-5" />}
+        </Button>
+        
+        <Button
+          onClick={onDownload}
+          disabled={isDownloading}
+          variant="ghost"
+          size="icon"
+          className="text-blue-600 hover:bg-blue-50 rounded-full h-10 w-10"
+          title="Download Image"
+        >
+          {isDownloading ? <Loader2 className="h-5 w-5 animate-spin" /> : <Download className="h-5 w-5" />}
+        </Button>
 
-      <div className="w-px h-6 bg-gray-200 mx-1" />
-
+        <div className="w-px h-6 bg-gray-200 mx-1" />
+      </div>
     </div>
   );
 };
