@@ -1,11 +1,11 @@
 "use client";
 
 import React, { useRef, useState, useEffect } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { toPng } from 'html-to-image';
 import { Button } from '@/components/ui/button';
 import { toast } from 'sonner';
-import { Share2, Download, Loader2, Edit, Save } from 'lucide-react';
+import { Share2, Download, Loader2, Edit, Save, Menu } from 'lucide-react';
 import { LanguageCode, SelectedAllergens, CustomMessages } from '@/lib/types';
 import { ALLERGEN_OPTIONS } from '@/lib/allergens';
 import { translateText } from '@/lib/translator';
@@ -18,6 +18,7 @@ interface AllergyCardProps {
 
 const AllergyCard: React.FC<AllergyCardProps> = ({ languageCode, selectedAllergens }) => {
   const cardRef = useRef<HTMLDivElement>(null);
+  const navigate = useNavigate();
   const [isSharing, setIsSharing] = useState(false);
   const [isDownloading, setIsDownloading] = useState(false);
   const [isSaveDialogOpen, setIsSaveDialogOpen] = useState(false);
@@ -37,6 +38,7 @@ const AllergyCard: React.FC<AllergyCardProps> = ({ languageCode, selectedAllerge
     languageName: "English",
     theyMakeMeSick: "They make me very sick and I could die"
   });
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
 
   // Load custom allergen translations and alert messages from localStorage
   useEffect(() => {
@@ -267,12 +269,58 @@ const AllergyCard: React.FC<AllergyCardProps> = ({ languageCode, selectedAllerge
         )}
       </div>
 
-      <Link
-        to="/select-allergens"
-        className="absolute bottom-4 left-4 text-xs sm:text-sm font-medium bg-gray-400/80 hover:bg-gray-500 text-white px-4 py-2 rounded-full transition-colors z-20"
-      >
-        <Edit className="inline-block w-4 h-4 mr-1" /> Allergen
-      </Link>
+      <div className="absolute top-4 left-4 z-20">
+        <Button
+          onClick={() => setIsMenuOpen(!isMenuOpen)}
+          className="bg-gray-400/80 hover:bg-gray-500 text-white w-8 h-8 p-0 rounded flex items-center justify-center"
+        >
+          <Menu className="h-4 w-4" />
+        </Button>
+        {isMenuOpen && (
+          <div className="absolute left-0 top-10 w-48 bg-white rounded-lg shadow-lg border border-gray-200">
+            <Link
+              to="/"
+              className="block px-4 py-2 text-sm hover:bg-gray-100 transition-colors"
+              onClick={() => {
+                setIsMenuOpen(false);
+                navigate("/");
+              }}
+            >
+              Home
+            </Link>
+            <Link
+              to="/select-allergens"
+              className="block px-4 py-2 text-sm hover:bg-gray-100 transition-colors"
+              onClick={() => {
+                setIsMenuOpen(false);
+                navigate("/select-allergens");
+              }}
+            >
+              Allergen
+            </Link>
+            <Link
+              to="/custom-alert"
+              className="block px-4 py-2 text-sm hover:bg-gray-100 transition-colors"
+              onClick={() => {
+                setIsMenuOpen(false);
+                navigate("/custom-alert");
+              }}
+            >
+              Alert
+            </Link>
+            <Link
+              to="/select-language"
+              className="block px-4 py-2 text-sm hover:bg-gray-100 transition-colors"
+              onClick={() => {
+                setIsMenuOpen(false);
+                navigate("/select-language");
+              }}
+            >
+              Language
+            </Link>
+          </div>
+        )}
+      </div>
 
       <div className="absolute bottom-4 left-1/2 transform -translate-x-1/2 flex space-x-2 z-20">
         <Button
@@ -297,14 +345,6 @@ const AllergyCard: React.FC<AllergyCardProps> = ({ languageCode, selectedAllerge
           {isDownloading ? <Loader2 className="h-4 w-4 animate-spin" /> : <Download className="h-4 w-4" />}
         </Button>
       </div>
-
-      <Link
-        to="/select-language"
-        className="absolute bottom-4 right-4 text-xs sm:text-sm font-medium bg-gray-400/80 hover:bg-gray-500 text-white px-4 py-2 rounded-full transition-colors z-20"
-      >
-        <Edit className="inline-block w-4 h-4 mr-1" /> Language
-      </Link>
-
       {fullSelectedData && (
         <SaveCardDialog
           isOpen={isSaveDialogOpen}
