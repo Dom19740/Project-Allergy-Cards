@@ -223,13 +223,15 @@ const AllergyCard: React.FC<AllergyCardProps> = ({ languageCode, selectedAllerge
       {/* Printable Area */}
       <div 
         ref={cardRef} 
-        className="flex-1 w-full flex flex-col items-center justify-center text-center print:shadow-none print:m-0 print:rounded-none overflow-hidden p-4 sm:p-6 md:p-8"
+        className="flex-1 w-full flex flex-col items-center justify-start text-center print:shadow-none print:m-0 print:rounded-none overflow-hidden p-4 sm:p-6 md:p-8"
       >
-        <h1 className="text-2xl sm:text-4xl md:text-5xl lg:text-6xl font-black leading-tight mb-2 sm:mb-4 text-red-600 uppercase tracking-tighter whitespace-nowrap">
+        <div className="h-4 sm:h-8 md:h-12" /> {/* Top spacing */}
+        
+        <h1 className="text-2xl sm:text-4xl md:text-5xl lg:text-6xl font-black leading-tight mb-4 sm:mb-8 md:mb-12 text-red-600 uppercase tracking-tighter whitespace-nowrap">
           {translatedUIText.allergyAlert}
         </h1>
 
-        <p className="text-lg sm:text-xl md:text-2xl font-normal text-gray-800 mb-2 sm:mb-3">
+        <p className="text-lg sm:text-xl md:text-2xl font-normal text-gray-800 mb-4 sm:mb-8 md:mb-12">
           {translatedUIText.iAmAllergicTo}
         </p>
 
@@ -253,7 +255,7 @@ const AllergyCard: React.FC<AllergyCardProps> = ({ languageCode, selectedAllerge
         </p>
 
         {allergensWithImages.length > 0 && (
-          <div className="relative w-full max-w-[280px] sm:max-w-md aspect-square mx-auto flex-shrink min-h-0">
+          <div className="relative w-full aspect-square mx-auto flex-shrink min-h-0">
             <div className={`absolute inset-0 ${imageGridClasses} gap-2 sm:gap-4 p-2 sm:p-4`}>
               {allergensWithImages.map((allergen) => (
                 <img
