@@ -219,17 +219,17 @@ const AllergyCard: React.FC<AllergyCardProps> = ({ languageCode, selectedAllerge
   }
 
   return (
-    <div className="flex flex-col items-center justify-center w-full h-screen bg-gray-50 dark:bg-gray-900 p-2 sm:p-4 overflow-hidden">
+    <div className="flex flex-col items-center justify-center w-full h-screen bg-white dark:bg-gray-900 overflow-hidden">
       {/* Printable Area */}
       <div 
         ref={cardRef} 
-        className="bg-white rounded-3xl p-4 sm:p-8 w-full max-w-2xl max-h-[calc(100vh-100px)] flex flex-col items-center justify-center text-center print:shadow-none print:m-0 print:rounded-none overflow-hidden"
+        className="bg-white w-full h-full flex flex-col items-center justify-center text-center print:shadow-none print:m-0 print:rounded-none overflow-hidden p-4 sm:p-8"
       >
-        <h1 className="text-2xl sm:text-4xl md:text-5xl font-black leading-tight mb-4 text-red-600 uppercase tracking-tighter whitespace-nowrap">
+        <h1 className="text-3xl sm:text-5xl md:text-6xl font-black leading-tight mb-4 text-red-600 uppercase tracking-tighter whitespace-nowrap">
           {translatedUIText.allergyAlert}
         </h1>
 
-        <p className="text-lg sm:text-xl font-bold text-gray-800 mb-3">
+        <p className="text-xl sm:text-2xl font-bold text-gray-800 mb-3">
           {translatedUIText.iAmAllergicTo}
         </p>
 
@@ -237,24 +237,24 @@ const AllergyCard: React.FC<AllergyCardProps> = ({ languageCode, selectedAllerge
           {translatedAllergenList.map((allergen, index) => (
             <span
               key={index}
-              className="bg-red-600 text-white px-3 py-1.5 rounded-full text-base sm:text-lg font-black uppercase"
+              className="bg-red-600 text-white px-4 py-2 rounded-full text-lg sm:text-xl font-black uppercase"
             >
               {allergen}
             </span>
           ))}
         </div>
 
-        <p className="text-lg sm:text-xl font-bold text-gray-800 mb-3 leading-tight max-w-xl">
+        <p className="text-xl sm:text-2xl font-bold text-gray-800 mb-3 leading-tight max-w-2xl">
           {translatedUIText.theyMakeMeSick}
         </p>
 
-        <p className="text-lg sm:text-xl font-bold text-gray-600 italic mb-4">
+        <p className="text-xl sm:text-2xl font-bold text-gray-600 italic mb-6">
           {translatedUIText.thankYou}
         </p>
 
         {allergensWithImages.length > 0 && (
-          <div className="relative w-full max-w-[200px] sm:max-w-[280px] aspect-square mx-auto flex-shrink">
-            <div className={`absolute inset-0 ${imageGridClasses} gap-2 p-2`}>
+          <div className="relative w-full max-w-md aspect-square mx-auto flex-shrink">
+            <div className={`absolute inset-0 ${imageGridClasses} gap-4 p-4`}>
               {allergensWithImages.map((allergen) => (
                 <img
                   key={allergen.id}
