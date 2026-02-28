@@ -21,24 +21,28 @@ export const translateFullSentence = async (
   targetLanguage: SupportedLanguage
 ): Promise<string> => {
   try {
+    // Split text at periods but keep the period with the first part
     const parts = text.split(/(?<=\.)/);
     const translatedParts = await Promise.all(
       parts.map(async (part) => {
-        const withPeriod = part.endsWith('.') ? part : `${part}.`;
-        return await translateText(withPeriod, targetLanguage);
+        const withPeriod = part.endsWith(".") ? part : `${part}.`;
+        return await translateText(withPeriod, targetLanguage.code);
       })
     );
-    return translatedParts.join(' ');
+    return translatedParts.join(" ");
   } catch (error) {
-    console.error('Translation error:', error);
+    console.error("Translation error:", error);
     return text;
   }
 };
 
-const translateText = async (
+export const translateText = async (
   text: string,
-  targetLanguage: SupportedLanguage
+  targetLanguage: string
 ): Promise<string> => {
-  // Implementation would use Google Translate API
+  // Placeholder for actual translation logic (e.g., Google Translate API)
   return text;
 };
+
+// Re-export SupportedLanguage for convenience
+export type { SupportedLanguage };
