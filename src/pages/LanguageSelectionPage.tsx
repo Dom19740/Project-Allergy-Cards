@@ -1,5 +1,4 @@
 "use client";
-
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
@@ -14,7 +13,6 @@ const LanguageSelectionPage = () => {
   const [translatedContinue, setTranslatedContinue] = useState("Continue");
   const [supportedLanguages, setSupportedLanguages] = useState<SupportedLanguage[]>([]);
 
-  // Keep title in English only
   useEffect(() => {
     setTranslatedTitle("Select Target Language");
   }, []);
@@ -25,11 +23,9 @@ const LanguageSelectionPage = () => {
       const langs = await getAllGoogleLanguages();
       if (!mounted) return;
       
-      // Explicitly sort by name to ensure alphabetical order in the UI
       const sortedLangs = [...langs].sort((a, b) => a.name.localeCompare(b.name));
       setSupportedLanguages(sortedLangs);
       
-      // If current selection isn't in list, keep 'en' as default
       const hasSelected = sortedLangs.some(l => l.code === selectedLanguageCode);
       if (!hasSelected) setSelectedLanguageCode("en");
     })();
@@ -60,7 +56,7 @@ const LanguageSelectionPage = () => {
                 className="text-xl sm:text-2xl font-bold text-gray-700 dark:text-gray-200 hover:text-gray-800 dark:hover:text-gray-100"
                 aria-label="Go back"
               >
-                ←
+                <
               </button>
               <h2 className="text-xl sm:text-2xl font-bold text-gray-700 dark:text-gray-200">
                 {translatedTitle}

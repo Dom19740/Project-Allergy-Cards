@@ -46,7 +46,7 @@ const SelectAlertPage = () => {
                 className="text-xl sm:text-2xl font-bold text-gray-700 dark:text-gray-200 hover:text-gray-800 dark:hover:text-gray-100"
                 aria-label="Go back"
               >
-                ←
+                <
               </button>
               <h2 className="text-xl sm:text-2xl font-bold text-gray-700 dark:text-gray-200">
                 Customise Alert
