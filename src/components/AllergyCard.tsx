@@ -127,7 +127,7 @@ const AllergyCard: React.FC<AllergyCardProps> = ({ languageCode, selectedAllerge
         setTranslatedAllergens(allergenTranslations);
       } catch (error) {
         console.error('Translation failed:', error);
-        toast.error("Translation failed. Please try again.");
+        toast.error("Translation failed. Please try again.", { duration: 1000 });
       } finally {
         setIsTranslating(false);
       }
@@ -147,10 +147,10 @@ const AllergyCard: React.FC<AllergyCardProps> = ({ languageCode, selectedAllerge
         document.body.appendChild(link);
         link.click();
         document.body.removeChild(link);
-        toast.success("Allergy card downloaded!");
+        toast.success("Allergy card downloaded!", { duration: 1000 });
       } catch (error) {
         console.error('Error downloading image:', error);
-        toast.error("Failed to download card.");
+        toast.error("Failed to download card.", { duration: 1000 });
       } finally {
         setIsDownloading(false);
       }
@@ -176,13 +176,13 @@ const AllergyCard: React.FC<AllergyCardProps> = ({ languageCode, selectedAllerge
             text: 'Check out my allergy card!'
           });
         } else {
-          toast.warning("Sharing not supported on this browser. Downloading instead.");
+          toast.warning("Sharing not supported on this browser. Downloading instead.", { duration: 1000 });
           handleDownload();
         }
       } catch (error: any) {
         if (error.name !== 'AbortError') {
           console.error('Error sharing image:', error);
-          toast.error("Failed to share card.");
+          toast.error("Failed to share card.", { duration: 1000 });
         }
       } finally {
         setIsSharing(false);
