@@ -16,16 +16,19 @@ const AllergenSelectionPage = () => {
   const [selectedAllergens, setSelectedAllergens] = useState<string[]>([]);
   const [customAllergenInput, setCustomAllergenInput] = useState<string>('');
 
+  // Load selected allergens from local storage on mount
   useEffect(() => {
     const storedAllergens = localStorage.getItem('selectedAllergens');
     if (storedAllergens) {
       try {
         const parsed = JSON.parse(storedAllergens);
+        // Handle both old array format and new object format
         if (Array.isArray(parsed)) {
           setSelectedAllergens(parsed);
         } else if (parsed.ids) {
           setSelectedAllergens(parsed.ids);
         } else if (parsed.standard) {
+          // Handle standard/custom split format
           setSelectedAllergens([...(parsed.standard || []), ...(parsed.custom || [])]);
         }
       } catch (e) {
@@ -66,6 +69,7 @@ const AllergenSelectionPage = () => {
       return;
     }
     
+    // Save in a consistent format for the AllergyCard
     const standardIds = ALLERGEN_OPTIONS.map(opt => opt.id);
     const standard = selectedAllergens.filter(id => standardIds.includes(id));
     const custom = selectedAllergens.filter(id => !standardIds.includes(id));
@@ -73,7 +77,7 @@ const AllergenSelectionPage = () => {
     localStorage.setItem('selectedAllergens', JSON.stringify({
       standard,
       custom,
-      ids: selectedAllergens
+      ids: selectedAllergens // Keep flat list for compatibility
     }));
     
     navigate('/select-alert');
@@ -93,10 +97,10 @@ const AllergenSelectionPage = () => {
             <div className="flex items-center space-x-2">
               <button
                 onClick={() => navigate(-1)}
-                className="text-xl sm:text-2xl font-bold text-gray-700 dark:text-gray-200 hover:text-gray-800 dark:hover:text-gray-100"
+                className="text-gray-600 dark:text-gray-300 hover:text-gray-800 dark:hover:text-gray-100"
                 aria-label="Go back"
               >
-                <
+                ←
               </button>
               <h2 className="text-xl sm:text-2xl font-bold text-gray-700 dark:text-gray-200">
                 Select Allergens
