@@ -262,8 +262,8 @@ const AllergyCard: React.FC<AllergyCardProps> = ({ languageCode, selectedAllerge
           <div className="relative w-full max-w-[400px] aspect-square mx-auto flex-shrink min-h-0">
             {/* Unified Container for locking */}
             <div className="absolute inset-0 flex items-center justify-center">
-              {/* Allergens Grid - sized to fit inside the circle */}
-              <div className={`absolute inset-[15%] grid ${imageGridClasses} gap-2 sm:gap-4 items-center justify-items-center z-0`}>
+              {/* Allergens Grid - expanded to full width */}
+              <div className={`absolute inset-0 grid ${imageGridClasses} gap-1 sm:gap-2 items-center justify-items-center z-0 p-4`}>
                 {allergensWithImages.map((allergen) => (
                   <div key={allergen.id} className="w-full h-full flex items-center justify-center">
                     <img
