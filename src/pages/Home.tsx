@@ -4,7 +4,6 @@ import React from 'react';
 import { Link } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import FixedHeader from '@/components/FixedHeader';
-import { ArrowLeft } from 'lucide-react'; // <-- Added for chunky back icon
 
 const Home = () => {
   return (
@@ -36,9 +35,7 @@ const Home = () => {
             asChild 
             className="py-3 text-lg md:text-xl h-auto transition-all duration-200 ease-in-out hover:scale-105 bg-red-600 text-white hover:bg-red-700 w-[280px]"
           >
-            <Link to="/select-allergens">
-              <ArrowLeft className="h-4 w-4 mr-1" />
-            </Link>
+            <Link to="/select-allergens">Get Started</Link>
           </Button>
         </div>
       </div>
