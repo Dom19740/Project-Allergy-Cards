@@ -1,18 +1,6 @@
-"use client";
-
 export type LanguageCode = string;
 
-export interface Allergen {
-  id: string;
+export interface SupportedLanguage {
+  code: LanguageCode;
   name: string;
-  image: string;
-}
-
-export interface SelectedAllergens {
-  standard: string[];
-  custom: {
-    [key: string]: {
-      [lang: string]: string;
-    };
-  };
 }

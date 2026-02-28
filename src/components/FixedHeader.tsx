@@ -1,17 +1,17 @@
-"use client";
-import React from "react";
-import { Link } from "react-router-dom";
+import React from 'react';
 
-const FixedHeader = () => {
-    return (
-        <div
-            className="fixed top-0 left-0 right-0 z-50 bg-gray-100 dark:bg-gray-900 flex justify-center items-center h-[106px]">
-            <Link to="/" className="block flex justify-center">
-                <h1
-                    className="bg-red-600 text-white px-4 py-[13px] rounded-lg text-2xl md:text-3xl font-extrabold tracking-tight">SIMPLE ALLERGY ALERT</h1>
-            </Link>
-        </div>
-    );
+interface FixedHeaderProps {
+  children?: React.ReactNode;
+}
+
+const FixedHeader: React.FC<FixedHeaderProps> = ({ children }) => {
+  return (
+    <header className="fixed top-0 left-0 right-0 z-50 bg-white dark:bg-gray-900 shadow-sm border-b border-gray-200 dark:border-gray-700">
+      <div className="container mx-auto px-4 py-4">
+        {children}
+      </div>
+    </header>
+  );
 };
 
 export default FixedHeader;
