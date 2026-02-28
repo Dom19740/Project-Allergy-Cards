@@ -223,7 +223,7 @@ const AllergyCard: React.FC<AllergyCardProps> = ({ languageCode, selectedAllerge
       {/* Printable Area */}
       <div 
         ref={cardRef} 
-        className="bg-white shadow-2xl rounded-3xl p-8 sm:p-12 w-full max-w-md aspect-[3/4] flex flex-col items-center justify-center text-center border-4 border-red-600 print:shadow-none print:border-red-600 print:m-0 print:rounded-none"
+        className="bg-white shadow-2xl rounded-3xl p-8 sm:p-12 w-full max-w-md aspect-[3/4] flex flex-col items-center justify-center text-center print:shadow-none print:m-0 print:rounded-none"
       >
         <h1 className="text-4xl sm:text-5xl font-black leading-tight mb-8 text-red-600 uppercase tracking-tighter">
           {translatedUIText.allergyAlert}
