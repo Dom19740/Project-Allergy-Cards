@@ -14,27 +14,35 @@ const LanguageSelectionPage = () => {
   const [translatedContinue, setTranslatedContinue] = useState("Continue");
   const [supportedLanguages, setSupportedLanguages] = useState<SupportedLanguage[]>([]);
 
+  // Load selected language from localStorage on mount
+  useEffect(() => {
+    const savedLang = localStorage.getItem("selectedLanguageCode");
+    if (savedLang) {
+      setSelectedLanguageCode(savedLang);
+    }
+  }, []);
+
   // Keep title in English only
   useEffect(() => {
     setTranslatedTitle("Select Target Language");
   }, []);
 
+  // Load supported languages
   useEffect(() => {
     let mounted = true;
     (async () => {
       const langs = await getAllGoogleLanguages();
       if (!mounted) return;
-      
-      // Explicitly sort by name to ensure alphabetical order in the UI
       const sortedLangs = [...langs].sort((a, b) => a.name.localeCompare(b.name));
       setSupportedLanguages(sortedLangs);
-      
-      // If current selection isn't in list, keep 'en' as default
-      const hasSelected = sortedLangs.some(l => l.code === selectedLanguageCode);
-      if (!hasSelected) setSelectedLanguageCode("en");
     })();
     return () => { mounted = false; };
   }, []);
+
+  // Persist selected language when it changes
+  useEffect(() => {
+    localStorage.setItem("selectedLanguageCode", selectedLanguageCode);
+  }, [selectedLanguageCode]);
 
   const handleLanguageChange = (code: string) => {
     setSelectedLanguageCode(code);
@@ -66,7 +74,7 @@ const LanguageSelectionPage = () => {
                 >
                   <div className="flex items-center">
                     {selectedLanguage ? (
-                      <span>{selectedLanguage.name}</span> // Removed code from display
+                      <span>{selectedLanguage.name}</span>
                     ) : (
                       <SelectValue placeholder={translatedTitle} />
                     )}
