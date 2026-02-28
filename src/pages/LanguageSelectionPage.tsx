@@ -64,9 +64,7 @@ const LanguageSelectionPage = () => {
             </div>
             <div className="w-full max-w-xs sm:max-w-sm md:max-w-md lg:max-w-lg">
               <Select value={selectedLanguageCode} onValueChange={handleLanguageChange}>
-                <SelectTrigger
-                  className="w-full py-4 text-lg md:text-xl h-auto bg-white text-gray-900 hover:bg-gray-50 border border-red-600 dark:border-red-500 mx-[0px]"
-                >
+                <SelectTrigger className="w-full py-4 text-lg md:text-xl h-auto bg-white text-gray-900 hover:bg-gray-50 border border-red-600 dark:border-red-500 mx-[0px]">
                   <div className="flex items-center">
                     {selectedLanguage ? (
                       <span>{selectedLanguage.name} ({selectedLanguage.code})</span>
@@ -76,7 +74,7 @@ const LanguageSelectionPage = () => {
                   </div>
                 </SelectTrigger>
                 <SelectContent className="bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-50 max-h-[50vh]">
-                  {(supportedLanguages.length ? supportedLanguages : [{ code: "en", name: "English" }]).map((lang) => (
+                  {(supportedLanguages.length ? supportedLanguages : [{ code: "en", name: "English" }]).map(lang => (
                     <SelectItem
                       key={lang.code}
                       value={lang.code}
