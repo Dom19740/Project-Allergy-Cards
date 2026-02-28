@@ -1,4 +1,5 @@
 "use client";
+
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
@@ -65,7 +66,7 @@ const LanguageSelectionPage = () => {
                 >
                   <div className="flex items-center">
                     {selectedLanguage ? (
-                      <span>{selectedLanguage.name} ({selectedLanguage.code})</span>
+                      <span>{selectedLanguage.name}</span> // Removed code from display
                     ) : (
                       <SelectValue placeholder={translatedTitle} />
                     )}
