@@ -219,60 +219,58 @@ const AllergyCard: React.FC<AllergyCardProps> = ({ languageCode, selectedAllerge
   }
 
   return (
-    <div className="flex flex-col items-center justify-center w-full min-h-screen bg-gray-50 dark:bg-gray-900 p-4 sm:p-8 pb-32 overflow-hidden">
-      {/* Printable Area Wrapper for Scaling */}
-      <div className="w-full max-w-2xl flex flex-col items-center justify-center scale-on-small-height transition-transform duration-300">
-        <div 
-          ref={cardRef} 
-          className="bg-white rounded-3xl p-6 sm:p-10 w-full flex flex-col items-center justify-center text-center print:shadow-none print:m-0 print:rounded-none shadow-sm"
-        >
-          <h1 className="text-3xl sm:text-5xl font-black leading-tight mb-6 text-red-600 uppercase tracking-tighter">
-            {translatedUIText.allergyAlert}
-          </h1>
+    <div className="flex flex-col items-center justify-center w-full min-h-screen bg-gray-50 dark:bg-gray-900 p-4 sm:p-8">
+      {/* Printable Area */}
+      <div 
+        ref={cardRef} 
+        className="bg-white rounded-3xl p-6 sm:p-10 w-full max-w-2xl flex flex-col items-center justify-center text-center print:shadow-none print:m-0 print:rounded-none"
+      >
+        <h1 className="text-3xl sm:text-5xl font-black leading-tight mb-6 text-red-600 uppercase tracking-tighter">
+          {translatedUIText.allergyAlert}
+        </h1>
 
-          <p className="text-xl sm:text-2xl font-bold text-gray-800 mb-4">
-            {translatedUIText.iAmAllergicTo}
-          </p>
+        <p className="text-xl sm:text-2xl font-bold text-gray-800 mb-4">
+          {translatedUIText.iAmAllergicTo}
+        </p>
 
-          <div className="flex flex-wrap justify-center gap-2 mb-6">
-            {translatedAllergenList.map((allergen, index) => (
-              <span
-                key={index}
-                className="bg-red-600 text-white px-4 py-2 rounded-full text-xl sm:text-2xl font-black uppercase"
-              >
-                {allergen}
-              </span>
-            ))}
-          </div>
-
-          <p className="text-xl sm:text-2xl font-bold text-gray-800 mb-4 leading-tight max-w-xl">
-            {translatedUIText.theyMakeMeSick}
-          </p>
-
-          <p className="text-xl sm:text-2xl font-bold text-gray-600 italic">
-            {translatedUIText.thankYou}
-          </p>
-
-          {allergensWithImages.length > 0 && (
-            <div className="relative w-full max-w-[250px] aspect-square mx-auto mt-8 max-h-[25vh]">
-              <div className={`absolute inset-0 ${imageGridClasses} gap-4 p-4`}>
-                {allergensWithImages.map((allergen) => (
-                  <img
-                    key={allergen.id}
-                    src={allergen.image}
-                    alt={allergen.name}
-                    className="w-full h-full object-contain"
-                  />
-                ))}
-              </div>
-              <img
-                src="/noentry.png"
-                alt="No entry"
-                className="absolute inset-0 w-full h-full object-contain z-10 opacity-90"
-              />
-            </div>
-          )}
+        <div className="flex flex-wrap justify-center gap-2 mb-6">
+          {translatedAllergenList.map((allergen, index) => (
+            <span
+              key={index}
+              className="bg-red-600 text-white px-4 py-2 rounded-full text-xl sm:text-2xl font-black uppercase"
+            >
+              {allergen}
+            </span>
+          ))}
         </div>
+
+        <p className="text-xl sm:text-2xl font-bold text-gray-800 mb-4 leading-tight max-w-xl">
+          {translatedUIText.theyMakeMeSick}
+        </p>
+
+        <p className="text-xl sm:text-2xl font-bold text-gray-600 italic">
+          {translatedUIText.thankYou}
+        </p>
+
+        {allergensWithImages.length > 0 && (
+          <div className="relative w-full max-w-[300px] aspect-square mx-auto mt-8">
+            <div className={`absolute inset-0 ${imageGridClasses} gap-4 p-4`}>
+              {allergensWithImages.map((allergen) => (
+                <img
+                  key={allergen.id}
+                  src={allergen.image}
+                  alt={allergen.name}
+                  className="w-full h-full object-contain"
+                />
+              ))}
+            </div>
+            <img
+              src="/noentry.png"
+              alt="No entry"
+              className="absolute inset-0 w-full h-full object-contain z-10 opacity-90"
+            />
+          </div>
+        )}
       </div>
 
       {/* Action Buttons */}
@@ -303,28 +301,8 @@ const AllergyCard: React.FC<AllergyCardProps> = ({ languageCode, selectedAllerge
         />
       )}
 
-      {/* Print & Responsive Styles */}
+      {/* Print Styles */}
       <style dangerouslySetInnerHTML={{ __html: `
-        @media (max-height: 850px) {
-          .scale-on-small-height {
-            transform: scale(0.9);
-          }
-        }
-        @media (max-height: 750px) {
-          .scale-on-small-height {
-            transform: scale(0.8);
-          }
-        }
-        @media (max-height: 650px) {
-          .scale-on-small-height {
-            transform: scale(0.7);
-          }
-        }
-        @media (max-height: 550px) {
-          .scale-on-small-height {
-            transform: scale(0.6);
-          }
-        }
         @media print {
           body * { visibility: hidden; }
           .print\\:shadow-none, .print\\:shadow-none * { visibility: visible; }
@@ -334,7 +312,6 @@ const AllergyCard: React.FC<AllergyCardProps> = ({ languageCode, selectedAllerge
             top: 0;
             width: 100%;
             height: auto;
-            transform: none !important;
           }
         }
       `}} />
