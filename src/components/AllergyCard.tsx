@@ -200,11 +200,15 @@ const AllergyCard: React.FC<AllergyCardProps> = ({ languageCode, selectedAllerge
 
   let imageGridClasses = "";
   if (allergensWithImages.length === 1) {
-    imageGridClasses = "grid grid-cols-1";
-  } else if (allergensWithImages.length >= 2 && allergensWithImages.length <= 4) {
-    imageGridClasses = "grid grid-cols-2";
-  } else if (allergensWithImages.length >= 5) {
-    imageGridClasses = "grid grid-cols-3";
+    imageGridClasses = "grid-cols-1 grid-rows-1";
+  } else if (allergensWithImages.length === 2) {
+    imageGridClasses = "grid-cols-2 grid-rows-1";
+  } else if (allergensWithImages.length <= 4) {
+    imageGridClasses = "grid-cols-2 grid-rows-2";
+  } else if (allergensWithImages.length <= 6) {
+    imageGridClasses = "grid-cols-3 grid-rows-2";
+  } else {
+    imageGridClasses = "grid-cols-3 grid-rows-3";
   }
 
   if (isTranslating) {
@@ -256,24 +260,28 @@ const AllergyCard: React.FC<AllergyCardProps> = ({ languageCode, selectedAllerge
 
         {allergensWithImages.length > 0 && (
           <div className="relative w-full max-w-[400px] aspect-square mx-auto flex-shrink min-h-0">
-            {/* Allergens Layer */}
-            <div className={`absolute inset-0 ${imageGridClasses} gap-2 sm:gap-4 p-[15%] items-center justify-items-center`}>
-              {allergensWithImages.map((allergen) => (
-                <div key={allergen.id} className="w-full h-full flex items-center justify-center">
-                  <img
-                    src={allergen.image}
-                    alt={allergen.name}
-                    className="max-w-full max-h-full object-contain"
-                  />
-                </div>
-              ))}
+            {/* Unified Container for locking */}
+            <div className="absolute inset-0 flex items-center justify-center">
+              {/* Allergens Grid - sized to fit inside the circle */}
+              <div className={`absolute inset-[15%] grid ${imageGridClasses} gap-2 sm:gap-4 items-center justify-items-center z-0`}>
+                {allergensWithImages.map((allergen) => (
+                  <div key={allergen.id} className="w-full h-full flex items-center justify-center">
+                    <img
+                      src={allergen.image}
+                      alt={allergen.name}
+                      className="max-w-full max-h-full object-contain"
+                    />
+                  </div>
+                ))}
+              </div>
+              
+              {/* No Entry Overlay - spans the entire container */}
+              <img
+                src="/noentry.png"
+                alt="No entry"
+                className="absolute inset-0 w-full h-full object-contain z-10 opacity-90 pointer-events-none"
+              />
             </div>
-            {/* No Entry Layer */}
-            <img
-              src="/noentry.png"
-              alt="No entry"
-              className="absolute inset-0 w-full h-full object-contain z-10 opacity-90 pointer-events-none"
-            />
           </div>
         )}
       </div>
