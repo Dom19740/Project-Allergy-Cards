@@ -219,11 +219,11 @@ const AllergyCard: React.FC<AllergyCardProps> = ({ languageCode, selectedAllerge
   }
 
   return (
-    <div className="flex flex-col w-full h-screen bg-white dark:bg-gray-900 overflow-hidden">
+    <div className="flex flex-col w-full h-screen bg-white overflow-hidden">
       {/* Printable Area */}
       <div 
         ref={cardRef} 
-        className="flex-1 w-full flex flex-col items-center justify-start text-center print:shadow-none print:m-0 print:rounded-none overflow-hidden p-4 sm:p-6 md:p-8"
+        className="flex-1 w-full flex flex-col items-center justify-start text-center print:shadow-none print:m-0 print:rounded-none overflow-hidden p-4 sm:p-6 md:p-8 bg-white"
       >
         <div className="h-4 sm:h-8 md:h-12" /> {/* Top spacing */}
         
