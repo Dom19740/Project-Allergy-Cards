@@ -55,7 +55,7 @@ const SelectAlertPage = () => {
                   value={iAmAllergicTo}
                   onChange={(e) => setIAmAllergicTo(e.target.value)}
                   placeholder="e.g. I can not eat:"
-                  className="w-full p-3 text-base sm:text-lg bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-700 rounded-lg shadow-sm text-gray-800 dark:text-gray-200 h-12"
+                  className="w-full p-3 text-base sm:text-lg bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-700 rounded-lg shadow-sm text-gray-800 dark:text-gray-200 h-full"
                 />
               </div>
 
@@ -68,7 +68,7 @@ const SelectAlertPage = () => {
                   value={theyMakeMeSick}
                   onChange={(e) => setTheyMakeMeSick(e.target.value)}
                   placeholder="e.g. They make me very sick..."
-                  className="w-full p-3 text-base sm:text-lg bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-700 rounded-lg shadow-sm text-gray-800 dark:text-gray-200 h-12"
+                  className="w-full p-3 text-base sm:text-lg bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-700 rounded-lg shadow-sm text-gray-800 dark:text-gray-200 h-full"
                 />
               </div>
             </div>
