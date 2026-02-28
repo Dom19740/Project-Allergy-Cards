@@ -7,17 +7,33 @@ export interface SupportedLanguage {
   name: string;
 }
 
-// This is a mock of what would be a real translation API call
-// In a real app, you'd use Google Cloud Translation API or similar
+/**
+ * Translates text using the Google Translate free API endpoint.
+ * Handles multiple segments (sentences) by joining them together.
+ */
 export const translateText = async (text: string, targetLanguage: string): Promise<string> => {
-  if (!targetLanguage || targetLanguage === 'en') return text;
+  if (!text || !targetLanguage || targetLanguage === 'en') return text;
   
   try {
     const response = await fetch(
       `https://translate.googleapis.com/translate_a/single?client=gtx&sl=en&tl=${targetLanguage}&dt=t&q=${encodeURIComponent(text)}`
     );
+    
+    if (!response.ok) throw new Error('Translation request failed');
+    
     const data = await response.json();
-    return data[0][0][0];
+    
+    // Google Translate returns an array of segments in data[0].
+    // Each segment is an array where the first element is the translated text.
+    // We join all segments to get the full translated text.
+    if (data && data[0] && Array.isArray(data[0])) {
+      return data[0]
+        .map((segment: any) => segment[0])
+        .filter((text: any) => typeof text === 'string')
+        .join('');
+    }
+    
+    return text;
   } catch (error) {
     console.error('Translation error:', error);
     return text;
