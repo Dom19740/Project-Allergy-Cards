@@ -256,7 +256,7 @@ const AllergyCard: React.FC<AllergyCardProps> = ({ languageCode, selectedAllerge
 
         {allergensWithImages.length > 0 && (
           <div className="relative w-full aspect-square mx-auto flex-shrink min-h-0">
-            <div className={`absolute inset-0 ${imageGridClasses} gap-2 sm:gap-4 p-2 sm:p-4`}>
+            <div className={`absolute inset-0 ${imageGridClasses} gap-2 sm:gap-4 p-4 sm:p-8`}>
               {allergensWithImages.map((allergen) => (
                 <img
                   key={allergen.id}
