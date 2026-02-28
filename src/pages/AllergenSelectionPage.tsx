@@ -97,7 +97,7 @@ const AllergenSelectionPage = () => {
             <div className="flex items-center space-x-2">
               <button
                 onClick={() => navigate(-1)}
-                className="text-gray-600 dark:text-gray-300 hover:text-gray-800 dark:hover:text-gray-100"
+                className="text-xl sm:text-2xl font-bold text-gray-700 dark:text-gray-200 hover:text-gray-800 dark:hover:text-gray-100"
                 aria-label="Go back"
               >
                 ←
