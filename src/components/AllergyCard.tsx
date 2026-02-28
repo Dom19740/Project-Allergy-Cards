@@ -255,21 +255,24 @@ const AllergyCard: React.FC<AllergyCardProps> = ({ languageCode, selectedAllerge
         </p>
 
         {allergensWithImages.length > 0 && (
-          <div className="relative w-full aspect-square mx-auto flex-shrink min-h-0">
-            <div className={`absolute inset-0 ${imageGridClasses} gap-2 sm:gap-4 p-4 sm:p-8`}>
+          <div className="relative w-full max-w-[400px] aspect-square mx-auto flex-shrink min-h-0">
+            {/* Allergens Layer */}
+            <div className={`absolute inset-0 ${imageGridClasses} gap-2 sm:gap-4 p-[15%] items-center justify-items-center`}>
               {allergensWithImages.map((allergen) => (
-                <img
-                  key={allergen.id}
-                  src={allergen.image}
-                  alt={allergen.name}
-                  className="w-full h-full object-contain"
-                />
+                <div key={allergen.id} className="w-full h-full flex items-center justify-center">
+                  <img
+                    src={allergen.image}
+                    alt={allergen.name}
+                    className="max-w-full max-h-full object-contain"
+                  />
+                </div>
               ))}
             </div>
+            {/* No Entry Layer */}
             <img
               src="/noentry.png"
               alt="No entry"
-              className="absolute inset-0 w-full h-full object-contain z-10 opacity-90"
+              className="absolute inset-0 w-full h-full object-contain z-10 opacity-90 pointer-events-none"
             />
           </div>
         )}
