@@ -22,14 +22,14 @@ const LanguageSelectionPage = () => {
     (async () => {
       const langs = await getAllGoogleLanguages();
       if (!mounted) return;
-      
       const sortedLangs = [...langs].sort((a, b) => a.name.localeCompare(b.name));
       setSupportedLanguages(sortedLangs);
-      
       const hasSelected = sortedLangs.some(l => l.code === selectedLanguageCode);
       if (!hasSelected) setSelectedLanguageCode("en");
     })();
-    return () => { mounted = false; };
+    return () => {
+      mounted = false;
+    };
   }, []);
 
   const handleLanguageChange = (code: string) => {
@@ -94,7 +94,7 @@ const LanguageSelectionPage = () => {
           <Button
             onClick={handleContinue}
             disabled={!selectedLanguageCode}
-            className="py-3 text-lg md:text-xl h-auto transition-all duration-200 ease-in-out hover:scale-105 bg-red-600 text-white hover:bg-red-700 w-[280px]"
+            className="py-3 text-lg md:text-2xl h-auto transition-all duration-200 ease-in-out hover:scale-105 bg-red-600 text-white hover:bg-red-700 w-[280px]"
           >
             {translatedContinue}
           </Button>

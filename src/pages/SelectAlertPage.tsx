@@ -36,7 +36,6 @@ const SelectAlertPage = () => {
   return (
     <div className="flex flex-col min-h-screen bg-gray-100 dark:bg-gray-900">
       <FixedHeader />
-      
       <div className="flex flex-col flex-grow w-full max-w-2xl mx-auto px-4 pt-[126px]">
         <div className="flex-grow overflow-y-auto">
           <div className="flex flex-col items-center text-center space-y-8">
@@ -52,7 +51,6 @@ const SelectAlertPage = () => {
                 Customise Alert
               </h2>
             </div>
-            
             <div className="w-full space-y-6 text-left">
               <div className="space-y-2">
                 <Label htmlFor="allergic-to" className="text-sm font-medium text-gray-500 dark:text-gray-400">
@@ -66,7 +64,6 @@ const SelectAlertPage = () => {
                   className="w-full p-3 text-base sm:text-lg bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-700 rounded-lg shadow-sm text-gray-800 dark:text-gray-200 h-12"
                 />
               </div>
-
               <div className="space-y-2">
                 <Label htmlFor="make-me-sick" className="text-sm font-medium text-gray-500 dark:text-gray-400">
                   Secondary Warning
@@ -82,7 +79,6 @@ const SelectAlertPage = () => {
             </div>
           </div>
         </div>
-
         <div className="w-full flex justify-center items-center mt-8 mb-[50px]">
           <Button
             onClick={handleContinue}
