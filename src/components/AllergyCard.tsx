@@ -299,11 +299,11 @@ const AllergyCard: React.FC<AllergyCardProps> = ({ languageCode, selectedAllerge
               Allergen
             </Link>
             <Link
-              to="/custom-alert"
+              to="/select-alert"
               className="block px-4 py-2 text-sm hover:bg-gray-100 transition-colors"
               onClick={() => {
                 setIsMenuOpen(false);
-                navigate("/custom-alert");
+                navigate("/select-alert");
               }}
             >
               Alert
