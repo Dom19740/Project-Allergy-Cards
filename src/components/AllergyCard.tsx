@@ -269,7 +269,28 @@ const AllergyCard: React.FC<AllergyCardProps> = ({ languageCode, selectedAllerge
         )}
       </div>
 
-      <div className="absolute top-4 left-4 z-20">
+      <div className="absolute bottom-4 left-1/2 transform -translate-x-1/2 flex space-x-2 z-20">
+        <Button
+          onClick={handleShare}
+          disabled={isSharing}
+          className="bg-green-600 text-white hover:bg-green-700 w-8 h-8 p-0 rounded flex items-center justify-center"
+        >
+          {isSharing ? <Loader2 className="h-4 w-4 animate-spin" /> : <Share2 className="h-4 w-4" />}
+        </Button>
+        <Button
+          onClick={() => setIsSaveDialogOpen(true)}
+          className="bg-red-600 text-white hover:bg-red-700 w-8 h-8 p-0 rounded flex items-center justify-center"
+          title="Save Card"
+        >
+          <Save className="h-4 w-4" />
+        </Button>
+        <Button
+          onClick={handleDownload}
+          disabled={isDownloading}
+          className="bg-blue-600 text-white hover:bg-blue-700 w-8 h-8 p-0 rounded flex items-center justify-center"
+        >
+          {isDownloading ? <Loader2 className="h-4 w-4 animate-spin" /> : <Download className="h-4 w-4" />}
+        </Button>
         <Button
           onClick={() => setIsMenuOpen(!isMenuOpen)}
           className="bg-gray-400/80 hover:bg-gray-500 text-white w-8 h-8 p-0 rounded flex items-center justify-center"
@@ -277,7 +298,7 @@ const AllergyCard: React.FC<AllergyCardProps> = ({ languageCode, selectedAllerge
           <Menu className="h-4 w-4" />
         </Button>
         {isMenuOpen && (
-          <div className="absolute left-0 top-10 w-48 bg-white rounded-lg shadow-lg border border-gray-200">
+          <div className="absolute left-1/2 top-[-60px] transform -translate-x-1/2 w-48 bg-white rounded-lg shadow-lg border border-gray-200">
             <Link
               to="/"
               className="block px-4 py-2 text-sm hover:bg-gray-100 transition-colors"
@@ -320,30 +341,6 @@ const AllergyCard: React.FC<AllergyCardProps> = ({ languageCode, selectedAllerge
             </Link>
           </div>
         )}
-      </div>
-
-      <div className="absolute bottom-4 left-1/2 transform -translate-x-1/2 flex space-x-2 z-20">
-        <Button
-          onClick={handleShare}
-          disabled={isSharing}
-          className="bg-green-600 text-white hover:bg-green-700 w-8 h-8 p-0 rounded flex items-center justify-center"
-        >
-          {isSharing ? <Loader2 className="h-4 w-4 animate-spin" /> : <Share2 className="h-4 w-4" />}
-        </Button>
-        <Button
-          onClick={() => setIsSaveDialogOpen(true)}
-          className="bg-red-600 text-white hover:bg-red-700 w-8 h-8 p-0 rounded flex items-center justify-center"
-          title="Save Card"
-        >
-          <Save className="h-4 w-4" />
-        </Button>
-        <Button
-          onClick={handleDownload}
-          disabled={isDownloading}
-          className="bg-blue-600 text-white hover:bg-blue-700 w-8 h-8 p-0 rounded flex items-center justify-center"
-        >
-          {isDownloading ? <Loader2 className="h-4 w-4 animate-spin" /> : <Download className="h-4 w-4" />}
-        </Button>
       </div>
       {fullSelectedData && (
         <SaveCardDialog
