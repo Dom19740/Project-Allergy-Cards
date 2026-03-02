@@ -2,7 +2,7 @@
 
 import React, { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { AlertTriangle, ArrowLeft, Loader2, Phone } from 'lucide-react';
+import { AlertTriangle, ArrowLeft, Loader2, Phone, Share2, Download } from 'lucide-react';
 import { translateText } from '@/lib/translator';
 import { Button } from '@/components/ui/button';
 
@@ -51,6 +51,24 @@ const EmergencyPage = () => {
     translateEmergencyContent();
   }, [langCode]);
 
+  const handleShare = async () => {
+    if (navigator.share) {
+      try {
+        await navigator.share({
+          title: 'Emergency Medical Message',
+          text: `${translatedText.attention}\n${translatedText.emergency}\n${translatedText.needHelp}`,
+          url: window.location.href,
+        });
+      } catch (error) {
+        console.error('Error sharing:', error);
+      }
+    }
+  };
+
+  const handleDownload = () => {
+    window.print();
+  };
+
   if (isTranslating) {
     return (
       <div className="flex flex-col items-center justify-center min-h-screen bg-white">
@@ -97,7 +115,7 @@ const EmergencyPage = () => {
           </div>
         </div>
 
-        <div className="mt-12 flex justify-center">
+        <div className="mt-12 flex flex-wrap items-center justify-center gap-4">
           <Button
             variant="ghost"
             onClick={() => navigate(-1)}
@@ -106,6 +124,27 @@ const EmergencyPage = () => {
             <ArrowLeft className="h-4 w-4" />
             Back to Card
           </Button>
+
+          <div className="flex items-center gap-2">
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={handleShare}
+              className="flex items-center gap-2 text-gray-500 border-gray-200"
+            >
+              <Share2 className="h-4 w-4" />
+              Share
+            </Button>
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={handleDownload}
+              className="flex items-center gap-2 text-gray-500 border-gray-200"
+            >
+              <Download className="h-4 w-4" />
+              Download
+            </Button>
+          </div>
         </div>
       </div>
     </div>
