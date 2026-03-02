@@ -325,8 +325,8 @@ const AllergyCard: React.FC<AllergyCardProps> = ({ languageCode, selectedAllerge
           </div>
         )}
 
-        <div className="mt-auto pt-4">
-          <p className="text-[20px] sm:text-2xl text-gray-400 font-light mb-1">
+        <div className="mt-auto pt-2">
+          <p className="text-[20px] sm:text-2xl text-gray-400 font-light mb-0">
             Translated to {LANGUAGE_NAMES[languageCode] || languageCode}
           </p>
           <p className="text-[13px] sm:text-base text-gray-400 font-light">
