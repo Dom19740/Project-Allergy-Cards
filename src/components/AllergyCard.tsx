@@ -16,6 +16,34 @@ interface AllergyCardProps {
   selectedAllergens: string[];
 }
 
+const LANGUAGE_NAMES: Record<string, string> = {
+  en: 'English',
+  es: 'Spanish',
+  fr: 'French',
+  de: 'German',
+  it: 'Italian',
+  pt: 'Portuguese',
+  zh: 'Chinese',
+  ja: 'Japanese',
+  ko: 'Korean',
+  ru: 'Russian',
+  ar: 'Arabic',
+  hi: 'Hindi',
+  tr: 'Turkish',
+  nl: 'Dutch',
+  pl: 'Polish',
+  sv: 'Swedish',
+  da: 'Danish',
+  no: 'Norwegian',
+  fi: 'Finnish',
+  el: 'Greek',
+  he: 'Hebrew',
+  id: 'Indonesian',
+  ms: 'Malay',
+  th: 'Thai',
+  vi: 'Vietnamese'
+};
+
 const AllergyCard: React.FC<AllergyCardProps> = ({ languageCode, selectedAllergens }) => {
   const cardRef = useRef<HTMLDivElement>(null);
   const [isSharing, setIsSharing] = useState(false);
@@ -298,6 +326,9 @@ const AllergyCard: React.FC<AllergyCardProps> = ({ languageCode, selectedAllerge
         )}
 
         <div className="mt-auto pt-4">
+          <p className="text-[20px] sm:text-2xl text-gray-400 font-light mb-1">
+            Translated to {LANGUAGE_NAMES[languageCode] || languageCode}
+          </p>
           <p className="text-[10px] sm:text-xs text-gray-400 font-light">
             created with Simple Allergy Alert © 2026 dpbcreative
           </p>
