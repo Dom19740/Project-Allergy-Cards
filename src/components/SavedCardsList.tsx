@@ -36,6 +36,9 @@ const SavedCardsList = () => {
     localStorage.setItem('customAlertMessages', JSON.stringify(card.customMessages));
     localStorage.setItem('selectedLanguageCode', card.languageCode);
     
+    // Store the full card data so AllergyCard can use pre-translated content offline
+    localStorage.setItem('viewingSavedCard', JSON.stringify(card));
+    
     navigate(`/alert/${card.languageCode}`);
     toast.success(`Loaded card: ${card.name}`);
   };

@@ -6,7 +6,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { toast } from 'sonner';
-import { SavedCard, SelectedAllergens, CustomMessages } from '@/lib/types';
+import { SavedCard, SelectedAllergens, CustomMessages, TranslatedContent } from '@/lib/types';
 
 interface SaveCardDialogProps {
   isOpen: boolean;
@@ -14,6 +14,7 @@ interface SaveCardDialogProps {
   languageCode: string;
   selectedAllergens: SelectedAllergens;
   customMessages: CustomMessages;
+  translatedContent: TranslatedContent;
 }
 
 const SaveCardDialog: React.FC<SaveCardDialogProps> = ({
@@ -21,7 +22,8 @@ const SaveCardDialog: React.FC<SaveCardDialogProps> = ({
   onClose,
   languageCode,
   selectedAllergens,
-  customMessages
+  customMessages,
+  translatedContent
 }) => {
   const [cardName, setCardName] = useState('');
 
@@ -53,6 +55,7 @@ const SaveCardDialog: React.FC<SaveCardDialogProps> = ({
       languageCode,
       selectedAllergens,
       customMessages,
+      translatedContent,
       createdAt: Date.now()
     };
 
