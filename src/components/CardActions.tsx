@@ -32,7 +32,7 @@ const CardActions: React.FC<CardActionsProps> = ({
           variant="ghost"
           size="icon"
           className="text-gray-500 hover:bg-gray-100 rounded-full h-10 w-10"
-          title="Navigation Menu"
+          title="Menu"
         >
           <Menu className="h-5 w-5" />
         </Button>
@@ -64,7 +64,7 @@ const CardActions: React.FC<CardActionsProps> = ({
           variant="ghost"
           size="icon"
           className="text-blue-600 hover:bg-blue-50 rounded-full h-10 w-10"
-          title="Download Image"
+          title="Download Card"
         >
           {isDownloading ? <Loader2 className="h-5 w-5 animate-spin" /> : <Download className="h-5 w-5" />}
         </Button>
