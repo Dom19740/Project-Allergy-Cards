@@ -9,8 +9,11 @@ import FixedHeader from '@/components/FixedHeader';
 const SelectAlertPage = () => {
   const navigate = useNavigate();
   const [iAmAllergicTo, setIAmAllergicTo] = useState("I can not eat:");
-  const [theyMakeMeSick, setTheyMakeMeSick] = useState("They make me very sick and I could die");
+  const [theyMakeMeSick, setTheyMakeMeSick] = useState(
+    "They make me very sick and I could die",
+  );
 
+  // Load any previously saved custom messages
   useEffect(() => {
     const savedAlert = localStorage.getItem('customAlertMessages');
     if (savedAlert) {
@@ -25,40 +28,80 @@ const SelectAlertPage = () => {
   }, []);
 
   const handleContinue = () => {
-    localStorage.setItem('customAlertMessages', JSON.stringify({ iAmAllergicTo, theyMakeMeSick }));
+    localStorage.setItem(
+      'customAlertMessages',
+      JSON.stringify({
+        iAmAllergicTo,
+        theyMakeMeSick,
+      }),
+    );
     navigate('/select-language');
   };
 
   return (
     <div className="flex flex-col min-h-screen bg-gray-100 dark:bg-gray-900">
       <FixedHeader />
+
       <div className="flex flex-col flex-grow w-full max-w-2xl mx-auto px-4 pt-[126px]">
         <div className="flex-grow overflow-y-auto">
           <div className="flex flex-col items-center text-center space-y-8">
-            <h2 className="text-2xl font-bold text-gray-700 dark:text-gray-200">Customise Alert</h2>
+            <div className="flex items-center space-x-2">
+              <h2 className="text-xl sm:text-2xl font-bold text-gray-700 dark:text-gray-200">
+                Customise Alert
+              </h2>
+            </div>
+
             <div className="w-full space-y-6 text-left">
+              {/* Primary warning */}
               <div className="space-y-2">
-                <Label className="text-sm font-medium text-gray-500 ml-[10px]">Primary Warning</Label>
+                <Label
+                  htmlFor="allergic-to"
+                  className="text-sm font-medium text-gray-500 dark:text-gray-400"
+                >
+                  Primary Warning
+                </Label>
                 <textarea
+                  id="allergic-to"
                   value={iAmAllergicTo}
                   onChange={(e) => setIAmAllergicTo(e.target.value)}
-                  className="w-[calc(100%-20px)] mx-[10px] px-4 py-3 bg-white dark:bg-gray-800 border border-gray-300 rounded-lg min-h-[80px] resize-y"
+                  placeholder="e.g. I can not eat:"
+                  className="w-[calc(100%-20px)] mx-[10px] px-4 py-3 text-base sm:text-lg bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-700 rounded-lg shadow-sm text-gray-800 dark:text-gray-200 min-h-[80px] resize-y"
                 />
               </div>
+
+              {/* Secondary warning */}
               <div className="space-y-2">
-                <Label className="text-sm font-medium text-gray-500 ml-[10px]">Secondary Warning</Label>
+                <Label
+                  htmlFor="make-me-sick"
+                  className="text-sm font-medium text-gray-500 dark:text-gray-400"
+                >
+                  Secondary Warning
+                </Label>
                 <textarea
+                  id="make-me-sick"
                   value={theyMakeMeSick}
                   onChange={(e) => setTheyMakeMeSick(e.target.value)}
-                  className="w-[calc(100%-20px)] mx-[10px] px-4 py-3 bg-white dark:bg-gray-800 border border-gray-300 rounded-lg min-h-[80px] resize-y"
+                  placeholder="e.g. They make me very sick..."
+                  className="w-[calc(100%-20px)] mx-[10px] px-4 py-3 text-base sm:text-lg bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-700 rounded-lg shadow-sm text-gray-800 dark:text-gray-200 min-h-[80px] resize-y"
                 />
               </div>
             </div>
           </div>
         </div>
+
         <div className="w-full flex flex-col sm:flex-row justify-center sm:justify-between items-center mt-8 mb-[50px] gap-4">
-          <Button onClick={() => navigate(-1)} className="bg-gray-200 text-gray-800 w-[280px]">Back</Button>
-          <Button onClick={handleContinue} className="bg-red-600 text-white w-[280px]">Continue</Button>
+          <Button
+            onClick={() => navigate(-1)}
+            className="py-3 text-lg md:text-xl h-auto transition-all duration-200 ease-in-out hover:scale-105 bg-gray-200 text-gray-800 hover:bg-gray-300 w-[280px]"
+          >
+            Back
+          </Button>
+          <Button
+            onClick={handleContinue}
+            className="py-3 text-lg md:text-xl h-auto transition-all duration-200 ease-in-out hover:scale-105 bg-red-600 text-white hover:bg-red-700 w-[280px]"
+          >
+            Continue
+          </Button>
         </div>
       </div>
     </div>
