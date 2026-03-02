@@ -80,7 +80,6 @@ const EmergencyPage = () => {
           text: `${translatedText.attention}: ${translatedText.emergency}`,
         };
 
-        // Check if file sharing is supported
         if (navigator.canShare && navigator.canShare({ files: [file] })) {
           shareData.files = [file];
         } else {
@@ -89,13 +88,11 @@ const EmergencyPage = () => {
 
         await navigator.share(shareData);
       } else {
-        // Fallback: Copy link to clipboard
         await navigator.clipboard.writeText(window.location.href);
         alert('Link copied to clipboard!');
       }
     } catch (error) {
       console.error('Share failed:', error);
-      // Final fallback to simple text share
       if (navigator.share) {
         try {
           await navigator.share({
@@ -145,45 +142,47 @@ const EmergencyPage = () => {
   }
 
   return (
-    <div className="flex flex-col min-h-screen bg-white">
-      <div className="flex flex-col flex-grow w-full max-w-2xl mx-auto px-6 pt-10 pb-10">
-        <div className="flex-grow flex flex-col items-center justify-center text-center space-y-8">
-          <div ref={cardRef} className="w-full flex flex-col items-center space-y-8 bg-white p-4 rounded-3xl">
-            <div className="bg-red-600 p-6 rounded-full shadow-lg">
-              <AlertTriangle className="h-16 w-16 text-white" />
+    <div className="flex flex-col h-[100dvh] bg-white overflow-hidden">
+      <div className="flex flex-col flex-grow w-full max-w-2xl mx-auto px-4 sm:px-6 py-4 sm:py-8 overflow-y-auto">
+        <div className="flex-grow flex flex-col items-center justify-center text-center space-y-4 sm:space-y-8">
+          <div ref={cardRef} className="w-full flex flex-col items-center space-y-4 sm:space-y-8 bg-white p-2 sm:p-4 rounded-3xl">
+            <div className="bg-red-600 p-4 sm:p-6 rounded-full shadow-lg shrink-0">
+              <AlertTriangle className="h-10 w-10 sm:h-16 sm:w-16 text-white" />
             </div>
             
-            <div className="space-y-6 bg-red-50 p-8 rounded-3xl border-2 border-red-200 w-full">
-              <h1 className="text-4xl sm:text-6xl font-black tracking-tighter uppercase text-red-600 border-b-4 border-red-600 pb-4">
-                {translatedText.attention}
-              </h1>
+            <div className="space-y-4 sm:space-y-6 bg-red-50 p-4 sm:p-8 rounded-3xl border-2 border-red-200 w-full">
+              <div className="flex justify-center border-b-4 border-red-600 pb-2 sm:pb-4">
+                <h1 className="text-3xl sm:text-6xl font-black tracking-tighter uppercase text-red-600 text-center">
+                  {translatedText.attention}
+                </h1>
+              </div>
               
-              <div className="space-y-4">
-                <p className="text-2xl sm:text-3xl font-bold text-gray-900 leading-tight">
+              <div className="space-y-2 sm:space-y-4">
+                <p className="text-xl sm:text-3xl font-bold text-gray-900 leading-tight">
                   {translatedText.emergency}
                 </p>
-                <p className="text-2xl sm:text-3xl font-bold text-gray-900 leading-tight">
+                <p className="text-xl sm:text-3xl font-bold text-gray-900 leading-tight">
                   {translatedText.needHelp}
                 </p>
-                <p className="text-2xl sm:text-3xl font-bold text-red-700 leading-tight">
+                <p className="text-xl sm:text-3xl font-bold text-red-700 leading-tight">
                   {translatedText.callServices}
                 </p>
               </div>
             </div>
           </div>
 
-          <div className="w-full pt-4">
+          <div className="w-full pt-2">
             <a 
               href="tel:112" 
-              className="flex items-center justify-center gap-4 w-full py-6 bg-red-600 hover:bg-red-700 text-white rounded-2xl text-3xl font-black shadow-xl transition-transform active:scale-95"
+              className="flex items-center justify-center gap-3 sm:gap-4 w-full py-4 sm:py-6 bg-red-600 hover:bg-red-700 text-white rounded-2xl text-2xl sm:text-3xl font-black shadow-xl transition-transform active:scale-95"
             >
-              <Phone className="h-10 w-10 fill-current" />
+              <Phone className="h-8 w-8 sm:h-10 sm:w-10 fill-current" />
               {translatedText.dial112}
             </a>
           </div>
         </div>
 
-        <div className="mt-12">
+        <div className="mt-4 sm:mt-8 shrink-0">
           <EmergencyActions 
             onBack={() => navigate(-1)}
             onShare={handleShare}
