@@ -169,7 +169,7 @@ const AllergyCard: React.FC<AllergyCardProps> = ({ languageCode, selectedAllerge
           await navigator.share({
             files: [file],
             title: 'My Allergy Card',
-            text: 'Check out my allergy card!'
+            text: 'Here is my allergy card, created with Simple Allergy Alert'
           });
         } else {
           toast.warning("Sharing not supported on this browser. Downloading instead.", { duration: 1000 });
@@ -296,6 +296,12 @@ const AllergyCard: React.FC<AllergyCardProps> = ({ languageCode, selectedAllerge
             </div>
           </div>
         )}
+
+        <div className="mt-auto pt-4">
+          <p className="text-[10px] sm:text-xs text-gray-400 font-light">
+            created with Simple Allergy Alert © 2026 dpbcreative
+          </p>
+        </div>
       </div>
 
       {/* Action Buttons */}

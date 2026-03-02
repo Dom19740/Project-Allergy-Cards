@@ -13,7 +13,7 @@ const CardMenu: React.FC<CardMenuProps> = ({ isOpen, onClose }) => {
   if (!isOpen) return null;
 
   const menuItems = [
-    { to: "/", label: "Home", icon: Home },
+    { to: "/", label: "Saved Cards", icon: Home },
     { to: "/select-allergens", label: "Edit Allergens", icon: ShieldAlert },
     { to: "/select-alert", label: "Edit Message", icon: MessageSquare },
     { to: "/select-language", label: "Change Language", icon: Languages },
@@ -31,7 +31,7 @@ const CardMenu: React.FC<CardMenuProps> = ({ isOpen, onClose }) => {
       <div className="fixed bottom-24 left-1/2 transform -translate-x-1/2 w-64 bg-white dark:bg-gray-800 rounded-2xl shadow-2xl border border-gray-200 dark:border-gray-700 z-50 overflow-hidden animate-in fade-in slide-in-from-bottom-4 duration-200">
         <div className="p-2">
           <div className="flex items-center justify-between px-4 py-2 border-bottom border-gray-100 dark:border-gray-700 mb-1">
-            <span className="text-xs font-bold text-gray-400 uppercase tracking-wider">Navigation</span>
+            <span className="text-xs font-bold text-gray-400 uppercase tracking-wider">Menu</span>
             <button onClick={onClose} className="text-gray-400 hover:text-gray-600">
               <X className="h-4 w-4" />
             </button>
