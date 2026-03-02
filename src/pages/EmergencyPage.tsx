@@ -4,7 +4,6 @@ import React, { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { AlertTriangle, ArrowLeft, Loader2, Phone } from 'lucide-react';
 import { translateText } from '@/lib/translator';
-import FixedHeader from '@/components/FixedHeader';
 import { Button } from '@/components/ui/button';
 
 const EmergencyPage = () => {
@@ -63,9 +62,7 @@ const EmergencyPage = () => {
 
   return (
     <div className="flex flex-col min-h-screen bg-white">
-      <FixedHeader />
-      
-      <div className="flex flex-col flex-grow w-full max-w-2xl mx-auto px-6 pt-[120px] pb-10">
+      <div className="flex flex-col flex-grow w-full max-w-2xl mx-auto px-6 pt-10 pb-10">
         <div className="flex-grow flex flex-col items-center justify-center text-center space-y-8">
           <div className="bg-red-600 p-6 rounded-full shadow-lg">
             <AlertTriangle className="h-16 w-16 text-white" />
@@ -104,9 +101,9 @@ const EmergencyPage = () => {
           <Button
             variant="ghost"
             onClick={() => navigate(-1)}
-            className="flex items-center gap-2 text-gray-500 hover:text-gray-900 text-lg font-medium"
+            className="flex items-center gap-2 text-gray-400 hover:text-gray-600 text-base font-normal"
           >
-            <ArrowLeft className="h-5 w-5" />
+            <ArrowLeft className="h-4 w-4" />
             Back to Card
           </Button>
         </div>
