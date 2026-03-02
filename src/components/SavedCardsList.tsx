@@ -68,14 +68,16 @@ const SavedCardsList = () => {
                   size="sm"
                   onClick={() => handleLoad(card)}
                   className="flex items-center text-blue-600 border-blue-200 hover:bg-blue-50"
+                  title="Load Card"
                 >
-                  <ExternalLink className="w-4 h-4 mr-1" /> Load
+                  <ExternalLink className="w-4 h-4" />
                 </Button>
                 <Button
                   variant="outline"
                   size="sm"
                   onClick={() => handleDelete(card.id, card.name)}
                   className="flex items-center text-red-600 border-red-200 hover:bg-red-50"
+                  title="Delete Card"
                 >
                   <Trash2 className="w-4 h-4" />
                 </Button>
