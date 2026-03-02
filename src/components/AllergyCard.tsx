@@ -94,7 +94,6 @@ const AllergyCard: React.FC<AllergyCardProps> = ({ languageCode, selectedAllerge
       setIsTranslating(true);
       try {
         const [alert, allergicTo, careful, thankYou, langName, theyMakeMeSick] = await Promise.all([
-
           translateText("ALLERGY ALERT!", languageCode),
           translateText(customMessages.iAmAllergicTo, languageCode),
           translateText("Please be careful with my food.", languageCode),
@@ -191,9 +190,17 @@ const AllergyCard: React.FC<AllergyCardProps> = ({ languageCode, selectedAllerge
     if (cardRef.current) {
       const printWindow = window.open('', '_blank', 'width=800,height=600');
       if (printWindow) {
-        printWindow.document.write(cardRef.current?.outerHTML);
-        printWindow.print();
-        printWindow.close();
+        printWindow.document.write('<html><head><title>Print Allergy Card</title>');
+        printWindow.document.write('<link rel="stylesheet" href="/src/globals.css">');
+        printWindow.document.write('</head><body>');
+        printWindow.document.write(cardRef.current.innerHTML);
+        printWindow.document.write('</body></html>');
+        printWindow.document.close();
+        printWindow.focus();
+        setTimeout(() => {
+          printWindow.print();
+          printWindow.close();
+        }, 500);
       }
     }
   };
@@ -237,13 +244,13 @@ const AllergyCard: React.FC<AllergyCardProps> = ({ languageCode, selectedAllerge
         ref={cardRef} 
         className="flex-1 w-full flex flex-col items-center justify-start text-center print:shadow-none print:m-0 print:rounded-none overflow-hidden p-4 sm:p-6 md:p-8 bg-white"
       >
-        <div className="h-4 sm:h-8 md:h-12" /> {/* Top spacing */}
+        <div className="h-4 sm:h-8 md:h-12" />
 
         <h1 className="text-2xl sm:text-4xl md:text-5xl lg:text-6xl font-black leading-tight mb-4 sm:mb-8 md:mb-12 text-red-600 uppercase tracking-tighter whitespace-nowrap">
           {translatedUIText.allergyAlert}
         </h1>
 
-        <p className="text-2xl sm:text-3xl md:text-4xl font-normal text-gray-800 mb-4 sm:mb-8 md:mb-12"> // <-- EDIT HERE
+        <p className="text-2xl sm:text-3xl md:text-4xl font-normal text-gray-800 mb-4 sm:mb-8 md:mb-12">
           {translatedUIText.iAmAllergicTo}
         </p>
 
@@ -268,9 +275,7 @@ const AllergyCard: React.FC<AllergyCardProps> = ({ languageCode, selectedAllerge
 
         {allergensWithImages.length > 0 && (
           <div className="relative w-full max-w-[400px] aspect-square mx-auto flex-shrink min-h-0">
-            {/* Unified Container for locking */}
             <div className="absolute inset-0 flex items-center justify-center">
-              {/* Allergens Grid - expanded to full width */}
               <div className={`absolute inset-0 grid ${imageGridClasses} gap-1 sm:gap-2 items-center justify-items-center z-0 p-4`}>
                 {allergensWithImages.map((allergen) => (
                   <div key={allergen.id} className="w-full h-full flex items-center justify-center">
@@ -283,7 +288,6 @@ const AllergyCard: React.FC<AllergyCardProps> = ({ languageCode, selectedAllerge
                 ))}
               </div>
               
-              {/* No Entry Overlay - spans the entire container */}
               <img
                 src="/noentry.png"
                 alt="No entry"
