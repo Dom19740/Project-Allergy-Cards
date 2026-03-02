@@ -11,8 +11,8 @@ const Home = () => {
 
   const handleScroll = (e: React.UIEvent<HTMLDivElement>) => {
     const scrollTop = e.currentTarget.scrollTop;
-    // Fade out over 300px of scroll
-    const newOpacity = Math.max(0, 1 - scrollTop / 300);
+    // Fade out much faster (over 80px of scroll) to prevent sliding behind header
+    const newOpacity = Math.max(0, 1 - scrollTop / 80);
     setScrollOpacity(newOpacity);
   };
 
@@ -31,10 +31,10 @@ const Home = () => {
             <img 
               src="/logo_main.png" 
               alt="App Logo" 
-              className="w-72 h-72 sm:w-96 sm:h-96 md:w-[30rem] md:h-[30rem] object-contain transition-opacity duration-75" 
+              className="w-72 h-72 sm:w-96 sm:h-96 md:w-[30rem] md:h-[30rem] object-contain transition-opacity duration-150" 
               style={{ opacity: scrollOpacity }}
             />
-            <div style={{ opacity: scrollOpacity }} className="transition-opacity duration-75 space-y-8">
+            <div style={{ opacity: scrollOpacity }} className="transition-opacity duration-150 space-y-8">
               <p className="text-lg md:text-xl text-gray-700 dark:text-gray-300 max-w-md px-10">
                 Create a personalized allergy alert in multiple languages to communicate your dietary restrictions easily and safely when traveling or dining out. 
               </p>
