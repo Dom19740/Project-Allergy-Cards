@@ -2,14 +2,15 @@
 
 import React, { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { AlertTriangle, ArrowLeft, Loader2, Phone, Share2, Download } from 'lucide-react';
+import { AlertTriangle, Loader2, Phone } from 'lucide-react';
 import { translateText } from '@/lib/translator';
-import { Button } from '@/components/ui/button';
+import EmergencyActions from '@/components/EmergencyActions';
 
 const EmergencyPage = () => {
   const { langCode } = useParams<{ langCode: string }>();
   const navigate = useNavigate();
   const [isTranslating, setIsTranslating] = useState(true);
+  const [isSharing, setIsSharing] = useState(false);
   const [translatedText, setTranslatedText] = useState({
     attention: "ATTENTION",
     emergency: "I am having a severe allergic reaction.",
@@ -53,6 +54,7 @@ const EmergencyPage = () => {
 
   const handleShare = async () => {
     if (navigator.share) {
+      setIsSharing(true);
       try {
         await navigator.share({
           title: 'Emergency Medical Message',
@@ -61,6 +63,8 @@ const EmergencyPage = () => {
         });
       } catch (error) {
         console.error('Error sharing:', error);
+      } finally {
+        setIsSharing(false);
       }
     }
   };
@@ -115,36 +119,13 @@ const EmergencyPage = () => {
           </div>
         </div>
 
-        <div className="mt-12 flex flex-wrap items-center justify-center gap-4">
-          <Button
-            variant="ghost"
-            onClick={() => navigate(-1)}
-            className="flex items-center gap-2 text-gray-400 hover:text-gray-600 text-base font-normal"
-          >
-            <ArrowLeft className="h-4 w-4" />
-            Back to Card
-          </Button>
-
-          <div className="flex items-center gap-2">
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={handleShare}
-              className="flex items-center gap-2 text-gray-500 border-gray-200"
-            >
-              <Share2 className="h-4 w-4" />
-              Share
-            </Button>
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={handleDownload}
-              className="flex items-center gap-2 text-gray-500 border-gray-200"
-            >
-              <Download className="h-4 w-4" />
-              Download
-            </Button>
-          </div>
+        <div className="mt-12">
+          <EmergencyActions 
+            onBack={() => navigate(-1)}
+            onShare={handleShare}
+            onDownload={handleDownload}
+            isSharing={isSharing}
+          />
         </div>
       </div>
     </div>
