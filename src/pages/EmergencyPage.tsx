@@ -2,9 +2,10 @@
 
 import React, { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { AlertTriangle, ArrowLeft, Loader2 } from 'lucide-react';
+import { AlertTriangle, ArrowLeft, Loader2, Phone } from 'lucide-react';
 import { translateText } from '@/lib/translator';
 import FixedHeader from '@/components/FixedHeader';
+import { Button } from '@/components/ui/button';
 
 const EmergencyPage = () => {
   const { langCode } = useParams<{ langCode: string }>();
@@ -14,7 +15,8 @@ const EmergencyPage = () => {
     attention: "ATTENTION",
     emergency: "I am having a medical emergency.",
     needHelp: "I need help immediately.",
-    callServices: "Please call emergency services."
+    callServices: "Please call emergency services.",
+    dial112: "DIAL 112"
   });
 
   useEffect(() => {
@@ -25,18 +27,20 @@ const EmergencyPage = () => {
       }
 
       try {
-        const [attention, emergency, needHelp, callServices] = await Promise.all([
+        const [attention, emergency, needHelp, callServices, dial112] = await Promise.all([
           translateText("ATTENTION", langCode),
           translateText("I am having a medical emergency.", langCode),
           translateText("I need help immediately.", langCode),
-          translateText("Please call emergency services.", langCode)
+          translateText("Please call emergency services.", langCode),
+          translateText("DIAL 112", langCode)
         ]);
 
         setTranslatedText({
           attention,
           emergency,
           needHelp,
-          callServices
+          callServices,
+          dial112
         });
       } catch (error) {
         console.error('Translation failed:', error);
@@ -58,42 +62,53 @@ const EmergencyPage = () => {
   }
 
   return (
-    <div className="flex flex-col min-h-screen bg-red-600 text-white">
+    <div className="flex flex-col min-h-screen bg-white">
       <FixedHeader />
       
-      <div className="flex flex-col flex-grow w-full max-w-2xl mx-auto px-6 pt-[140px] pb-10">
-        <div className="flex-grow flex flex-col items-center justify-center text-center space-y-12">
-          <div className="bg-white p-8 rounded-full animate-pulse shadow-2xl">
-            <AlertTriangle className="h-24 w-24 text-red-600" />
+      <div className="flex flex-col flex-grow w-full max-w-2xl mx-auto px-6 pt-[120px] pb-10">
+        <div className="flex-grow flex flex-col items-center justify-center text-center space-y-8">
+          <div className="bg-red-600 p-6 rounded-full shadow-lg">
+            <AlertTriangle className="h-16 w-16 text-white" />
           </div>
           
-          <div className="space-y-8">
-            <h1 className="text-5xl sm:text-7xl font-black tracking-tighter uppercase border-b-8 border-white pb-4">
+          <div className="space-y-6 bg-red-50 p-8 rounded-3xl border-2 border-red-200 w-full">
+            <h1 className="text-4xl sm:text-6xl font-black tracking-tighter uppercase text-red-600 border-b-4 border-red-600 pb-4">
               {translatedText.attention}
             </h1>
             
-            <div className="space-y-6">
-              <p className="text-3xl sm:text-4xl font-bold leading-tight">
+            <div className="space-y-4">
+              <p className="text-2xl sm:text-3xl font-bold text-gray-900 leading-tight">
                 {translatedText.emergency}
               </p>
-              <p className="text-3xl sm:text-4xl font-bold leading-tight">
+              <p className="text-2xl sm:text-3xl font-bold text-gray-900 leading-tight">
                 {translatedText.needHelp}
               </p>
-              <p className="text-3xl sm:text-4xl font-bold leading-tight underline decoration-4 underline-offset-8">
+              <p className="text-2xl sm:text-3xl font-bold text-red-700 leading-tight">
                 {translatedText.callServices}
               </p>
             </div>
           </div>
+
+          <div className="w-full pt-4">
+            <a 
+              href="tel:112" 
+              className="flex items-center justify-center gap-4 w-full py-6 bg-red-600 hover:bg-red-700 text-white rounded-2xl text-3xl font-black shadow-xl transition-transform active:scale-95"
+            >
+              <Phone className="h-10 w-10 fill-current" />
+              {translatedText.dial112}
+            </a>
+          </div>
         </div>
 
         <div className="mt-12 flex justify-center">
-          <button
+          <Button
+            variant="ghost"
             onClick={() => navigate(-1)}
-            className="flex items-center gap-2 px-8 py-4 bg-white/20 hover:bg-white/30 rounded-full transition-colors text-xl font-bold backdrop-blur-sm"
+            className="flex items-center gap-2 text-gray-500 hover:text-gray-900 text-lg font-medium"
           >
-            <ArrowLeft className="h-6 w-6" />
+            <ArrowLeft className="h-5 w-5" />
             Back to Card
-          </button>
+          </Button>
         </div>
       </div>
     </div>
