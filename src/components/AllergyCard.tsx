@@ -34,10 +34,9 @@ const AllergyCard: React.FC<AllergyCardProps> = ({
   };
 
   const handleToggleMenu = () => {
-    navigate('/allergen-selection');
+    navigate('/select-allergens');
   };
 
-  // Map the new props to the format expected by AllergyCardContent
   const allergensData = {
     ids: selectedAllergens,
     custom: []
