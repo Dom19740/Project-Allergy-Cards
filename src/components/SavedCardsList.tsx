@@ -4,7 +4,7 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Trash2, ExternalLink, Clock } from 'lucide-react';
+import { Trash2, ExternalLink, Clock, Bookmark } from 'lucide-react';
 import { SavedCard } from '@/lib/types';
 import { toast } from 'sonner';
 
@@ -45,13 +45,17 @@ const SavedCardsList = () => {
   }
 
   return (
-    <div className="w-full max-w-2xl mx-auto mt-8 px-4">
-      <h3 className="text-xl text-gray-700 dark:text-gray-200 mb-4 flex items-center justify-center">
-        Your Saved Cards ({savedCards.length}/3)
-      </h3>
+    <div className="w-full max-w-2xl mx-auto mt-12 mb-8 p-6 bg-gray-50 dark:bg-gray-800/40 rounded-2xl border border-gray-200 dark:border-gray-700 shadow-sm">
+      <div className="flex items-center justify-center space-x-2 mb-6">
+        <Bookmark className="w-5 h-5 text-blue-600 dark:text-blue-400" />
+        <h3 className="text-xl font-bold text-gray-800 dark:text-gray-100">
+          Your Saved Cards ({savedCards.length}/3)
+        </h3>
+      </div>
+      
       <div className="grid gap-4">
         {savedCards.map((card) => (
-          <Card key={card.id} className="bg-white dark:bg-gray-800 border-gray-200 dark:border-gray-700 shadow-sm hover:shadow-md transition-shadow">
+          <Card key={card.id} className="bg-white dark:bg-gray-800 border-gray-200 dark:border-gray-700 shadow-sm hover:shadow-md transition-shadow overflow-hidden">
             <CardContent className="p-4 flex items-center justify-between">
               <div className="flex flex-col flex-1 pr-4 text-left">
                 <CardTitle className="text-lg font-semibold text-gray-800 dark:text-gray-100">
@@ -67,7 +71,7 @@ const SavedCardsList = () => {
                   variant="outline"
                   size="sm"
                   onClick={() => handleLoad(card)}
-                  className="flex items-center text-blue-600 border-blue-200 hover:bg-blue-50"
+                  className="flex items-center text-blue-600 border-blue-200 hover:bg-blue-50 dark:hover:bg-blue-900/20 dark:border-blue-900/50"
                   title="Load Card"
                 >
                   <ExternalLink className="w-4 h-4" />
@@ -76,7 +80,7 @@ const SavedCardsList = () => {
                   variant="outline"
                   size="sm"
                   onClick={() => handleDelete(card.id, card.name)}
-                  className="flex items-center text-red-600 border-red-200 hover:bg-red-50"
+                  className="flex items-center text-red-600 border-red-200 hover:bg-red-50 dark:hover:bg-red-900/20 dark:border-red-900/50"
                   title="Delete Card"
                 >
                   <Trash2 className="w-4 h-4" />
