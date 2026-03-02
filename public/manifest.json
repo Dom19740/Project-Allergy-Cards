@@ -1,6 +1,6 @@
 {
   "name": "Simple Allergy Alert",
-  "short_name": "Allergy Alert",
+  "short_name": "Simple Allergy Alert",
   "description": "Create and share personalized allergy alert cards in multiple languages.",
   "start_url": "/",
   "display": "standalone",
