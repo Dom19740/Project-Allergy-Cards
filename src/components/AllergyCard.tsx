@@ -243,11 +243,11 @@ const AllergyCard: React.FC<AllergyCardProps> = ({ languageCode, selectedAllerge
           {translatedUIText.allergyAlert}
         </h1>
 
-        <p className="text-lg sm:text-xl md:text-2xl font-normal text-gray-800 mb-4 sm:mb-8 md:mb-12">
+        <p className="text-2xl sm:text-3xl md:text-4xl font-normal text-gray-800 mb-4 sm:mb-8 md:mb-12"> // <-- EDIT HERE
           {translatedUIText.iAmAllergicTo}
         </p>
 
-        <div className="flex flex-wrap justify-center gap-1 sm:gap-2 mb-4 sm:mb-4">
+        <div className="flex flex-wrap justify-center gap-1 sm:gap-2 mb-2 sm:mb-4">
           {translatedAllergenList.map((allergen, index) => (
             <span
               key={index}
@@ -258,11 +258,11 @@ const AllergyCard: React.FC<AllergyCardProps> = ({ languageCode, selectedAllerge
           ))}
         </div>
 
-        <p className="text-lg sm:text-xl md:text-2xl font-normal text-gray-800 mb-2 sm:mb-3 leading-tight max-w-2xl">
+        <p className="text-2xl sm:text-3xl md:text-4xl font-normal text-gray-800 mb-2 sm:mb-3 leading-tight max-w-2xl">
           {translatedUIText.theyMakeMeSick}
         </p>
 
-        <p className="text-lg sm:text-xl md:text-2xl font-normal text-gray-600 italic mb-4 sm:mb-6">
+        <p className="text-2xl sm:text-3xl md:text-4xl font-normal text-gray-600 italic mb-4 sm:mb-6">
           {translatedUIText.thankYou}
         </p>
 
