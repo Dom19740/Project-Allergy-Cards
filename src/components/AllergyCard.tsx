@@ -329,7 +329,7 @@ const AllergyCard: React.FC<AllergyCardProps> = ({ languageCode, selectedAllerge
           <p className="text-[20px] sm:text-2xl text-gray-400 font-light mb-1">
             Translated to {LANGUAGE_NAMES[languageCode] || languageCode}
           </p>
-          <p className="text-[10px] sm:text-xs text-gray-400 font-light">
+          <p className="text-[13px] sm:text-base text-gray-400 font-light">
             created with Simple Allergy Alert © 2026 dpbcreative
           </p>
         </div>
