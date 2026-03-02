@@ -46,7 +46,7 @@ const SavedCardsList = () => {
 
   return (
     <div className="w-full max-w-2xl mx-auto mt-8 px-4">
-      <h3 className="text-xl font-bold text-gray-700 dark:text-gray-200 mb-4 flex items-center justify-center">
+      <h3 className="text-xl text-gray-700 dark:text-gray-200 mb-4 flex items-center justify-center">
         Your Saved Cards ({savedCards.length}/3)
       </h3>
       <div className="grid gap-4">

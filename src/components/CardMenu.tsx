@@ -23,14 +23,14 @@ const CardMenu: React.FC<CardMenuProps> = ({ isOpen, onClose }) => {
     <>
       {/* Backdrop */}
       <div 
-        className="fixed inset-0 bg-black/20 backdrop-blur-sm z-40" 
+        className="fixed inset-0 bg-black/20 backdrop-blur-sm z-40 animate-in fade-in duration-300" 
         onClick={onClose}
       />
       
       {/* Menu Content */}
-      <div className="fixed bottom-24 left-1/2 transform -translate-x-1/2 w-64 bg-white dark:bg-gray-800 rounded-2xl shadow-2xl border border-gray-200 dark:border-gray-700 z-50 overflow-hidden animate-in fade-in slide-in-from-bottom-4 duration-200">
+      <div className="fixed bottom-24 left-1/2 -translate-x-1/2 w-64 bg-white dark:bg-gray-800 rounded-2xl shadow-2xl border border-gray-200 dark:border-gray-700 z-50 overflow-hidden animate-in fade-in slide-in-from-bottom-8 duration-300 ease-out">
         <div className="p-2">
-          <div className="flex items-center justify-between px-4 py-2 border-bottom border-gray-100 dark:border-gray-700 mb-1">
+          <div className="flex items-center justify-between px-4 py-2 border-b border-gray-100 dark:border-gray-700 mb-1">
             <span className="text-xs font-bold text-gray-400 uppercase tracking-wider">Menu</span>
             <button onClick={onClose} className="text-gray-400 hover:text-gray-600">
               <X className="h-4 w-4" />

@@ -33,7 +33,7 @@ const Home = () => {
         {/* Bottom Section: Fixed height button area */}
         <div className="w-full flex flex-col justify-center items-center mt-8 mb-[50px]">
           <p className="text-xs text-gray-500 dark:text-gray-400 mb-2">
-            Made with Dyad. © 2025 <a href="https://dpbcreative.com/" target="_blank" rel="noopener noreferrer" className="underline hover:text-gray-700 dark:hover:text-gray-200">dpb creative</a>. All rights reserved
+          © 2026 <a href="https://dpbcreative.com/" target="_blank" rel="noopener noreferrer" className="underline hover:text-gray-700 dark:hover:text-gray-200">dpb creative</a>. All rights reserved
           </p>
           <Button 
             asChild 
