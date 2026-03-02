@@ -94,6 +94,7 @@ const AllergyCard: React.FC<AllergyCardProps> = ({ languageCode, selectedAllerge
       setIsTranslating(true);
       try {
         const [alert, allergicTo, careful, thankYou, langName, theyMakeMeSick] = await Promise.all([
+
           translateText("ALLERGY ALERT!", languageCode),
           translateText(customMessages.iAmAllergicTo, languageCode),
           translateText("Please be careful with my food.", languageCode),
@@ -157,10 +158,6 @@ const AllergyCard: React.FC<AllergyCardProps> = ({ languageCode, selectedAllerge
     }
   };
 
-  const handlePrint = () => {
-    window.print();
-  };
-
   const handleShare = async () => {
     if (cardRef.current) {
       setIsSharing(true);
@@ -186,6 +183,17 @@ const AllergyCard: React.FC<AllergyCardProps> = ({ languageCode, selectedAllerge
         }
       } finally {
         setIsSharing(false);
+      }
+    }
+  };
+
+  const handlePrint = () => {
+    if (cardRef.current) {
+      const printWindow = window.open('', '_blank', 'width=800,height=600');
+      if (printWindow) {
+        printWindow.document.write(cardRef.current?.outerHTML);
+        printWindow.print();
+        printWindow.close();
       }
     }
   };
@@ -216,7 +224,7 @@ const AllergyCard: React.FC<AllergyCardProps> = ({ languageCode, selectedAllerge
       <div className="flex flex-col items-center justify-center min-h-screen bg-white">
         <div className="flex flex-col items-center space-y-4">
           <Loader2 className="h-8 w-8 animate-spin text-red-600" />
-          <p className="text-lg text-gray-700">Translating your card...</p>
+          <p className="text-lg sm:text-xl md:text-2xl font-normal text-gray-700">Translating your card...</p>
         </div>
       </div>
     );
@@ -230,7 +238,7 @@ const AllergyCard: React.FC<AllergyCardProps> = ({ languageCode, selectedAllerge
         className="flex-1 w-full flex flex-col items-center justify-start text-center print:shadow-none print:m-0 print:rounded-none overflow-hidden p-4 sm:p-6 md:p-8 bg-white"
       >
         <div className="h-4 sm:h-8 md:h-12" /> {/* Top spacing */}
-        
+
         <h1 className="text-2xl sm:text-4xl md:text-5xl lg:text-6xl font-black leading-tight mb-4 sm:mb-8 md:mb-12 text-red-600 uppercase tracking-tighter whitespace-nowrap">
           {translatedUIText.allergyAlert}
         </h1>
