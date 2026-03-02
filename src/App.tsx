@@ -1,45 +1,26 @@
-import { Toaster } from "@/components/ui/toaster";
-import { Toaster as Sonner } from "@/components/ui/sonner";
-import { TooltipProvider } from "@/components/ui/tooltip";
-import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { BrowserRouter, Routes, Route } from "react-router-dom";
-import Home from "./pages/Home";
-import NotFound from "./pages/NotFound";
-import LanguageSelectionPage from "./pages/LanguageSelectionPage";
-import AllergyAlertPage from "./pages/AllergyAlertPage";
-import AllergenSelectionPage from "./pages/AllergenSelectionPage";
-import SelectAlertPage from "./pages/SelectAlertPage";
-import PageTemplate from "./pages/PageTemplate";
-import { usePreloadImages } from "./hooks/usePreloadImages";
+import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import Index from './pages/Index';
+import AllergenSelectionPage from './pages/AllergenSelectionPage';
+import SelectAlertPage from './pages/SelectAlertPage';
+import SelectLanguagePage from './pages/SelectLanguagePage';
+import AllergyCard from './pages/AllergyCard';
+import EmergencyPage from './pages/EmergencyPage';
+import { Toaster } from 'sonner';
 
-const queryClient = new QueryClient();
-
-const AppContent = () => {
-  usePreloadImages();
-  
+function App() {
   return (
-    <Routes>
-      <Route path="/" element={<Home />} />
-      <Route path="/select-allergens" element={<AllergenSelectionPage />} />
-      <Route path="/select-alert" element={<SelectAlertPage />} />
-      <Route path="/select-language" element={<LanguageSelectionPage />} />
-      <Route path="/alert/:langCode" element={<AllergyAlertPage />} />
-      <Route path="/page-template" element={<PageTemplate />} />
-      <Route path="*" element={<NotFound />} />
-    </Routes>
+    <Router>
+      <Routes>
+        <Route path="/" element={<Index />} />
+        <Route path="/allergen-selection" element={<AllergenSelectionPage />} />
+        <Route path="/select-alert" element={<SelectAlertPage />} />
+        <Route path="/select-language" element={<SelectLanguagePage />} />
+        <Route path="/allergy-card" element={<AllergyCard />} />
+        <Route path="/emergency" element={<EmergencyPage />} />
+      </Routes>
+      <Toaster position="top-center" />
+    </Router>
   );
-};
-
-const App = () => (
-  <QueryClientProvider client={queryClient}>
-    <TooltipProvider>
-      <Toaster />
-      <Sonner />
-      <BrowserRouter>
-        <AppContent />
-      </BrowserRouter>
-    </TooltipProvider>
-  </QueryClientProvider>
-);
+}
 
 export default App;
