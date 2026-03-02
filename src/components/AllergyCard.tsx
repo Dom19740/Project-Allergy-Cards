@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useRef, useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { toPng } from 'html-to-image';
 import { toast } from 'sonner';
 import { Loader2 } from 'lucide-react';
@@ -48,6 +49,7 @@ const LANGUAGE_NAMES: Record<string, string> = {
 
 const AllergyCard: React.FC<AllergyCardProps> = ({ languageCode, selectedAllergens }) => {
   const cardRef = useRef<HTMLDivElement>(null);
+  const navigate = useNavigate();
   const [isSharing, setIsSharing] = useState(false);
   const [isDownloading, setIsDownloading] = useState(false);
   const [isSaveDialogOpen, setIsSaveDialogOpen] = useState(false);
@@ -236,8 +238,7 @@ const AllergyCard: React.FC<AllergyCardProps> = ({ languageCode, selectedAllerge
   };
 
   const handleEmergency = () => {
-    // No effect for now as requested
-    console.log("Emergency button clicked");
+    navigate(`/emergency/${languageCode}`);
   };
 
   const translatedAllergenList = selectedAllergens.map(allergen => 
