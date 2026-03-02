@@ -5,7 +5,7 @@ import { useNavigate } from 'react-router-dom';
 import { toPng } from 'html-to-image';
 import { toast } from 'sonner';
 import { Loader2 } from 'lucide-react';
-import { LanguageCode, SelectedAllergens, CustomMessages, TranslatedContent } from '@/lib/types';
+import { LanguageCode, SelectedAllergens, CustomMessages } from '@/lib/types';
 import { ALLERGEN_OPTIONS } from '@/lib/allergens';
 import { translateText } from '@/lib/translator';
 import SaveCardDialog from './SaveCardDialog';
@@ -61,14 +61,13 @@ const AllergyCard: React.FC<AllergyCardProps> = ({ languageCode, selectedAllerge
     iAmAllergicTo: "I can not eat:",
     theyMakeMeSick: "They make me very sick and I could die"
   });
-  const [translatedUIText, setTranslatedUIText] = useState<TranslatedContent>({
+  const [translatedUIText, setTranslatedUIText] = useState({
     allergyAlert: "ALLERGY ALERT!",
     iAmAllergicTo: "I can not eat:",
     pleaseBeCareful: "Please be careful with my food.",
     thankYou: "Thank you!",
     languageName: "English",
-    theyMakeMeSick: "They make me very sick and I could die",
-    allergens: {}
+    theyMakeMeSick: "They make me very sick and I could die"
   });
   const [isMenuOpen, setIsMenuOpen] = useState(false);
 
@@ -101,23 +100,16 @@ const AllergyCard: React.FC<AllergyCardProps> = ({ languageCode, selectedAllerge
 
   useEffect(() => {
     const translateAllContent = async () => {
-      // Check if we have pre-translated content from a saved card
-      const savedCardData = localStorage.getItem('viewingSavedCard');
-      if (savedCardData) {
-        try {
-          const savedCard = JSON.parse(savedCardData);
-          if (savedCard.translatedContent && savedCard.languageCode === languageCode) {
-            setTranslatedUIText(savedCard.translatedContent);
-            setTranslatedAllergens(savedCard.translatedContent.allergens);
-            setIsTranslating(false);
-            return;
-          }
-        } catch (e) {
-          console.error("Failed to parse saved card data", e);
-        }
-      }
-
       if (!languageCode || languageCode === 'en') {
+        setTranslatedUIText({
+          allergyAlert: "ALLERGY ALERT!",
+          iAmAllergicTo: customMessages.iAmAllergicTo,
+          pleaseBeCareful: "Please be careful with my food.",
+          thankYou: "Thank you!",
+          languageName: "English",
+          theyMakeMeSick: customMessages.theyMakeMeSick
+        });
+
         const allergenTranslations: { [key: string]: string } = {};
         for (const allergenId of selectedAllergens) {
           const predefinedAllergen = ALLERGEN_OPTIONS.find(opt => opt.id === allergenId);
@@ -127,16 +119,6 @@ const AllergyCard: React.FC<AllergyCardProps> = ({ languageCode, selectedAllerge
             allergenTranslations[allergenId] = customAllergenTranslations[allergenId]?.[languageCode] || allergenId;
           }
         }
-
-        setTranslatedUIText({
-          allergyAlert: "ALLERGY ALERT!",
-          iAmAllergicTo: customMessages.iAmAllergicTo,
-          pleaseBeCareful: "Please be careful with my food.",
-          thankYou: "Thank you!",
-          languageName: "English",
-          theyMakeMeSick: customMessages.theyMakeMeSick,
-          allergens: allergenTranslations
-        });
         setTranslatedAllergens(allergenTranslations);
         return;
       }
@@ -152,6 +134,15 @@ const AllergyCard: React.FC<AllergyCardProps> = ({ languageCode, selectedAllerge
           translateText(customMessages.theyMakeMeSick, languageCode)
         ]);
 
+        setTranslatedUIText({
+          allergyAlert: alert,
+          iAmAllergicTo: allergicTo,
+          pleaseBeCareful: careful,
+          thankYou: thankYou,
+          languageName: langName,
+          theyMakeMeSick: theyMakeMeSick
+        });
+
         const allergenTranslations: { [key: string]: string } = {};
         for (const allergenId of selectedAllergens) {
           const predefinedAllergen = ALLERGEN_OPTIONS.find(opt => opt.id === allergenId);
@@ -165,16 +156,6 @@ const AllergyCard: React.FC<AllergyCardProps> = ({ languageCode, selectedAllerge
             }
           }
         }
-
-        setTranslatedUIText({
-          allergyAlert: alert,
-          iAmAllergicTo: allergicTo,
-          pleaseBeCareful: careful,
-          thankYou: thankYou,
-          languageName: langName,
-          theyMakeMeSick: theyMakeMeSick,
-          allergens: allergenTranslations
-        });
         setTranslatedAllergens(allergenTranslations);
       } catch (error) {
         console.error('Translation failed:', error);
@@ -388,7 +369,6 @@ const AllergyCard: React.FC<AllergyCardProps> = ({ languageCode, selectedAllerge
           languageCode={languageCode}
           selectedAllergens={fullSelectedData}
           customMessages={customMessages}
-          translatedContent={translatedUIText}
         />
       )}
 
