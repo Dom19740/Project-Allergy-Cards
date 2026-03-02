@@ -40,7 +40,7 @@ const EmergencyActions: React.FC<EmergencyActionsProps> = ({
           variant="ghost"
           size="icon"
           className="text-green-600 hover:bg-green-50 rounded-full h-10 w-10"
-          title="Share"
+          title="Share Card"
         >
           {isSharing ? <Loader2 className="h-5 w-5 animate-spin" /> : <Share2 className="h-5 w-5" />}
         </Button>
@@ -51,7 +51,7 @@ const EmergencyActions: React.FC<EmergencyActionsProps> = ({
           variant="ghost"
           size="icon"
           className="text-blue-600 hover:bg-blue-50 rounded-full h-10 w-10"
-          title="Download"
+          title="Download Card"
         >
           {isDownloading ? <Loader2 className="h-5 w-5 animate-spin" /> : <Download className="h-5 w-5" />}
         </Button>

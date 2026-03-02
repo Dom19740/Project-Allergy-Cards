@@ -1,16 +1,21 @@
 "use client";
 
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useRef } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { AlertTriangle, Loader2, Phone } from 'lucide-react';
 import { translateText } from '@/lib/translator';
 import EmergencyActions from '@/components/EmergencyActions';
+import html2canvas from 'html2canvas';
 
 const EmergencyPage = () => {
   const { langCode } = useParams<{ langCode: string }>();
   const navigate = useNavigate();
+  const cardRef = useRef<HTMLDivElement>(null);
+  
   const [isTranslating, setIsTranslating] = useState(true);
   const [isSharing, setIsSharing] = useState(false);
+  const [isDownloading, setIsDownloading] = useState(false);
+  
   const [translatedText, setTranslatedText] = useState({
     attention: "ATTENTION",
     emergency: "I am having a severe allergic reaction.",
@@ -53,24 +58,61 @@ const EmergencyPage = () => {
   }, [langCode]);
 
   const handleShare = async () => {
-    if (navigator.share) {
-      setIsSharing(true);
-      try {
-        await navigator.share({
-          title: 'Emergency Medical Message',
-          text: `${translatedText.attention}\n${translatedText.emergency}\n${translatedText.needHelp}`,
-          url: window.location.href,
-        });
-      } catch (error) {
-        console.error('Error sharing:', error);
-      } finally {
-        setIsSharing(false);
-      }
+    if (!cardRef.current) return;
+    setIsSharing(true);
+    try {
+      const canvas = await html2canvas(cardRef.current, {
+        scale: 2,
+        backgroundColor: '#ffffff',
+        logging: false,
+        useCORS: true
+      });
+      
+      canvas.toBlob(async (blob) => {
+        if (!blob) return;
+        const file = new File([blob], 'emergency-message.png', { type: 'image/png' });
+        
+        if (navigator.share && navigator.canShare({ files: [file] })) {
+          await navigator.share({
+            files: [file],
+            title: 'Emergency Medical Message',
+            text: `${translatedText.attention}: ${translatedText.emergency}`,
+          });
+        } else {
+          await navigator.share({
+            title: 'Emergency Medical Message',
+            text: `${translatedText.attention}\n${translatedText.emergency}\n${translatedText.needHelp}`,
+            url: window.location.href,
+          });
+        }
+      }, 'image/png');
+    } catch (error) {
+      console.error('Share failed:', error);
+    } finally {
+      setIsSharing(false);
     }
   };
 
-  const handleDownload = () => {
-    window.print();
+  const handleDownload = async () => {
+    if (!cardRef.current) return;
+    setIsDownloading(true);
+    try {
+      const canvas = await html2canvas(cardRef.current, {
+        scale: 2,
+        backgroundColor: '#ffffff',
+        logging: false,
+        useCORS: true
+      });
+      const image = canvas.toDataURL('image/png');
+      const link = document.createElement('a');
+      link.href = image;
+      link.download = `emergency-message-${langCode || 'en'}.png`;
+      link.click();
+    } catch (error) {
+      console.error('Download failed:', error);
+    } finally {
+      setIsDownloading(false);
+    }
   };
 
   if (isTranslating) {
@@ -86,25 +128,27 @@ const EmergencyPage = () => {
     <div className="flex flex-col min-h-screen bg-white">
       <div className="flex flex-col flex-grow w-full max-w-2xl mx-auto px-6 pt-10 pb-10">
         <div className="flex-grow flex flex-col items-center justify-center text-center space-y-8">
-          <div className="bg-red-600 p-6 rounded-full shadow-lg">
-            <AlertTriangle className="h-16 w-16 text-white" />
-          </div>
-          
-          <div className="space-y-6 bg-red-50 p-8 rounded-3xl border-2 border-red-200 w-full">
-            <h1 className="text-4xl sm:text-6xl font-black tracking-tighter uppercase text-red-600 border-b-4 border-red-600 pb-4">
-              {translatedText.attention}
-            </h1>
+          <div ref={cardRef} className="w-full flex flex-col items-center space-y-8 bg-white p-4 rounded-3xl">
+            <div className="bg-red-600 p-6 rounded-full shadow-lg">
+              <AlertTriangle className="h-16 w-16 text-white" />
+            </div>
             
-            <div className="space-y-4">
-              <p className="text-2xl sm:text-3xl font-bold text-gray-900 leading-tight">
-                {translatedText.emergency}
-              </p>
-              <p className="text-2xl sm:text-3xl font-bold text-gray-900 leading-tight">
-                {translatedText.needHelp}
-              </p>
-              <p className="text-2xl sm:text-3xl font-bold text-red-700 leading-tight">
-                {translatedText.callServices}
-              </p>
+            <div className="space-y-6 bg-red-50 p-8 rounded-3xl border-2 border-red-200 w-full">
+              <h1 className="text-4xl sm:text-6xl font-black tracking-tighter uppercase text-red-600 border-b-4 border-red-600 pb-4">
+                {translatedText.attention}
+              </h1>
+              
+              <div className="space-y-4">
+                <p className="text-2xl sm:text-3xl font-bold text-gray-900 leading-tight">
+                  {translatedText.emergency}
+                </p>
+                <p className="text-2xl sm:text-3xl font-bold text-gray-900 leading-tight">
+                  {translatedText.needHelp}
+                </p>
+                <p className="text-2xl sm:text-3xl font-bold text-red-700 leading-tight">
+                  {translatedText.callServices}
+                </p>
+              </div>
             </div>
           </div>
 
@@ -125,6 +169,7 @@ const EmergencyPage = () => {
             onShare={handleShare}
             onDownload={handleDownload}
             isSharing={isSharing}
+            isDownloading={isDownloading}
           />
         </div>
       </div>
