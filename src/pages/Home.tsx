@@ -31,16 +31,18 @@ const Home = () => {
         </div>
 
         {/* Bottom Section: Fixed height button area */}
-        <div className="w-full flex flex-col justify-center items-center mt-8 mb-[50px]">
-          <p className="text-xs text-gray-500 dark:text-gray-400 mb-2">
-          © 2026 <a href="https://dpbcreative.com/" target="_blank" rel="noopener noreferrer" className="underline hover:text-gray-700 dark:hover:text-gray-200">dpb creative</a>. All rights reserved
-          </p>
+        <div className="w-full flex flex-col justify-center items-center mt-8 mb-[50px] gap-4">
+
           <Button 
             asChild 
             className="py-3 text-lg md:text-xl h-auto transition-all duration-200 ease-in-out hover:scale-105 bg-red-600 text-white hover:bg-red-700 w-[280px]"
           >
             <Link to="/select-allergens">Get Started</Link>
           </Button>
+
+          <p className="text-xs text-gray-500 dark:text-gray-400 mb-2">
+          © 2026 <a href="https://dpbcreative.com/" target="_blank" rel="noopener noreferrer" className="underline hover:text-gray-700 dark:hover:text-gray-200">dpb creative</a>. All rights reserved
+          </p>
         </div>
       </div>
     </div>
