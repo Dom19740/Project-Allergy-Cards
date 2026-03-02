@@ -28,8 +28,8 @@ const EmergencyPage = () => {
       try {
         const [attention, emergency, needHelp, callServices, dial112] = await Promise.all([
           translateText("ATTENTION", langCode),
-          translateText("I am having a medical emergency.", langCode),
-          translateText("I need help immediately.", langCode),
+          translateText("I am having a severe allergic reaction.", langCode),
+          translateText("I need medical help immediately.", langCode),
           translateText("Please call emergency services.", langCode),
           translateText("DIAL 112", langCode)
         ]);
