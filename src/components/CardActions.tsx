@@ -2,7 +2,7 @@
 
 import React from 'react';
 import { Button } from '@/components/ui/button';
-import { Share2, Download, Printer, Save, Loader2, Menu } from 'lucide-react';
+import { Share2, Download, Save, Loader2, Menu, AlertTriangle } from 'lucide-react';
 
 interface CardActionsProps {
   onShare: () => void;
@@ -10,6 +10,7 @@ interface CardActionsProps {
   onPrint: () => void;
   onSave: () => void;
   onToggleMenu: () => void;
+  onEmergency: () => void;
   isSharing: boolean;
   isDownloading: boolean;
 }
@@ -20,6 +21,7 @@ const CardActions: React.FC<CardActionsProps> = ({
   onPrint,
   onSave,
   onToggleMenu,
+  onEmergency,
   isSharing,
   isDownloading
 }) => {
@@ -67,6 +69,16 @@ const CardActions: React.FC<CardActionsProps> = ({
           title="Download Card"
         >
           {isDownloading ? <Loader2 className="h-5 w-5 animate-spin" /> : <Download className="h-5 w-5" />}
+        </Button>
+
+        <Button
+          onClick={onEmergency}
+          variant="ghost"
+          size="icon"
+          className="text-orange-600 hover:bg-orange-50 rounded-full h-10 w-10"
+          title="Emergency"
+        >
+          <AlertTriangle className="h-5 w-5" />
         </Button>
 
         <div className="w-px h-6 bg-gray-200 mx-1" />
