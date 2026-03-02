@@ -12,8 +12,8 @@ const EmergencyPage = () => {
   const [isTranslating, setIsTranslating] = useState(true);
   const [translatedText, setTranslatedText] = useState({
     attention: "ATTENTION",
-    emergency: "I am having a medical emergency.",
-    needHelp: "I need help immediately.",
+    emergency: "I am having a severe allergic reaction.",
+    needHelp: "I need medical help immediately.",
     callServices: "Please call emergency services.",
     dial112: "DIAL 112"
   });
