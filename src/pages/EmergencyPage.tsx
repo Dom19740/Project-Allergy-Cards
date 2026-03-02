@@ -65,29 +65,48 @@ const EmergencyPage = () => {
         scale: 2,
         backgroundColor: '#ffffff',
         logging: false,
-        useCORS: true
+        useCORS: true,
+        allowTaint: true
       });
       
-      canvas.toBlob(async (blob) => {
-        if (!blob) return;
-        const file = new File([blob], 'emergency-message.png', { type: 'image/png' });
-        
-        if (navigator.share && navigator.canShare({ files: [file] })) {
-          await navigator.share({
-            files: [file],
-            title: 'Emergency Medical Message',
-            text: `${translatedText.attention}: ${translatedText.emergency}`,
-          });
+      const blob = await new Promise<Blob | null>(resolve => canvas.toBlob(resolve, 'image/png'));
+      if (!blob) throw new Error('Failed to create image');
+
+      const file = new File([blob], 'emergency-message.png', { type: 'image/png' });
+      
+      if (navigator.share) {
+        const shareData: ShareData = {
+          title: 'Emergency Medical Message',
+          text: `${translatedText.attention}: ${translatedText.emergency}`,
+        };
+
+        // Check if file sharing is supported
+        if (navigator.canShare && navigator.canShare({ files: [file] })) {
+          shareData.files = [file];
         } else {
+          shareData.url = window.location.href;
+        }
+
+        await navigator.share(shareData);
+      } else {
+        // Fallback: Copy link to clipboard
+        await navigator.clipboard.writeText(window.location.href);
+        alert('Link copied to clipboard!');
+      }
+    } catch (error) {
+      console.error('Share failed:', error);
+      // Final fallback to simple text share
+      if (navigator.share) {
+        try {
           await navigator.share({
             title: 'Emergency Medical Message',
             text: `${translatedText.attention}\n${translatedText.emergency}\n${translatedText.needHelp}`,
             url: window.location.href,
           });
+        } catch (e) {
+          console.error('Text share failed:', e);
         }
-      }, 'image/png');
-    } catch (error) {
-      console.error('Share failed:', error);
+      }
     } finally {
       setIsSharing(false);
     }
@@ -101,7 +120,8 @@ const EmergencyPage = () => {
         scale: 2,
         backgroundColor: '#ffffff',
         logging: false,
-        useCORS: true
+        useCORS: true,
+        allowTaint: true
       });
       const image = canvas.toDataURL('image/png');
       const link = document.createElement('a');

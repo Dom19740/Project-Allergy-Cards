@@ -32,8 +32,6 @@ const EmergencyActions: React.FC<EmergencyActionsProps> = ({
           <ArrowLeft className="h-5 w-5" />
         </Button>
 
-        <div className="w-px h-6 bg-gray-200 mx-1" />
-
         <Button
           onClick={onShare}
           disabled={isSharing}
