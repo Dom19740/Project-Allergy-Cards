@@ -17,12 +17,18 @@ const Home = () => {
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
-  // Calculate scale: shrinks from 1 to 0.4
-  const scale = Math.max(0.4, 1 - scrollY / 300);
-  // Calculate opacity: fades out completely by 250px of scroll
-  const opacity = Math.max(0, 1 - scrollY / 250);
-  // Calculate height: shrinks from 384px to 0 to "pull" the text up
-  const currentHeight = Math.max(0, 384 * (1 - scrollY / 300));
+  // Animation configuration
+  const shrinkDistance = 120; // The scroll distance (in px) over which the logo disappears
+  
+  // Calculate scale: shrinks from 1 to 0 faster
+  const scale = Math.max(0, 1 - scrollY / shrinkDistance);
+  
+  // Calculate opacity: fades out even faster than it shrinks to ensure it's gone before hitting the header
+  const opacity = Math.max(0, 1 - (scrollY * 1.2) / shrinkDistance);
+  
+  // Calculate height: shrinks the container height to pull the text up without overlap
+  const baseHeight = 384; // Original height of the logo area
+  const currentHeight = Math.max(0, baseHeight * (1 - scrollY / shrinkDistance));
 
   return (
     <div className="flex flex-col min-h-screen bg-gray-100 dark:bg-gray-900">
@@ -31,9 +37,9 @@ const Home = () => {
       {/* Main Content Wrapper */}
       <div className="flex flex-col flex-grow w-full max-w-2xl mx-auto px-4 pt-[106px]">
         <div className="flex flex-col items-center text-center">
-          {/* Logo Container: Relative positioning ensures no overlap with text below */}
+          {/* Logo Container: Height shrinks to 0 to pull content up */}
           <div 
-            className="flex justify-center items-center w-full overflow-hidden transition-all duration-75 ease-out"
+            className="flex justify-center items-center w-full overflow-hidden transition-all duration-75 ease-out pointer-events-none"
             style={{ 
               height: `${currentHeight}px`,
               opacity: opacity,
@@ -52,9 +58,10 @@ const Home = () => {
             />
           </div>
 
+          {/* Content area that moves up as the logo container shrinks */}
           <div className="space-y-8 mt-4">
             <p className="text-lg md:text-xl text-gray-700 dark:text-gray-300 max-w-md px-10">
-              Create a personalized allergy alert in multiple languages to communicate your dietary restrictions easily and safely when traveling or dining out. Plus generate an emergency alert card for urgent situations
+              Create a personalized allergy alert in multiple languages to communicate your dietary restrictions easily and safely when traveling or dining out.
             </p>
             <p className="text-lg md:text-xl text-gray-700 dark:text-gray-300 max-w-md px-10">
                Plus a translated emergency alert card for urgent situations
