@@ -53,7 +53,7 @@ const SavedCardsList = () => {
         {savedCards.map((card) => (
           <Card key={card.id} className="bg-white dark:bg-gray-800 border-gray-200 dark:border-gray-700 shadow-sm hover:shadow-md transition-shadow">
             <CardContent className="p-4 flex items-center justify-between">
-              <div className="flex flex-col">
+              <div className="flex flex-col flex-1 pr-4 text-left">
                 <CardTitle className="text-lg font-semibold text-gray-800 dark:text-gray-100">
                   {card.name}
                 </CardTitle>
@@ -62,7 +62,7 @@ const SavedCardsList = () => {
                   {new Date(card.createdAt).toLocaleDateString()} • {card.languageCode.toUpperCase()}
                 </div>
               </div>
-              <div className="flex space-x-2">
+              <div className="flex space-x-2 shrink-0">
                 <Button
                   variant="outline"
                   size="sm"
