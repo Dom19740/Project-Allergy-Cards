@@ -17,12 +17,10 @@ const Home = () => {
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
-  // Calculate scale: shrinks from 1 to 0.4
+  // Calculate scale factor: starts at 1, shrinks to 0.4 over 300px of scroll
   const scale = Math.max(0.4, 1 - scrollY / 300);
-  // Calculate opacity: fades out completely by 250px of scroll
-  const opacity = Math.max(0, 1 - scrollY / 250);
-  // Calculate height: shrinks from 384px to 0 to "pull" the text up
-  const currentHeight = Math.max(0, 384 * (1 - scrollY / 300));
+  // Calculate height: starts at 384px (w-96), shrinks proportionally
+  const currentHeight = Math.max(120, 384 * scale);
 
   return (
     <div className="flex flex-col min-h-screen bg-gray-100 dark:bg-gray-900">
@@ -31,14 +29,10 @@ const Home = () => {
       {/* Main Content Wrapper */}
       <div className="flex flex-col flex-grow w-full max-w-2xl mx-auto px-4 pt-[106px]">
         <div className="flex flex-col items-center text-center">
-          {/* Logo Container: Relative positioning ensures no overlap with text below */}
+          {/* Sticky Logo Container that shrinks */}
           <div 
-            className="flex justify-center items-center w-full overflow-hidden transition-all duration-75 ease-out"
-            style={{ 
-              height: `${currentHeight}px`,
-              opacity: opacity,
-              visibility: opacity === 0 ? 'hidden' : 'visible'
-            }}
+            className="sticky top-[106px] z-10 flex justify-center items-center w-full transition-all duration-75 ease-out overflow-hidden"
+            style={{ height: `${currentHeight}px` }}
           >
             <img 
               src="/logo_main.png" 
