@@ -41,7 +41,8 @@ const LANGUAGE_NAMES: Record<string, string> = {
   id: 'Indonesian',
   ms: 'Malay',
   th: 'Thai',
-  vi: 'Vietnamese'
+  vi: 'Vietnamese',
+  sr: 'Serbian'
 };
 
 const AllergyCard: React.FC<AllergyCardProps> = ({ languageCode, selectedAllergens }) => {
