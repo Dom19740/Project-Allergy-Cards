@@ -235,6 +235,11 @@ const AllergyCard: React.FC<AllergyCardProps> = ({ languageCode, selectedAllerge
     }
   };
 
+  const handleEmergency = () => {
+    // No effect for now as requested
+    console.log("Emergency button clicked");
+  };
+
   const translatedAllergenList = selectedAllergens.map(allergen => 
     translatedAllergens[allergen] || allergen
   );
@@ -344,6 +349,7 @@ const AllergyCard: React.FC<AllergyCardProps> = ({ languageCode, selectedAllerge
         onPrint={handlePrint}
         onSave={() => setIsSaveDialogOpen(true)}
         onToggleMenu={() => setIsMenuOpen(!isMenuOpen)}
+        onEmergency={handleEmergency}
         isSharing={isSharing}
         isDownloading={isDownloading}
       />
