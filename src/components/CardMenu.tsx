@@ -15,7 +15,7 @@ const CardMenu: React.FC<CardMenuProps> = ({ isOpen, onClose }) => {
   const menuItems = [
     { to: "/", label: "Saved Cards", icon: Home },
     { to: "/select-allergens", label: "Edit Allergens", icon: ShieldAlert },
-    { to: "/select-alert", label: "Edit Message", icon: MessageSquare },
+    { to: "/select-alert", label: "Edit Alert", icon: MessageSquare },
     { to: "/select-language", label: "Change Language", icon: Languages },
   ];
 
