@@ -1,12 +1,26 @@
 "use client";
 
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import FixedHeader from '@/components/FixedHeader';
 import SavedCardsList from '@/components/SavedCardsList';
 
 const Home = () => {
+  const [hasSavedCards, setHasSavedCards] = useState(false);
+
+  useEffect(() => {
+    const saved = localStorage.getItem('savedCards');
+    if (saved) {
+      try {
+        const parsed = JSON.parse(saved);
+        setHasSavedCards(Array.isArray(parsed) && parsed.length > 0);
+      } catch (e) {
+        setHasSavedCards(false);
+      }
+    }
+  }, []);
+
   return (
     <div className="flex flex-col min-h-screen bg-gray-100 dark:bg-gray-900">
       <FixedHeader />
@@ -21,12 +35,17 @@ const Home = () => {
               alt="App Logo" 
               className="w-72 h-72 sm:w-96 sm:h-96 md:w-[30rem] md:h-[30rem] object-contain" 
             />
-            <p className="text-lg md:text-xl text-gray-700 dark:text-gray-300 max-w-md px-10">
-              Create a personalized allergy alert in multiple languages to communicate your dietary restrictions easily and safely when traveling or dining out. Plus generate an emergency alert card for urgent situations
-            </p>
-            <p className="text-lg md:text-xl text-gray-700 dark:text-gray-300 max-w-md px-10">
-               Plus a translated emergency alert card for urgent situations
-            </p>
+            
+            {!hasSavedCards && (
+              <>
+                <p className="text-lg md:text-xl text-gray-700 dark:text-gray-300 max-w-md px-10">
+                  Create a personalized allergy alert in multiple languages to communicate your dietary restrictions easily and safely when traveling or dining out. Plus generate an emergency alert card for urgent situations
+                </p>
+                <p className="text-lg md:text-xl text-gray-700 dark:text-gray-300 max-w-md px-10">
+                   Plus a translated emergency alert card for urgent situations
+                </p>
+              </>
+            )}
             
             {/* Saved Cards Section */}
             <SavedCardsList />
