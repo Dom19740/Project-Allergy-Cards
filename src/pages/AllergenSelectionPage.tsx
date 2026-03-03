@@ -5,7 +5,7 @@ import { Checkbox } from '@/components/ui/checkbox';
 import { Label } from '@/components/ui/label';
 import { Input } from '@/components/ui/input';
 import { toast } from 'sonner';
-import { X, ChevronLeft, ChevronRight } from 'lucide-react';
+import { X, ChevronLeft, ChevronRight, ShieldAlert } from 'lucide-react';
 import { ALLERGEN_OPTIONS } from '@/lib/allergens';
 import FixedHeader from '@/components/FixedHeader';
 
@@ -14,7 +14,6 @@ const AllergenSelectionPage = () => {
   const [selectedAllergens, setSelectedAllergens] = useState<string[]>([]);
   const [customAllergenInput, setCustomAllergenInput] = useState<string>('');
 
-  // Load selected allergens from local storage on mount
   useEffect(() => {
     const storedAllergens = localStorage.getItem('selectedAllergens');
     if (storedAllergens) {
@@ -88,12 +87,22 @@ const AllergenSelectionPage = () => {
       
       <div className="flex flex-col flex-grow w-full max-w-2xl mx-auto px-4 pt-[126px]">
         <div className="flex-grow overflow-y-auto">
-          <div className="flex flex-col items-center text-center space-y-3">
-            <h2 className="text-xl sm:text-2xl font-bold text-gray-700 dark:text-gray-200">
-              Select Allergens
-            </h2>
+          <div className="flex flex-col items-center text-center space-y-6">
+            {/* Standardized Icon Header */}
+            <div className="bg-red-100 dark:bg-red-900/30 p-6 rounded-full">
+              <ShieldAlert className="w-16 h-16 text-red-600" />
+            </div>
+
+            <div className="space-y-2">
+              <h2 className="text-2xl md:text-3xl font-bold text-gray-800 dark:text-gray-100">
+                Select Your Allergens
+              </h2>
+              <p className="text-lg text-gray-600 dark:text-gray-400 max-w-sm mx-auto leading-relaxed">
+                Choose from our standard list or add your own custom allergens.
+              </p>
+            </div>
             
-            <div className="grid grid-cols-2 gap-2 sm:gap-3 w-full">
+            <div className="grid grid-cols-2 gap-2 sm:gap-3 w-full pt-4">
               {ALLERGEN_OPTIONS.map((allergen) => (
                 <div 
                   key={allergen.id} 
@@ -127,7 +136,7 @@ const AllergenSelectionPage = () => {
                   placeholder="Add your own allergen"
                   value={customAllergenInput}
                   onChange={(e) => setCustomAllergenInput(e.target.value)}
-                  className="flex-grow ml-[10px] p-2 text-sm sm:text-base bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-700 rounded-lg shadow-sm text-gray-800 dark:text-gray-200 h-9"
+                  className="flex-grow p-2 text-sm sm:text-base bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-700 rounded-lg shadow-sm text-gray-800 dark:text-gray-200 h-9"
                   onKeyPress={(e) => {
                     if (e.key === 'Enter') {
                       handleAddCustomAllergen();
@@ -161,7 +170,7 @@ const AllergenSelectionPage = () => {
           </div>
         </div>
 
-        <div className="w-full flex justify-between items-center mt-8 mb-[50px] gap-4">
+        <div className="w-full flex justify-between items-center mt-8 mb-[50px] gap-4 shrink-0">
           <Button
             variant="ghost"
             onClick={() => navigate(-1)}

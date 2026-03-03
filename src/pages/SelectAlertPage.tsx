@@ -4,7 +4,7 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Label } from '@/components/ui/label';
-import { ChevronLeft, ChevronRight } from 'lucide-react';
+import { ChevronLeft, ChevronRight, AlertTriangle } from 'lucide-react';
 import FixedHeader from '@/components/FixedHeader';
 
 const SelectAlertPage = () => {
@@ -44,18 +44,26 @@ const SelectAlertPage = () => {
 
       <div className="flex flex-col flex-grow w-full max-w-2xl mx-auto px-4 pt-[126px]">
         <div className="flex-grow overflow-y-auto">
-          <div className="flex flex-col items-center text-center space-y-8">
-            <div className="flex items-center space-x-2">
-              <h2 className="text-xl sm:text-2xl font-bold text-gray-700 dark:text-gray-200">
-                Customise Alert
-              </h2>
+          <div className="flex flex-col items-center text-center space-y-6">
+            {/* Standardized Icon Header */}
+            <div className="bg-red-100 dark:bg-red-900/30 p-6 rounded-full">
+              <AlertTriangle className="w-16 h-16 text-red-600" />
             </div>
 
-            <div className="w-full space-y-6 text-left">
+            <div className="space-y-2">
+              <h2 className="text-2xl md:text-3xl font-bold text-gray-800 dark:text-gray-100">
+                Customise Alert
+              </h2>
+              <p className="text-lg text-gray-600 dark:text-gray-400 max-w-sm mx-auto leading-relaxed">
+                Personalise the warning messages that will appear on your card.
+              </p>
+            </div>
+
+            <div className="w-full space-y-6 text-left pt-4">
               <div className="space-y-2">
                 <Label
                   htmlFor="allergic-to"
-                  className="text-sm font-medium text-gray-500 dark:text-gray-400"
+                  className="text-sm font-medium text-gray-500 dark:text-gray-400 ml-2"
                 >
                   Primary Warning
                 </Label>
@@ -64,14 +72,14 @@ const SelectAlertPage = () => {
                   value={iAmAllergicTo}
                   onChange={(e) => setIAmAllergicTo(e.target.value)}
                   placeholder="e.g. I can not eat:"
-                  className="w-[calc(100%-20px)] mx-[10px] px-4 py-3 text-base sm:text-lg bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-700 rounded-lg shadow-sm text-gray-800 dark:text-gray-200 min-h-[80px] resize-y"
+                  className="w-full px-4 py-3 text-base sm:text-lg bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-700 rounded-lg shadow-sm text-gray-800 dark:text-gray-200 min-h-[80px] resize-y"
                 />
               </div>
 
               <div className="space-y-2">
                 <Label
                   htmlFor="make-me-sick"
-                  className="text-sm font-medium text-gray-500 dark:text-gray-400"
+                  className="text-sm font-medium text-gray-500 dark:text-gray-400 ml-2"
                 >
                   Secondary Warning
                 </Label>
@@ -80,14 +88,14 @@ const SelectAlertPage = () => {
                   value={theyMakeMeSick}
                   onChange={(e) => setTheyMakeMeSick(e.target.value)}
                   placeholder="e.g. They make me very sick..."
-                  className="w-[calc(100%-20px)] mx-[10px] px-4 py-3 text-base sm:text-lg bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-700 rounded-lg shadow-sm text-gray-800 dark:text-gray-200 min-h-[80px] resize-y"
+                  className="w-full px-4 py-3 text-base sm:text-lg bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-700 rounded-lg shadow-sm text-gray-800 dark:text-gray-200 min-h-[80px] resize-y"
                 />
               </div>
             </div>
           </div>
         </div>
 
-        <div className="w-full flex justify-between items-center mt-8 mb-[50px] gap-4">
+        <div className="w-full flex justify-between items-center mt-8 mb-[50px] gap-4 shrink-0">
           <Button
             variant="ghost"
             onClick={() => navigate(-1)}
