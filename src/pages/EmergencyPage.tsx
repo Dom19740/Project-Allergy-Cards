@@ -26,6 +26,21 @@ const EmergencyPage = () => {
 
   useEffect(() => {
     const translateEmergencyContent = async () => {
+      // Check for session translations (offline support)
+      const sessionTranslations = localStorage.getItem('currentSessionTranslations');
+      if (sessionTranslations) {
+        try {
+          const parsed = JSON.parse(sessionTranslations);
+          if (parsed.languageCode === langCode) {
+            setTranslatedText(parsed.content.emergency);
+            setIsTranslating(false);
+            return;
+          }
+        } catch (e) {
+          console.error("Failed to parse session translations", e);
+        }
+      }
+
       if (!langCode || langCode === 'en') {
         setIsTranslating(false);
         return;

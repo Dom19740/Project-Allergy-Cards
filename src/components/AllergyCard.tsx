@@ -5,7 +5,7 @@ import { useNavigate } from 'react-router-dom';
 import { toPng } from 'html-to-image';
 import { toast } from 'sonner';
 import { Loader2 } from 'lucide-react';
-import { LanguageCode, SelectedAllergens, CustomMessages } from '@/lib/types';
+import { LanguageCode, SelectedAllergens, CustomMessages, TranslatedContent } from '@/lib/types';
 import { ALLERGEN_OPTIONS } from '@/lib/allergens';
 import { translateText } from '@/lib/translator';
 import SaveCardDialog from './SaveCardDialog';
@@ -69,6 +69,13 @@ const AllergyCard: React.FC<AllergyCardProps> = ({ languageCode, selectedAllerge
     languageName: "English",
     theyMakeMeSick: "They make me very sick and I could die"
   });
+  const [emergencyTranslations, setEmergencyTranslations] = useState({
+    attention: "ATTENTION",
+    emergency: "I am having a severe allergic reaction.",
+    needHelp: "I need medical help immediately.",
+    callServices: "Please call emergency services.",
+    dial112: "DIAL 112"
+  });
   const [isMenuOpen, setIsMenuOpen] = useState(false);
 
   useEffect(() => {
@@ -100,6 +107,22 @@ const AllergyCard: React.FC<AllergyCardProps> = ({ languageCode, selectedAllerge
 
   useEffect(() => {
     const translateAllContent = async () => {
+      // Check if we have pre-translated content for this session (offline support)
+      const sessionTranslations = localStorage.getItem('currentSessionTranslations');
+      if (sessionTranslations) {
+        try {
+          const parsed = JSON.parse(sessionTranslations);
+          if (parsed.languageCode === languageCode) {
+            setTranslatedUIText(parsed.content.ui);
+            setTranslatedAllergens(parsed.content.allergens);
+            setEmergencyTranslations(parsed.content.emergency);
+            return;
+          }
+        } catch (e) {
+          console.error("Failed to parse session translations", e);
+        }
+      }
+
       if (!languageCode || languageCode === 'en') {
         setTranslatedUIText({
           allergyAlert: "ALLERGY ALERT!",
@@ -125,13 +148,19 @@ const AllergyCard: React.FC<AllergyCardProps> = ({ languageCode, selectedAllerge
 
       setIsTranslating(true);
       try {
-        const [alert, allergicTo, careful, thankYou, langName, theyMakeMeSick] = await Promise.all([
+        const [alert, allergicTo, careful, thankYou, langName, theyMakeMeSick, att, em, help, call, dial] = await Promise.all([
           translateText("ALLERGY ALERT!", languageCode),
           translateText(customMessages.iAmAllergicTo, languageCode),
           translateText("Please be careful with my food.", languageCode),
           translateText("Thank you!", languageCode),
           translateText("English", languageCode),
-          translateText(customMessages.theyMakeMeSick, languageCode)
+          translateText(customMessages.theyMakeMeSick, languageCode),
+          // Pre-translate emergency messages for offline saving
+          translateText("ATTENTION", languageCode),
+          translateText("I am having a severe allergic reaction.", languageCode),
+          translateText("I need medical help immediately.", languageCode),
+          translateText("Please call emergency services.", languageCode),
+          translateText("DIAL 112", languageCode)
         ]);
 
         setTranslatedUIText({
@@ -141,6 +170,14 @@ const AllergyCard: React.FC<AllergyCardProps> = ({ languageCode, selectedAllerge
           thankYou: thankYou,
           languageName: langName,
           theyMakeMeSick: theyMakeMeSick
+        });
+
+        setEmergencyTranslations({
+          attention: att,
+          emergency: em,
+          needHelp: help,
+          callServices: call,
+          dial112: dial
         });
 
         const allergenTranslations: { [key: string]: string } = {};
@@ -273,6 +310,12 @@ const AllergyCard: React.FC<AllergyCardProps> = ({ languageCode, selectedAllerge
     );
   }
 
+  const currentTranslatedContent: TranslatedContent = {
+    ui: translatedUIText,
+    allergens: translatedAllergens,
+    emergency: emergencyTranslations
+  };
+
   return (
     <div className="flex flex-col w-full h-screen bg-white overflow-hidden">
       {/* Printable Area */}
@@ -369,6 +412,7 @@ const AllergyCard: React.FC<AllergyCardProps> = ({ languageCode, selectedAllerge
           languageCode={languageCode}
           selectedAllergens={fullSelectedData}
           customMessages={customMessages}
+          translatedContent={currentTranslatedContent}
         />
       )}
 

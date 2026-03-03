@@ -36,6 +36,16 @@ const SavedCardsList = () => {
     localStorage.setItem('customAlertMessages', JSON.stringify(card.customMessages));
     localStorage.setItem('selectedLanguageCode', card.languageCode);
     
+    // Store the translated content for this session to enable offline use
+    if (card.translatedContent) {
+      localStorage.setItem('currentSessionTranslations', JSON.stringify({
+        languageCode: card.languageCode,
+        content: card.translatedContent
+      }));
+    } else {
+      localStorage.removeItem('currentSessionTranslations');
+    }
+    
     navigate(`/alert/${card.languageCode}`);
     toast.success(`Loaded card: ${card.name}`);
   };
