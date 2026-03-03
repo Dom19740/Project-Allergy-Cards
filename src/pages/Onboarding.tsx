@@ -10,7 +10,7 @@ import OnboardingStep from '@/components/OnboardingStep';
 const ONBOARDING_STEPS = [
   {
     title: "Select Your Allergens",
-    description: "Choose from our standard list or add your own custom allergens. Customise your allergy warnings.",
+    description: "Choose from our standard list or add your own custom allergens. Customise your allergy alert.",
     icon: ShieldAlert,
   },
   {
