@@ -54,11 +54,11 @@ const Onboarding = () => {
   const step = ONBOARDING_STEPS[currentStep];
 
   return (
-    <div className="flex flex-col min-h-screen bg-gray-100 dark:bg-gray-900">
+    <div className="flex flex-col h-screen bg-gray-100 dark:bg-gray-900 overflow-hidden">
       <FixedHeader />
       
-      <div className="flex flex-col flex-grow w-full max-w-2xl mx-auto px-4 pt-[126px]">
-        <div className="flex-grow flex items-center justify-center py-8">
+      <div className="flex flex-col flex-grow w-full max-w-2xl mx-auto px-4 pt-[126px] overflow-hidden">
+        <div className="flex-grow flex items-center justify-center py-8 overflow-hidden">
           <OnboardingStep 
             key={currentStep}
             title={step.title}
@@ -68,7 +68,7 @@ const Onboarding = () => {
         </div>
 
         {/* Navigation and Indicators */}
-        <div className="w-full flex flex-col items-center mt-auto mb-[50px] space-y-8">
+        <div className="w-full flex flex-col items-center mt-auto mb-[50px] space-y-8 shrink-0">
           {/* Dot Indicators */}
           <div className="flex space-x-2">
             {ONBOARDING_STEPS.map((_, index) => (
