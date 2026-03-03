@@ -4,6 +4,7 @@ import React, { useEffect, useState, useRef } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { AlertTriangle, Loader2, Phone } from 'lucide-react';
 import { translateText } from '@/lib/translator';
+import { getEmergencyNumber } from '@/lib/emergencyNumbers';
 import EmergencyActions from '@/components/EmergencyActions';
 import html2canvas from 'html2canvas';
 
@@ -16,12 +17,14 @@ const EmergencyPage = () => {
   const [isSharing, setIsSharing] = useState(false);
   const [isDownloading, setIsDownloading] = useState(false);
   
+  const emergencyNumber = getEmergencyNumber(langCode);
+  
   const [translatedText, setTranslatedText] = useState({
     attention: "ATTENTION",
     emergency: "I am having a severe allergic reaction.",
     needHelp: "I need medical help immediately.",
     callServices: "Please call emergency services.",
-    dial112: "DIAL 112"
+    dialText: "DIAL"
   });
 
   useEffect(() => {
@@ -31,7 +34,12 @@ const EmergencyPage = () => {
         try {
           const parsed = JSON.parse(sessionTranslations);
           if (parsed.languageCode === langCode) {
-            setTranslatedText(parsed.content.emergency);
+            // We need to ensure dialText is handled if it wasn't in the old session
+            const content = parsed.content.emergency;
+            setTranslatedText({
+              ...content,
+              dialText: content.dialText || "DIAL"
+            });
             setIsTranslating(false);
             return;
           }
@@ -46,12 +54,12 @@ const EmergencyPage = () => {
       }
 
       try {
-        const [attention, emergency, needHelp, callServices, dial112] = await Promise.all([
+        const [attention, emergency, needHelp, callServices, dialText] = await Promise.all([
           translateText("ATTENTION", langCode),
           translateText("I am having a severe allergic reaction.", langCode),
           translateText("I need medical help immediately.", langCode),
           translateText("Please call emergency services.", langCode),
-          translateText("DIAL 112", langCode)
+          translateText("DIAL", langCode)
         ]);
 
         setTranslatedText({
@@ -59,7 +67,7 @@ const EmergencyPage = () => {
           emergency,
           needHelp,
           callServices,
-          dial112
+          dialText
         });
       } catch (error) {
         console.error('Translation failed:', error);
@@ -179,11 +187,11 @@ const EmergencyPage = () => {
 
         <div className="mt-auto w-full max-w-md pt-6">
           <a 
-            href="tel:112" 
+            href={`tel:${emergencyNumber}`} 
             className="flex items-center justify-center gap-3 sm:gap-4 w-full py-4 sm:py-6 bg-red-600 hover:bg-red-700 text-white rounded-2xl text-2xl sm:text-3xl font-black shadow-xl transition-transform active:scale-95"
           >
             <Phone className="h-8 w-8 sm:h-10 sm:w-10 fill-current" />
-            {translatedText.dial112}
+            {translatedText.dialText} {emergencyNumber}
           </a>
         </div>
       </div>
