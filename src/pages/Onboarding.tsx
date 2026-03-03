@@ -10,7 +10,7 @@ import OnboardingStep from '@/components/OnboardingStep';
 const ONBOARDING_STEPS = [
   {
     title: "Select Your Allergens",
-    description: "Choose from our standard list or add your own custom allergens. We'll make sure they're clearly communicated.",
+    description: "Choose from our standard list or add your own custom allergens. Customise your allergy alert. We'll make sure it's clearly communicated.",
     icon: ShieldAlert,
   },
   {
@@ -25,7 +25,7 @@ const ONBOARDING_STEPS = [
   },
   {
     title: "Emergency Ready",
-    description: "In urgent situations, use the Emergency Card to quickly communicate your needs to first responders.",
+    description: "In urgent situations, use the Emergency Card to quickly communicate your need for medical assistance.",
     icon: AlertTriangle,
   }
 ];
