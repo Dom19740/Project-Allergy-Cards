@@ -5,7 +5,7 @@ import { Checkbox } from '@/components/ui/checkbox';
 import { Label } from '@/components/ui/label';
 import { Input } from '@/components/ui/input';
 import { toast } from 'sonner';
-import { X } from 'lucide-react';
+import { X, ChevronLeft, ChevronRight } from 'lucide-react';
 import { ALLERGEN_OPTIONS } from '@/lib/allergens';
 import FixedHeader from '@/components/FixedHeader';
 
@@ -20,13 +20,11 @@ const AllergenSelectionPage = () => {
     if (storedAllergens) {
       try {
         const parsed = JSON.parse(storedAllergens);
-        // Handle both old array format and new object format
         if (Array.isArray(parsed)) {
           setSelectedAllergens(parsed);
         } else if (parsed.ids) {
           setSelectedAllergens(parsed.ids);
         } else if (parsed.standard) {
-          // Handle standard/custom split format
           setSelectedAllergens([...(parsed.standard || []), ...(parsed.custom || [])]);
         }
       } catch (e) {
@@ -67,7 +65,6 @@ const AllergenSelectionPage = () => {
       return;
     }
     
-    // Save in a consistent format for the AllergyCard
     const standardIds = ALLERGEN_OPTIONS.map(opt => opt.id);
     const standard = selectedAllergens.filter(id => standardIds.includes(id));
     const custom = selectedAllergens.filter(id => !standardIds.includes(id));
@@ -75,7 +72,7 @@ const AllergenSelectionPage = () => {
     localStorage.setItem('selectedAllergens', JSON.stringify({
       standard,
       custom,
-      ids: selectedAllergens // Keep flat list for compatibility
+      ids: selectedAllergens
     }));
     
     navigate('/select-alert');
@@ -164,20 +161,23 @@ const AllergenSelectionPage = () => {
           </div>
         </div>
 
-        <div className="w-full flex flex-col sm:flex-row justify-center sm:justify-between items-center mt-8 mb-[50px] gap-4">
+        <div className="w-full flex justify-between items-center mt-8 mb-[50px] gap-4">
           <Button
+            variant="ghost"
             onClick={() => navigate(-1)}
-            className="py-3 text-lg md:text-xl h-auto transition-all duration-200 ease-in-out hover:scale-105 bg-gray-200 text-gray-800 hover:bg-gray-300 w-[280px]"
+            className="flex items-center text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-100"
           >
+            <ChevronLeft className="w-5 h-5 mr-1" />
             Back
           </Button>
 
           <Button
             onClick={handleContinue}
             disabled={selectedAllergens.length === 0}
-            className="py-3 text-lg md:text-xl h-auto transition-all duration-200 ease-in-out hover:scale-105 bg-red-600 text-white hover:bg-red-700 w-[280px]"
+            className="py-3 px-8 text-lg h-auto bg-red-600 text-white hover:bg-red-700 rounded-xl shadow-lg transition-transform active:scale-95 flex items-center"
           >
             Continue
+            <ChevronRight className="w-5 h-5 ml-1" />
           </Button>
         </div>
       </div>

@@ -4,6 +4,7 @@ import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Button } from "@/components/ui/button";
+import { ChevronLeft, ChevronRight } from "lucide-react";
 import FixedHeader from "@/components/FixedHeader";
 import { getAllGoogleLanguages, SupportedLanguage } from "@/lib/translator";
 
@@ -14,7 +15,6 @@ const LanguageSelectionPage = () => {
   const [translatedContinue, setTranslatedContinue] = useState("Continue");
   const [supportedLanguages, setSupportedLanguages] = useState<SupportedLanguage[]>([]);
 
-  // Load selected language from localStorage on mount
   useEffect(() => {
     const savedLang = localStorage.getItem("selectedLanguageCode");
     if (savedLang) {
@@ -22,12 +22,10 @@ const LanguageSelectionPage = () => {
     }
   }, []);
 
-  // Keep title in English only
   useEffect(() => {
     setTranslatedTitle("Select Target Language");
   }, []);
 
-  // Load supported languages
   useEffect(() => {
     let mounted = true;
     (async () => {
@@ -39,7 +37,6 @@ const LanguageSelectionPage = () => {
     return () => { mounted = false; };
   }, []);
 
-  // Persist selected language when it changes
   useEffect(() => {
     localStorage.setItem("selectedLanguageCode", selectedLanguageCode);
   }, [selectedLanguageCode]);
@@ -95,19 +92,23 @@ const LanguageSelectionPage = () => {
             </div>
           </div>
         </div>
-        <div className="w-full flex flex-col sm:flex-row justify-center sm:justify-between items-center mt-8 mb-[50px] gap-4">
+        
+        <div className="w-full flex justify-between items-center mt-8 mb-[50px] gap-4">
           <Button
+            variant="ghost"
             onClick={() => navigate(-1)}
-            className="py-3 text-lg md:text-xl h-auto transition-all duration-200 ease-in-out hover:scale-105 bg-gray-200 text-gray-800 hover:bg-gray-300 w-[280px]"
+            className="flex items-center text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-100"
           >
+            <ChevronLeft className="w-5 h-5 mr-1" />
             Back
           </Button>
           <Button
             onClick={handleContinue}
             disabled={!selectedLanguageCode}
-            className="py-3 text-lg md:text-xl h-auto transition-all duration-200 ease-in-out hover:scale-105 bg-red-600 text-white hover:bg-red-700 w-[280px]"
+            className="py-3 px-8 text-lg h-auto bg-red-600 text-white hover:bg-red-700 rounded-xl shadow-lg transition-transform active:scale-95 flex items-center"
           >
             {translatedContinue}
+            <ChevronRight className="w-5 h-5 ml-1" />
           </Button>
         </div>
       </div>
