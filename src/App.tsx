@@ -11,6 +11,7 @@ import AllergenSelectionPage from "./pages/AllergenSelectionPage";
 import SelectAlertPage from "./pages/SelectAlertPage";
 import EmergencyPage from "./pages/EmergencyPage";
 import PageTemplate from "./pages/PageTemplate";
+import Onboarding from "./pages/Onboarding";
 import { usePreloadImages } from "./hooks/usePreloadImages";
 
 const queryClient = new QueryClient();
@@ -21,6 +22,7 @@ const AppContent = () => {
   return (
     <Routes>
       <Route path="/" element={<Home />} />
+      <Route path="/onboarding" element={<Onboarding />} />
       <Route path="/select-allergens" element={<AllergenSelectionPage />} />
       <Route path="/select-alert" element={<SelectAlertPage />} />
       <Route path="/select-language" element={<LanguageSelectionPage />} />
