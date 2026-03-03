@@ -107,7 +107,6 @@ const AllergyCard: React.FC<AllergyCardProps> = ({ languageCode, selectedAllerge
 
   useEffect(() => {
     const translateAllContent = async () => {
-      // Check if we have pre-translated content for this session (offline support)
       const sessionTranslations = localStorage.getItem('currentSessionTranslations');
       if (sessionTranslations) {
         try {
@@ -155,7 +154,6 @@ const AllergyCard: React.FC<AllergyCardProps> = ({ languageCode, selectedAllerge
           translateText("Thank you!", languageCode),
           translateText("English", languageCode),
           translateText(customMessages.theyMakeMeSick, languageCode),
-          // Pre-translate emergency messages for offline saving
           translateText("ATTENTION", languageCode),
           translateText("I am having a severe allergic reaction.", languageCode),
           translateText("I need medical help immediately.", languageCode),
@@ -321,9 +319,9 @@ const AllergyCard: React.FC<AllergyCardProps> = ({ languageCode, selectedAllerge
       {/* Printable Area */}
       <div 
         ref={cardRef} 
-        className="flex-1 w-full flex flex-col items-center justify-start text-center print:shadow-none print:m-0 print:rounded-none overflow-hidden p-4 sm:p-6 md:p-8 bg-white border-none"
+        className="flex-1 w-full flex flex-col items-center justify-start text-center print:shadow-none print:m-0 print:rounded-none overflow-hidden p-4 sm:p-6 md:p-8 pt-[calc(1rem+env(safe-area-inset-top))] bg-white border-none"
       >
-        <div className="h-4 sm:h-8 md:h-12" />
+        <div className="h-6 sm:h-10 md:h-14" />
 
         <h1 className="text-2xl sm:text-4xl md:text-5xl lg:text-6xl font-black leading-tight mb-4 sm:mb-8 md:mb-12 text-red-600 uppercase tracking-tighter whitespace-nowrap">
           {translatedUIText.allergyAlert}

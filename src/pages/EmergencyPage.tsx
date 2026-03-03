@@ -149,9 +149,9 @@ const EmergencyPage = () => {
       {/* Printable Area - Matches AllergyCard structure */}
       <div 
         ref={cardRef} 
-        className="flex-1 w-full flex flex-col items-center justify-start text-center overflow-hidden p-4 sm:p-6 md:p-8 bg-white border-none"
+        className="flex-1 w-full flex flex-col items-center justify-start text-center overflow-hidden p-4 sm:p-6 md:p-8 pt-[calc(1rem+env(safe-area-inset-top))] bg-white border-none"
       >
-        <div className="h-4 sm:h-8 md:h-12" />
+        <div className="h-6 sm:h-10 md:h-14" />
 
         <div className="bg-red-600 p-4 sm:p-6 rounded-full shadow-lg mb-6 sm:mb-10">
           <AlertTriangle className="h-10 w-10 sm:h-16 sm:w-16 text-white" />
