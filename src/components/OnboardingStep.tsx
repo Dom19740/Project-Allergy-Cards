@@ -2,6 +2,7 @@
 
 import React from 'react';
 import { LucideIcon } from 'lucide-react';
+import StepHeader from './StepHeader';
 
 interface OnboardingStepProps {
   title: string;
@@ -10,24 +11,17 @@ interface OnboardingStepProps {
   image?: string;
 }
 
-const OnboardingStep: React.FC<OnboardingStepProps> = ({ title, description, icon: Icon, image }) => {
+const OnboardingStep: React.FC<OnboardingStepProps> = ({ title, description, icon, image }) => {
   return (
-    <div className="flex flex-col items-center text-center space-y-6 animate-in fade-in slide-in-from-right-8 duration-500">
-      <div className="bg-red-100 dark:bg-red-900/30 p-6 rounded-full">
-        <Icon className="w-16 h-16 text-red-600" />
-      </div>
-      
-      <div className="space-y-4">
-        <h2 className="text-2xl md:text-3xl font-bold text-gray-800 dark:text-gray-100">
-          {title}
-        </h2>
-        <p className="text-lg text-gray-600 dark:text-gray-400 max-w-sm mx-auto leading-relaxed">
-          {description}
-        </p>
-      </div>
+    <div className="flex flex-col items-center w-full animate-in fade-in slide-in-from-right-8 duration-500">
+      <StepHeader 
+        title={title}
+        description={description}
+        icon={icon}
+      />
 
       {image && (
-        <div className="mt-4 w-full max-w-xs aspect-video bg-gray-200 dark:bg-gray-800 rounded-xl overflow-hidden shadow-inner flex items-center justify-center">
+        <div className="mt-8 w-full max-w-xs aspect-video bg-gray-200 dark:bg-gray-800 rounded-xl overflow-hidden shadow-inner flex items-center justify-center">
           <img src={image} alt={title} className="w-full h-full object-cover opacity-80" />
         </div>
       )}

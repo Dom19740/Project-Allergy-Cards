@@ -6,6 +6,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Button } from "@/components/ui/button";
 import { ChevronLeft, ChevronRight, Languages } from "lucide-react";
 import FixedHeader from "@/components/FixedHeader";
+import StepHeader from "@/components/StepHeader";
 import { getAllGoogleLanguages, SupportedLanguage } from "@/lib/translator";
 
 const LanguageSelectionPage = () => {
@@ -48,26 +49,18 @@ const LanguageSelectionPage = () => {
   const selectedLanguage = supportedLanguages.find(l => l.code === selectedLanguageCode);
 
   return (
-    <div className="flex flex-col min-h-screen bg-gray-100 dark:bg-gray-900">
+    <div className="flex flex-col h-screen bg-gray-100 dark:bg-gray-900 overflow-hidden">
       <FixedHeader />
-      <div className="flex flex-col flex-grow w-full max-w-2xl mx-auto px-4 pt-[126px]">
-        <div className="flex-grow overflow-y-auto">
-          <div className="flex flex-col items-center text-center space-y-6">
-            {/* Standardized Icon Header */}
-            <div className="bg-red-100 dark:bg-red-900/30 p-6 rounded-full">
-              <Languages className="w-16 h-16 text-red-600" />
-            </div>
+      <div className="flex flex-col flex-grow w-full max-w-2xl mx-auto px-4 pt-[126px] overflow-hidden">
+        <div className="flex-grow overflow-y-auto pt-8">
+          <StepHeader 
+            title="Choose a Language"
+            description="Select the language you want your allergy alert to be translated into."
+            icon={Languages}
+          />
 
-            <div className="space-y-2">
-              <h2 className="text-2xl md:text-3xl font-bold text-gray-800 dark:text-gray-100">
-                Choose a Language
-              </h2>
-              <p className="text-lg text-gray-600 dark:text-gray-400 max-w-sm mx-auto leading-relaxed">
-                Select the language you want your allergy alert to be translated into.
-              </p>
-            </div>
-
-            <div className="w-full max-w-xs sm:max-w-sm md:max-w-md lg:max-w-lg pt-4">
+          <div className="w-full flex justify-center pt-8 pb-4">
+            <div className="w-full max-w-xs sm:max-w-sm md:max-w-md lg:max-w-lg">
               <Select value={selectedLanguageCode} onValueChange={handleLanguageChange}>
                 <SelectTrigger
                   className="w-full py-4 text-lg md:text-xl h-auto bg-white text-gray-900 hover:bg-gray-50 border border-red-600 dark:border-red-500"
@@ -96,7 +89,7 @@ const LanguageSelectionPage = () => {
           </div>
         </div>
         
-        <div className="w-full flex justify-between items-center mt-8 mb-[50px] gap-4 shrink-0">
+        <div className="w-full flex justify-between items-center mt-auto mb-[50px] gap-4 shrink-0">
           <Button
             variant="ghost"
             onClick={() => navigate(-1)}

@@ -6,6 +6,7 @@ import { Button } from '@/components/ui/button';
 import { Label } from '@/components/ui/label';
 import { ChevronLeft, ChevronRight, AlertTriangle } from 'lucide-react';
 import FixedHeader from '@/components/FixedHeader';
+import StepHeader from '@/components/StepHeader';
 
 const SelectAlertPage = () => {
   const navigate = useNavigate();
@@ -39,63 +40,53 @@ const SelectAlertPage = () => {
   };
 
   return (
-    <div className="flex flex-col min-h-screen bg-gray-100 dark:bg-gray-900">
+    <div className="flex flex-col h-screen bg-gray-100 dark:bg-gray-900 overflow-hidden">
       <FixedHeader />
 
-      <div className="flex flex-col flex-grow w-full max-w-2xl mx-auto px-4 pt-[126px]">
-        <div className="flex-grow overflow-y-auto">
-          <div className="flex flex-col items-center text-center space-y-6">
-            {/* Standardized Icon Header */}
-            <div className="bg-red-100 dark:bg-red-900/30 p-6 rounded-full">
-              <AlertTriangle className="w-16 h-16 text-red-600" />
+      <div className="flex flex-col flex-grow w-full max-w-2xl mx-auto px-4 pt-[126px] overflow-hidden">
+        <div className="flex-grow overflow-y-auto pt-8">
+          <StepHeader 
+            title="Customise Alert"
+            description="Personalise the warning messages that will appear on your card."
+            icon={AlertTriangle}
+          />
+
+          <div className="w-full space-y-6 text-left pt-8 pb-4">
+            <div className="space-y-2">
+              <Label
+                htmlFor="allergic-to"
+                className="text-sm font-medium text-gray-500 dark:text-gray-400 ml-2"
+              >
+                Primary Warning
+              </Label>
+              <textarea
+                id="allergic-to"
+                value={iAmAllergicTo}
+                onChange={(e) => setIAmAllergicTo(e.target.value)}
+                placeholder="e.g. I can not eat:"
+                className="w-full px-4 py-3 text-base sm:text-lg bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-700 rounded-lg shadow-sm text-gray-800 dark:text-gray-200 min-h-[80px] resize-y"
+              />
             </div>
 
             <div className="space-y-2">
-              <h2 className="text-2xl md:text-3xl font-bold text-gray-800 dark:text-gray-100">
-                Customise Alert
-              </h2>
-              <p className="text-lg text-gray-600 dark:text-gray-400 max-w-sm mx-auto leading-relaxed">
-                Personalise the warning messages that will appear on your card.
-              </p>
-            </div>
-
-            <div className="w-full space-y-6 text-left pt-4">
-              <div className="space-y-2">
-                <Label
-                  htmlFor="allergic-to"
-                  className="text-sm font-medium text-gray-500 dark:text-gray-400 ml-2"
-                >
-                  Primary Warning
-                </Label>
-                <textarea
-                  id="allergic-to"
-                  value={iAmAllergicTo}
-                  onChange={(e) => setIAmAllergicTo(e.target.value)}
-                  placeholder="e.g. I can not eat:"
-                  className="w-full px-4 py-3 text-base sm:text-lg bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-700 rounded-lg shadow-sm text-gray-800 dark:text-gray-200 min-h-[80px] resize-y"
-                />
-              </div>
-
-              <div className="space-y-2">
-                <Label
-                  htmlFor="make-me-sick"
-                  className="text-sm font-medium text-gray-500 dark:text-gray-400 ml-2"
-                >
-                  Secondary Warning
-                </Label>
-                <textarea
-                  id="make-me-sick"
-                  value={theyMakeMeSick}
-                  onChange={(e) => setTheyMakeMeSick(e.target.value)}
-                  placeholder="e.g. They make me very sick..."
-                  className="w-full px-4 py-3 text-base sm:text-lg bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-700 rounded-lg shadow-sm text-gray-800 dark:text-gray-200 min-h-[80px] resize-y"
-                />
-              </div>
+              <Label
+                htmlFor="make-me-sick"
+                className="text-sm font-medium text-gray-500 dark:text-gray-400 ml-2"
+              >
+                Secondary Warning
+              </Label>
+              <textarea
+                id="make-me-sick"
+                value={theyMakeMeSick}
+                onChange={(e) => setTheyMakeMeSick(e.target.value)}
+                placeholder="e.g. They make me very sick..."
+                className="w-full px-4 py-3 text-base sm:text-lg bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-700 rounded-lg shadow-sm text-gray-800 dark:text-gray-200 min-h-[80px] resize-y"
+              />
             </div>
           </div>
         </div>
 
-        <div className="w-full flex justify-between items-center mt-8 mb-[50px] gap-4 shrink-0">
+        <div className="w-full flex justify-between items-center mt-auto mb-[50px] gap-4 shrink-0">
           <Button
             variant="ghost"
             onClick={() => navigate(-1)}

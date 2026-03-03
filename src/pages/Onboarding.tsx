@@ -10,12 +10,12 @@ import OnboardingStep from '@/components/OnboardingStep';
 const ONBOARDING_STEPS = [
   {
     title: "Select Your Allergens",
-    description: "Choose from our standard list or add your own custom allergens. Customise your allergy alert. We'll make sure it's clearly communicated.",
+    description: "Choose from our standard list or add your own custom allergens. We'll make sure they're clearly communicated.",
     icon: ShieldAlert,
   },
   {
     title: "Choose a Language",
-    description: "Select from over 100 languages to translate your allergy alert instantly.",
+    description: "Traveling abroad? Select from over 100 languages to translate your allergy alert instantly.",
     icon: Languages,
   },
   {
@@ -25,7 +25,7 @@ const ONBOARDING_STEPS = [
   },
   {
     title: "Emergency Ready",
-    description: "In urgent situations, use the Emergency Card to quickly communicate your need for medical assistance with immediate emergency services dial button",
+    description: "In urgent situations, use the Emergency Card to quickly communicate your needs to first responders.",
     icon: AlertTriangle,
   }
 ];
@@ -46,7 +46,6 @@ const Onboarding = () => {
     if (currentStep > 0) {
       setCurrentStep(prev => prev - 1);
     } else {
-      // Skip leads to the Select Allergens page
       navigate('/select-allergens');
     }
   };
@@ -58,7 +57,7 @@ const Onboarding = () => {
       <FixedHeader />
       
       <div className="flex flex-col flex-grow w-full max-w-2xl mx-auto px-4 pt-[126px] overflow-hidden">
-        <div className="flex-grow flex items-center justify-center py-8 overflow-hidden">
+        <div className="flex-grow overflow-y-auto pt-8">
           <OnboardingStep 
             key={currentStep}
             title={step.title}
@@ -67,9 +66,7 @@ const Onboarding = () => {
           />
         </div>
 
-        {/* Navigation and Indicators */}
         <div className="w-full flex flex-col items-center mt-auto mb-[50px] space-y-8 shrink-0">
-          {/* Dot Indicators */}
           <div className="flex space-x-2">
             {ONBOARDING_STEPS.map((_, index) => (
               <div 
@@ -83,7 +80,6 @@ const Onboarding = () => {
             ))}
           </div>
 
-          {/* Buttons */}
           <div className="w-full flex justify-between items-center gap-4">
             <Button
               variant="ghost"
@@ -96,7 +92,7 @@ const Onboarding = () => {
 
             <Button
               onClick={handleNext}
-              className="py-3 px-8 text-lg h-auto bg-red-600 text-white hover:bg-red-700 rounded-xl shadow-lg transition-transform active:scale-95"
+              className="py-3 px-8 text-lg h-auto bg-red-600 text-white hover:bg-red-700 rounded-xl shadow-lg transition-transform active:scale-95 flex items-center"
             >
               {currentStep === ONBOARDING_STEPS.length - 1 ? "Get Started" : "Next"}
               {currentStep < ONBOARDING_STEPS.length - 1 && <ChevronRight className="w-5 h-5 ml-1" />}
