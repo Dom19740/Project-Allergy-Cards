@@ -46,7 +46,8 @@ const Onboarding = () => {
     if (currentStep > 0) {
       setCurrentStep(prev => prev - 1);
     } else {
-      navigate('/');
+      // Skip leads to the Select Allergens page
+      navigate('/select-allergens');
     }
   };
 
