@@ -57,7 +57,7 @@ const Onboarding = () => {
       <FixedHeader />
       
       <div className="flex flex-col flex-grow w-full max-w-2xl mx-auto px-4 pt-[126px] overflow-hidden">
-        <div className="flex-grow overflow-y-auto pt-8">
+        <div className="flex-grow overflow-y-auto overflow-x-hidden pt-8">
           <OnboardingStep 
             key={currentStep}
             title={step.title}
