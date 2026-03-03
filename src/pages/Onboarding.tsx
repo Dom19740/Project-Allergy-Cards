@@ -25,7 +25,7 @@ const ONBOARDING_STEPS = [
   },
   {
     title: "Emergency Ready",
-    description: "In urgent situations, use the Emergency Card to quickly communicate your need for medical assistance.",
+    description: "In urgent situations, use the Emergency Card to quickly communicate your need for medical assistance with immediate emergency services dial button",
     icon: AlertTriangle,
   }
 ];
