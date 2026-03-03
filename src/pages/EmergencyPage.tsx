@@ -26,7 +26,6 @@ const EmergencyPage = () => {
 
   useEffect(() => {
     const translateEmergencyContent = async () => {
-      // Check for session translations (offline support)
       const sessionTranslations = localStorage.getItem('currentSessionTranslations');
       if (sessionTranslations) {
         try {
@@ -108,17 +107,6 @@ const EmergencyPage = () => {
       }
     } catch (error) {
       console.error('Share failed:', error);
-      if (navigator.share) {
-        try {
-          await navigator.share({
-            title: 'Emergency Medical Message',
-            text: `${translatedText.attention}\n${translatedText.emergency}\n${translatedText.needHelp}`,
-            url: window.location.href,
-          });
-        } catch (e) {
-          console.error('Text share failed:', e);
-        }
-      }
     } finally {
       setIsSharing(false);
     }
@@ -157,56 +145,57 @@ const EmergencyPage = () => {
   }
 
   return (
-    <div className="flex flex-col h-[100dvh] bg-white overflow-hidden">
-      <div className="flex flex-col flex-grow w-full max-w-2xl mx-auto px-4 sm:px-6 py-4 sm:py-8 overflow-y-auto">
-        <div className="flex-grow flex flex-col items-center justify-center text-center space-y-4 sm:space-y-8">
-          <div ref={cardRef} className="w-full flex flex-col items-center space-y-4 sm:space-y-8 bg-white p-2 sm:p-4 rounded-3xl">
-            <div className="bg-red-600 p-4 sm:p-6 rounded-full shadow-lg shrink-0">
-              <AlertTriangle className="h-10 w-10 sm:h-16 sm:w-16 text-white" />
-            </div>
-            
-            <div className="space-y-4 sm:space-y-6 bg-red-50 p-4 sm:p-8 rounded-3xl border-2 border-red-200 w-full">
-              <div className="flex justify-center border-b-4 border-red-600 pb-2 sm:pb-4">
-                <h1 className="text-3xl sm:text-6xl font-black tracking-tighter uppercase text-red-600 text-center">
-                  {translatedText.attention}
-                </h1>
-              </div>
-              
-              <div className="space-y-2 sm:space-y-4">
-                <p className="text-xl sm:text-3xl font-bold text-gray-900 leading-tight">
-                  {translatedText.emergency}
-                </p>
-                <p className="text-xl sm:text-3xl font-bold text-gray-900 leading-tight">
-                  {translatedText.needHelp}
-                </p>
-                <p className="text-xl sm:text-3xl font-bold text-red-700 leading-tight">
-                  {translatedText.callServices}
-                </p>
-              </div>
-            </div>
-          </div>
+    <div className="flex flex-col w-full h-screen bg-white overflow-hidden">
+      {/* Printable Area - Matches AllergyCard structure */}
+      <div 
+        ref={cardRef} 
+        className="flex-1 w-full flex flex-col items-center justify-start text-center overflow-hidden p-4 sm:p-6 md:p-8 bg-white border-none"
+      >
+        <div className="h-4 sm:h-8 md:h-12" />
 
-          <div className="w-full pt-2">
-            <a 
-              href="tel:112" 
-              className="flex items-center justify-center gap-3 sm:gap-4 w-full py-4 sm:py-6 bg-red-600 hover:bg-red-700 text-white rounded-2xl text-2xl sm:text-3xl font-black shadow-xl transition-transform active:scale-95"
-            >
-              <Phone className="h-8 w-8 sm:h-10 sm:w-10 fill-current" />
-              {translatedText.dial112}
-            </a>
+        <div className="bg-red-600 p-4 sm:p-6 rounded-full shadow-lg mb-6 sm:mb-10">
+          <AlertTriangle className="h-10 w-10 sm:h-16 sm:w-16 text-white" />
+        </div>
+
+        <div className="w-full max-w-2xl space-y-6 sm:space-y-10">
+          <div className="border-b-4 border-red-600 pb-2 sm:pb-4">
+            <h1 className="text-3xl sm:text-6xl font-black tracking-tighter uppercase text-red-600">
+              {translatedText.attention}
+            </h1>
+          </div>
+          
+          <div className="space-y-4 sm:space-y-8">
+            <p className="text-2xl sm:text-4xl font-bold text-gray-900 leading-tight">
+              {translatedText.emergency}
+            </p>
+            <p className="text-2xl sm:text-4xl font-bold text-gray-900 leading-tight">
+              {translatedText.needHelp}
+            </p>
+            <p className="text-2xl sm:text-4xl font-bold text-red-700 leading-tight">
+              {translatedText.callServices}
+            </p>
           </div>
         </div>
 
-        <div className="mt-4 sm:mt-8 shrink-0">
-          <EmergencyActions 
-            onBack={() => navigate(-1)}
-            onShare={handleShare}
-            onDownload={handleDownload}
-            isSharing={isSharing}
-            isDownloading={isDownloading}
-          />
+        <div className="mt-auto w-full max-w-md pt-6">
+          <a 
+            href="tel:112" 
+            className="flex items-center justify-center gap-3 sm:gap-4 w-full py-4 sm:py-6 bg-red-600 hover:bg-red-700 text-white rounded-2xl text-2xl sm:text-3xl font-black shadow-xl transition-transform active:scale-95"
+          >
+            <Phone className="h-8 w-8 sm:h-10 sm:w-10 fill-current" />
+            {translatedText.dial112}
+          </a>
         </div>
       </div>
+
+      {/* Action Buttons - Matches AllergyCard structure */}
+      <EmergencyActions 
+        onBack={() => navigate(-1)}
+        onShare={handleShare}
+        onDownload={handleDownload}
+        isSharing={isSharing}
+        isDownloading={isDownloading}
+      />
     </div>
   );
 };
