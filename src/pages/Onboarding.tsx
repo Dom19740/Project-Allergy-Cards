@@ -15,7 +15,7 @@ const ONBOARDING_STEPS = [
   },
   {
     title: "Choose a Language",
-    description: "Traveling abroad? Select from over 100 languages to translate your allergy alert instantly.",
+    description: "Select from over 100 languages to translate your allergy alert instantly.",
     icon: Languages,
   },
   {
