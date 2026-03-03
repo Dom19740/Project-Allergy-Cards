@@ -20,7 +20,7 @@ const EmergencyActions: React.FC<EmergencyActionsProps> = ({
   isDownloading = false
 }) => {
   return (
-    <div className="w-full py-4 flex justify-center bg-white z-30">
+    <div className="w-full pt-2 pb-[calc(8px+env(safe-area-inset-bottom))] flex justify-center bg-white border-t border-gray-100 z-30">
       <div className="flex items-center space-x-3 bg-white p-2 rounded-full shadow-md border border-gray-200">
         <Button
           onClick={onBack}
