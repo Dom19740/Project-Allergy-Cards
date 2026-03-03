@@ -4,7 +4,7 @@ import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Button } from "@/components/ui/button";
-import { ChevronLeft, ChevronRight, Languages } from "lucide-react";
+import { ChevronLeft, ChevronRight } from "lucide-react";
 import FixedHeader from "@/components/FixedHeader";
 import StepHeader from "@/components/StepHeader";
 import { getAllGoogleLanguages, SupportedLanguage } from "@/lib/translator";
@@ -56,7 +56,6 @@ const LanguageSelectionPage = () => {
           <StepHeader 
             title="Choose a Language"
             description="Select the language you want your allergy alert to be translated into."
-            icon={Languages}
           />
 
           <div className="w-full flex justify-center pt-8 pb-4">

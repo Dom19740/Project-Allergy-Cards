@@ -5,7 +5,7 @@ import { Checkbox } from '@/components/ui/checkbox';
 import { Label } from '@/components/ui/label';
 import { Input } from '@/components/ui/input';
 import { toast } from 'sonner';
-import { X, ChevronLeft, ChevronRight, ShieldAlert } from 'lucide-react';
+import { X, ChevronLeft, ChevronRight } from 'lucide-react';
 import { ALLERGEN_OPTIONS } from '@/lib/allergens';
 import FixedHeader from '@/components/FixedHeader';
 import StepHeader from '@/components/StepHeader';
@@ -91,7 +91,6 @@ const AllergenSelectionPage = () => {
           <StepHeader 
             title="Select Your Allergens"
             description="Choose from our standard list or add your own custom allergens."
-            icon={ShieldAlert}
           />
           
           <div className="grid grid-cols-2 gap-2 sm:gap-3 w-full pt-8">
