@@ -5,7 +5,7 @@ import { Link } from "react-router-dom";
 const FixedHeader = () => {
     return (
         <div
-            className="fixed top-0 left-0 right-0 z-50 bg-gray-100 dark:bg-gray-900 flex justify-center items-center h-[106px]">
+            className="fixed top-0 left-0 right-0 z-50 bg-gray-100 dark:bg-gray-900 flex justify-center items-center h-[calc(106px+env(safe-area-inset-top))] pt-[env(safe-area-inset-top)]">
             <Link to="/" className="block flex justify-center">
                 <h1
                     className="bg-red-600 text-white px-4 py-[13px] rounded-lg text-2xl md:text-3xl font-extrabold tracking-tight">SIMPLE ALLERGY ALERT</h1>

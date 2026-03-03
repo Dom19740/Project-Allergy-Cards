@@ -10,12 +10,12 @@ import OnboardingStep from '@/components/OnboardingStep';
 const ONBOARDING_STEPS = [
   {
     title: "Select Your Allergens",
-    description: "Choose from our standard list or add your own custom allergens. Customise your allergy alert.",
+    description: "Choose from our standard list or add your own custom allergens. We'll make sure they're clearly communicated.",
     icon: ShieldAlert,
   },
   {
     title: "Choose a Language",
-    description: "Select from over 100 languages to translate your allergy alert instantly.",
+    description: "Traveling abroad? Select from over 100 languages to translate your allergy alert instantly.",
     icon: Languages,
   },
   {
@@ -25,7 +25,7 @@ const ONBOARDING_STEPS = [
   },
   {
     title: "Emergency Ready",
-    description: "In urgent situations, use the Emergency Card to quickly communicate your need for medical assistance.",
+    description: "In urgent situations, use the Emergency Card to quickly communicate your needs to first responders.",
     icon: AlertTriangle,
   }
 ];
@@ -56,7 +56,7 @@ const Onboarding = () => {
     <div className="flex flex-col h-screen bg-gray-100 dark:bg-gray-900 overflow-hidden">
       <FixedHeader />
       
-      <div className="flex flex-col flex-grow w-full max-w-2xl mx-auto px-4 pt-[126px] overflow-hidden">
+      <div className="flex flex-col flex-grow w-full max-w-2xl mx-auto px-4 pt-[calc(126px+env(safe-area-inset-top))] overflow-hidden">
         <div className="flex-grow overflow-y-auto overflow-x-hidden pt-8">
           <OnboardingStep 
             key={currentStep}
@@ -66,7 +66,7 @@ const Onboarding = () => {
           />
         </div>
 
-        <div className="w-full flex flex-col items-center mt-auto mb-[50px] space-y-8 shrink-0">
+        <div className="w-full flex flex-col items-center mt-auto mb-[calc(50px+env(safe-area-inset-bottom))] space-y-8 shrink-0">
           <div className="flex space-x-2">
             {ONBOARDING_STEPS.map((_, index) => (
               <div 
