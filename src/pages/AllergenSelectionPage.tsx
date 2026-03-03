@@ -127,7 +127,7 @@ const AllergenSelectionPage = () => {
                 placeholder="Add your own allergen"
                 value={customAllergenInput}
                 onChange={(e) => setCustomAllergenInput(e.target.value)}
-                className="flex-grow p-2 text-sm sm:text-base bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-700 rounded-lg shadow-sm text-gray-800 dark:text-gray-200 h-9"
+                className="flex-grow mx-[10px] p-2 text-sm sm:text-base bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-700 rounded-lg shadow-sm text-gray-800 dark:text-gray-200 h-9"
                 onKeyPress={(e) => {
                   if (e.key === 'Enter') {
                     handleAddCustomAllergen();
