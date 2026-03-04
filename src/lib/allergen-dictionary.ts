@@ -10,7 +10,7 @@ export const ALLERGEN_DICTIONARY: Record<string, Record<string, string>> = {
     'potato': 'patata',
     'sweet potato': 'batata',
     'peanut': 'cacahuete',
-    'green bean': 'judía verde'
+    'green bean': 'judía verde',
     'bean': 'judía'
   
   },
@@ -20,8 +20,7 @@ export const ALLERGEN_DICTIONARY: Record<string, Record<string, string>> = {
     'potato': 'papa',
     'sweet potato': 'camote',
     'peanut': 'maní',
-    'green bean': 'frijol verde'
+    'green bean': 'frijol verde',
     'bean': 'judía'
-  
   }
 };
