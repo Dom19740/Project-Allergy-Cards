@@ -2,14 +2,15 @@
 
 import React from 'react';
 import { Link } from 'react-router-dom';
-import { Home, ShieldAlert, MessageSquare, Languages, X } from 'lucide-react';
+import { Home, ShieldAlert, MessageSquare, Languages, X, Info } from 'lucide-react';
 
 interface CardMenuProps {
   isOpen: boolean;
   onClose: () => void;
+  onOpenDisclaimer: () => void;
 }
 
-const CardMenu: React.FC<CardMenuProps> = ({ isOpen, onClose }) => {
+const CardMenu: React.FC<CardMenuProps> = ({ isOpen, onClose, onOpenDisclaimer }) => {
   if (!isOpen) return null;
 
   const menuItems = [
@@ -49,6 +50,17 @@ const CardMenu: React.FC<CardMenuProps> = ({ isOpen, onClose }) => {
                 <span>{item.label}</span>
               </Link>
             ))}
+            
+            <button
+              onClick={() => {
+                onClose();
+                onOpenDisclaimer();
+              }}
+              className="w-full flex items-center space-x-3 px-4 py-3 text-sm font-medium text-gray-700 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-gray-700 rounded-xl transition-colors text-left"
+            >
+              <Info className="h-4 w-4 text-red-500" />
+              <span>Disclaimer</span>
+            </button>
           </div>
         </div>
       </div>

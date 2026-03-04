@@ -11,6 +11,7 @@ import { shareCard, downloadCard } from '@/lib/card-utils';
 import SaveCardDialog from './SaveCardDialog';
 import CardActions from './CardActions';
 import CardMenu from './CardMenu';
+import DisclaimerDialog from './DisclaimerDialog';
 
 interface AllergyCardProps {
   languageCode: LanguageCode;
@@ -23,6 +24,7 @@ const AllergyCard: React.FC<AllergyCardProps> = ({ languageCode, selectedAllerge
   const [isSharing, setIsSharing] = useState(false);
   const [isDownloading, setIsDownloading] = useState(false);
   const [isSaveDialogOpen, setIsSaveDialogOpen] = useState(false);
+  const [isDisclaimerOpen, setIsDisclaimerOpen] = useState(false);
   const [customAllergenTranslations, setCustomAllergenTranslations] = useState<{ [key: string]: { [lang: string]: string } }>({});
   const [translatedAllergens, setTranslatedAllergens] = useState<{ [key: string]: string }>({});
   const [isTranslating, setIsTranslating] = useState(false);
@@ -339,6 +341,12 @@ const AllergyCard: React.FC<AllergyCardProps> = ({ languageCode, selectedAllerge
       <CardMenu 
         isOpen={isMenuOpen} 
         onClose={() => setIsMenuOpen(false)} 
+        onOpenDisclaimer={() => setIsDisclaimerOpen(true)}
+      />
+
+      <DisclaimerDialog 
+        isOpen={isDisclaimerOpen} 
+        onClose={() => setIsDisclaimerOpen(false)} 
       />
 
       {fullSelectedData && (
