@@ -57,7 +57,7 @@ export const downloadCard = async (element: HTMLElement, fileName: string = 'all
   }
 };
 
-export const shareCard = async (element: HTMLElement, title: string = 'My Allergy Card') => {
+export const shareCard = async (element: HTMLElement, title: string = 'My Allergy Card', text: string = 'My Allergy Alert Card') => {
   const dataUrl = await generateCardImage(element);
   if (!dataUrl) return false;
 
@@ -76,7 +76,7 @@ export const shareCard = async (element: HTMLElement, title: string = 'My Allerg
 
       await Share.share({
         title: title,
-        text: 'My Allergy Alert Card',
+        text: text,
         url: savedFile.uri,
       });
       return true;
@@ -94,6 +94,7 @@ export const shareCard = async (element: HTMLElement, title: string = 'My Allerg
         const file = new File([blob], 'allergy-card.png', { type: 'image/png' });
         await navigator.share({
           title: title,
+          text: text,
           files: [file],
         });
         return true;

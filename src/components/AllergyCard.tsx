@@ -200,9 +200,9 @@ const AllergyCard: React.FC<AllergyCardProps> = ({ languageCode, selectedAllerge
   const handleShare = async () => {
     if (cardRef.current) {
       setIsSharing(true);
-      // Extract 2-letter code if it's a longer code (e.g., 'es-ES' -> 'ES')
       const shortCode = languageCode.split('-')[0].toUpperCase();
-      const success = await shareCard(cardRef.current, `My Allergy Alert Card (${shortCode})`);
+      const shareText = `My Allergy Alert Card (${shortCode})`;
+      const success = await shareCard(cardRef.current, shareText, shareText);
       if (!success) {
         toast.error("Failed to share card.");
       }

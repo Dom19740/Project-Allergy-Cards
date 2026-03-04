@@ -82,9 +82,9 @@ const EmergencyPage = () => {
   const handleShare = async () => {
     if (!cardRef.current) return;
     setIsSharing(true);
-    // Extract 2-letter code if it's a longer code (e.g., 'es-ES' -> 'ES')
     const shortCode = (langCode || 'EN').split('-')[0].toUpperCase();
-    const success = await shareCard(cardRef.current, `My Emergency Alert Card (${shortCode})`);
+    const shareText = `My Emergency Alert Card (${shortCode})`;
+    const success = await shareCard(cardRef.current, shareText, shareText);
     if (!success) {
       toast.error("Failed to share emergency message.");
     }
