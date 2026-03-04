@@ -35,6 +35,8 @@ export const REGIONAL_OVERRIDES: Record<string, Record<string, string>> = {
     'maní': 'cacahuete',
     'Maníes': 'Cacahuetes',
     'maníes': 'cacahuetes',
+    'Peanuts': 'Cacahuetes',
+    'peanuts': 'cacahuetes',
     'Soya': 'Soja',
     'soya': 'soja',
     'Frutos secos': 'Frutos de cáscara',
