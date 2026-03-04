@@ -4,7 +4,7 @@ import { useEffect } from 'react';
 // @ts-ignore
 import { StatusBar, Style } from '@capacitor/status-bar';
 // @ts-ignore
-import { NavigationBar } from '@capgo/capacitor-navigationbar';
+import { NavigationBar } from '@capacitor-community/navigation-bar';
 import { Capacitor } from '@capacitor/core';
 
 const SystemBarsConfig = () => {
@@ -22,7 +22,7 @@ const SystemBarsConfig = () => {
             await StatusBar.setBackgroundColor({ color: '#f3f4f6' });
             
             // Set Navigation Bar (Android bottom bar)
-            // We set the background to light and the buttons/items to dark (black)
+            // The community plugin uses setNavigationBarColor
             await NavigationBar.setNavigationBarColor({
               color: '#f3f4f6',
               darkButtons: true, // This makes the icons black
