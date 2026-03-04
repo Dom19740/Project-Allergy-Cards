@@ -5,8 +5,9 @@ import { useParams, useNavigate } from 'react-router-dom';
 import { AlertTriangle, Loader2, Phone } from 'lucide-react';
 import { translateText } from '@/lib/translator';
 import { getEmergencyNumber } from '@/lib/emergencyNumbers';
+import { shareCard, downloadCard } from '@/lib/card-utils';
 import EmergencyActions from '@/components/EmergencyActions';
-import html2canvas from 'html2canvas';
+import { toast } from 'sonner';
 
 const EmergencyPage = () => {
   const { langCode } = useParams<{ langCode: string }>();
@@ -34,7 +35,6 @@ const EmergencyPage = () => {
         try {
           const parsed = JSON.parse(sessionTranslations);
           if (parsed.languageCode === langCode) {
-            // We need to ensure dialText is handled if it wasn't in the old session
             const content = parsed.content.emergency;
             setTranslatedText({
               ...content,
@@ -82,65 +82,23 @@ const EmergencyPage = () => {
   const handleShare = async () => {
     if (!cardRef.current) return;
     setIsSharing(true);
-    try {
-      const canvas = await html2canvas(cardRef.current, {
-        scale: 2,
-        backgroundColor: '#ffffff',
-        logging: false,
-        useCORS: true,
-        allowTaint: true
-      });
-      
-      const blob = await new Promise<Blob | null>(resolve => canvas.toBlob(resolve, 'image/png'));
-      if (!blob) throw new Error('Failed to create image');
-
-      const file = new File([blob], 'emergency-message.png', { type: 'image/png' });
-      
-      if (navigator.share) {
-        const shareData: ShareData = {
-          title: 'Emergency Medical Message',
-          text: `${translatedText.attention}: ${translatedText.emergency}`,
-        };
-
-        if (navigator.canShare && navigator.canShare({ files: [file] })) {
-          shareData.files = [file];
-        } else {
-          shareData.url = window.location.href;
-        }
-
-        await navigator.share(shareData);
-      } else {
-        await navigator.clipboard.writeText(window.location.href);
-        alert('Link copied to clipboard!');
-      }
-    } catch (error) {
-      console.error('Share failed:', error);
-    } finally {
-      setIsSharing(false);
+    const success = await shareCard(cardRef.current, 'Emergency Medical Message');
+    if (!success) {
+      toast.error("Failed to share emergency message.");
     }
+    setIsSharing(false);
   };
 
   const handleDownload = async () => {
     if (!cardRef.current) return;
     setIsDownloading(true);
-    try {
-      const canvas = await html2canvas(cardRef.current, {
-        scale: 2,
-        backgroundColor: '#ffffff',
-        logging: false,
-        useCORS: true,
-        allowTaint: true
-      });
-      const image = canvas.toDataURL('image/png');
-      const link = document.createElement('a');
-      link.href = image;
-      link.download = `emergency-message-${langCode || 'en'}.png`;
-      link.click();
-    } catch (error) {
-      console.error('Download failed:', error);
-    } finally {
-      setIsDownloading(false);
+    const success = await downloadCard(cardRef.current, `emergency-message-${langCode || 'en'}.png`);
+    if (success) {
+      toast.success("Emergency message saved to your device!");
+    } else {
+      toast.error("Failed to save emergency message.");
     }
+    setIsDownloading(false);
   };
 
   if (isTranslating) {
@@ -154,7 +112,6 @@ const EmergencyPage = () => {
 
   return (
     <div className="flex flex-col w-full h-screen bg-white overflow-hidden">
-      {/* Printable Area - Matches AllergyCard structure */}
       <div 
         ref={cardRef} 
         className="flex-1 w-full flex flex-col items-center justify-start text-center overflow-hidden p-4 sm:p-6 md:p-8 pt-[calc(1rem+env(safe-area-inset-top))] bg-white border-none"
@@ -196,7 +153,6 @@ const EmergencyPage = () => {
         </div>
       </div>
 
-      {/* Action Buttons - Matches AllergyCard structure */}
       <EmergencyActions 
         onBack={() => navigate(-1)}
         onShare={handleShare}

@@ -1,78 +1,52 @@
 "use client";
 
-import html2canvas from 'html2canvas';
+import { toPng } from 'html-to-image';
 import { Share } from '@capacitor/share';
 import { Filesystem, Directory } from '@capacitor/filesystem';
 import { Device } from '@capacitor/device';
 
 /**
- * Checks if the app is running in a native mobile environment (Android/iOS)
+ * Checks if the app is running in a native mobile environment
  */
 const isNative = async () => {
   const info = await Device.getInfo();
   return info.platform === 'android' || info.platform === 'ios';
 };
 
-export const generateCardImage = async (elementId: string): Promise<string | null> => {
-  const element = document.getElementById(elementId);
-  if (!element) return null;
-
+export const generateCardImage = async (element: HTMLElement): Promise<string | null> => {
   try {
-    // Ensure images are loaded
-    const images = element.getElementsByTagName('img');
-    await Promise.all(Array.from(images).map(img => {
-      if (img.complete) return Promise.resolve();
-      return new Promise(resolve => {
-        img.onload = resolve;
-        img.onerror = resolve;
-      });
-    }));
-
-    const canvas = await html2canvas(element, {
-      scale: 3, // Higher scale for better quality
-      useCORS: true,
-      logging: false,
-      backgroundColor: '#ffffff',
-      onclone: (clonedDoc) => {
-        const clonedElement = clonedDoc.getElementById(elementId);
-        if (clonedElement) {
-          clonedElement.style.transform = 'none';
-        }
-      }
+    return await toPng(element, { 
+      cacheBust: true, 
+      pixelRatio: 3,
+      backgroundColor: '#ffffff'
     });
-
-    return canvas.toDataURL('image/png', 1.0);
   } catch (error) {
     console.error('Error generating card image:', error);
     return null;
   }
 };
 
-export const downloadCard = async (elementId: string, fileName: string = 'allergy-card.png') => {
-  const dataUrl = await generateCardImage(elementId);
+export const downloadCard = async (element: HTMLElement, fileName: string = 'allergy-card.png') => {
+  const dataUrl = await generateCardImage(element);
   if (!dataUrl) return false;
 
   const native = await isNative();
 
   if (native) {
     try {
-      // For native apps, we save to the filesystem
       const base64Data = dataUrl.split(',')[1];
-      const savedFile = await Filesystem.writeFile({
+      await Filesystem.writeFile({
         path: fileName,
         data: base64Data,
         directory: Directory.Documents,
+        recursive: true
       });
-      
-      // On Android, we might want to share it immediately or notify the user where it is
-      // For now, just saving it is the primary goal.
       return true;
     } catch (error) {
       console.error('Native download error:', error);
       return false;
     }
   } else {
-    // Standard web download
     const link = document.createElement('a');
     link.download = fileName;
     link.href = dataUrl;
@@ -83,8 +57,8 @@ export const downloadCard = async (elementId: string, fileName: string = 'allerg
   }
 };
 
-export const shareCard = async (elementId: string, title: string = 'My Allergy Card') => {
-  const dataUrl = await generateCardImage(elementId);
+export const shareCard = async (element: HTMLElement, title: string = 'My Allergy Card') => {
+  const dataUrl = await generateCardImage(element);
   if (!dataUrl) return false;
 
   const native = await isNative();
@@ -94,8 +68,7 @@ export const shareCard = async (elementId: string, title: string = 'My Allergy C
       const base64Data = dataUrl.split(',')[1];
       const fileName = 'allergy-card.png';
       
-      // Save temporarily to share
-      const cacheFile = await Filesystem.writeFile({
+      const savedFile = await Filesystem.writeFile({
         path: fileName,
         data: base64Data,
         directory: Directory.Cache,
@@ -103,39 +76,31 @@ export const shareCard = async (elementId: string, title: string = 'My Allergy C
 
       await Share.share({
         title: title,
-        text: 'Check out my allergy card generated with AllergyCard.app',
-        url: cacheFile.uri,
-        dialogTitle: 'Share Allergy Card',
+        text: 'My Allergy Alert Card',
+        url: savedFile.uri,
       });
       return true;
     } catch (error) {
-      console.error('Native share error:', error);
-      return false;
+      if ((error as any).code !== 'UA') { // Ignore user cancellations
+        console.error('Native share error:', error);
+        return false;
+      }
+      return true;
     }
   } else {
-    // Web share
     if (navigator.share) {
       try {
         const blob = await (await fetch(dataUrl)).blob();
         const file = new File([blob], 'allergy-card.png', { type: 'image/png' });
-        
         await navigator.share({
           title: title,
-          text: 'Check out my allergy card generated with AllergyCard.app',
           files: [file],
         });
         return true;
       } catch (error) {
-        if ((error as Error).name === 'AbortError') return true;
-        console.error('Web share error:', error);
+        return false;
       }
     }
-    
-    // Fallback for browsers that don't support file sharing
-    const link = document.createElement('a');
-    link.href = dataUrl;
-    link.download = 'allergy-card.png';
-    link.click();
-    return true;
+    return false;
   }
 };

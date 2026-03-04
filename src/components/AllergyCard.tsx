@@ -2,12 +2,12 @@
 
 import React, { useRef, useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { toPng } from 'html-to-image';
 import { toast } from 'sonner';
 import { Loader2 } from 'lucide-react';
 import { LanguageCode, SelectedAllergens, CustomMessages, TranslatedContent } from '@/lib/types';
 import { ALLERGEN_OPTIONS } from '@/lib/allergens';
 import { translateText } from '@/lib/translator';
+import { shareCard, downloadCard } from '@/lib/card-utils';
 import SaveCardDialog from './SaveCardDialog';
 import CardActions from './CardActions';
 import CardMenu from './CardMenu';
@@ -48,7 +48,6 @@ const AllergyCard: React.FC<AllergyCardProps> = ({ languageCode, selectedAllerge
   });
   const [isMenuOpen, setIsMenuOpen] = useState(false);
 
-  // Get the full language name using the built-in Intl API
   const getLanguageName = (code: string) => {
     if (code === 'en') return 'English';
     try {
@@ -176,7 +175,7 @@ const AllergyCard: React.FC<AllergyCardProps> = ({ languageCode, selectedAllerge
         setTranslatedAllergens(allergenTranslations);
       } catch (error) {
         console.error('Translation failed:', error);
-        toast.error("Translation failed. Please try again.", { duration: 1000 });
+        toast.error("Translation failed. Please try again.");
       } finally {
         setIsTranslating(false);
       }
@@ -188,70 +187,29 @@ const AllergyCard: React.FC<AllergyCardProps> = ({ languageCode, selectedAllerge
   const handleDownload = async () => {
     if (cardRef.current) {
       setIsDownloading(true);
-      try {
-        const dataUrl = await toPng(cardRef.current, { cacheBust: true, pixelRatio: 2 });
-        const link = document.createElement('a');
-        link.download = `allergy-card-${languageCode}.png`;
-        link.href = dataUrl;
-        document.body.appendChild(link);
-        link.click();
-        document.body.removeChild(link);
-        toast.success("Allergy card downloaded!", { duration: 1000 });
-      } catch (error) {
-        console.error('Error downloading image:', error);
-        toast.error("Failed to download card.", { duration: 1000 });
-      } finally {
-        setIsDownloading(false);
+      const success = await downloadCard(cardRef.current, `allergy-card-${languageCode}.png`);
+      if (success) {
+        toast.success("Allergy card saved to your device!");
+      } else {
+        toast.error("Failed to save card.");
       }
+      setIsDownloading(false);
     }
   };
 
   const handleShare = async () => {
     if (cardRef.current) {
       setIsSharing(true);
-      try {
-        const dataUrl = await toPng(cardRef.current, { cacheBust: true, pixelRatio: 2 });
-        const blob = await (await fetch(dataUrl)).blob();
-        const file = new File([blob], `allergy-card-${languageCode}.png`, { type: 'image/png' });
-
-        if (navigator.canShare && navigator.canShare({ files: [file] })) {
-          await navigator.share({
-            files: [file],
-            title: 'My Allergy Card',
-            text: 'Here is my allergy card, created with Simple Allergy Alert'
-          });
-        } else {
-          toast.warning("Sharing not supported on this browser. Downloading instead.", { duration: 1000 });
-          handleDownload();
-        }
-      } catch (error: any) {
-        if (error.name !== 'AbortError') {
-          console.error('Error sharing image:', error);
-          toast.error("Failed to share card.", { duration: 1000 });
-        }
-      } finally {
-        setIsSharing(false);
+      const success = await shareCard(cardRef.current, 'My Allergy Card');
+      if (!success) {
+        toast.error("Failed to share card.");
       }
+      setIsSharing(false);
     }
   };
 
   const handlePrint = () => {
-    if (cardRef.current) {
-      const printWindow = window.open('', '_blank', 'width=800,height=600');
-      if (printWindow) {
-        printWindow.document.write('<html><head><title>Print Allergy Card</title>');
-        printWindow.document.write('<link rel="stylesheet" href="/src/globals.css">');
-        printWindow.document.write('</head><body>');
-        printWindow.document.write(cardRef.current.innerHTML);
-        printWindow.document.write('</body></html>');
-        printWindow.document.close();
-        printWindow.focus();
-        setTimeout(() => {
-          printWindow.print();
-          printWindow.close();
-        }, 500);
-      }
-    }
+    window.print();
   };
 
   const handleEmergency = () => {
@@ -298,10 +256,9 @@ const AllergyCard: React.FC<AllergyCardProps> = ({ languageCode, selectedAllerge
 
   return (
     <div className="flex flex-col w-full h-screen bg-white overflow-hidden">
-      {/* Printable Area */}
       <div 
         ref={cardRef} 
-        className="flex-1 w-full flex flex-col items-center justify-start text-center print:shadow-none print:m-0 print:rounded-none overflow-hidden p-4 sm:p-6 md:p-8 pt-[calc(1rem+env(safe-area-inset-top))] bg-white border-none"
+        className="flex-1 w-full flex flex-col items-center justify-start text-center overflow-hidden p-4 sm:p-6 md:p-8 pt-[calc(1rem+env(safe-area-inset-top))] bg-white border-none"
       >
         <div className="h-6 sm:h-10 md:h-14" />
 
@@ -366,7 +323,6 @@ const AllergyCard: React.FC<AllergyCardProps> = ({ languageCode, selectedAllerge
         </div>
       </div>
 
-      {/* Action Buttons */}
       <CardActions 
         onShare={handleShare}
         onDownload={handleDownload}
@@ -378,13 +334,11 @@ const AllergyCard: React.FC<AllergyCardProps> = ({ languageCode, selectedAllerge
         isDownloading={isDownloading}
       />
 
-      {/* Navigation Menu */}
       <CardMenu 
         isOpen={isMenuOpen} 
         onClose={() => setIsMenuOpen(false)} 
       />
 
-      {/* Save Dialog */}
       {fullSelectedData && (
         <SaveCardDialog
           isOpen={isSaveDialogOpen}
@@ -396,7 +350,6 @@ const AllergyCard: React.FC<AllergyCardProps> = ({ languageCode, selectedAllerge
         />
       )}
 
-      {/* Print Styles */}
       <style dangerouslySetInnerHTML={{ __html: `
         @media print {
           body * { visibility: hidden; }
