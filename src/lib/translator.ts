@@ -1,6 +1,7 @@
 "use client";
 
 import { LanguageCode } from './types';
+import { ALLERGEN_DICTIONARY } from './allergen-dictionary';
 
 export interface SupportedLanguage {
   code: LanguageCode;
@@ -9,7 +10,8 @@ export interface SupportedLanguage {
 
 /**
  * Regional overrides for specific languages to ensure correct dialect terms.
- * This acts as a safety net for the Google Translate API.
+ * This acts as a safety net for the Google Translate API when it returns 
+ * terms that are more common in one region than another.
  */
 const REGIONAL_OVERRIDES: Record<string, Record<string, string>> = {
   'es-ES': {
@@ -38,16 +40,35 @@ const REGIONAL_OVERRIDES: Record<string, Record<string, string>> = {
     'Jugos': 'Zumos',
     'jugos': 'zumos',
     'Celular': 'Móvil',
-    'celular': 'móvil'
+    'celular': 'móvil',
+    'Maracuyá': 'Fruta de la pasión',
+    'maracuyá': 'fruta de la pasión',
+    'Camote': 'Batata',
+    'camote': 'batata',
+    'Frijol verde': 'Judía verde',
+    'frijol verde': 'judía verde'
   }
 };
 
 /**
- * Translates text using the Google Translate free API endpoint.
- * Handles multiple segments (sentences) by joining them together.
+ * Translates text using a local dictionary first, then falls back to the Google Translate API.
  */
 export const translateText = async (text: string, targetLanguage: string): Promise<string> => {
   if (!text || !targetLanguage || targetLanguage === 'en') return text;
+
+  // 1. Check local dictionary first (case-insensitive)
+  const langDictionary = ALLERGEN_DICTIONARY[targetLanguage];
+  if (langDictionary) {
+    const normalizedText = text.toLowerCase().trim();
+    if (langDictionary[normalizedText]) {
+      // Preserve capitalization if the original text was capitalized
+      const translation = langDictionary[normalizedText];
+      if (text[0] === text[0].toUpperCase() && text[0] !== text[0].toLowerCase()) {
+        return translation.charAt(0).toUpperCase() + translation.slice(1);
+      }
+      return translation;
+    }
+  }
   
   try {
     const response = await fetch(
@@ -70,8 +91,6 @@ export const translateText = async (text: string, targetLanguage: string): Promi
     if (REGIONAL_OVERRIDES[targetLanguage]) {
       Object.entries(REGIONAL_OVERRIDES[targetLanguage]).forEach(([latin, european]) => {
         // Use a more robust replacement that handles accented characters correctly.
-        // Standard \b doesn't work with accented characters like 'í' in 'Maní'.
-        // We look for the word not surrounded by other letters or numbers.
         const escaped = latin.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
         const regex = new RegExp(`(^|[^a-zA-Z0-9áéíóúÁÉÍÓÚñÑ])${escaped}(?![a-zA-Z0-9áéíóúÁÉÍÓÚñÑ])`, 'g');
         translated = translated.replace(regex, (match, p1) => (p1 || '') + european);
