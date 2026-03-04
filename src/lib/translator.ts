@@ -12,6 +12,34 @@ export interface SupportedLanguage {
  * This acts as a safety net for the Google Translate API.
  */
 const REGIONAL_OVERRIDES: Record<string, Record<string, string>> = {
+  'es': {
+    'Maní': 'Cacahuete',
+    'maní': 'cacahuete',
+    'Maníes': 'Cacahuetes',
+    'maníes': 'cacahuetes',
+    'Soya': 'Soja',
+    'soya': 'soja',
+    'Frutos secos': 'Frutos de cáscara',
+    'frutos secos': 'frutos de cáscara',
+    'Durazno': 'Melocotón',
+    'durazno': 'melocotón',
+    'Duraznos': 'Melocotones',
+    'duraznos': 'melocotones',
+    'Frutilla': 'Fresa',
+    'frutilla': 'fresa',
+    'Frutillas': 'Fresas',
+    'frutillas': 'fresas',
+    'Papa': 'Patata',
+    'papa': 'patata',
+    'Papas': 'Patatas',
+    'papas': 'patatas',
+    'Jugo': 'Zumo',
+    'jugo': 'zumo',
+    'Jugos': 'Zumos',
+    'jugos': 'zumos',
+    'Celular': 'Móvil',
+    'celular': 'móvil'
+  },
   'es-ES': {
     'Maní': 'Cacahuete',
     'maní': 'cacahuete',
@@ -69,8 +97,12 @@ export const translateText = async (text: string, targetLanguage: string): Promi
     // Apply regional overrides if they exist for this language
     if (REGIONAL_OVERRIDES[targetLanguage]) {
       Object.entries(REGIONAL_OVERRIDES[targetLanguage]).forEach(([latin, european]) => {
-        // Use regex for case-insensitive replacement if needed, but here we have both cases
-        translated = translated.replace(new RegExp(`\\b${latin}\\b`, 'g'), european);
+        // Use a more robust replacement that handles accented characters correctly.
+        // Standard \b doesn't work with accented characters like 'í' in 'Maní'.
+        // We look for the word not surrounded by other letters or numbers.
+        const escaped = latin.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+        const regex = new RegExp(`(^|[^a-zA-Z0-9áéíóúÁÉÍÓÚñÑ])${escaped}(?![a-zA-Z0-9áéíóúÁÉÍÓÚñÑ])`, 'g');
+        translated = translated.replace(regex, (match, p1) => (p1 || '') + european);
       });
     }
     
