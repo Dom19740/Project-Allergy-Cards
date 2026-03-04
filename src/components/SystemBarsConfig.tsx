@@ -1,7 +1,9 @@
 "use client";
 
 import { useEffect } from 'react';
+// @ts-ignore
 import { StatusBar, Style } from '@capacitor/status-bar';
+// @ts-ignore
 import { NavigationBar } from '@capgo/capacitor-navigationbar';
 import { Capacitor } from '@capacitor/core';
 

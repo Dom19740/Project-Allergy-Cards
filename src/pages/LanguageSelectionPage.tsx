@@ -51,7 +51,7 @@ const LanguageSelectionPage = () => {
   return (
     <div className="flex flex-col h-screen bg-gray-100 dark:bg-gray-900 overflow-hidden">
       <FixedHeader />
-      <div className="flex flex-col flex-grow w-full max-w-2xl mx-auto px-4 pt-[126px] overflow-hidden">
+      <div className="flex flex-col flex-grow w-full max-w-2xl mx-auto px-4 pt-[calc(126px+env(safe-area-inset-top))] overflow-hidden">
         <div className="flex-grow overflow-y-auto pt-8">
           <StepHeader 
             title="Choose a Language"
@@ -88,7 +88,7 @@ const LanguageSelectionPage = () => {
           </div>
         </div>
         
-        <div className="w-full flex justify-between items-center mt-auto mb-[50px] gap-4 shrink-0">
+        <div className="w-full flex justify-between items-center mt-auto mb-[calc(50px+env(safe-area-inset-bottom))] gap-4 shrink-0">
           <Button
             variant="ghost"
             onClick={() => navigate(-1)}

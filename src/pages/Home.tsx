@@ -11,8 +11,8 @@ const Home = () => {
     <div className="flex flex-col min-h-screen bg-gray-100 dark:bg-gray-900">
       <FixedHeader />
       
-      {/* Main Content Wrapper - takes remaining height, adds padding for header */}
-      <div className="flex flex-col flex-grow w-full max-w-2xl mx-auto px-4 pt-[126px]">
+      {/* Main Content Wrapper - takes remaining height, adds padding for header and safe areas */}
+      <div className="flex flex-col flex-grow w-full max-w-2xl mx-auto px-4 pt-[calc(126px+env(safe-area-inset-top))]">
         {/* Top Section: Flexible content area, scrollable */}
         <div className="flex-grow overflow-y-auto">
           <div className="flex flex-col items-center text-center space-y-8">
@@ -33,8 +33,8 @@ const Home = () => {
           </div>
         </div>
 
-        {/* Bottom Section: Fixed height button area */}
-        <div className="w-full flex flex-col justify-center items-center mt-8 mb-[50px] gap-4">
+        {/* Bottom Section: Fixed height button area with safe area bottom padding */}
+        <div className="w-full flex flex-col justify-center items-center mt-8 mb-[calc(50px+env(safe-area-inset-bottom))] gap-4">
 
           <Button 
             asChild 
