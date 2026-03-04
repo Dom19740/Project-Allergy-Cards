@@ -9,7 +9,7 @@ import {
   DialogFooter,
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
-import { AlertTriangle } from "lucide-react";
+import { Info } from "lucide-react";
 
 interface DisclaimerDialogProps {
   isOpen: boolean;
@@ -21,8 +21,8 @@ const DisclaimerDialog: React.FC<DisclaimerDialogProps> = ({ isOpen, onClose }) 
     <Dialog open={isOpen} onOpenChange={onClose}>
       <DialogContent className="sm:max-w-[425px] rounded-2xl">
         <DialogHeader className="flex flex-col items-center text-center">
-          <div className="bg-amber-100 dark:bg-amber-900/30 p-3 rounded-full mb-2">
-            <AlertTriangle className="h-6 w-6 text-amber-600" />
+          <div className="bg-red-50 dark:bg-red-900/20 p-3 rounded-full mb-2">
+            <Info className="h-6 w-6 text-red-600" />
           </div>
           <DialogTitle className="text-xl font-bold">Safety Disclaimer</DialogTitle>
         </DialogHeader>
