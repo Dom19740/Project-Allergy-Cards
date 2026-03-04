@@ -1,36 +1,48 @@
+import { Suspense, lazy } from "react";
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
-import Home from "./pages/Home";
-import NotFound from "./pages/NotFound";
-import LanguageSelectionPage from "./pages/LanguageSelectionPage";
-import AllergyAlertPage from "./pages/AllergyAlertPage";
-import AllergenSelectionPage from "./pages/AllergenSelectionPage";
-import SelectAlertPage from "./pages/SelectAlertPage";
-import EmergencyPage from "./pages/EmergencyPage";
-import PageTemplate from "./pages/PageTemplate";
-import Onboarding from "./pages/Onboarding";
 import { usePreloadImages } from "./hooks/usePreloadImages";
+import { Loader2 } from "lucide-react";
+
+// Lazy load pages
+const Home = lazy(() => import("./pages/Home"));
+const NotFound = lazy(() => import("./pages/NotFound"));
+const LanguageSelectionPage = lazy(() => import("./pages/LanguageSelectionPage"));
+const AllergyAlertPage = lazy(() => import("./pages/AllergyAlertPage"));
+const AllergenSelectionPage = lazy(() => import("./pages/AllergenSelectionPage"));
+const SelectAlertPage = lazy(() => import("./pages/SelectAlertPage"));
+const EmergencyPage = lazy(() => import("./pages/EmergencyPage"));
+const PageTemplate = lazy(() => import("./pages/PageTemplate"));
+const Onboarding = lazy(() => import("./pages/Onboarding"));
 
 const queryClient = new QueryClient();
+
+const LoadingFallback = () => (
+  <div className="flex h-screen w-full items-center justify-center bg-gray-100 dark:bg-gray-900">
+    <Loader2 className="h-8 w-8 animate-spin text-red-600" />
+  </div>
+);
 
 const AppContent = () => {
   usePreloadImages();
   
   return (
-    <Routes>
-      <Route path="/" element={<Home />} />
-      <Route path="/onboarding" element={<Onboarding />} />
-      <Route path="/select-allergens" element={<AllergenSelectionPage />} />
-      <Route path="/select-alert" element={<SelectAlertPage />} />
-      <Route path="/select-language" element={<LanguageSelectionPage />} />
-      <Route path="/alert/:langCode" element={<AllergyAlertPage />} />
-      <Route path="/emergency/:langCode" element={<EmergencyPage />} />
-      <Route path="/page-template" element={<PageTemplate />} />
-      <Route path="*" element={<NotFound />} />
-    </Routes>
+    <Suspense fallback={<LoadingFallback />}>
+      <Routes>
+        <Route path="/" element={<Home />} />
+        <Route path="/onboarding" element={<Onboarding />} />
+        <Route path="/select-allergens" element={<AllergenSelectionPage />} />
+        <Route path="/select-alert" element={<SelectAlertPage />} />
+        <Route path="/select-language" element={<LanguageSelectionPage />} />
+        <Route path="/alert/:langCode" element={<AllergyAlertPage />} />
+        <Route path="/emergency/:langCode" element={<EmergencyPage />} />
+        <Route path="/page-template" element={<PageTemplate />} />
+        <Route path="*" element={<NotFound />} />
+      </Routes>
+    </Suspense>
   );
 };
 
