@@ -30,9 +30,12 @@ const DisclaimerDialog: React.FC<DisclaimerDialogProps> = ({ isOpen, onClose }) 
           <p className="text-gray-700 dark:text-gray-300 leading-relaxed">
             This app provides translated allergy alerts for convenience. While we aim for accuracy, translations and emergency numbers may not always be correct.
           </p>
-          <p className="text-gray-700 dark:text-gray-300 font-medium leading-relaxed">
-            Always verify important information locally when possible. If in doubt, do not eat.
-          </p>
+          <div className="text-gray-700 dark:text-gray-300 leading-relaxed">
+            <p>Always verify important information locally when possible.</p>
+            <p className="mt-2 font-bold text-red-600 dark:text-red-500">
+              If in doubt, do not eat.
+            </p>
+          </div>
         </div>
         <DialogFooter>
           <Button 
