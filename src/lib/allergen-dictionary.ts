@@ -10,8 +10,10 @@ export const ALLERGEN_DICTIONARY: Record<string, Record<string, string>> = {
     'potato': 'patata',
     'sweet potato': 'batata',
     'peanut': 'cacahuete',
+    'peanuts': 'cacahuetes',
     'green bean': 'judía verde',
-    'bean': 'judía'
+    'bean': 'judía',
+    'beans': 'judías'
   },
   'es-419': {
     'passion fruit': 'maracuyá',
@@ -19,8 +21,10 @@ export const ALLERGEN_DICTIONARY: Record<string, Record<string, string>> = {
     'potato': 'papa',
     'sweet potato': 'camote',
     'peanut': 'maní',
+    'peanuts': 'maníes',
     'green bean': 'frijol verde',
-    'bean': 'judía'
+    'bean': 'judía',
+    'beans': 'judías'
   }
 };
 
@@ -35,8 +39,8 @@ export const REGIONAL_OVERRIDES: Record<string, Record<string, string>> = {
     'maní': 'cacahuete',
     'Maníes': 'Cacahuetes',
     'maníes': 'cacahuetes',
-    'Peanuts': 'Cacahuetes',
-    'peanuts': 'cacahuetes',
+    'Miseria': 'Cacahuetes', // Catching the common "peanuts = small money" mistranslation
+    'miseria': 'cacahuetes',
     'Soya': 'Soja',
     'soya': 'soja',
     'Frutos secos': 'Frutos de cáscara',
