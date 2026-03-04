@@ -7,9 +7,6 @@
  */
 export const emergencyNumbers: Record<string, string> = {
   'en': '911', // Defaulting to 911 for English (US/Canada)
-  'es': '112', // General Spanish
-  'es-ES': '112', // Spain
-  'es-419': '911', // Latin America (911 is common in many LatAm countries)
   'fr': '112',
   'de': '112',
   'it': '112',

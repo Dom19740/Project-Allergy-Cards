@@ -22,7 +22,7 @@ export type TranslationKey =
   | 'Placeholder'
   | 'Checkbox';
 
-export type LanguageCode = 'en' | 'es' | 'fr' | 'de' | 'it' | 'pt' | 'zh-Hans' | 'zh-Hant' | 'ar' | 'ru' | 'ja' | 'ko';
+export type LanguageCode = 'en' | 'fr' | 'de' | 'it' | 'pt' | 'zh-Hans' | 'zh-Hant' | 'ar' | 'ru' | 'ja' | 'ko';
 
 export const translations: Record<LanguageCode, Record<TranslationKey, string>> = {
   en: {
@@ -78,24 +78,6 @@ export const translations: Record<LanguageCode, Record<TranslationKey, string>> 
     Input: 'Entrada',
     Placeholder: 'Espaço reservado',
     Checkbox: 'Caixa de seleção',
-  },
-  es: {
-    eggs: 'Huevos',
-    fish: 'Pescado',
-    milk: 'Leche',
-    peanut: 'Cacahuete',
-    sesame: 'Sésamo',
-    shellfish: 'Marisco',
-    soy: 'Soja',
-    treeNuts: 'Frutos secos',
-    wheat: 'Trigo',
-    allergenId: 'ID Alérgeno',
-    Title: 'Título',
-    Description: 'Descripción',
-    ButtonTitle: 'Título del botón',
-    Input: 'Entrada',
-    Placeholder: 'Marcador de posición',
-    Checkbox: 'Casilla de verificación',
   },
   de: {
     eggs: 'Eier',

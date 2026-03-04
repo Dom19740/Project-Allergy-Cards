@@ -8,37 +8,11 @@ export interface SupportedLanguage {
 }
 
 /**
- * Regional overrides for specific terms where the translation engine 
- * might fail to distinguish between dialects (e.g., Spain vs Latin America).
- */
-const REGIONAL_OVERRIDES: Record<string, Record<string, string>> = {
-  'es-ES': {
-    'Peanut': 'Cacahuete',
-    'Peanuts': 'Cacahuetes',
-    'I can not eat:': 'No puedo comer:',
-    'They make me very sick and I could die': 'Me ponen muy enfermo y podría morir',
-    'Please be careful with my food.': 'Por favor, tenga cuidado con mi comida.',
-    'Thank you!': '¡Gracias!',
-    'ALLERGY ALERT!': '¡ALERTA DE ALERGIA!',
-    'ATTENTION': 'ATENCIÓN',
-    'I am having a severe allergic reaction.': 'Estoy teniendo una reacción alérgica grave.',
-    'I need medical help immediately.': 'Necesito ayuda médica de inmediato.',
-    'Please call emergency services.': 'Por favor, llame a los servicios de emergencia.',
-    'DIAL': 'LLAME AL'
-  }
-};
-
-/**
  * Translates text using the Google Translate free API endpoint.
  * Handles multiple segments (sentences) by joining them together.
  */
 export const translateText = async (text: string, targetLanguage: string): Promise<string> => {
   if (!text || !targetLanguage || targetLanguage === 'en') return text;
-
-  // Check for regional overrides first
-  if (REGIONAL_OVERRIDES[targetLanguage] && REGIONAL_OVERRIDES[targetLanguage][text]) {
-    return REGIONAL_OVERRIDES[targetLanguage][text];
-  }
   
   try {
     const response = await fetch(
@@ -50,22 +24,10 @@ export const translateText = async (text: string, targetLanguage: string): Promi
     const data = await response.json();
     
     if (data && data[0] && Array.isArray(data[0])) {
-      let translated = data[0]
+      return data[0]
         .map((segment: any) => segment[0])
         .filter((text: any) => typeof text === 'string')
         .join('');
-
-      // Secondary check: if the API returned a known LatAm term for an es-ES request, swap it
-      if (targetLanguage === 'es-ES') {
-        if (translated.toLowerCase().includes('maní')) {
-          translated = translated.replace(/maní/gi, 'cacahuete');
-        }
-        if (translated.toLowerCase().includes('jugo')) {
-          translated = translated.replace(/jugo/gi, 'zumo');
-        }
-      }
-      
-      return translated;
     }
     
     return text;
@@ -164,8 +126,6 @@ export const getAllGoogleLanguages = async (): Promise<SupportedLanguage[]> => {
     { code: 'sk', name: 'Slovak' },
     { code: 'sl', name: 'Slovenian' },
     { code: 'so', name: 'Somali' },
-    { code: 'es-ES', name: 'Spanish (Spain)' },
-    { code: 'es-419', name: 'Spanish (Latin America)' },
     { code: 'su', name: 'Sundanese' },
     { code: 'sw', name: 'Swahili' },
     { code: 'sv', name: 'Swedish' },
