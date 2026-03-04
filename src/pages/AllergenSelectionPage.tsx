@@ -5,26 +5,28 @@ import { Checkbox } from '@/components/ui/checkbox';
 import { Label } from '@/components/ui/label';
 import { Input } from '@/components/ui/input';
 import { toast } from 'sonner';
-import { X, ChevronLeft, ChevronRight } from 'lucide-react';
+import { X } from 'lucide-react';
 import { ALLERGEN_OPTIONS } from '@/lib/allergens';
 import FixedHeader from '@/components/FixedHeader';
-import StepHeader from '@/components/StepHeader';
 
 const AllergenSelectionPage = () => {
   const navigate = useNavigate();
   const [selectedAllergens, setSelectedAllergens] = useState<string[]>([]);
   const [customAllergenInput, setCustomAllergenInput] = useState<string>('');
 
+  // Load selected allergens from local storage on mount
   useEffect(() => {
     const storedAllergens = localStorage.getItem('selectedAllergens');
     if (storedAllergens) {
       try {
         const parsed = JSON.parse(storedAllergens);
+        // Handle both old array format and new object format
         if (Array.isArray(parsed)) {
           setSelectedAllergens(parsed);
         } else if (parsed.ids) {
           setSelectedAllergens(parsed.ids);
         } else if (parsed.standard) {
+          // Handle standard/custom split format
           setSelectedAllergens([...(parsed.standard || []), ...(parsed.custom || [])]);
         }
       } catch (e) {
@@ -65,6 +67,7 @@ const AllergenSelectionPage = () => {
       return;
     }
     
+    // Save in a consistent format for the AllergyCard
     const standardIds = ALLERGEN_OPTIONS.map(opt => opt.id);
     const standard = selectedAllergens.filter(id => standardIds.includes(id));
     const custom = selectedAllergens.filter(id => !standardIds.includes(id));
@@ -72,7 +75,7 @@ const AllergenSelectionPage = () => {
     localStorage.setItem('selectedAllergens', JSON.stringify({
       standard,
       custom,
-      ids: selectedAllergens
+      ids: selectedAllergens // Keep flat list for compatibility
     }));
     
     navigate('/select-alert');
@@ -83,100 +86,98 @@ const AllergenSelectionPage = () => {
   );
 
   return (
-    <div className="flex flex-col h-screen bg-gray-100 dark:bg-gray-900 overflow-hidden">
+    <div className="flex flex-col min-h-screen bg-gray-100 dark:bg-gray-900">
       <FixedHeader />
       
-      <div className="flex flex-col flex-grow w-full max-w-2xl mx-auto px-4 pt-[126px] overflow-hidden">
-        <div className="flex-grow overflow-y-auto pt-8">
-          <StepHeader 
-            title="Select Your Allergens"
-            description="Choose from our standard list or add your own custom allergens."
-          />
-          
-          <div className="grid grid-cols-2 gap-2 sm:gap-3 w-full pt-8">
-            {ALLERGEN_OPTIONS.map((allergen) => (
-              <div 
-                key={allergen.id} 
-                className="flex items-center justify-between p-2 bg-white dark:bg-gray-800 rounded-lg shadow-sm cursor-pointer"
-                onClick={(e) => {
-                  if (e.target === e.currentTarget || (e.target as HTMLElement).tagName === 'IMG') {
-                    handleCheckboxChange(allergen.id, !selectedAllergens.includes(allergen.id));
-                  }
-                }}
-              >
-                <div className="flex items-center space-x-2">
-                  <img src={allergen.image} alt={allergen.name} className="w-6 h-6 sm:w-7 sm:h-7 object-contain" />
-                  <Label htmlFor={allergen.id} className="text-sm sm:text-base font-medium text-gray-800 dark:text-gray-200 cursor-pointer">
-                    {allergen.name}
-                  </Label>
+      <div className="flex flex-col flex-grow w-full max-w-2xl mx-auto px-4 pt-[126px]">
+        <div className="flex-grow overflow-y-auto">
+          <div className="flex flex-col items-center text-center space-y-3">
+            <h2 className="text-xl sm:text-2xl font-bold text-gray-700 dark:text-gray-200">
+              Select Allergens
+            </h2>
+            
+            <div className="grid grid-cols-2 gap-2 sm:gap-3 w-full">
+              {ALLERGEN_OPTIONS.map((allergen) => (
+                <div 
+                  key={allergen.id} 
+                  className="flex items-center justify-between p-2 bg-white dark:bg-gray-800 rounded-lg shadow-sm cursor-pointer"
+                  onClick={(e) => {
+                    if (e.target === e.currentTarget || (e.target as HTMLElement).tagName === 'IMG') {
+                      handleCheckboxChange(allergen.id, !selectedAllergens.includes(allergen.id));
+                    }
+                  }}
+                >
+                  <div className="flex items-center space-x-2">
+                    <img src={allergen.image} alt={allergen.name} className="w-6 h-6 sm:w-7 sm:h-7 object-contain" />
+                    <Label htmlFor={allergen.id} className="text-sm sm:text-base font-medium text-gray-800 dark:text-gray-200 cursor-pointer">
+                      {allergen.name}
+                    </Label>
+                  </div>
+                  <Checkbox
+                    id={allergen.id}
+                    checked={selectedAllergens.includes(allergen.id)}
+                    onCheckedChange={(checked) => handleCheckboxChange(allergen.id, !!checked)}
+                    className="w-5 h-5"
+                  />
                 </div>
-                <Checkbox
-                  id={allergen.id}
-                  checked={selectedAllergens.includes(allergen.id)}
-                  onCheckedChange={(checked) => handleCheckboxChange(allergen.id, !!checked)}
-                  className="w-5 h-5"
+              ))}
+            </div>
+
+            <div className="w-full">
+              <div className="flex space-x-2">
+                <Input
+                  type="text"
+                  placeholder="Add your own allergen"
+                  value={customAllergenInput}
+                  onChange={(e) => setCustomAllergenInput(e.target.value)}
+                  className="flex-grow ml-[10px] p-2 text-sm sm:text-base bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-700 rounded-lg shadow-sm text-gray-800 dark:text-gray-200 h-9"
+                  onKeyPress={(e) => {
+                    if (e.key === 'Enter') {
+                      handleAddCustomAllergen();
+                    }
+                  }}
                 />
-              </div>
-            ))}
-          </div>
-
-          <div className="w-full pt-6 pb-4">
-            <div className="flex space-x-2">
-              <Input
-                type="text"
-                placeholder="Add your own allergen"
-                value={customAllergenInput}
-                onChange={(e) => setCustomAllergenInput(e.target.value)}
-                className="flex-grow mx-[10px] p-2 text-sm sm:text-base bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-700 rounded-lg shadow-sm text-gray-800 dark:text-gray-200 h-9"
-                onKeyPress={(e) => {
-                  if (e.key === 'Enter') {
-                    handleAddCustomAllergen();
-                  }
-                }}
-              />
-              <Button onClick={handleAddCustomAllergen} className="py-2 px-4 text-sm sm:text-base bg-blue-600 text-white hover:bg-blue-700 h-9">
-                Add
-              </Button>
-            </div>
-          </div>
-
-          {customSelected.length > 0 && (
-            <div className="w-full p-2 sm:p-3 bg-white dark:bg-gray-800 rounded-lg shadow-lg mb-4">
-              <h3 className="text-base sm:text-lg font-semibold mb-2 text-gray-700 dark:text-gray-200">Your Custom Allergens:</h3>
-              <div className="flex flex-wrap gap-1.5">
-                {customSelected.map((allergen) => (
-                  <span key={allergen} className="flex items-center bg-gray-200 dark:bg-gray-700 text-gray-800 dark:text-gray-100 px-2 py-0.5 rounded-full text-sm">
-                    {allergen}
-                    <button 
-                      onClick={() => handleRemoveAllergen(allergen)} 
-                      className="ml-2 text-gray-600 dark:text-gray-300 hover:text-red-500 dark:hover:text-red-400"
-                    >
-                      <X className="h-4 w-4" />
-                    </button>
-                  </span>
-                ))}
+                <Button onClick={handleAddCustomAllergen} className="py-2 px-4 text-sm sm:text-base bg-blue-600 text-white hover:bg-blue-700 h-9">
+                  Add
+                </Button>
               </div>
             </div>
-          )}
+
+            {customSelected.length > 0 && (
+              <div className="w-full p-2 sm:p-3 bg-white dark:bg-gray-800 rounded-lg shadow-lg">
+                <h3 className="text-base sm:text-lg font-semibold mb-2 text-gray-700 dark:text-gray-200">Your Custom Allergens:</h3>
+                <div className="flex flex-wrap gap-1.5">
+                  {customSelected.map((allergen) => (
+                    <span key={allergen} className="flex items-center bg-gray-200 dark:bg-gray-700 text-gray-800 dark:text-gray-100 px-2 py-0.5 rounded-full text-sm">
+                      {allergen}
+                      <button 
+                        onClick={() => handleRemoveAllergen(allergen)} 
+                        className="ml-2 text-gray-600 dark:text-gray-300 hover:text-red-500 dark:hover:text-red-400"
+                      >
+                        <X className="h-4 w-4" />
+                      </button>
+                    </span>
+                  ))}
+                </div>
+              </div>
+            )}
+          </div>
         </div>
 
-        <div className="w-full flex justify-between items-center mt-auto mb-[50px] gap-4 shrink-0">
+        <div className="w-full flex flex-col sm:flex-row justify-center sm:justify-between items-center mt-8 mb-[50px] gap-4">
           <Button
-            variant="ghost"
             onClick={() => navigate(-1)}
-            className="flex items-center text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-100"
+            className="py-3 text-lg md:text-xl h-auto transition-all duration-200 ease-in-out hover:scale-105 bg-gray-200 text-gray-800 hover:bg-gray-300 w-[280px]"
           >
-            <ChevronLeft className="w-5 h-5 mr-1" />
             Back
           </Button>
 
           <Button
             onClick={handleContinue}
             disabled={selectedAllergens.length === 0}
-            className="py-3 px-8 text-lg h-auto bg-red-600 text-white hover:bg-red-700 rounded-xl shadow-lg transition-transform active:scale-95 flex items-center"
+            className="py-3 text-lg md:text-xl h-auto transition-all duration-200 ease-in-out hover:scale-105 bg-red-600 text-white hover:bg-red-700 w-[280px]"
           >
             Continue
-            <ChevronRight className="w-5 h-5 ml-1" />
           </Button>
         </div>
       </div>
