@@ -130,7 +130,7 @@ export const getAllGoogleLanguages = async (): Promise<SupportedLanguage[]> => {
     { code: 'sk', name: 'Slovak' },
     { code: 'sl', name: 'Slovenian' },
     { code: 'so', name: 'Somali' },
-    { code: 'es', name: 'Spanish (Spain)' },
+    { code: 'es-ES', name: 'Spanish (Spain)' },
     { code: 'es-419', name: 'Spanish (Latin America)' },
     { code: 'su', name: 'Sundanese' },
     { code: 'sw', name: 'Swahili' },
