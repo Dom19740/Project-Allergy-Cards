@@ -62,6 +62,12 @@ export const REGIONAL_OVERRIDES: Record<string, Record<string, string>> = {
     'Camote': 'Batata',
     'camote': 'batata',
     'Frijol verde': 'Judía verde',
-    'frijol verde': 'judía verde'
+    'frijol verde': 'judía verde',
+    'Frijoles verdes': 'Judías verdes',
+    'frijoles verdes': 'judías verdes',
+    'Frijol': 'Judía',
+    'frijol': 'judía',
+    'Frijoles': 'Judías',
+    'frijoles': 'judías',
   }
 };
