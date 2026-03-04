@@ -8,6 +8,21 @@ export interface SupportedLanguage {
 }
 
 /**
+ * Regional overrides for specific languages to ensure correct dialect terms.
+ */
+const REGIONAL_OVERRIDES: Record<string, Record<string, string>> = {
+  'es': {
+    'Maní': 'Cacahuete',
+    'maní': 'cacahuete',
+    'Soya': 'Soja',
+    'soya': 'soja',
+    'Frutos secos': 'Frutos de cáscara',
+    'frutos secos': 'frutos de cáscara',
+    'Mariscos': 'Mariscos', // Both use this, but good to have
+  }
+};
+
+/**
  * Translates text using the Google Translate free API endpoint.
  * Handles multiple segments (sentences) by joining them together.
  */
@@ -23,14 +38,23 @@ export const translateText = async (text: string, targetLanguage: string): Promi
     
     const data = await response.json();
     
+    let translated = text;
     if (data && data[0] && Array.isArray(data[0])) {
-      return data[0]
+      translated = data[0]
         .map((segment: any) => segment[0])
         .filter((text: any) => typeof text === 'string')
         .join('');
     }
     
-    return text;
+    // Apply regional overrides if they exist for this language
+    if (REGIONAL_OVERRIDES[targetLanguage]) {
+      Object.entries(REGIONAL_OVERRIDES[targetLanguage]).forEach(([latin, european]) => {
+        // Use regex for case-insensitive replacement if needed, but here we have both cases
+        translated = translated.replace(new RegExp(`\\b${latin}\\b`, 'g'), european);
+      });
+    }
+    
+    return translated;
   } catch (error) {
     console.error('Translation error:', error);
     return text;
@@ -63,6 +87,7 @@ export const getAllGoogleLanguages = async (): Promise<SupportedLanguage[]> => {
     { code: 'en', name: 'English' },
     { code: 'eo', name: 'Esperanto' },
     { code: 'et', name: 'Estonian' },
+    { code: 'es', name: 'Spanish (European)' },
     { code: 'tl', name: 'Filipino' },
     { code: 'fi', name: 'Finnish' },
     { code: 'fr', name: 'French' },
