@@ -127,7 +127,7 @@ const AllergenSelectionPage = () => {
               <div className="flex space-x-2">
                 <Input
                   type="text"
-                  placeholder="Add your own allergen"
+                  placeholder="Add your own allergen, one at a time"
                   value={customAllergenInput}
                   onChange={(e) => setCustomAllergenInput(e.target.value)}
                   className="flex-grow ml-[10px] p-2 text-sm sm:text-base bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-700 rounded-lg shadow-sm text-gray-800 dark:text-gray-200 h-9"

@@ -1,54 +1,12 @@
 "use client";
 
 import { LanguageCode } from './types';
-import { ALLERGEN_DICTIONARY } from './allergen-dictionary';
+import { ALLERGEN_DICTIONARY, REGIONAL_OVERRIDES } from './allergen-dictionary';
 
 export interface SupportedLanguage {
   code: LanguageCode;
   name: string;
 }
-
-/**
- * Regional overrides for specific languages to ensure correct dialect terms.
- * This acts as a safety net for the Google Translate API when it returns 
- * terms that are more common in one region than another.
- */
-const REGIONAL_OVERRIDES: Record<string, Record<string, string>> = {
-  'es-ES': {
-    'Maní': 'Cacahuete',
-    'maní': 'cacahuete',
-    'Maníes': 'Cacahuetes',
-    'maníes': 'cacahuetes',
-    'Soya': 'Soja',
-    'soya': 'soja',
-    'Frutos secos': 'Frutos de cáscara',
-    'frutos secos': 'frutos de cáscara',
-    'Durazno': 'Melocotón',
-    'durazno': 'melocotón',
-    'Duraznos': 'Melocotones',
-    'duraznos': 'melocotones',
-    'Frutilla': 'Fresa',
-    'frutilla': 'fresa',
-    'Frutillas': 'Fresas',
-    'frutillas': 'fresas',
-    'Papa': 'Patata',
-    'papa': 'patata',
-    'Papas': 'Patatas',
-    'papas': 'patatas',
-    'Jugo': 'Zumo',
-    'jugo': 'zumo',
-    'Jugos': 'Zumos',
-    'jugos': 'zumos',
-    'Celular': 'Móvil',
-    'celular': 'móvil',
-    'Maracuyá': 'Fruta de la pasión',
-    'maracuyá': 'fruta de la pasión',
-    'Camote': 'Batata',
-    'camote': 'batata',
-    'Frijol verde': 'Judía verde',
-    'frijol verde': 'judía verde'
-  }
-};
 
 /**
  * Translates text using a local dictionary first, then falls back to the Google Translate API.
