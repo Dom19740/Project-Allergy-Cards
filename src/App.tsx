@@ -6,6 +6,7 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { usePreloadImages } from "./hooks/usePreloadImages";
 import { Loader2 } from "lucide-react";
+import SystemBarsConfig from "./components/SystemBarsConfig";
 
 // Lazy load pages
 const Home = lazy(() => import("./pages/Home"));
@@ -31,6 +32,7 @@ const AppContent = () => {
   
   return (
     <Suspense fallback={<LoadingFallback />}>
+      <SystemBarsConfig />
       <Routes>
         <Route path="/" element={<Home />} />
         <Route path="/onboarding" element={<Onboarding />} />
