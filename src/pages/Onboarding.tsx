@@ -15,22 +15,22 @@ const ONBOARDING_STEPS = [
   },
   {
     title: "Select Your Allergens",
-    description: "Choose from our standard list or add your own custom allergens. We'll make sure they're clearly communicated.",
+    description: "Choose from our standard list or add your own custom allergens. Customise your allergy alert warnings.",
     icon: ShieldAlert,
   },
   {
     title: "Choose a Language",
-    description: "Traveling abroad? Select from over 100 languages to translate your allergy alert instantly.",
+    description: "Select from over 100 languages to translate your allergy alert instantly.",
     icon: Languages,
   },
   {
     title: "Share & Save",
-    description: "Download your card as an image, share it with others, or save up to 3 cards for quick access later.",
+    description: "Download your card as an image, share it with others, or save up to 3 cards in the app for quick access later.",
     icon: Share2,
   },
   {
     title: "Emergency Ready",
-    description: "In urgent situations, use the Emergency Card to quickly communicate your needs to first responders.",
+    description: "In urgent situations, use the Emergency Card to quickly communicate your need for medical attention.",
     icon: AlertTriangle,
   }
 ];
