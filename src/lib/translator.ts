@@ -12,34 +12,6 @@ export interface SupportedLanguage {
  * This acts as a safety net for the Google Translate API.
  */
 const REGIONAL_OVERRIDES: Record<string, Record<string, string>> = {
-  'es': {
-    'Maní': 'Cacahuete',
-    'maní': 'cacahuete',
-    'Maníes': 'Cacahuetes',
-    'maníes': 'cacahuetes',
-    'Soya': 'Soja',
-    'soya': 'soja',
-    'Frutos secos': 'Frutos de cáscara',
-    'frutos secos': 'frutos de cáscara',
-    'Durazno': 'Melocotón',
-    'durazno': 'melocotón',
-    'Duraznos': 'Melocotones',
-    'duraznos': 'melocotones',
-    'Frutilla': 'Fresa',
-    'frutilla': 'fresa',
-    'Frutillas': 'Fresas',
-    'frutillas': 'fresas',
-    'Papa': 'Patata',
-    'papa': 'patata',
-    'Papas': 'Patatas',
-    'papas': 'patatas',
-    'Jugo': 'Zumo',
-    'jugo': 'zumo',
-    'Jugos': 'Zumos',
-    'jugos': 'zumos',
-    'Celular': 'Móvil',
-    'celular': 'móvil'
-  },
   'es-ES': {
     'Maní': 'Cacahuete',
     'maní': 'cacahuete',
@@ -140,6 +112,7 @@ export const getAllGoogleLanguages = async (): Promise<SupportedLanguage[]> => {
     { code: 'eo', name: 'Esperanto' },
     { code: 'et', name: 'Estonian' },
     { code: 'es-ES', name: 'Spanish (European)' },
+    { code: 'es-419', name: 'Spanish (Latin)' },
     { code: 'tl', name: 'Filipino' },
     { code: 'fi', name: 'Finnish' },
     { code: 'fr', name: 'French' },

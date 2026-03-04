@@ -12,6 +12,7 @@ export const emergencyNumbers: Record<string, string> = {
   'it': '112',
   'pt': '112',
   'es-ES': '112',
+  'es-419': '911',
   'nl': '112',
   'pl': '112',
   'ru': '112',
