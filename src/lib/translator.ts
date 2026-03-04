@@ -9,16 +9,36 @@ export interface SupportedLanguage {
 
 /**
  * Regional overrides for specific languages to ensure correct dialect terms.
+ * This acts as a safety net for the Google Translate API.
  */
 const REGIONAL_OVERRIDES: Record<string, Record<string, string>> = {
-  'es': {
+  'es-ES': {
     'Maní': 'Cacahuete',
     'maní': 'cacahuete',
+    'Maníes': 'Cacahuetes',
+    'maníes': 'cacahuetes',
     'Soya': 'Soja',
     'soya': 'soja',
     'Frutos secos': 'Frutos de cáscara',
     'frutos secos': 'frutos de cáscara',
-    'Mariscos': 'Mariscos', // Both use this, but good to have
+    'Durazno': 'Melocotón',
+    'durazno': 'melocotón',
+    'Duraznos': 'Melocotones',
+    'duraznos': 'melocotones',
+    'Frutilla': 'Fresa',
+    'frutilla': 'fresa',
+    'Frutillas': 'Fresas',
+    'frutillas': 'fresas',
+    'Papa': 'Patata',
+    'papa': 'patata',
+    'Papas': 'Patatas',
+    'papas': 'patatas',
+    'Jugo': 'Zumo',
+    'jugo': 'zumo',
+    'Jugos': 'Zumos',
+    'jugos': 'zumos',
+    'Celular': 'Móvil',
+    'celular': 'móvil'
   }
 };
 
@@ -87,7 +107,7 @@ export const getAllGoogleLanguages = async (): Promise<SupportedLanguage[]> => {
     { code: 'en', name: 'English' },
     { code: 'eo', name: 'Esperanto' },
     { code: 'et', name: 'Estonian' },
-    { code: 'es', name: 'Spanish (European)' },
+    { code: 'es-ES', name: 'Spanish (European)' },
     { code: 'tl', name: 'Filipino' },
     { code: 'fi', name: 'Finnish' },
     { code: 'fr', name: 'French' },

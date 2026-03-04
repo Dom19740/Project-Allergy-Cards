@@ -22,7 +22,7 @@ export type TranslationKey =
   | 'Placeholder'
   | 'Checkbox';
 
-export type LanguageCode = 'en' | 'fr' | 'de' | 'it' | 'pt' | 'es' | 'zh-Hans' | 'zh-Hant' | 'ar' | 'ru' | 'ja' | 'ko';
+export type LanguageCode = 'en' | 'fr' | 'de' | 'it' | 'pt' | 'es-ES' | 'zh-Hans' | 'zh-Hant' | 'ar' | 'ru' | 'ja' | 'ko';
 
 export const translations: Record<LanguageCode, Record<TranslationKey, string>> = {
   en: {
@@ -43,7 +43,7 @@ export const translations: Record<LanguageCode, Record<TranslationKey, string>> 
     Placeholder: 'Placeholder',
     Checkbox: 'Checkbox',
   },
-  es: {
+  'es-ES': {
     eggs: 'Huevos',
     fish: 'Pescado',
     milk: 'Leche',
