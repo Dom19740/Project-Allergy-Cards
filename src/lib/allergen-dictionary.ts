@@ -21,5 +21,7 @@ export const ALLERGEN_DICTIONARY: Record<string, Record<string, string>> = {
     'sweet potato': 'camote',
     'peanut': 'maní',
     'green bean': 'frijol verde'
+    'bean': 'judía'
+  
   }
 };
