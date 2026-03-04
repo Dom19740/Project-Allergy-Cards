@@ -9,5 +9,10 @@ public class MainActivity extends BridgeActivity {
     protected void onCreate(Bundle savedInstanceState) {
         EdgeToEdge.enable(this);
         super.onCreate(savedInstanceState);
+        
+        // Ensure the native action bar is hidden if it's being shown
+        if (getSupportActionBar() != null) {
+            getSupportActionBar().hide();
+        }
     }
 }
