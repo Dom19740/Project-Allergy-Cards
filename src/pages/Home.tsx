@@ -26,12 +26,12 @@ const Home = () => {
             />
           </div>
           
-          {/* Text section - standardized font sizes */}
+          {/* Text section - matching StepHeader description style */}
           <div className="shrink-0 space-y-3">
-            <p className="text-base text-gray-700 dark:text-gray-300 max-w-md px-4 leading-tight">
+            <p className="text-base text-gray-600 dark:text-gray-400 max-w-md px-4 leading-relaxed">
               Create a personalized allergy alert in multiple languages to communicate your dietary restrictions easily and safely.
             </p>
-            <p className="text-base text-gray-700 dark:text-gray-300 max-w-md px-4 leading-tight">
+            <p className="text-base text-gray-600 dark:text-gray-400 max-w-md px-4 leading-relaxed">
                Plus a translated emergency alert card for urgent situations.
             </p>
           </div>
