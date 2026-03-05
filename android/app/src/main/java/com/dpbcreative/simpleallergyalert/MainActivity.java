@@ -13,17 +13,27 @@ public class MainActivity extends BridgeActivity {
 
         Window window = getWindow();
 
-        // 1. Set Status Bar color and black icons
+        // Ensure we can draw under the system bars if needed, but set specific colors
         window.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
-        window.setStatusBarColor(android.graphics.Color.parseColor("#f3f4f6")); // Light gray
-        window.getDecorView().setSystemUiVisibility(View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR);
+        
+        // Set Status Bar color to match your header (#f3f4f6 is gray-100)
+        window.setStatusBarColor(android.graphics.Color.parseColor("#f3f4f6"));
+        
+        // Set Navigation Bar color (bottom of screen)
+        window.setNavigationBarColor(android.graphics.Color.parseColor("#f3f4f6"));
 
-        // 2. Set Navigation Bar color and black icons
-        window.setNavigationBarColor(android.graphics.Color.parseColor("#f3f4f6")); // Light gray
+        // Make icons dark (black) so they are visible on the light gray background
+        View decorView = window.getDecorView();
+        int flags = decorView.getSystemUiVisibility();
+        
+        // Add the light status bar flag
+        flags |= View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR;
+        
+        // Add the light navigation bar flag (Android 8.0+)
         if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {
-            window.getDecorView().setSystemUiVisibility(
-                    window.getDecorView().getSystemUiVisibility() | View.SYSTEM_UI_FLAG_LIGHT_NAVIGATION_BAR
-            );
+            flags |= View.SYSTEM_UI_FLAG_LIGHT_NAVIGATION_BAR;
         }
+        
+        decorView.setSystemUiVisibility(flags);
     }
 }
