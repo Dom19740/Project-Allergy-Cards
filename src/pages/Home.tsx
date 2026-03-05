@@ -33,8 +33,8 @@ const Home = () => {
           </div>
         </div>
 
-        {/* Bottom Section: Fixed height button area */}
-        <div className="w-full flex flex-col justify-center items-center mt-8 mb-[50px] gap-4">
+        {/* Bottom Section: Fixed height button area with safe area padding */}
+        <div className="w-full flex flex-col justify-center items-center mt-8 mb-[50px] gap-4 pb-[env(safe-area-inset-bottom,24px)]">
 
           <Button 
             asChild 
