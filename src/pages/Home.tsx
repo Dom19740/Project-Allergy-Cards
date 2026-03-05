@@ -11,11 +11,13 @@ const Home = () => {
     <div className="flex flex-col h-screen h-[100dvh] bg-gray-100 dark:bg-gray-900 overflow-hidden">
       <FixedHeader />
       
-      {/* Main Content Wrapper - fills remaining space */}
-      <div className="flex flex-col flex-1 w-full max-w-2xl mx-auto px-4 min-h-0">
+      {/* Main Content Wrapper - accounts for fixed header height */}
+      <div className="flex flex-col flex-1 w-full max-w-2xl mx-auto px-4 pt-[calc(106px+env(safe-area-inset-top))] overflow-hidden">
         
-        {/* Top Section: Flexible content area */}
-        <div className="flex-1 flex flex-col items-center text-center space-y-4 py-2 min-h-0 overflow-hidden">
+        {/* Flexible content area */}
+        <div className="flex-1 flex flex-col items-center text-center space-y-4 py-4 min-h-0 overflow-hidden">
+          
+          {/* Image container that shrinks to fit available space */}
           <div className="flex-1 min-h-0 flex items-center justify-center w-full">
             <img 
               src="/logo_main.png" 
@@ -24,6 +26,7 @@ const Home = () => {
             />
           </div>
           
+          {/* Text section */}
           <div className="shrink-0 space-y-2">
             <p className="text-base md:text-lg text-gray-700 dark:text-gray-300 max-w-md px-4 leading-tight">
               Create a personalized allergy alert in multiple languages to communicate your dietary restrictions easily and safely.
@@ -33,7 +36,7 @@ const Home = () => {
             </p>
           </div>
           
-          {/* Saved Cards Section - Internally scrollable if content exceeds space */}
+          {/* Saved Cards Section - Internally scrollable if needed, but doesn't cause page scroll */}
           <div className="flex-1 w-full overflow-y-auto min-h-0">
             <SavedCardsList />
           </div>
