@@ -20,13 +20,11 @@ const AllergenSelectionPage = () => {
     if (storedAllergens) {
       try {
         const parsed = JSON.parse(storedAllergens);
-        // Handle both old array format and new object format
         if (Array.isArray(parsed)) {
           setSelectedAllergens(parsed);
         } else if (parsed.ids) {
           setSelectedAllergens(parsed.ids);
         } else if (parsed.standard) {
-          // Handle standard/custom split format
           setSelectedAllergens([...(parsed.standard || []), ...(parsed.custom || [])]);
         }
       } catch (e) {
@@ -67,7 +65,6 @@ const AllergenSelectionPage = () => {
       return;
     }
     
-    // Save in a consistent format for the AllergyCard
     const standardIds = ALLERGEN_OPTIONS.map(opt => opt.id);
     const standard = selectedAllergens.filter(id => standardIds.includes(id));
     const custom = selectedAllergens.filter(id => !standardIds.includes(id));
@@ -75,7 +72,7 @@ const AllergenSelectionPage = () => {
     localStorage.setItem('selectedAllergens', JSON.stringify({
       standard,
       custom,
-      ids: selectedAllergens // Keep flat list for compatibility
+      ids: selectedAllergens
     }));
     
     navigate('/select-alert');
@@ -92,7 +89,7 @@ const AllergenSelectionPage = () => {
       <div className="flex flex-col flex-grow w-full max-w-2xl mx-auto px-4 pt-[126px]">
         <div className="flex-grow overflow-y-auto">
           <div className="flex flex-col items-center text-center space-y-3">
-            <h2 className="text-xl sm:text-2xl font-bold text-gray-700 dark:text-gray-200">
+            <h2 className="text-xl sm:text-2xl font-bold text-gray-800 dark:text-gray-100">
               Select Allergens
             </h2>
             
@@ -109,7 +106,7 @@ const AllergenSelectionPage = () => {
                 >
                   <div className="flex items-center space-x-2">
                     <img src={allergen.image} alt={allergen.name} className="w-6 h-6 sm:w-7 sm:h-7 object-contain" />
-                    <Label htmlFor={allergen.id} className="text-sm sm:text-base font-medium text-gray-800 dark:text-gray-200 cursor-pointer">
+                    <Label htmlFor={allergen.id} className="text-sm font-medium text-gray-600 dark:text-gray-400 cursor-pointer">
                       {allergen.name}
                     </Label>
                   </div>
@@ -130,14 +127,14 @@ const AllergenSelectionPage = () => {
                   placeholder="Add your own allergen, one at a time"
                   value={customAllergenInput}
                   onChange={(e) => setCustomAllergenInput(e.target.value)}
-                  className="flex-grow ml-[10px] p-2 text-sm sm:text-base bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-700 rounded-lg shadow-sm text-gray-800 dark:text-gray-200 h-9"
+                  className="flex-grow ml-[10px] p-2 text-sm bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-700 rounded-lg shadow-sm text-gray-600 dark:text-gray-400 h-9"
                   onKeyPress={(e) => {
                     if (e.key === 'Enter') {
                       handleAddCustomAllergen();
                     }
                   }}
                 />
-                <Button onClick={handleAddCustomAllergen} className="py-2 px-4 text-sm sm:text-base bg-blue-600 text-white hover:bg-blue-700 h-9">
+                <Button onClick={handleAddCustomAllergen} className="py-2 px-4 text-sm bg-blue-600 text-white hover:bg-blue-700 h-9">
                   Add
                 </Button>
               </div>
@@ -145,16 +142,16 @@ const AllergenSelectionPage = () => {
 
             {customSelected.length > 0 && (
               <div className="w-full p-2 sm:p-3 bg-white dark:bg-gray-800 rounded-lg shadow-lg">
-                <h3 className="text-base sm:text-lg font-semibold mb-2 text-gray-700 dark:text-gray-200">Your Custom Allergens:</h3>
+                <h3 className="text-sm font-semibold mb-2 text-gray-800 dark:text-gray-100">Your Custom Allergens:</h3>
                 <div className="flex flex-wrap gap-1.5">
                   {customSelected.map((allergen) => (
-                    <span key={allergen} className="flex items-center bg-gray-200 dark:bg-gray-700 text-gray-800 dark:text-gray-100 px-2 py-0.5 rounded-full text-sm">
+                    <span key={allergen} className="flex items-center bg-gray-200 dark:bg-gray-700 text-gray-600 dark:text-gray-400 px-2 py-0.5 rounded-full text-xs">
                       {allergen}
                       <button 
                         onClick={() => handleRemoveAllergen(allergen)} 
-                        className="ml-2 text-gray-600 dark:text-gray-300 hover:text-red-500 dark:hover:text-red-400"
+                        className="ml-2 text-gray-600 dark:text-gray-400 hover:text-red-500 dark:hover:text-red-400"
                       >
-                        <X className="h-4 w-4" />
+                        <X className="h-3 w-3" />
                       </button>
                     </span>
                   ))}
