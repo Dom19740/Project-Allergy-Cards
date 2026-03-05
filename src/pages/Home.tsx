@@ -15,28 +15,28 @@ const Home = () => {
       <div className="flex flex-col flex-1 w-full max-w-2xl mx-auto px-4 pt-[calc(106px+env(safe-area-inset-top))] overflow-hidden">
         
         {/* Flexible content area */}
-        <div className="flex-1 flex flex-col items-center text-center space-y-4 py-4 min-h-0 overflow-hidden">
+        <div className="flex-1 flex flex-col items-center text-center space-y-6 py-4 min-h-0 overflow-hidden">
           
-          {/* Image container that shrinks to fit available space */}
-          <div className="flex-1 min-h-0 flex items-center justify-center w-full">
+          {/* Image container - increased priority and size */}
+          <div className="flex-[2] min-h-0 flex items-center justify-center w-full">
             <img 
               src="/logo_main.png" 
               alt="App Logo" 
-              className="max-h-full max-w-full object-contain" 
+              className="h-full w-auto max-w-full object-contain scale-110" 
             />
           </div>
           
-          {/* Text section */}
-          <div className="shrink-0 space-y-2">
-            <p className="text-base md:text-lg text-gray-700 dark:text-gray-300 max-w-md px-4 leading-tight">
+          {/* Text section - standardized font sizes */}
+          <div className="shrink-0 space-y-3">
+            <p className="text-base text-gray-700 dark:text-gray-300 max-w-md px-4 leading-tight">
               Create a personalized allergy alert in multiple languages to communicate your dietary restrictions easily and safely.
             </p>
-            <p className="text-sm md:text-base text-gray-700 dark:text-gray-300 max-w-md px-4 leading-tight">
+            <p className="text-base text-gray-700 dark:text-gray-300 max-w-md px-4 leading-tight">
                Plus a translated emergency alert card for urgent situations.
             </p>
           </div>
           
-          {/* Saved Cards Section - Internally scrollable if needed, but doesn't cause page scroll */}
+          {/* Saved Cards Section - Reduced priority to prevent it from pushing other elements */}
           <div className="flex-1 w-full overflow-y-auto min-h-0">
             <SavedCardsList />
           </div>
