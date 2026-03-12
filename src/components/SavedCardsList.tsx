@@ -88,11 +88,25 @@ const SavedCardsList = () => {
   if (allCards.length === 0) return null;
 
   return (
-    <div className="w-full flex flex-col items-center">
-      <div className="w-full mb-2 px-8">
-        <h3 className="text-[10px] font-medium text-gray-400 uppercase tracking-widest text-center">
-          Your Saved Cards
+    <div className="w-full flex flex-col items-start">
+      {/* Header with Title and Dots */}
+      <div className="w-full mb-4 px-8 flex flex-col items-start gap-2">
+        <h3 className="text-[10px] font-medium text-gray-400 uppercase tracking-widest">
+          Saved Cards
         </h3>
+        
+        {/* Dot Indicators moved above the cards */}
+        <div className="flex justify-start gap-1.5">
+          {allCards.map((_, i) => (
+            <div 
+              key={i} 
+              className={cn(
+                "h-1.5 rounded-full transition-all duration-300", 
+                i === selectedIndex ? "w-4 bg-red-600" : "w-1.5 bg-gray-300 dark:bg-gray-700"
+              )} 
+            />
+          ))}
+        </div>
       </div>
 
       {/* Carousel Viewport */}
@@ -139,19 +153,6 @@ const SavedCardsList = () => {
             </div>
           ))}
         </div>
-      </div>
-
-      {/* Dot Indicators */}
-      <div className="flex justify-center gap-2 mt-6">
-        {allCards.map((_, i) => (
-          <div 
-            key={i} 
-            className={cn(
-              "h-2 rounded-full transition-all duration-300", 
-              i === selectedIndex ? "w-6 bg-red-600" : "w-2 bg-gray-300 dark:bg-gray-700"
-            )} 
-          />
-        ))}
       </div>
     </div>
   );
