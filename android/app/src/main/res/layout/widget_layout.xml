@@ -47,6 +47,18 @@
         android:animateFirstView="true"
         android:loopViews="true" />
 
+    <!-- Empty View shown when no cards are saved -->
+    <TextView
+        android:id="@+id/empty_view"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_below="@id/header_layout"
+        android:layout_above="@+id/dot_indicator_container"
+        android:gravity="center"
+        android:text="No saved cards"
+        android:textColor="#9CA3AF"
+        android:visibility="gone" />
+
     <!-- Dot Indicator Container -->
     <LinearLayout
         android:id="@+id/dot_indicator_container"
