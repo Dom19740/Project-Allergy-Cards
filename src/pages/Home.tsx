@@ -12,17 +12,26 @@ import { cn } from '@/lib/utils';
 const Home = () => {
   const [hasCards, setHasCards] = useState(false);
 
+  const checkCards = async () => {
+    const cards = await storage.get<SavedCard[]>(STORAGE_KEYS.SAVED_CARDS);
+    const emergencyCard = await storage.get<SavedCard>(STORAGE_KEYS.SAVED_EMERGENCY_CARD);
+    setHasCards(!!((cards && cards.length > 0) || emergencyCard));
+  };
+
   useEffect(() => {
-    const checkCards = async () => {
-      const cards = await storage.get<SavedCard[]>(STORAGE_KEYS.SAVED_CARDS);
-      const emergencyCard = await storage.get<SavedCard>(STORAGE_KEYS.SAVED_EMERGENCY_CARD);
-      setHasCards(!!((cards && cards.length > 0) || emergencyCard));
-    };
     checkCards();
     
     const handleStorageChange = () => checkCards();
+    
+    // Listen for standard storage events (cross-tab)
     window.addEventListener('storage', handleStorageChange);
-    return () => window.removeEventListener('storage', handleStorageChange);
+    // Listen for custom storage update events (same-tab)
+    window.addEventListener('storage-update', handleStorageChange);
+    
+    return () => {
+      window.removeEventListener('storage', handleStorageChange);
+      window.removeEventListener('storage-update', handleStorageChange);
+    };
   }, []);
 
   return (

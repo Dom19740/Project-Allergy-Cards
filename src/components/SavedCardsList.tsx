@@ -16,14 +16,15 @@ const SavedCardsList = () => {
   const [activeIndex, setActiveIndex] = useState(0);
   const scrollRef = useRef<HTMLDivElement>(null);
 
+  const loadCards = async () => {
+    const standardCards = await storage.get<SavedCard[]>(STORAGE_KEYS.SAVED_CARDS) || [];
+    const emergencyCard = await storage.get<SavedCard>(STORAGE_KEYS.SAVED_EMERGENCY_CARD);
+    
+    const combined = emergencyCard ? [emergencyCard, ...standardCards] : standardCards;
+    setAllCards(combined);
+  };
+
   useEffect(() => {
-    const loadCards = async () => {
-      const standardCards = await storage.get<SavedCard[]>(STORAGE_KEYS.SAVED_CARDS) || [];
-      const emergencyCard = await storage.get<SavedCard>(STORAGE_KEYS.SAVED_EMERGENCY_CARD);
-      
-      const combined = emergencyCard ? [emergencyCard, ...standardCards] : standardCards;
-      setAllCards(combined);
-    };
     loadCards();
   }, []);
 
@@ -48,9 +49,10 @@ const SavedCardsList = () => {
     }
     
     // Reload list
-    const standardCards = await storage.get<SavedCard[]>(STORAGE_KEYS.SAVED_CARDS) || [];
-    const emergencyCard = await storage.get<SavedCard>(STORAGE_KEYS.SAVED_EMERGENCY_CARD);
-    setAllCards(emergencyCard ? [emergencyCard, ...standardCards] : standardCards);
+    await loadCards();
+    
+    // Dispatch custom event to notify Home page to expand if no cards left
+    window.dispatchEvent(new CustomEvent('storage-update'));
   };
 
   const handleLoad = async (card: SavedCard) => {
