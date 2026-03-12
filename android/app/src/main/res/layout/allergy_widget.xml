@@ -6,16 +6,50 @@
     android:orientation="vertical"
     android:padding="8dp">
 
-    <TextView
-        android:id="@+id/emergency_button"
+    <RelativeLayout
         android:layout_width="match_parent"
-        android:layout_height="48dp"
-        android:background="@android:color/holo_red_dark"
-        android:gravity="center"
-        android:text="EMERGENCY"
-        android:textColor="@android:color/white"
-        android:textSize="18sp"
-        android:textStyle="bold" />
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="4dp">
+
+        <!-- Emergency Button with Icon -->
+        <LinearLayout
+            android:id="@+id/emergency_container"
+            android:layout_width="match_parent"
+            android:layout_height="54dp"
+            android:layout_toStartOf="@+id/refresh_button"
+            android:layout_marginEnd="8dp"
+            android:background="@android:color/holo_red_dark"
+            android:gravity="center"
+            android:orientation="horizontal"
+            android:padding="8dp">
+
+            <ImageView
+                android:layout_width="32dp"
+                android:layout_height="32dp"
+                android:layout_marginEnd="12dp"
+                android:src="@mipmap/ic_launcher" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="EMERGENCY"
+                android:textColor="@android:color/white"
+                android:textSize="18sp"
+                android:textStyle="bold" />
+        </LinearLayout>
+
+        <!-- Refresh Button -->
+        <ImageButton
+            android:id="@+id/refresh_button"
+            android:layout_width="54dp"
+            android:layout_height="54dp"
+            android:layout_alignParentEnd="true"
+            android:background="@android:color/darker_gray"
+            android:padding="12dp"
+            android:scaleType="fitCenter"
+            android:src="@android:drawable/ic_menu_rotate"
+            android:contentDescription="Refresh" />
+    </RelativeLayout>
 
     <ListView
         android:id="@+id/card_list"
