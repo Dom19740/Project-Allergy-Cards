@@ -43,7 +43,7 @@ const CardActions: React.FC<CardActionsProps> = ({
           onClick={onSave}
           variant="ghost"
           size="icon"
-          className="text-red-600 hover:bg-red-50 rounded-full h-10 w-10"
+          className="text-black hover:bg-gray-100 rounded-full h-10 w-10"
           title="Save Card"
         >
           <Save className="h-5 w-5" />

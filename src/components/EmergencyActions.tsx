@@ -34,6 +34,18 @@ const EmergencyActions: React.FC<EmergencyActionsProps> = ({
           <ArrowLeft className="h-5 w-5" />
         </Button>
 
+        {onSave && (
+          <Button
+            onClick={onSave}
+            variant="ghost"
+            size="icon"
+            className="text-black hover:bg-gray-100 rounded-full h-10 w-10"
+            title="Save Card"
+          >
+            <Save className="h-5 w-5" />
+          </Button>
+        )}
+
         <Button
           onClick={onShare}
           disabled={isSharing}
@@ -55,18 +67,6 @@ const EmergencyActions: React.FC<EmergencyActionsProps> = ({
         >
           {isDownloading ? <Loader2 className="h-5 w-5 animate-spin" /> : <Download className="h-5 w-5" />}
         </Button>
-
-        {onSave && (
-          <Button
-            onClick={onSave}
-            variant="ghost"
-            size="icon"
-            className="text-amber-600 hover:bg-amber-50 rounded-full h-10 w-10"
-            title="Save Card"
-          >
-            <Save className="h-5 w-5" />
-          </Button>
-        )}
       </div>
     </div>
   );
