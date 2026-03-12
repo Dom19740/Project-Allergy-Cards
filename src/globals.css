@@ -99,3 +99,8 @@
     @apply bg-background text-foreground;
   }
 }
+
+/* Ensure toast notifications are above the Android navigation bar */
+[data-sonner-toaster] {
+  bottom: calc(16px + env(safe-area-inset-bottom)) !important;
+}
