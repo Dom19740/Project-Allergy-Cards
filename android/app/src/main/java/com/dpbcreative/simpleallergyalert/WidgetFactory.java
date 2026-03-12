@@ -34,9 +34,7 @@ public class WidgetFactory implements RemoteViewsService.RemoteViewsFactory {
     private void loadData() {
         cards.clear();
         try {
-            // Capacitor Preferences uses "CapacitorStorage" by default
             SharedPreferences prefs = context.getSharedPreferences("CapacitorStorage", Context.MODE_PRIVATE);
-            // The key in the web app is "savedAllergyCards"
             String savedCardsJson = prefs.getString("savedAllergyCards", "[]");
             JSONArray array = new JSONArray(savedCardsJson);
             for (int i = 0; i < array.length(); i++) {
@@ -64,11 +62,11 @@ public class WidgetFactory implements RemoteViewsService.RemoteViewsFactory {
         RemoteViews views = new RemoteViews(context.getPackageName(), R.layout.widget_item);
         try {
             JSONObject card = cards.get(position);
-            views.setTextViewText(R.id.card_name, card.optString("name", "Unnamed Card"));
-            
-            // Get language info
+            String name = card.optString("name", "Unnamed Card");
             String langCode = card.optString("languageCode", "").split("-")[0].toUpperCase();
-            views.setTextViewText(R.id.lang_code, langCode);
+            
+            // Combine name and lang code: "Name (EN)"
+            views.setTextViewText(R.id.card_name_full, name + " (" + langCode + ")");
 
             // Handle Dots
             int totalCards = cards.size();
@@ -78,6 +76,7 @@ public class WidgetFactory implements RemoteViewsService.RemoteViewsFactory {
                 if (i < totalCards) {
                     views.setViewVisibility(dotIds[i], View.VISIBLE);
                     if (i == position) {
+                        // Using a smaller version of the active dot for the condensed layout
                         views.setImageViewResource(dotIds[i], R.drawable.dot_active);
                     } else {
                         views.setImageViewResource(dotIds[i], R.drawable.dot_inactive);
@@ -87,12 +86,12 @@ public class WidgetFactory implements RemoteViewsService.RemoteViewsFactory {
                 }
             }
 
-            // Set up click fill-in intent for the whole card
+            // Set up click fill-in intent
             Bundle extras = new Bundle();
             extras.putString(AllergyWidgetProvider.EXTRA_CARD_ID, card.optString("id"));
             Intent fillInIntent = new Intent();
             fillInIntent.putExtras(extras);
-            views.setOnClickFillInIntent(R.id.card_name, fillInIntent);
+            views.setOnClickFillInIntent(R.id.card_name_full, fillInIntent);
 
         } catch (Exception e) {
             e.printStackTrace();
