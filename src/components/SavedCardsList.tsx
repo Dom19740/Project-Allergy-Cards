@@ -87,7 +87,7 @@ const SavedCardsList = () => {
       </div>
       <div ref={scrollRef} onScroll={handleScroll} className="flex overflow-x-auto snap-x snap-mandatory no-scrollbar">
         {allCards.map((card) => (
-          <div key={card.id} className="flex-shrink-0 w-full flex justify-center px-6 snap-center">
+          <div key={card.id} className="flex-shrink-0 w-full flex justify-center px-6 snap-center snap-always">
             <Card onClick={() => handleLoad(card)} className={cn("w-full max-w-[320px] bg-white dark:bg-gray-800 border-gray-200 dark:border-gray-700 shadow-md hover:shadow-lg transition-all active:scale-95 cursor-pointer overflow-hidden rounded-xl", card.id === 'emergency-slot' && "border-red-200 dark:border-red-900/50")}>
               <CardContent className="p-4 flex flex-col">
                 <div className="flex justify-between items-start mb-2">
