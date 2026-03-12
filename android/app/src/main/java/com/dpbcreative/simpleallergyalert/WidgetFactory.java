@@ -34,8 +34,10 @@ public class WidgetFactory implements RemoteViewsService.RemoteViewsFactory {
     private void loadData() {
         cards.clear();
         try {
+            // Capacitor Preferences uses "CapacitorStorage" by default
             SharedPreferences prefs = context.getSharedPreferences("CapacitorStorage", Context.MODE_PRIVATE);
-            String savedCardsJson = prefs.getString("savedCards", "[]");
+            // The key in the web app is "savedAllergyCards"
+            String savedCardsJson = prefs.getString("savedAllergyCards", "[]");
             JSONArray array = new JSONArray(savedCardsJson);
             for (int i = 0; i < array.length(); i++) {
                 cards.add(array.getJSONObject(i));
@@ -64,9 +66,9 @@ public class WidgetFactory implements RemoteViewsService.RemoteViewsFactory {
             JSONObject card = cards.get(position);
             views.setTextViewText(R.id.card_name, card.optString("name", "Unnamed Card"));
             
-            String langName = card.optString("languageName", "");
+            // Get language info
             String langCode = card.optString("languageCode", "").split("-")[0].toUpperCase();
-            views.setTextViewText(R.id.lang_code, langName + " (" + langCode + ")");
+            views.setTextViewText(R.id.lang_code, langCode);
 
             // Handle Dots
             int totalCards = cards.size();
@@ -85,7 +87,7 @@ public class WidgetFactory implements RemoteViewsService.RemoteViewsFactory {
                 }
             }
 
-            // Set up click fill-in intent
+            // Set up click fill-in intent for the whole card
             Bundle extras = new Bundle();
             extras.putString(AllergyWidgetProvider.EXTRA_CARD_ID, card.optString("id"));
             Intent fillInIntent = new Intent();
