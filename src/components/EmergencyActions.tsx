@@ -2,12 +2,13 @@
 
 import React from 'react';
 import { Button } from '@/components/ui/button';
-import { Share2, Download, ArrowLeft, Loader2 } from 'lucide-react';
+import { Share2, Download, ArrowLeft, Loader2, Save } from 'lucide-react';
 
 interface EmergencyActionsProps {
   onBack: () => void;
   onShare: () => void;
   onDownload: () => void;
+  onSave?: () => void;
   isSharing?: boolean;
   isDownloading?: boolean;
 }
@@ -16,6 +17,7 @@ const EmergencyActions: React.FC<EmergencyActionsProps> = ({
   onBack,
   onShare,
   onDownload,
+  onSave,
   isSharing = false,
   isDownloading = false
 }) => {
@@ -53,6 +55,18 @@ const EmergencyActions: React.FC<EmergencyActionsProps> = ({
         >
           {isDownloading ? <Loader2 className="h-5 w-5 animate-spin" /> : <Download className="h-5 w-5" />}
         </Button>
+
+        {onSave && (
+          <Button
+            onClick={onSave}
+            variant="ghost"
+            size="icon"
+            className="text-amber-600 hover:bg-amber-50 rounded-full h-10 w-10"
+            title="Save Card"
+          >
+            <Save className="h-5 w-5" />
+          </Button>
+        )}
       </div>
     </div>
   );

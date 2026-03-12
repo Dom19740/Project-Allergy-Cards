@@ -7,7 +7,10 @@ import { translateText } from '@/lib/translator';
 import { getEmergencyNumber } from '@/lib/emergencyNumbers';
 import { shareCard, downloadCard } from '@/lib/card-utils';
 import EmergencyActions from '@/components/EmergencyActions';
+import SaveCardDialog from '@/components/SaveCardDialog';
 import { toast } from 'sonner';
+import { storage, STORAGE_KEYS } from '@/lib/storage';
+import { SelectedAllergens, CustomMessages, TranslatedContent } from '@/lib/types';
 
 const EmergencyPage = () => {
   const { langCode } = useParams<{ langCode: string }>();
@@ -17,7 +20,12 @@ const EmergencyPage = () => {
   const [isTranslating, setIsTranslating] = useState(true);
   const [isSharing, setIsSharing] = useState(false);
   const [isDownloading, setIsDownloading] = useState(false);
+  const [isSaveDialogOpen, setIsSaveDialogOpen] = useState(false);
   
+  const [selectedAllergens, setSelectedAllergens] = useState<SelectedAllergens | null>(null);
+  const [customMessages, setCustomMessages] = useState<CustomMessages | null>(null);
+  const [fullTranslatedContent, setFullTranslatedContent] = useState<TranslatedContent | null>(null);
+
   const emergencyNumber = getEmergencyNumber(langCode);
   
   const [translatedText, setTranslatedText] = useState({
@@ -29,22 +37,29 @@ const EmergencyPage = () => {
   });
 
   useEffect(() => {
-    const translateEmergencyContent = async () => {
-      const sessionTranslations = localStorage.getItem('currentSessionTranslations');
+    const loadDataAndTranslate = async () => {
+      // Save last used language for widget
+      if (langCode) {
+        await storage.set(STORAGE_KEYS.LAST_EMERGENCY_LANG, langCode);
+      }
+
+      // Load session data
+      const allergens = await storage.get<SelectedAllergens>(STORAGE_KEYS.SELECTED_ALLERGENS);
+      const messages = await storage.get<CustomMessages>(STORAGE_KEYS.CUSTOM_MESSAGES);
+      setSelectedAllergens(allergens);
+      setCustomMessages(messages);
+
+      const sessionTranslations = await storage.get<any>(STORAGE_KEYS.SESSION_TRANSLATIONS);
       if (sessionTranslations) {
-        try {
-          const parsed = JSON.parse(sessionTranslations);
-          if (parsed.languageCode === langCode) {
-            const content = parsed.content.emergency;
-            setTranslatedText({
-              ...content,
-              dialText: content.dialText || "DIAL"
-            });
-            setIsTranslating(false);
-            return;
-          }
-        } catch (e) {
-          console.error("Failed to parse session translations", e);
+        if (sessionTranslations.languageCode === langCode) {
+          const content = sessionTranslations.content.emergency;
+          setTranslatedText({
+            ...content,
+            dialText: content.dialText || "DIAL"
+          });
+          setFullTranslatedContent(sessionTranslations.content);
+          setIsTranslating(false);
+          return;
         }
       }
 
@@ -62,13 +77,19 @@ const EmergencyPage = () => {
           translateText("DIAL", langCode)
         ]);
 
-        setTranslatedText({
+        const newTranslatedText = {
           attention,
           emergency,
           needHelp,
           callServices,
           dialText
-        });
+        };
+
+        setTranslatedText(newTranslatedText);
+        
+        // If we don't have full translated content, we might need it for saving
+        // But usually it's generated in AllergyAlertPage. 
+        // If we are on EmergencyPage directly, we might only have emergency translations.
       } catch (error) {
         console.error('Translation failed:', error);
       } finally {
@@ -76,7 +97,7 @@ const EmergencyPage = () => {
       }
     };
 
-    translateEmergencyContent();
+    loadDataAndTranslate();
   }, [langCode]);
 
   const handleShare = async () => {
@@ -101,6 +122,14 @@ const EmergencyPage = () => {
       toast.error("Failed to save emergency message.");
     }
     setIsDownloading(false);
+  };
+
+  const handleSave = () => {
+    if (!selectedAllergens || !customMessages) {
+      toast.error("Missing allergen data to save card.");
+      return;
+    }
+    setIsSaveDialogOpen(true);
   };
 
   if (isTranslating) {
@@ -159,9 +188,34 @@ const EmergencyPage = () => {
         onBack={() => navigate(-1)}
         onShare={handleShare}
         onDownload={handleDownload}
+        onSave={handleSave}
         isSharing={isSharing}
         isDownloading={isDownloading}
       />
+
+      {selectedAllergens && customMessages && (
+        <SaveCardDialog
+          isOpen={isSaveDialogOpen}
+          onClose={() => setIsSaveDialogOpen(false)}
+          languageCode={langCode || 'en'}
+          selectedAllergens={selectedAllergens}
+          customMessages={customMessages}
+          translatedContent={fullTranslatedContent || {
+            ui: {
+              allergyAlert: "Allergy Alert",
+              iAmAllergicTo: "I am allergic to:",
+              pleaseBeCareful: "Please be careful.",
+              thankYou: "Thank you.",
+              theyMakeMeSick: "They make me sick."
+            },
+            allergens: {},
+            emergency: {
+              ...translatedText,
+              dial112: `DIAL ${emergencyNumber}`
+            }
+          }}
+        />
+      )}
     </div>
   );
 };

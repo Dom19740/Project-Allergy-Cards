@@ -1,4 +1,4 @@
-import { Suspense, lazy } from "react";
+import { Suspense, lazy, useEffect } from "react";
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -6,6 +6,8 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { usePreloadImages } from "./hooks/usePreloadImages";
 import { Loader2 } from "lucide-react";
+import { storage, STORAGE_KEYS } from "./lib/storage";
+import { useDeepLinks } from "./hooks/useDeepLinks";
 
 // Lazy load pages
 const Home = lazy(() => import("./pages/Home"));
@@ -28,6 +30,36 @@ const LoadingFallback = () => (
 
 const AppContent = () => {
   usePreloadImages();
+  useDeepLinks();
+
+  useEffect(() => {
+    const migrate = async () => {
+      const hasMigrated = await storage.get(STORAGE_KEYS.HAS_MIGRATED);
+      if (hasMigrated) return;
+
+      const keysToMigrate = [
+        'savedAllergyCards',
+        'selectedAllergens',
+        'customAlertMessages',
+        'selectedLanguageCode',
+        'currentSessionTranslations'
+      ];
+
+      for (const key of keysToMigrate) {
+        const value = localStorage.getItem(key);
+        if (value) {
+          // localStorage values are already stringified JSON or strings
+          // storage.set will handle it
+          await storage.set(key, value);
+        }
+      }
+
+      await storage.set(STORAGE_KEYS.HAS_MIGRATED, 'true');
+      console.log('Migration to Preferences completed');
+    };
+
+    migrate();
+  }, []);
   
   return (
     <Suspense fallback={<LoadingFallback />}>

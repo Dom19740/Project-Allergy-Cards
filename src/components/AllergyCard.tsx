@@ -12,6 +12,7 @@ import SaveCardDialog from './SaveCardDialog';
 import CardActions from './CardActions';
 import CardMenu from './CardMenu';
 import DisclaimerDialog from './DisclaimerDialog';
+import { storage, STORAGE_KEYS } from '@/lib/storage';
 
 interface AllergyCardProps {
   languageCode: LanguageCode;
@@ -62,46 +63,34 @@ const AllergyCard: React.FC<AllergyCardProps> = ({ languageCode, selectedAllerge
   };
 
   useEffect(() => {
-    const storedAllergens = localStorage.getItem('selectedAllergens');
-    if (storedAllergens) {
-      try {
-        const parsed = JSON.parse(storedAllergens);
-        setFullSelectedData(parsed);
-        const custom = parsed.custom || {};
+    const loadData = async () => {
+      const storedAllergens = await storage.get<SelectedAllergens>(STORAGE_KEYS.SELECTED_ALLERGENS);
+      if (storedAllergens) {
+        setFullSelectedData(storedAllergens);
+        const custom = storedAllergens.custom || {};
         setCustomAllergenTranslations(custom);
-      } catch (e) {
-        console.error("Failed to parse stored allergens", e);
       }
-    }
 
-    const savedAlert = localStorage.getItem('customAlertMessages');
-    if (savedAlert) {
-      try {
-        const parsed = JSON.parse(savedAlert);
+      const savedAlert = await storage.get<CustomMessages>(STORAGE_KEYS.CUSTOM_MESSAGES);
+      if (savedAlert) {
         setCustomMessages({
-          iAmAllergicTo: parsed.iAmAllergicTo || "I can not eat:",
-          theyMakeMeSick: parsed.theyMakeMeSick || "They make me very sick and I could die"
+          iAmAllergicTo: savedAlert.iAmAllergicTo || "I can not eat:",
+          theyMakeMeSick: savedAlert.theyMakeMeSick || "They make me very sick and I could die"
         });
-      } catch (e) {
-        console.error("Failed to parse custom alert messages", e);
       }
-    }
+    };
+    loadData();
   }, []);
 
   useEffect(() => {
     const translateAllContent = async () => {
-      const sessionTranslations = localStorage.getItem('currentSessionTranslations');
+      const sessionTranslations = await storage.get<any>(STORAGE_KEYS.SESSION_TRANSLATIONS);
       if (sessionTranslations) {
-        try {
-          const parsed = JSON.parse(sessionTranslations);
-          if (parsed.languageCode === languageCode) {
-            setTranslatedUIText(parsed.content.ui);
-            setTranslatedAllergens(parsed.content.allergens);
-            setEmergencyTranslations(parsed.content.emergency);
-            return;
-          }
-        } catch (e) {
-          console.error("Failed to parse session translations", e);
+        if (sessionTranslations.languageCode === languageCode) {
+          setTranslatedUIText(sessionTranslations.content.ui);
+          setTranslatedAllergens(sessionTranslations.content.allergens);
+          setEmergencyTranslations(sessionTranslations.content.emergency);
+          return;
         }
       }
 

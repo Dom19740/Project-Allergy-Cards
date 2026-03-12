@@ -7,43 +7,43 @@ import { Card, CardContent, CardTitle } from '@/components/ui/card';
 import { Trash2, ExternalLink, Clock } from 'lucide-react';
 import { SavedCard } from '@/lib/types';
 import { toast } from 'sonner';
+import { storage, STORAGE_KEYS } from '@/lib/storage';
 
 const SavedCardsList = () => {
   const navigate = useNavigate();
   const [savedCards, setSavedCards] = useState<SavedCard[]>([]);
 
   useEffect(() => {
-    const storedCards = localStorage.getItem('savedAllergyCards');
-    if (storedCards) {
-      try {
-        setSavedCards(JSON.parse(storedCards));
-      } catch (e) {
-        console.error("Failed to parse saved cards", e);
+    const loadCards = async () => {
+      const cards = await storage.get<SavedCard[]>(STORAGE_KEYS.SAVED_CARDS);
+      if (cards) {
+        setSavedCards(cards);
       }
-    }
+    };
+    loadCards();
   }, []);
 
-  const handleDelete = (id: string, name: string) => {
+  const handleDelete = async (id: string, name: string) => {
     const updatedCards = savedCards.filter(card => card.id !== id);
-    localStorage.setItem('savedAllergyCards', JSON.stringify(updatedCards));
+    await storage.set(STORAGE_KEYS.SAVED_CARDS, updatedCards);
     setSavedCards(updatedCards);
     toast.success(`Card "${name}" deleted.`);
   };
 
-  const handleLoad = (card: SavedCard) => {
+  const handleLoad = async (card: SavedCard) => {
     // Set the current session data to match the saved card
-    localStorage.setItem('selectedAllergens', JSON.stringify(card.selectedAllergens));
-    localStorage.setItem('customAlertMessages', JSON.stringify(card.customMessages));
-    localStorage.setItem('selectedLanguageCode', card.languageCode);
+    await storage.set(STORAGE_KEYS.SELECTED_ALLERGENS, card.selectedAllergens);
+    await storage.set(STORAGE_KEYS.CUSTOM_MESSAGES, card.customMessages);
+    await storage.set(STORAGE_KEYS.SELECTED_LANGUAGE, card.languageCode);
     
     // Store the translated content for this session to enable offline use
     if (card.translatedContent) {
-      localStorage.setItem('currentSessionTranslations', JSON.stringify({
+      await storage.set(STORAGE_KEYS.SESSION_TRANSLATIONS, {
         languageCode: card.languageCode,
         content: card.translatedContent
-      }));
+      });
     } else {
-      localStorage.removeItem('currentSessionTranslations');
+      await storage.remove(STORAGE_KEYS.SESSION_TRANSLATIONS);
     }
     
     navigate(`/alert/${card.languageCode}`);

@@ -9,29 +9,28 @@ import { X, ChevronLeft, ChevronRight } from 'lucide-react';
 import { ALLERGEN_OPTIONS } from '@/lib/allergens';
 import FixedHeader from '@/components/FixedHeader';
 import StepHeader from '@/components/StepHeader';
+import { storage, STORAGE_KEYS } from '@/lib/storage';
 
 const AllergenSelectionPage = () => {
   const navigate = useNavigate();
   const [selectedAllergens, setSelectedAllergens] = useState<string[]>([]);
   const [customAllergenInput, setCustomAllergenInput] = useState<string>('');
 
-  // Load selected allergens from local storage on mount
+  // Load selected allergens from storage on mount
   useEffect(() => {
-    const storedAllergens = localStorage.getItem('selectedAllergens');
-    if (storedAllergens) {
-      try {
-        const parsed = JSON.parse(storedAllergens);
-        if (Array.isArray(parsed)) {
-          setSelectedAllergens(parsed);
-        } else if (parsed.ids) {
-          setSelectedAllergens(parsed.ids);
-        } else if (parsed.standard) {
-          setSelectedAllergens([...(parsed.standard || []), ...(parsed.custom || [])]);
+    const loadAllergens = async () => {
+      const storedAllergens = await storage.get<any>(STORAGE_KEYS.SELECTED_ALLERGENS);
+      if (storedAllergens) {
+        if (Array.isArray(storedAllergens)) {
+          setSelectedAllergens(storedAllergens);
+        } else if (storedAllergens.ids) {
+          setSelectedAllergens(storedAllergens.ids);
+        } else if (storedAllergens.standard) {
+          setSelectedAllergens([...(storedAllergens.standard || []), ...(storedAllergens.custom || [])]);
         }
-      } catch (e) {
-        console.error("Failed to parse stored allergens from localStorage", e);
       }
-    }
+    };
+    loadAllergens();
   }, []);
 
   const handleCheckboxChange = (allergenId: string, checked: boolean) => {
@@ -60,7 +59,7 @@ const AllergenSelectionPage = () => {
     toast.info(`"${allergenToRemove}" removed.`);
   };
 
-  const handleContinue = () => {
+  const handleContinue = async () => {
     if (selectedAllergens.length === 0) {
       toast.error("Please select at least one allergen.");
       return;
@@ -70,11 +69,11 @@ const AllergenSelectionPage = () => {
     const standard = selectedAllergens.filter(id => standardIds.includes(id));
     const custom = selectedAllergens.filter(id => !standardIds.includes(id));
     
-    localStorage.setItem('selectedAllergens', JSON.stringify({
+    await storage.set(STORAGE_KEYS.SELECTED_ALLERGENS, {
       standard,
       custom,
       ids: selectedAllergens
-    }));
+    });
     
     navigate('/select-alert');
   };

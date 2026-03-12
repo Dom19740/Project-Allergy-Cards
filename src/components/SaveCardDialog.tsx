@@ -7,6 +7,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { toast } from 'sonner';
 import { SavedCard, SelectedAllergens, CustomMessages, TranslatedContent } from '@/lib/types';
+import { storage, STORAGE_KEYS } from '@/lib/storage';
 
 interface SaveCardDialogProps {
   isOpen: boolean;
@@ -27,22 +28,13 @@ const SaveCardDialog: React.FC<SaveCardDialogProps> = ({
 }) => {
   const [cardName, setCardName] = useState('');
 
-  const handleSave = () => {
+  const handleSave = async () => {
     if (!cardName.trim()) {
       toast.error("Please enter a name for your card.");
       return;
     }
 
-    const storedCards = localStorage.getItem('savedAllergyCards');
-    let savedCards: SavedCard[] = [];
-    
-    if (storedCards) {
-      try {
-        savedCards = JSON.parse(storedCards);
-      } catch (e) {
-        console.error("Failed to parse saved cards", e);
-      }
-    }
+    const savedCards = await storage.get<SavedCard[]>(STORAGE_KEYS.SAVED_CARDS) || [];
 
     if (savedCards.length >= 3) {
       toast.error("You can only save up to 3 cards. Please delete one to save a new one.");
@@ -60,7 +52,7 @@ const SaveCardDialog: React.FC<SaveCardDialogProps> = ({
     };
 
     const updatedCards = [...savedCards, newCard];
-    localStorage.setItem('savedAllergyCards', JSON.stringify(updatedCards));
+    await storage.set(STORAGE_KEYS.SAVED_CARDS, updatedCards);
     
     toast.success(`Card "${cardName}" saved successfully!`);
     setCardName('');

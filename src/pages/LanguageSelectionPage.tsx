@@ -8,6 +8,7 @@ import { ChevronLeft, ChevronRight } from "lucide-react";
 import FixedHeader from "@/components/FixedHeader";
 import StepHeader from "@/components/StepHeader";
 import { getAllGoogleLanguages, SupportedLanguage } from "@/lib/translator";
+import { storage, STORAGE_KEYS } from "@/lib/storage";
 
 const LanguageSelectionPage = () => {
   const navigate = useNavigate();
@@ -15,10 +16,13 @@ const LanguageSelectionPage = () => {
   const [supportedLanguages, setSupportedLanguages] = useState<SupportedLanguage[]>([]);
 
   useEffect(() => {
-    const savedLang = localStorage.getItem("selectedLanguageCode");
-    if (savedLang) {
-      setSelectedLanguageCode(savedLang);
-    }
+    const loadLang = async () => {
+      const savedLang = await storage.get<string>(STORAGE_KEYS.SELECTED_LANGUAGE);
+      if (savedLang) {
+        setSelectedLanguageCode(savedLang);
+      }
+    };
+    loadLang();
   }, []);
 
   useEffect(() => {
@@ -32,12 +36,9 @@ const LanguageSelectionPage = () => {
     return () => { mounted = false; };
   }, []);
 
-  useEffect(() => {
-    localStorage.setItem("selectedLanguageCode", selectedLanguageCode);
-  }, [selectedLanguageCode]);
-
-  const handleLanguageChange = (code: string) => {
+  const handleLanguageChange = async (code: string) => {
     setSelectedLanguageCode(code);
+    await storage.set(STORAGE_KEYS.SELECTED_LANGUAGE, code);
   };
 
   const handleContinue = () => {

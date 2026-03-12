@@ -7,6 +7,7 @@ import { Label } from '@/components/ui/label';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
 import FixedHeader from '@/components/FixedHeader';
 import StepHeader from '@/components/StepHeader';
+import { storage, STORAGE_KEYS } from '@/lib/storage';
 
 const SelectAlertPage = () => {
   const navigate = useNavigate();
@@ -16,25 +17,23 @@ const SelectAlertPage = () => {
   );
 
   useEffect(() => {
-    const savedAlert = localStorage.getItem('customAlertMessages');
-    if (savedAlert) {
-      try {
-        const parsed = JSON.parse(savedAlert);
-        if (parsed.iAmAllergicTo) setIAmAllergicTo(parsed.iAmAllergicTo);
-        if (parsed.theyMakeMeSick) setTheyMakeMeSick(parsed.theyMakeMeSick);
-      } catch (e) {
-        console.error('Failed to parse custom alert messages', e);
+    const loadMessages = async () => {
+      const savedAlert = await storage.get<any>(STORAGE_KEYS.CUSTOM_MESSAGES);
+      if (savedAlert) {
+        if (savedAlert.iAmAllergicTo) setIAmAllergicTo(savedAlert.iAmAllergicTo);
+        if (savedAlert.theyMakeMeSick) setTheyMakeMeSick(savedAlert.theyMakeMeSick);
       }
-    }
+    };
+    loadMessages();
   }, []);
 
-  const handleContinue = () => {
-    localStorage.setItem(
-      'customAlertMessages',
-      JSON.stringify({
+  const handleContinue = async () => {
+    await storage.set(
+      STORAGE_KEYS.CUSTOM_MESSAGES,
+      {
         iAmAllergicTo,
         theyMakeMeSick,
-      }),
+      },
     );
     navigate('/select-language');
   };
