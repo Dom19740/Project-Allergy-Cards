@@ -1,12 +1,30 @@
 "use client";
 
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import FixedHeader from '@/components/FixedHeader';
 import SavedCardsList from '@/components/SavedCardsList';
+import { storage, STORAGE_KEYS } from '@/lib/storage';
+import { SavedCard } from '@/lib/types';
+import { cn } from '@/lib/utils';
 
 const Home = () => {
+  const [hasCards, setHasCards] = useState(false);
+
+  useEffect(() => {
+    const checkCards = async () => {
+      const cards = await storage.get<SavedCard[]>(STORAGE_KEYS.SAVED_CARDS);
+      setHasCards(!!(cards && cards.length > 0));
+    };
+    checkCards();
+    
+    // Listen for storage changes to update UI if a card is deleted
+    const handleStorageChange = () => checkCards();
+    window.addEventListener('storage', handleStorageChange);
+    return () => window.removeEventListener('storage', handleStorageChange);
+  }, []);
+
   return (
     <div className="flex flex-col h-[100dvh] bg-gray-100 dark:bg-gray-900 overflow-hidden">
       <FixedHeader />
@@ -17,30 +35,50 @@ const Home = () => {
         {/* Top Section */}
         <div className="flex-1 flex flex-col items-center text-center min-h-0">
           
-          {/* Minimized Image Container */}
-          <div className="flex-[0.3] w-full flex items-center justify-center min-h-0 p-2">
+          {/* Image Container - Expands when no cards */}
+          <div className={cn(
+            "w-full flex items-center justify-center min-h-0 p-2 transition-all duration-500 ease-in-out",
+            hasCards ? "flex-[0.3]" : "flex-[0.5]"
+          )}>
             <img 
               src="/logo_main.png" 
               alt="App Logo" 
-              className="max-h-full max-w-[160px] w-auto h-auto object-contain" 
+              className={cn(
+                "max-h-full w-auto h-auto object-contain transition-all duration-500",
+                hasCards ? "max-w-[160px]" : "max-w-[220px] md:max-w-[280px]"
+              )} 
             />
           </div>
           
           {/* Text and Saved Cards Section */}
-          <div className="flex-1 flex flex-col justify-around w-full py-2 min-h-0">
-            <div className="space-y-2">
-              <p className="text-sm md:text-base text-gray-700 dark:text-gray-300 max-w-md mx-auto px-6 leading-relaxed">
+          <div className={cn(
+            "flex flex-col w-full py-2 min-h-0 transition-all duration-500",
+            hasCards ? "flex-1 justify-around" : "flex-[0.5] justify-center"
+          )}>
+            <div className={cn(
+              "space-y-3 transition-all duration-500",
+              !hasCards && "mb-8"
+            )}>
+              <p className={cn(
+                "text-gray-700 dark:text-gray-300 max-w-md mx-auto px-6 leading-relaxed transition-all duration-500",
+                hasCards ? "text-sm md:text-base" : "text-base md:text-xl"
+              )}>
                 Create a personalized allergy alert in multiple languages to communicate your dietary restrictions easily and safely.
               </p>
-              <p className="text-sm md:text-base text-gray-700 dark:text-gray-300 max-w-md mx-auto px-6 leading-relaxed">
+              <p className={cn(
+                "text-gray-700 dark:text-gray-300 max-w-md mx-auto px-6 leading-relaxed transition-all duration-500",
+                hasCards ? "text-sm md:text-base" : "text-base md:text-lg opacity-80"
+              )}>
                  Plus a translated emergency alert card.
               </p>
             </div>
             
             {/* Saved Cards Section */}
-            <div className="w-full">
-              <SavedCardsList />
-            </div>
+            {hasCards && (
+              <div className="w-full animate-in fade-in slide-in-from-bottom-4 duration-700">
+                <SavedCardsList />
+              </div>
+            )}
           </div>
         </div>
 
