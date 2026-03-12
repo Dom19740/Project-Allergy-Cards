@@ -8,15 +8,18 @@ interface CardMenuProps {
   isOpen: boolean;
   onClose: () => void;
   onOpenDisclaimer: () => void;
+  isEmergency?: boolean;
 }
 
-const CardMenu: React.FC<CardMenuProps> = ({ isOpen, onClose, onOpenDisclaimer }) => {
+const CardMenu: React.FC<CardMenuProps> = ({ isOpen, onClose, onOpenDisclaimer, isEmergency = false }) => {
   if (!isOpen) return null;
 
   const menuItems = [
     { to: "/", label: "Saved Cards", icon: Home },
-    { to: "/select-allergens", label: "Edit Allergens", icon: ShieldAlert },
-    { to: "/select-alert", label: "Edit Alert", icon: MessageSquare },
+    ...(!isEmergency ? [
+      { to: "/select-allergens", label: "Edit Allergens", icon: ShieldAlert },
+      { to: "/select-alert", label: "Edit Alert", icon: MessageSquare },
+    ] : []),
     { to: "/select-language", label: "Change Language", icon: Languages },
   ];
 
