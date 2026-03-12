@@ -68,7 +68,7 @@ public class WidgetFactory implements RemoteViewsService.RemoteViewsFactory {
             // Combine name and lang code: "Name (EN)"
             views.setTextViewText(R.id.card_name_full, name + " (" + langCode + ")");
 
-            // Handle Dots
+            // Handle Vertical Dots
             int totalCards = cards.size();
             int[] dotIds = {R.id.dot_0, R.id.dot_1, R.id.dot_2};
             
@@ -76,7 +76,6 @@ public class WidgetFactory implements RemoteViewsService.RemoteViewsFactory {
                 if (i < totalCards) {
                     views.setViewVisibility(dotIds[i], View.VISIBLE);
                     if (i == position) {
-                        // Using a smaller version of the active dot for the condensed layout
                         views.setImageViewResource(dotIds[i], R.drawable.dot_active);
                     } else {
                         views.setImageViewResource(dotIds[i], R.drawable.dot_inactive);

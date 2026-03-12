@@ -48,8 +48,6 @@ const AppContent = () => {
       for (const key of keysToMigrate) {
         const value = localStorage.getItem(key);
         if (value) {
-          // localStorage values are already stringified JSON or strings
-          // storage.set will handle it
           await storage.set(key, value);
         }
       }
@@ -82,7 +80,7 @@ const App = () => (
   <QueryClientProvider client={queryClient}>
     <TooltipProvider>
       <Toaster />
-      <Sonner />
+      <Sonner duration={2000} />
       <BrowserRouter>
         <AppContent />
       </BrowserRouter>
