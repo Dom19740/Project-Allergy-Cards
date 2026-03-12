@@ -67,7 +67,7 @@ const Home = () => {
               </p>
               <p className={cn(
                 "text-gray-700 dark:text-gray-300 max-w-md mx-auto px-6 leading-relaxed transition-all duration-500",
-                hasCards ? "text-sm md:text-base" : "text-base md:text-lg opacity-80"
+                hasCards ? "text-sm md:text-base" : "text-base md:text-lg"
               )}>
                  Plus a translated emergency alert card.
               </p>
