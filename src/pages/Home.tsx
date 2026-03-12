@@ -14,29 +14,31 @@ const Home = () => {
       {/* Main Content Wrapper */}
       <div className="flex flex-col flex-1 w-full max-w-2xl mx-auto px-4 pt-[calc(106px+env(safe-area-inset-top)+10px)] pb-[env(safe-area-inset-bottom)] min-h-0">
         
-        {/* Top Section: This container will shrink the image area first */}
+        {/* Top Section */}
         <div className="flex-1 flex flex-col items-center text-center min-h-0">
           
-          {/* Image Container: Takes all available space and shrinks as needed */}
-          <div className="flex-1 w-full flex items-center justify-center min-h-0 p-4">
+          {/* Minimized Image Container */}
+          <div className="flex-[0.4] w-full flex items-center justify-center min-h-0 p-2">
             <img 
               src="/logo_main.png" 
               alt="App Logo" 
-              className="max-h-full max-w-full w-auto h-auto object-contain" 
+              className="max-h-full max-w-[180px] w-auto h-auto object-contain" 
             />
           </div>
           
-          {/* Text and Saved Cards Section: Fixed-ish height but can shrink if absolutely necessary */}
-          <div className="flex-shrink-0 space-y-3 pb-2">
-            <p className="text-base md:text-lg text-gray-700 dark:text-gray-300 max-w-md px-6 leading-relaxed">
-              Create a personalized allergy alert in multiple languages to communicate your dietary restrictions easily and safely when traveling or dining out.
-            </p>
-            <p className="text-base md:text-lg text-gray-700 dark:text-gray-300 max-w-md px-6 leading-relaxed">
-               Plus a translated emergency alert card for urgent situations
-            </p>
+          {/* Text and Saved Cards Section */}
+          <div className="flex-1 flex flex-col justify-center w-full space-y-2 min-h-0">
+            <div className="space-y-1">
+              <p className="text-sm md:text-base text-gray-700 dark:text-gray-300 max-w-md mx-auto px-6 leading-tight">
+                Create a personalized allergy alert in multiple languages to communicate your dietary restrictions easily and safely.
+              </p>
+              <p className="text-sm md:text-base text-gray-700 dark:text-gray-300 max-w-md mx-auto px-6 leading-tight font-medium">
+                 Plus a translated emergency alert card.
+              </p>
+            </div>
             
-            {/* Saved Cards Section */}
-            <div className="max-h-[120px] overflow-y-auto">
+            {/* Saved Cards Section - No longer height constrained, uses horizontal scroll */}
+            <div className="w-full py-2">
               <SavedCardsList />
             </div>
           </div>
