@@ -11,6 +11,7 @@ import android.widget.RemoteViews;
 public class AllergyWidgetProvider extends AppWidgetProvider {
     public static final String ACTION_REFRESH = "com.dpbcreative.simpleallergyalert.ACTION_REFRESH";
     public static final String ACTION_OPEN_CARD = "com.dpbcreative.simpleallergyalert.ACTION_OPEN_CARD";
+    public static final String EXTRA_CARD_ID = "card_id";
 
     @Override
     public void onUpdate(Context context, AppWidgetManager appWidgetManager, int[] appWidgetIds) {
@@ -52,9 +53,9 @@ public class AllergyWidgetProvider extends AppWidgetProvider {
             int[] ids = mgr.getAppWidgetIds(new android.content.ComponentName(context, AllergyWidgetProvider.class));
             mgr.notifyAppWidgetViewDataChanged(ids, R.id.card_stack);
         } else if (ACTION_OPEN_CARD.equals(intent.getAction())) {
-            String cardId = intent.getStringExtra("card_id");
+            String cardId = intent.getStringExtra(EXTRA_CARD_ID);
             Intent appIntent = new Intent(context, MainActivity.class);
-            appIntent.putExtra("card_id", cardId);
+            appIntent.putExtra(EXTRA_CARD_ID, cardId);
             appIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
             context.startActivity(appIntent);
         }
