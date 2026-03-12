@@ -4,7 +4,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
-import { Trash2, ExternalLink, Clock } from 'lucide-react';
+import { Trash2, Clock } from 'lucide-react';
 import { SavedCard } from '@/lib/types';
 import { toast } from 'sonner';
 import { storage, STORAGE_KEYS } from '@/lib/storage';
@@ -66,6 +66,11 @@ const SavedCardsList = () => {
 
   return (
     <div className="w-full">
+      <style dangerouslySetInnerHTML={{ __html: `
+        .no-scrollbar::-webkit-scrollbar { display: none; }
+        .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+      `}} />
+      
       <div className="flex items-center justify-between px-8 mb-2">
         <h3 className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">
           Saved Cards
@@ -94,8 +99,8 @@ const SavedCardsList = () => {
               onClick={() => handleLoad(card)}
               className="w-full max-w-[320px] bg-white dark:bg-gray-800 border-gray-200 dark:border-gray-700 shadow-lg hover:shadow-xl transition-all active:scale-95 cursor-pointer overflow-hidden rounded-2xl"
             >
-              <CardContent className="p-4 flex flex-col">
-                <div className="flex justify-between items-start mb-2">
+              <CardContent className="p-5 flex flex-col">
+                <div className="flex justify-between items-start mb-3">
                   <div className="bg-red-50 dark:bg-red-900/20 px-2 py-1 rounded text-[10px] font-bold text-red-600 dark:text-red-400 uppercase">
                     {card.languageCode}
                   </div>
@@ -109,19 +114,14 @@ const SavedCardsList = () => {
                   </Button>
                 </div>
                 
-                <div className="mb-3">
-                  <h4 className="text-lg font-bold text-gray-800 dark:text-gray-100 line-clamp-1">
+                <div>
+                  <h4 className="text-xl font-bold text-gray-800 dark:text-gray-100 line-clamp-1">
                     {card.name}
                   </h4>
-                  <div className="flex items-center text-[10px] text-gray-500 dark:text-gray-400 mt-0.5">
-                    <Clock className="w-3 h-3 mr-1" />
-                    {new Date(card.createdAt).toLocaleDateString()}
+                  <div className="flex items-center text-[11px] text-gray-500 dark:text-gray-400 mt-1">
+                    <Clock className="w-3.5 h-3.5 mr-1.5" />
+                    Created on {new Date(card.createdAt).toLocaleDateString()}
                   </div>
-                </div>
-
-                <div className="flex items-center text-blue-600 dark:text-blue-400 text-[10px] font-bold uppercase tracking-wider">
-                  <ExternalLink className="w-3 h-3 mr-1.5" />
-                  Tap to Open
                 </div>
               </CardContent>
             </Card>
