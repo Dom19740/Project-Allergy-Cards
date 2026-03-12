@@ -18,27 +18,27 @@ const Home = () => {
         <div className="flex-1 flex flex-col items-center text-center min-h-0">
           
           {/* Minimized Image Container */}
-          <div className="flex-[0.4] w-full flex items-center justify-center min-h-0 p-2">
+          <div className="flex-[0.3] w-full flex items-center justify-center min-h-0 p-2">
             <img 
               src="/logo_main.png" 
               alt="App Logo" 
-              className="max-h-full max-w-[180px] w-auto h-auto object-contain" 
+              className="max-h-full max-w-[160px] w-auto h-auto object-contain" 
             />
           </div>
           
           {/* Text and Saved Cards Section */}
-          <div className="flex-1 flex flex-col justify-center w-full space-y-2 min-h-0">
-            <div className="space-y-1">
-              <p className="text-sm md:text-base text-gray-700 dark:text-gray-300 max-w-md mx-auto px-6 leading-tight">
+          <div className="flex-1 flex flex-col justify-around w-full py-2 min-h-0">
+            <div className="space-y-2">
+              <p className="text-sm md:text-base text-gray-700 dark:text-gray-300 max-w-md mx-auto px-6 leading-relaxed">
                 Create a personalized allergy alert in multiple languages to communicate your dietary restrictions easily and safely.
               </p>
-              <p className="text-sm md:text-base text-gray-700 dark:text-gray-300 max-w-md mx-auto px-6 leading-tight font-medium">
+              <p className="text-sm md:text-base text-gray-700 dark:text-gray-300 max-w-md mx-auto px-6 leading-relaxed">
                  Plus a translated emergency alert card.
               </p>
             </div>
             
-            {/* Saved Cards Section - No longer height constrained, uses horizontal scroll */}
-            <div className="w-full py-2">
+            {/* Saved Cards Section */}
+            <div className="w-full">
               <SavedCardsList />
             </div>
           </div>
