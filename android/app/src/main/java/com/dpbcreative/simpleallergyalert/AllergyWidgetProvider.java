@@ -6,8 +6,10 @@ import android.appwidget.AppWidgetProvider;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.net.Uri;
 import android.widget.RemoteViews;
+import org.json.JSONObject;
 
 public class AllergyWidgetProvider extends AppWidgetProvider {
 
@@ -25,6 +27,21 @@ public class AllergyWidgetProvider extends AppWidgetProvider {
 
     static void updateAppWidget(Context context, AppWidgetManager appWidgetManager, int appWidgetId) {
         RemoteViews views = new RemoteViews(context.getPackageName(), R.layout.allergy_widget);
+
+        // Update Emergency button text with language code
+        try {
+            SharedPreferences prefs = context.getSharedPreferences("CapacitorStorage", Context.MODE_PRIVATE);
+            String emergencyCardJson = prefs.getString("savedEmergencyCard", null);
+            if (emergencyCardJson != null) {
+                JSONObject obj = new JSONObject(emergencyCardJson);
+                String langCode = obj.optString("languageCode", "").split("-")[0].toUpperCase();
+                if (!langCode.isEmpty()) {
+                    views.setTextViewText(R.id.emergency_text, "EMERGENCY (" + langCode + ")");
+                }
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
 
         // Set up the intent for the Emergency button
         Intent emergencyIntent = new Intent(Intent.ACTION_VIEW, Uri.parse("simpleallergyalert://emergency"));
@@ -67,10 +84,8 @@ public class AllergyWidgetProvider extends AppWidgetProvider {
             ComponentName componentName = new ComponentName(context, AllergyWidgetProvider.class);
             int[] ids = appWidgetManager.getAppWidgetIds(componentName);
             
-            // Notify the StackView to refresh its data for all widgets
             appWidgetManager.notifyAppWidgetViewDataChanged(ids, R.id.card_stack);
             
-            // Also trigger a full layout update for each widget
             for (int id : ids) {
                 updateAppWidget(context, appWidgetManager, id);
             }
