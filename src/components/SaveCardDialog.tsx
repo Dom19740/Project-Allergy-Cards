@@ -74,7 +74,7 @@ const SaveCardDialog: React.FC<SaveCardDialogProps> = ({
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
       <DialogContent 
-        className="w-[90%] max-w-[400px] rounded-2xl border-gray-200 dark:border-gray-700 shadow-2xl p-6 top-[30%] translate-y-0 animate-in fade-in slide-in-from-bottom-8 duration-300"
+        className="w-[90%] max-w-[400px] rounded-2xl border-gray-200 dark:border-gray-700 shadow-2xl p-6 top-[15%] sm:top-[50%] translate-y-0 sm:-translate-y-1/2 animate-in fade-in slide-in-from-bottom-8 duration-300"
       >
         <DialogHeader className="mb-4">
           <DialogTitle className="text-xl font-bold text-gray-900 dark:text-white">
@@ -94,7 +94,7 @@ const SaveCardDialog: React.FC<SaveCardDialogProps> = ({
               onKeyDown={handleKeyDown}
               placeholder={isEmergency ? "Emergency Card" : "e.g. My Thai Card"}
               autoFocus
-              className="rounded-xl border-gray-200 focus:ring-red-500 focus:border-red-500"
+              className="rounded-xl border-gray-200 focus:ring-red-500 focus:border-gray-200"
             />
           </div>
         </div>
