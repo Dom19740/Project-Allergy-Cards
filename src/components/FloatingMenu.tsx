@@ -4,14 +4,13 @@ import React from 'react';
 import { Link } from 'react-router-dom';
 import { Home, ShieldAlert, MessageSquare, Languages, X, Info, Mail } from 'lucide-react';
 
-interface CardMenuProps {
+interface FloatingMenuProps {
   isOpen: boolean;
   onClose: () => void;
   onOpenDisclaimer: () => void;
-  isEmergency?: boolean;
 }
 
-const CardMenu: React.FC<CardMenuProps> = ({ isOpen, onClose, onOpenDisclaimer, isEmergency = false }) => {
+const FloatingMenu: React.FC<FloatingMenuProps> = ({ isOpen, onClose, onOpenDisclaimer }) => {
   if (!isOpen) return null;
 
   const handleReportIssue = () => {
@@ -21,11 +20,9 @@ const CardMenu: React.FC<CardMenuProps> = ({ isOpen, onClose, onOpenDisclaimer, 
   };
 
   const menuItems = [
-    { to: "/", label: "Saved Cards", icon: Home },
-    ...(!isEmergency ? [
-      { to: "/select-allergens", label: "Edit Allergens", icon: ShieldAlert },
-      { to: "/select-alert", label: "Edit Alert", icon: MessageSquare },
-    ] : []),
+    { to: "/", label: "Home", icon: Home },
+    { to: "/select-allergens", label: "Select Allergens", icon: ShieldAlert },
+    { to: "/select-alert", label: "Select Alert", icon: MessageSquare },
     { to: "/select-language", label: "Change Language", icon: Languages },
   ];
 
@@ -85,4 +82,4 @@ const CardMenu: React.FC<CardMenuProps> = ({ isOpen, onClose, onOpenDisclaimer, 
   );
 };
 
-export default CardMenu;
+export default FloatingMenu;
