@@ -15,8 +15,6 @@ public class AllergyWidgetProvider extends AppWidgetProvider {
 
     public static final String ACTION_OPEN_CARD = "com.dpbcreative.simpleallergyalert.ACTION_OPEN_CARD";
     public static final String ACTION_REFRESH = "com.dpbcreative.simpleallergyalert.ACTION_REFRESH";
-    public static final String ACTION_NEXT = "com.dpbcreative.simpleallergyalert.ACTION_NEXT";
-    public static final String ACTION_PREV = "com.dpbcreative.simpleallergyalert.ACTION_PREV";
     public static final String EXTRA_CARD_ID = "com.dpbcreative.simpleallergyalert.EXTRA_CARD_ID";
 
     @Override
@@ -48,17 +46,6 @@ public class AllergyWidgetProvider extends AppWidgetProvider {
         PendingIntent emergencyPendingIntent = PendingIntent.getActivity(context, 0, emergencyIntent, PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_IMMUTABLE);
         views.setOnClickPendingIntent(R.id.emergency_container, emergencyPendingIntent);
 
-        // Navigation Intents
-        Intent nextIntent = new Intent(context, AllergyWidgetProvider.class);
-        nextIntent.setAction(ACTION_NEXT);
-        nextIntent.putExtra(AppWidgetManager.EXTRA_APPWIDGET_ID, appWidgetId);
-        views.setOnClickPendingIntent(R.id.next_button, PendingIntent.getBroadcast(context, appWidgetId, nextIntent, PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_IMMUTABLE));
-
-        Intent prevIntent = new Intent(context, AllergyWidgetProvider.class);
-        prevIntent.setAction(ACTION_PREV);
-        prevIntent.putExtra(AppWidgetManager.EXTRA_APPWIDGET_ID, appWidgetId);
-        views.setOnClickPendingIntent(R.id.prev_button, PendingIntent.getBroadcast(context, appWidgetId + 100, prevIntent, PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_IMMUTABLE));
-
         // Adapter
         Intent serviceIntent = new Intent(context, WidgetService.class);
         serviceIntent.putExtra(AppWidgetManager.EXTRA_APPWIDGET_ID, appWidgetId);
@@ -76,17 +63,8 @@ public class AllergyWidgetProvider extends AppWidgetProvider {
     @Override
     public void onReceive(Context context, Intent intent) {
         AppWidgetManager appWidgetManager = AppWidgetManager.getInstance(context);
-        int appWidgetId = intent.getIntExtra(AppWidgetManager.EXTRA_APPWIDGET_ID, AppWidgetManager.INVALID_APPWIDGET_ID);
         
-        if (ACTION_NEXT.equals(intent.getAction())) {
-            RemoteViews views = new RemoteViews(context.getPackageName(), R.layout.allergy_widget);
-            views.showNext(R.id.card_stack);
-            appWidgetManager.partiallyUpdateAppWidget(appWidgetId, views);
-        } else if (ACTION_PREV.equals(intent.getAction())) {
-            RemoteViews views = new RemoteViews(context.getPackageName(), R.layout.allergy_widget);
-            views.showPrevious(R.id.card_stack);
-            appWidgetManager.partiallyUpdateAppWidget(appWidgetId, views);
-        } else if (ACTION_OPEN_CARD.equals(intent.getAction())) {
+        if (ACTION_OPEN_CARD.equals(intent.getAction())) {
             String cardId = intent.getStringExtra(EXTRA_CARD_ID);
             if (cardId != null) {
                 Intent appIntent = new Intent(Intent.ACTION_VIEW, Uri.parse("simpleallergyalert://card/" + cardId));
