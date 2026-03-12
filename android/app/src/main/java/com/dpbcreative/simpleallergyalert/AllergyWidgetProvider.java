@@ -30,9 +30,9 @@ public class AllergyWidgetProvider extends AppWidgetProvider {
         views.setRemoteAdapter(R.id.card_stack, serviceIntent);
         views.setEmptyView(R.id.card_stack, R.id.empty_view);
 
-        // Emergency Button Intent
-        Intent emergencyIntent = new Intent(context, MainActivity.class);
-        emergencyIntent.putExtra("route", "/emergency");
+        // Emergency Button Intent - uses deep link
+        Intent emergencyIntent = new Intent(Intent.ACTION_VIEW, Uri.parse("simpleallergyalert://emergency"));
+        emergencyIntent.setPackage(context.getPackageName());
         PendingIntent emergencyPendingIntent = PendingIntent.getActivity(context, 0, emergencyIntent, PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_IMMUTABLE);
         views.setOnClickPendingIntent(R.id.btn_emergency, emergencyPendingIntent);
 
@@ -54,8 +54,12 @@ public class AllergyWidgetProvider extends AppWidgetProvider {
             mgr.notifyAppWidgetViewDataChanged(ids, R.id.card_stack);
         } else if (ACTION_OPEN_CARD.equals(intent.getAction())) {
             String cardId = intent.getStringExtra(EXTRA_CARD_ID);
-            Intent appIntent = new Intent(context, MainActivity.class);
-            appIntent.putExtra(EXTRA_CARD_ID, cardId);
+            boolean isEmergency = intent.getBooleanExtra("isEmergency", false);
+            
+            // Create deep link URI
+            String uriString = isEmergency ? "simpleallergyalert://emergency" : "simpleallergyalert://card/" + cardId;
+            Intent appIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(uriString));
+            appIntent.setPackage(context.getPackageName());
             appIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
             context.startActivity(appIntent);
         }

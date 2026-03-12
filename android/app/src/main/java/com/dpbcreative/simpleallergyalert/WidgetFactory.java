@@ -83,11 +83,12 @@ public class WidgetFactory implements RemoteViewsService.RemoteViewsFactory {
         if (position >= cardItems.size()) return null;
 
         CardItem item = cardItems.get(position);
-        RemoteViews views = new RemoteViews(context.getPackageName(), R.layout.widget_item);
+        // Use the widget_card_item layout we created
+        RemoteViews views = new RemoteViews(context.getPackageName(), R.layout.widget_card_item);
         
         String displayName = item.isEmergency ? "⚠️ " + item.name : item.name;
         views.setTextViewText(R.id.card_name, displayName);
-        views.setTextViewText(R.id.lang_code, item.langCode.toUpperCase());
+        views.setTextViewText(R.id.card_lang, item.langCode.toUpperCase());
 
         Bundle extras = new Bundle();
         extras.putString(AllergyWidgetProvider.EXTRA_CARD_ID, item.id);
@@ -95,8 +96,8 @@ public class WidgetFactory implements RemoteViewsService.RemoteViewsFactory {
         
         Intent fillInIntent = new Intent();
         fillInIntent.putExtras(extras);
-        views.setOnClickFillInIntent(R.id.card_name, fillInIntent);
-        views.setOnClickFillInIntent(R.id.lang_code, fillInIntent);
+        // Set the fill-in intent for the entire container
+        views.setOnClickFillInIntent(R.id.card_container, fillInIntent);
 
         return views;
     }
