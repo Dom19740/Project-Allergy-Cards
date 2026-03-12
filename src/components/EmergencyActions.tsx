@@ -2,12 +2,13 @@
 
 import React from 'react';
 import { Button } from '@/components/ui/button';
-import { Share2, Download, ArrowLeft, Loader2, Save } from 'lucide-react';
+import { Share2, Download, ArrowLeft, Loader2, Save, Menu } from 'lucide-react';
 
 interface EmergencyActionsProps {
   onBack: () => void;
   onShare: () => void;
   onDownload: () => void;
+  onToggleMenu: () => void;
   onSave?: () => void;
   isSharing?: boolean;
   isDownloading?: boolean;
@@ -17,6 +18,7 @@ const EmergencyActions: React.FC<EmergencyActionsProps> = ({
   onBack,
   onShare,
   onDownload,
+  onToggleMenu,
   onSave,
   isSharing = false,
   isDownloading = false
@@ -32,6 +34,16 @@ const EmergencyActions: React.FC<EmergencyActionsProps> = ({
           title="Back to Card"
         >
           <ArrowLeft className="h-5 w-5" />
+        </Button>
+
+        <Button
+          onClick={onToggleMenu}
+          variant="ghost"
+          size="icon"
+          className="text-gray-500 hover:bg-gray-100 rounded-full h-10 w-10"
+          title="Menu"
+        >
+          <Menu className="h-5 w-5" />
         </Button>
 
         {onSave && (

@@ -2,7 +2,7 @@
 
 import React, { useEffect, useState, useRef } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { AlertTriangle, Loader2, Phone, Menu } from 'lucide-react';
+import { AlertTriangle, Loader2, Phone } from 'lucide-react';
 import { translateText } from '@/lib/translator';
 import { getEmergencyNumber } from '@/lib/emergencyNumbers';
 import { shareCard, downloadCard } from '@/lib/card-utils';
@@ -125,14 +125,6 @@ const EmergencyPage = () => {
 
   return (
     <div className="flex flex-col w-full h-screen bg-white overflow-hidden">
-      {/* Floating Menu Button */}
-      <button 
-        onClick={() => setIsMenuOpen(true)}
-        className="fixed top-[calc(1rem+env(safe-area-inset-top))] right-4 z-30 p-2 bg-white/80 backdrop-blur-sm rounded-full shadow-md border border-gray-100 text-gray-600 hover:text-red-600 transition-colors"
-      >
-        <Menu className="h-6 w-6" />
-      </button>
-
       <div ref={cardRef} className="flex-1 w-full flex flex-col items-center justify-start text-center overflow-hidden p-4 sm:p-6 md:p-8 pt-[calc(1rem+env(safe-area-inset-top))] bg-white border-none">
         <div className="h-6 sm:h-10 md:h-14" />
         <div className="bg-red-600 p-4 sm:p-6 rounded-full shadow-lg mb-6 sm:mb-10">
@@ -160,6 +152,7 @@ const EmergencyPage = () => {
         onBack={() => navigate(-1)} 
         onShare={handleShare} 
         onDownload={handleDownload} 
+        onToggleMenu={() => setIsMenuOpen(true)}
         onSave={handleSave} 
         isSharing={isSharing} 
         isDownloading={isDownloading} 
