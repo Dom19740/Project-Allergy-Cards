@@ -8,7 +8,9 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.net.Uri;
+import android.view.View;
 import android.widget.RemoteViews;
+import org.json.JSONArray;
 import org.json.JSONObject;
 
 public class AllergyWidgetProvider extends AppWidgetProvider {
@@ -28,15 +30,35 @@ public class AllergyWidgetProvider extends AppWidgetProvider {
     static void updateAppWidget(Context context, AppWidgetManager appWidgetManager, int appWidgetId) {
         RemoteViews views = new RemoteViews(context.getPackageName(), R.layout.allergy_widget);
 
+        SharedPreferences prefs = context.getSharedPreferences("CapacitorStorage", Context.MODE_PRIVATE);
+        
         // Emergency button text
         try {
-            SharedPreferences prefs = context.getSharedPreferences("CapacitorStorage", Context.MODE_PRIVATE);
             String emergencyCardJson = prefs.getString("savedEmergencyCard", null);
             if (emergencyCardJson != null) {
                 JSONObject obj = new JSONObject(emergencyCardJson);
                 String langCode = obj.optString("languageCode", "").split("-")[0].toUpperCase();
                 if (!langCode.isEmpty()) {
                     views.setTextViewText(R.id.emergency_text, "EMERGENCY (" + langCode + ")");
+                }
+            }
+        } catch (Exception e) {}
+
+        // Handle Dots
+        try {
+            String savedCardsJson = prefs.getString("savedAllergyCards", "[]");
+            JSONArray array = new JSONArray(savedCardsJson);
+            int count = array.length();
+            int[] dotIds = {R.id.widget_dot_0, R.id.widget_dot_1, R.id.widget_dot_2};
+            
+            for (int i = 0; i < 3; i++) {
+                if (i < count) {
+                    views.setViewVisibility(dotIds[i], View.VISIBLE);
+                    // Note: Real-time scroll tracking is not supported in standard Android widgets,
+                    // so we show the dots as a count indicator.
+                    views.setImageViewResource(dotIds[i], R.drawable.dot_inactive);
+                } else {
+                    views.setViewVisibility(dotIds[i], View.GONE);
                 }
             }
         } catch (Exception e) {}
@@ -75,6 +97,9 @@ public class AllergyWidgetProvider extends AppWidgetProvider {
             ComponentName componentName = new ComponentName(context, AllergyWidgetProvider.class);
             int[] ids = appWidgetManager.getAppWidgetIds(componentName);
             appWidgetManager.notifyAppWidgetViewDataChanged(ids, R.id.card_stack);
+            for (int id : ids) {
+                updateAppWidget(context, appWidgetManager, id);
+            }
         }
         super.onReceive(context, intent);
     }
