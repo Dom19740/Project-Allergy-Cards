@@ -73,7 +73,7 @@ const SaveCardDialog: React.FC<SaveCardDialogProps> = ({
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="sm:max-w-[425px] rounded-[32px] border-none shadow-2xl backdrop-blur-xl bg-white/90 dark:bg-gray-900/90 top-[35%] translate-y-[-35%] p-8">
+      <DialogContent className="w-[calc(100%-2rem)] sm:max-w-[425px] rounded-[32px] border-none shadow-2xl bg-white dark:bg-gray-900 top-[35%] translate-y-[-35%] p-8 mx-auto">
         <DialogHeader>
           <DialogTitle className="text-2xl font-bold text-gray-900 dark:text-white">
             {isEmergency ? 'Save Emergency Card' : 'Save Allergy Card'}
