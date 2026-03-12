@@ -31,55 +31,16 @@
         </LinearLayout>
     </RelativeLayout>
 
-    <LinearLayout
+    <!-- ListView is the most reliable scrolling collection for widgets -->
+    <ListView
+        android:id="@+id/card_stack"
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:layout_weight="1"
-        android:orientation="horizontal">
-
-        <ListView
-            android:id="@+id/card_stack"
-            android:layout_width="0dp"
-            android:layout_height="match_parent"
-            android:layout_weight="1"
-            android:divider="@android:color/transparent"
-            android:dividerHeight="8dp" />
-
-        <!-- Vertical Dots Container -->
-        <LinearLayout
-            android:id="@+id/widget_dots_container"
-            android:layout_width="wrap_content"
-            android:layout_height="match_parent"
-            android:layout_marginLeft="8dp"
-            android:gravity="center_horizontal|top"
-            android:orientation="vertical"
-            android:paddingTop="12dp">
-            
-            <ImageView
-                android:id="@+id/widget_dot_0"
-                android:layout_width="8dp"
-                android:layout_height="8dp"
-                android:layout_marginBottom="4dp"
-                android:src="@drawable/dot_inactive"
-                android:visibility="gone" />
-                
-            <ImageView
-                android:id="@+id/widget_dot_1"
-                android:layout_width="8dp"
-                android:layout_height="8dp"
-                android:layout_marginBottom="4dp"
-                android:src="@drawable/dot_inactive"
-                android:visibility="gone" />
-                
-            <ImageView
-                android:id="@+id/widget_dot_2"
-                android:layout_width="8dp"
-                android:layout_height="8dp"
-                android:layout_marginBottom="4dp"
-                android:src="@drawable/dot_inactive"
-                android:visibility="gone" />
-        </LinearLayout>
-    </LinearLayout>
+        android:divider="@android:color/transparent"
+        android:dividerHeight="8dp"
+        android:layout_marginTop="4dp"
+        android:layout_marginBottom="4dp" />
 
     <TextView
         android:id="@+id/footer"
