@@ -72,7 +72,7 @@ const SavedCardsList = () => {
       `}} />
       
       <div className="flex items-center justify-between px-8 mb-2">
-        <h3 className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">
+        <h3 className="text-[10px] font-medium text-gray-400 uppercase tracking-widest">
           Saved Cards
         </h3>
         <div className="flex gap-1.5">
@@ -97,30 +97,30 @@ const SavedCardsList = () => {
           <div key={card.id} className="flex-shrink-0 w-full flex justify-center px-6 snap-center">
             <Card 
               onClick={() => handleLoad(card)}
-              className="w-full max-w-[320px] bg-white dark:bg-gray-800 border-gray-200 dark:border-gray-700 shadow-lg hover:shadow-xl transition-all active:scale-95 cursor-pointer overflow-hidden rounded-2xl"
+              className="w-full max-w-[320px] bg-white dark:bg-gray-800 border-gray-200 dark:border-gray-700 shadow-md hover:shadow-lg transition-all active:scale-95 cursor-pointer overflow-hidden rounded-xl"
             >
-              <CardContent className="p-5 flex flex-col">
-                <div className="flex justify-between items-start mb-3">
-                  <div className="bg-red-50 dark:bg-red-900/20 px-2 py-1 rounded text-[10px] font-bold text-red-600 dark:text-red-400 uppercase">
+              <CardContent className="p-4 flex flex-col">
+                <div className="flex justify-between items-start mb-2">
+                  <div className="bg-red-50 dark:bg-red-900/20 px-2 py-0.5 rounded text-[10px] font-medium text-red-600 dark:text-red-400 uppercase">
                     {card.languageCode}
                   </div>
                   <Button
                     variant="ghost"
                     size="icon"
                     onClick={(e) => handleDelete(e, card.id, card.name)}
-                    className="h-8 w-8 text-gray-400 hover:text-red-500 hover:bg-red-50 dark:hover:bg-red-900/20"
+                    className="h-7 w-7 text-gray-400 hover:text-red-500 hover:bg-red-50 dark:hover:bg-red-900/20"
                   >
-                    <Trash2 className="h-4 w-4" />
+                    <Trash2 className="h-3.5 w-3.5" />
                   </Button>
                 </div>
                 
                 <div>
-                  <h4 className="text-xl font-bold text-gray-800 dark:text-gray-100 line-clamp-1">
+                  <h4 className="text-lg text-gray-800 dark:text-gray-100 line-clamp-1">
                     {card.name}
                   </h4>
-                  <div className="flex items-center text-[11px] text-gray-500 dark:text-gray-400 mt-1">
-                    <Clock className="w-3.5 h-3.5 mr-1.5" />
-                    Created on {new Date(card.createdAt).toLocaleDateString()}
+                  <div className="flex items-center text-[10px] text-gray-500 dark:text-gray-400 mt-0.5">
+                    <Clock className="w-3 h-3 mr-1" />
+                    {new Date(card.createdAt).toLocaleDateString()}
                   </div>
                 </div>
               </CardContent>
