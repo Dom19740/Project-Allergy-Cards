@@ -59,6 +59,13 @@ const SaveCardDialog: React.FC<SaveCardDialogProps> = ({
     onClose();
   };
 
+  const handleKeyDown = (e: React.KeyboardEvent) => {
+    if (e.key === 'Enter') {
+      e.preventDefault();
+      handleSave();
+    }
+  };
+
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
       <DialogContent className="sm:max-w-[425px]">
@@ -72,6 +79,7 @@ const SaveCardDialog: React.FC<SaveCardDialogProps> = ({
               id="name"
               value={cardName}
               onChange={(e) => setCardName(e.target.value)}
+              onKeyDown={handleKeyDown}
               placeholder="e.g. My Thai Card"
               autoFocus
             />
