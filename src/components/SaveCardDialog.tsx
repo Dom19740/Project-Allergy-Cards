@@ -16,6 +16,7 @@ interface SaveCardDialogProps {
   selectedAllergens: SelectedAllergens;
   customMessages: CustomMessages;
   translatedContent: TranslatedContent;
+  isEmergency?: boolean; // New prop to identify emergency card saving
 }
 
 const SaveCardDialog: React.FC<SaveCardDialogProps> = ({
@@ -24,9 +25,10 @@ const SaveCardDialog: React.FC<SaveCardDialogProps> = ({
   languageCode,
   selectedAllergens,
   customMessages,
-  translatedContent
+  translatedContent,
+  isEmergency = false
 }) => {
-  const [cardName, setCardName] = useState('');
+  const [cardName, setCardName] = useState(isEmergency ? 'Emergency Card' : '');
 
   const handleSave = async () => {
     if (!cardName.trim()) {
@@ -34,15 +36,8 @@ const SaveCardDialog: React.FC<SaveCardDialogProps> = ({
       return;
     }
 
-    const savedCards = await storage.get<SavedCard[]>(STORAGE_KEYS.SAVED_CARDS) || [];
-
-    if (savedCards.length >= 3) {
-      toast.error("You can only save up to 3 cards. Please delete one to save a new one.");
-      return;
-    }
-
     const newCard: SavedCard = {
-      id: crypto.randomUUID(),
+      id: isEmergency ? 'emergency-slot' : crypto.randomUUID(),
       name: cardName.trim(),
       languageCode,
       selectedAllergens,
@@ -51,10 +46,20 @@ const SaveCardDialog: React.FC<SaveCardDialogProps> = ({
       createdAt: Date.now()
     };
 
-    const updatedCards = [...savedCards, newCard];
-    await storage.set(STORAGE_KEYS.SAVED_CARDS, updatedCards);
+    if (isEmergency) {
+      await storage.set(STORAGE_KEYS.SAVED_EMERGENCY_CARD, newCard);
+      toast.success("Emergency card saved successfully!");
+    } else {
+      const savedCards = await storage.get<SavedCard[]>(STORAGE_KEYS.SAVED_CARDS) || [];
+      if (savedCards.length >= 3) {
+        toast.error("You can only save up to 3 cards. Please delete one to save a new one.");
+        return;
+      }
+      const updatedCards = [...savedCards, newCard];
+      await storage.set(STORAGE_KEYS.SAVED_CARDS, updatedCards);
+      toast.success(`Card "${cardName}" saved successfully!`);
+    }
     
-    toast.success(`Card "${cardName}" saved successfully!`);
     setCardName('');
     onClose();
   };
@@ -70,7 +75,7 @@ const SaveCardDialog: React.FC<SaveCardDialogProps> = ({
     <Dialog open={isOpen} onOpenChange={onClose}>
       <DialogContent className="sm:max-w-[425px]">
         <DialogHeader>
-          <DialogTitle>Save Allergy Card</DialogTitle>
+          <DialogTitle>{isEmergency ? 'Save Emergency Card' : 'Save Allergy Card'}</DialogTitle>
         </DialogHeader>
         <div className="grid gap-4 py-4">
           <div className="grid gap-2">
@@ -80,7 +85,7 @@ const SaveCardDialog: React.FC<SaveCardDialogProps> = ({
               value={cardName}
               onChange={(e) => setCardName(e.target.value)}
               onKeyDown={handleKeyDown}
-              placeholder="e.g. My Thai Card"
+              placeholder={isEmergency ? "Emergency Card" : "e.g. My Thai Card"}
               autoFocus
             />
           </div>

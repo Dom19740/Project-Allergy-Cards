@@ -36,6 +36,20 @@ public class WidgetFactory implements RemoteViewsService.RemoteViewsFactory {
         cardItems.clear();
         try {
             SharedPreferences prefs = context.getSharedPreferences("CapacitorStorage", Context.MODE_PRIVATE);
+            
+            // Load Emergency Card first
+            String emergencyCardJson = prefs.getString("savedEmergencyCard", null);
+            if (emergencyCardJson != null) {
+                JSONObject obj = new JSONObject(emergencyCardJson);
+                cardItems.add(new CardItem(
+                        obj.getString("id"),
+                        obj.getString("name"),
+                        obj.getString("languageCode"),
+                        true
+                ));
+            }
+
+            // Load Standard Cards
             String savedCardsJson = prefs.getString("savedAllergyCards", null);
             if (savedCardsJson != null) {
                 JSONArray jsonArray = new JSONArray(savedCardsJson);
@@ -44,7 +58,8 @@ public class WidgetFactory implements RemoteViewsService.RemoteViewsFactory {
                     cardItems.add(new CardItem(
                             obj.getString("id"),
                             obj.getString("name"),
-                            obj.getString("languageCode")
+                            obj.getString("languageCode"),
+                            false
                     ));
                 }
             }
@@ -69,11 +84,15 @@ public class WidgetFactory implements RemoteViewsService.RemoteViewsFactory {
 
         CardItem item = cardItems.get(position);
         RemoteViews views = new RemoteViews(context.getPackageName(), R.layout.widget_item);
-        views.setTextViewText(R.id.card_name, item.name);
+        
+        String displayName = item.isEmergency ? "⚠️ " + item.name : item.name;
+        views.setTextViewText(R.id.card_name, displayName);
         views.setTextViewText(R.id.lang_code, item.langCode.toUpperCase());
 
         Bundle extras = new Bundle();
         extras.putString(AllergyWidgetProvider.EXTRA_CARD_ID, item.id);
+        extras.putBoolean("isEmergency", item.isEmergency);
+        
         Intent fillInIntent = new Intent();
         fillInIntent.putExtras(extras);
         views.setOnClickFillInIntent(R.id.card_name, fillInIntent);
@@ -83,34 +102,28 @@ public class WidgetFactory implements RemoteViewsService.RemoteViewsFactory {
     }
 
     @Override
-    public RemoteViews getLoadingView() {
-        return null;
-    }
+    public RemoteViews getLoadingView() { return null; }
 
     @Override
-    public int getViewTypeCount() {
-        return 1;
-    }
+    public int getViewTypeCount() { return 1; }
 
     @Override
-    public long getItemId(int position) {
-        return position;
-    }
+    public long getItemId(int position) { return position; }
 
     @Override
-    public boolean hasStableIds() {
-        return true;
-    }
+    public boolean hasStableIds() { return true; }
 
     private static class CardItem {
         String id;
         String name;
         String langCode;
+        boolean isEmergency;
 
-        CardItem(String id, String name, String langCode) {
+        CardItem(String id, String name, String langCode, boolean isEmergency) {
             this.id = id;
             this.name = name;
             this.langCode = langCode;
+            this.isEmergency = isEmergency;
         }
     }
 }
