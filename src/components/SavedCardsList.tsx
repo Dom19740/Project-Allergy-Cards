@@ -114,11 +114,11 @@ const SavedCardsList = () => {
                   </Button>
                 </div>
                 
-                <div>
+                <div className="text-center">
                   <h4 className="text-lg text-gray-800 dark:text-gray-100 line-clamp-1">
                     {card.name}
                   </h4>
-                  <div className="flex items-center text-[10px] text-gray-500 dark:text-gray-400 mt-0.5">
+                  <div className="flex items-center justify-center text-[10px] text-gray-500 dark:text-gray-400 mt-0.5">
                     <Clock className="w-3 h-3 mr-1" />
                     {new Date(card.createdAt).toLocaleDateString()}
                   </div>
