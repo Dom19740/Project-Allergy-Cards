@@ -42,9 +42,9 @@ public class WidgetFactory implements RemoteViewsService.RemoteViewsFactory {
             if (emergencyCardJson != null) {
                 JSONObject obj = new JSONObject(emergencyCardJson);
                 cardItems.add(new CardItem(
-                        obj.optString("id", "emergency-slot"),
-                        obj.optString("name", "Emergency Card"),
-                        obj.optString("languageCode", "EN"),
+                        obj.getString("id"),
+                        obj.getString("name"),
+                        obj.getString("languageCode"),
                         true
                 ));
             }
@@ -56,9 +56,9 @@ public class WidgetFactory implements RemoteViewsService.RemoteViewsFactory {
                 for (int i = 0; i < Math.min(jsonArray.length(), 3); i++) {
                     JSONObject obj = jsonArray.getJSONObject(i);
                     cardItems.add(new CardItem(
-                            obj.optString("id", ""),
-                            obj.optString("name", "Allergy Card"),
-                            obj.optString("languageCode", "EN"),
+                            obj.getString("id"),
+                            obj.getString("name"),
+                            obj.getString("languageCode"),
                             false
                     ));
                 }
@@ -83,11 +83,11 @@ public class WidgetFactory implements RemoteViewsService.RemoteViewsFactory {
         if (position >= cardItems.size()) return null;
 
         CardItem item = cardItems.get(position);
-        RemoteViews views = new RemoteViews(context.getPackageName(), R.layout.widget_card_item);
+        RemoteViews views = new RemoteViews(context.getPackageName(), R.layout.widget_item);
         
         String displayName = item.isEmergency ? "⚠️ " + item.name : item.name;
         views.setTextViewText(R.id.card_name, displayName);
-        views.setTextViewText(R.id.card_lang, item.langCode.toUpperCase());
+        views.setTextViewText(R.id.lang_code, item.langCode.toUpperCase());
 
         Bundle extras = new Bundle();
         extras.putString(AllergyWidgetProvider.EXTRA_CARD_ID, item.id);
@@ -95,7 +95,8 @@ public class WidgetFactory implements RemoteViewsService.RemoteViewsFactory {
         
         Intent fillInIntent = new Intent();
         fillInIntent.putExtras(extras);
-        views.setOnClickFillInIntent(R.id.card_container, fillInIntent);
+        views.setOnClickFillInIntent(R.id.card_name, fillInIntent);
+        views.setOnClickFillInIntent(R.id.lang_code, fillInIntent);
 
         return views;
     }
