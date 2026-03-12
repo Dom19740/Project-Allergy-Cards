@@ -42,9 +42,9 @@ public class WidgetFactory implements RemoteViewsService.RemoteViewsFactory {
             if (emergencyCardJson != null) {
                 JSONObject obj = new JSONObject(emergencyCardJson);
                 cardItems.add(new CardItem(
-                        obj.getString("id"),
-                        obj.getString("name"),
-                        obj.getString("languageCode"),
+                        obj.optString("id", "emergency-slot"),
+                        obj.optString("name", "Emergency Card"),
+                        obj.optString("languageCode", "EN"),
                         true
                 ));
             }
@@ -56,9 +56,9 @@ public class WidgetFactory implements RemoteViewsService.RemoteViewsFactory {
                 for (int i = 0; i < Math.min(jsonArray.length(), 3); i++) {
                     JSONObject obj = jsonArray.getJSONObject(i);
                     cardItems.add(new CardItem(
-                            obj.getString("id"),
-                            obj.getString("name"),
-                            obj.getString("languageCode"),
+                            obj.optString("id", ""),
+                            obj.optString("name", "Allergy Card"),
+                            obj.optString("languageCode", "EN"),
                             false
                     ));
                 }
@@ -83,7 +83,6 @@ public class WidgetFactory implements RemoteViewsService.RemoteViewsFactory {
         if (position >= cardItems.size()) return null;
 
         CardItem item = cardItems.get(position);
-        // Use the widget_card_item layout we created
         RemoteViews views = new RemoteViews(context.getPackageName(), R.layout.widget_card_item);
         
         String displayName = item.isEmergency ? "⚠️ " + item.name : item.name;
@@ -96,7 +95,6 @@ public class WidgetFactory implements RemoteViewsService.RemoteViewsFactory {
         
         Intent fillInIntent = new Intent();
         fillInIntent.putExtras(extras);
-        // Set the fill-in intent for the entire container
         views.setOnClickFillInIntent(R.id.card_container, fillInIntent);
 
         return views;

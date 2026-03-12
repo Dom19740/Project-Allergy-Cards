@@ -5,7 +5,7 @@
     android:padding="8dp"
     android:background="@drawable/widget_background">
 
-    <!-- Header with Logo and Emergency Button -->
+    <!-- Header with Logo and Emergency Button (using TextView for better compatibility) -->
     <LinearLayout
         android:id="@+id/header_layout"
         android:layout_width="match_parent"
@@ -15,8 +15,8 @@
         android:layout_marginBottom="8dp">
 
         <ImageView
-            android:layout_width="40dp"
-            android:layout_height="40dp"
+            android:layout_width="32dp"
+            android:layout_height="32dp"
             android:src="@drawable/logo_main"
             android:contentDescription="App Logo" />
 
@@ -25,16 +25,18 @@
             android:layout_height="0dp"
             android:layout_weight="1" />
 
-        <Button
+        <TextView
             android:id="@+id/btn_emergency"
             android:layout_width="wrap_content"
-            android:layout_height="40dp"
+            android:layout_height="36dp"
             android:text="EMERGENCY"
             android:background="@drawable/emergency_button_bg"
             android:textColor="#FFFFFF"
             android:textStyle="bold"
-            android:paddingLeft="16dp"
-            android:paddingRight="16dp" />
+            android:gravity="center"
+            android:paddingLeft="12dp"
+            android:paddingRight="12dp"
+            android:textSize="12sp" />
     </LinearLayout>
 
     <!-- Horizontal StackView for Cards -->
@@ -43,7 +45,7 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:layout_below="@id/header_layout"
-        android:layout_above="@+id/dot_indicator_container"
+        android:layout_above="@+id/footer_text"
         android:animateFirstView="true"
         android:loopViews="true" />
 
@@ -53,20 +55,20 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:layout_below="@id/header_layout"
-        android:layout_above="@+id/dot_indicator_container"
+        android:layout_above="@+id/footer_text"
         android:gravity="center"
         android:text="No saved cards"
         android:textColor="#9CA3AF"
         android:visibility="gone" />
 
-    <!-- Dot Indicator Container -->
-    <LinearLayout
-        android:id="@+id/dot_indicator_container"
+    <TextView
+        android:id="@+id/footer_text"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_alignParentBottom="true"
         android:layout_centerHorizontal="true"
-        android:orientation="horizontal"
-        android:padding="4dp" />
+        android:text="Simple Allergy Alert"
+        android:textColor="#D1D5DB"
+        android:textSize="10sp" />
 
 </RelativeLayout>
