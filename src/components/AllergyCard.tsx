@@ -80,7 +80,7 @@ const AllergyCard: React.FC<AllergyCardProps> = ({ languageCode, selectedAllerge
       }
     };
     loadData();
-  }, []);
+  }, [languageCode, selectedAllergens]); // Re-load data when props change
 
   useEffect(() => {
     const translateAllContent = async () => {
