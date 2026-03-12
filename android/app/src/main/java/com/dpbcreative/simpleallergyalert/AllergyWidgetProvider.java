@@ -31,30 +31,23 @@ public class AllergyWidgetProvider extends AppWidgetProvider {
         PendingIntent emergencyPendingIntent = PendingIntent.getActivity(context, 0, emergencyIntent, PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_IMMUTABLE);
         views.setOnClickPendingIntent(R.id.emergency_container, emergencyPendingIntent);
 
-        // Set up the intent for the Refresh button
-        Intent refreshIntent = new Intent(context, AllergyWidgetProvider.class);
-        refreshIntent.setAction(ACTION_REFRESH);
-        refreshIntent.putExtra(AppWidgetManager.EXTRA_APPWIDGET_ID, appWidgetId);
-        PendingIntent refreshPendingIntent = PendingIntent.getBroadcast(context, appWidgetId, refreshIntent, PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_IMMUTABLE);
-        views.setOnClickPendingIntent(R.id.refresh_button, refreshPendingIntent);
-
         // Set up the intent for the footer (open app)
         Intent mainIntent = new Intent(context, MainActivity.class);
         PendingIntent mainPendingIntent = PendingIntent.getActivity(context, 0, mainIntent, PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_IMMUTABLE);
         views.setOnClickPendingIntent(R.id.footer, mainPendingIntent);
 
-        // Set up the collection (ListView)
+        // Set up the collection (StackView)
         Intent serviceIntent = new Intent(context, WidgetService.class);
         serviceIntent.putExtra(AppWidgetManager.EXTRA_APPWIDGET_ID, appWidgetId);
         serviceIntent.setData(Uri.parse(serviceIntent.toUri(Intent.URI_INTENT_SCHEME)));
-        views.setRemoteAdapter(R.id.card_list, serviceIntent);
-        views.setEmptyView(R.id.card_list, R.id.footer);
+        views.setRemoteAdapter(R.id.card_stack, serviceIntent);
+        views.setEmptyView(R.id.card_stack, R.id.footer);
 
         // Set up the template for list item clicks
         Intent clickIntent = new Intent(context, AllergyWidgetProvider.class);
         clickIntent.setAction(ACTION_OPEN_CARD);
         PendingIntent clickPendingIntent = PendingIntent.getBroadcast(context, 0, clickIntent, PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_MUTABLE);
-        views.setPendingIntentTemplate(R.id.card_list, clickPendingIntent);
+        views.setPendingIntentTemplate(R.id.card_stack, clickPendingIntent);
 
         appWidgetManager.updateAppWidget(appWidgetId, views);
     }
@@ -74,8 +67,8 @@ public class AllergyWidgetProvider extends AppWidgetProvider {
             ComponentName componentName = new ComponentName(context, AllergyWidgetProvider.class);
             int[] ids = appWidgetManager.getAppWidgetIds(componentName);
             
-            // Notify the ListView to refresh its data for all widgets
-            appWidgetManager.notifyAppWidgetViewDataChanged(ids, R.id.card_list);
+            // Notify the StackView to refresh its data for all widgets
+            appWidgetManager.notifyAppWidgetViewDataChanged(ids, R.id.card_stack);
             
             // Also trigger a full layout update for each widget
             for (int id : ids) {
