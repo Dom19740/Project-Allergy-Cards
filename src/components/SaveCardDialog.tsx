@@ -16,7 +16,7 @@ interface SaveCardDialogProps {
   selectedAllergens: SelectedAllergens;
   customMessages: CustomMessages;
   translatedContent: TranslatedContent;
-  isEmergency?: boolean; // New prop to identify emergency card saving
+  isEmergency?: boolean;
 }
 
 const SaveCardDialog: React.FC<SaveCardDialogProps> = ({
@@ -73,13 +73,17 @@ const SaveCardDialog: React.FC<SaveCardDialogProps> = ({
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="sm:max-w-[425px]">
+      <DialogContent className="sm:max-w-[425px] rounded-[32px] border-none shadow-2xl backdrop-blur-xl bg-white/90 dark:bg-gray-900/90 top-[35%] translate-y-[-35%] p-8">
         <DialogHeader>
-          <DialogTitle>{isEmergency ? 'Save Emergency Card' : 'Save Allergy Card'}</DialogTitle>
+          <DialogTitle className="text-2xl font-bold text-gray-900 dark:text-white">
+            {isEmergency ? 'Save Emergency Card' : 'Save Allergy Card'}
+          </DialogTitle>
         </DialogHeader>
-        <div className="grid gap-4 py-4">
-          <div className="grid gap-2">
-            <Label htmlFor="name">Card Name</Label>
+        <div className="grid gap-6 py-4">
+          <div className="grid gap-3">
+            <Label htmlFor="name" className="text-sm font-semibold text-gray-500 uppercase tracking-wider">
+              Card Name
+            </Label>
             <Input
               id="name"
               value={cardName}
@@ -87,12 +91,24 @@ const SaveCardDialog: React.FC<SaveCardDialogProps> = ({
               onKeyDown={handleKeyDown}
               placeholder={isEmergency ? "Emergency Card" : "e.g. My Thai Card"}
               autoFocus
+              className="h-12 rounded-2xl border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800 focus:ring-2 focus:ring-red-500 transition-all"
             />
           </div>
         </div>
-        <DialogFooter>
-          <Button variant="outline" onClick={onClose}>Cancel</Button>
-          <Button onClick={handleSave} className="bg-red-600 hover:bg-red-700 text-white">Save Card</Button>
+        <DialogFooter className="flex flex-col sm:flex-row gap-3 mt-2">
+          <Button 
+            variant="ghost" 
+            onClick={onClose}
+            className="h-12 rounded-2xl font-semibold text-gray-500 hover:bg-gray-100 dark:hover:bg-gray-800"
+          >
+            Cancel
+          </Button>
+          <Button 
+            onClick={handleSave} 
+            className="h-12 rounded-2xl bg-red-600 hover:bg-red-700 text-white font-bold shadow-lg shadow-red-200 dark:shadow-none transition-all active:scale-95"
+          >
+            Save Card
+          </Button>
         </DialogFooter>
       </DialogContent>
     </Dialog>
