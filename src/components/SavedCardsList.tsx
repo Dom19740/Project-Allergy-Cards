@@ -89,14 +89,14 @@ const SavedCardsList = () => {
 
   return (
     <div className="w-full flex flex-col items-start">
-      {/* Header with Title and Dots */}
-      <div className="w-full mb-4 px-8 flex flex-col items-start gap-2">
+      {/* Header with Title and Dots aligned in a row */}
+      <div className="w-full mb-4 px-8 flex flex-row items-center justify-between">
         <h3 className="text-[10px] font-medium text-gray-400 uppercase tracking-widest">
           Saved Cards
         </h3>
         
-        {/* Dot Indicators moved above the cards */}
-        <div className="flex justify-start gap-1.5">
+        {/* Dot Indicators moved to the top right */}
+        <div className="flex justify-end gap-1.5">
           {allCards.map((_, i) => (
             <div 
               key={i} 
