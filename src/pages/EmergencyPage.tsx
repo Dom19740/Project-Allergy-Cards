@@ -92,11 +92,7 @@ const EmergencyPage = () => {
     if (!cardRef.current) return;
     setIsSharing(true);
     const shortCode = (langCode || 'EN').split('-')[0].toUpperCase();
-    const success = await shareCard(
-      cardRef.current, 
-      `Emergency Alert (${shortCode})`, 
-      `Emergency Alert (${shortCode}) - made with Simple Allergy Alert`
-    );
+    const success = await shareCard(cardRef.current, `Emergency Alert (${shortCode})`, `Emergency Alert (${shortCode})`);
     if (!success) toast.error("Failed to share emergency message.");
     setIsSharing(false);
   };

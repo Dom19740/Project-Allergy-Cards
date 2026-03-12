@@ -32,27 +32,14 @@ public class AllergyWidgetProvider extends AppWidgetProvider {
         try {
             SharedPreferences prefs = context.getSharedPreferences("CapacitorStorage", Context.MODE_PRIVATE);
             String emergencyCardJson = prefs.getString("savedEmergencyCard", null);
-            String langCode = "";
-            
             if (emergencyCardJson != null) {
                 JSONObject obj = new JSONObject(emergencyCardJson);
-                langCode = obj.optString("languageCode", "").split("-")[0].toUpperCase();
-            } else {
-                // Fallback to last used emergency language if card isn't saved
-                String lastLang = prefs.getString("lastEmergencyLangCode", "");
-                if (!lastLang.isEmpty()) {
-                    langCode = lastLang.split("-")[0].toUpperCase();
+                String langCode = obj.optString("languageCode", "").split("-")[0].toUpperCase();
+                if (!langCode.isEmpty()) {
+                    views.setTextViewText(R.id.emergency_text, "EMERGENCY (" + langCode + ")");
                 }
             }
-            
-            if (!langCode.isEmpty()) {
-                views.setTextViewText(R.id.emergency_text, "EMERGENCY (" + langCode + ")");
-            } else {
-                views.setTextViewText(R.id.emergency_text, "EMERGENCY");
-            }
-        } catch (Exception e) {
-            views.setTextViewText(R.id.emergency_text, "EMERGENCY");
-        }
+        } catch (Exception e) {}
 
         // Emergency Intent
         Intent emergencyIntent = new Intent(Intent.ACTION_VIEW, Uri.parse("simpleallergyalert://emergency"));
