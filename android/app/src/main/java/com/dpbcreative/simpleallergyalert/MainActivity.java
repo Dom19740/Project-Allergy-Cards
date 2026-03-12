@@ -7,14 +7,14 @@ import com.getcapacitor.BridgeActivity;
 
 public class MainActivity extends BridgeActivity {
     @Override
-    protected void onPause() {
+    public void onPause() {
         super.onPause();
         // Trigger a widget refresh whenever the app is paused (e.g., user goes to home screen)
         triggerWidgetRefresh();
     }
 
     @Override
-    protected void onResume() {
+    public void onResume() {
         super.onResume();
         // Also refresh when returning to the app to ensure consistency
         triggerWidgetRefresh();
