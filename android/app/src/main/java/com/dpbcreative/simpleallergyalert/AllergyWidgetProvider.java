@@ -38,8 +38,12 @@ public class AllergyWidgetProvider extends AppWidgetProvider {
                 if (!langCode.isEmpty()) {
                     views.setTextViewText(R.id.emergency_text, "EMERGENCY (" + langCode + ")");
                 }
+            } else {
+                views.setTextViewText(R.id.emergency_text, "EMERGENCY");
             }
-        } catch (Exception e) {}
+        } catch (Exception e) {
+            views.setTextViewText(R.id.emergency_text, "EMERGENCY");
+        }
 
         // Emergency Intent
         Intent emergencyIntent = new Intent(Intent.ACTION_VIEW, Uri.parse("simpleallergyalert://emergency"));
@@ -74,7 +78,14 @@ public class AllergyWidgetProvider extends AppWidgetProvider {
         } else if (ACTION_REFRESH.equals(intent.getAction())) {
             ComponentName componentName = new ComponentName(context, AllergyWidgetProvider.class);
             int[] ids = appWidgetManager.getAppWidgetIds(componentName);
+            
+            // 1. Refresh the list of cards
             appWidgetManager.notifyAppWidgetViewDataChanged(ids, R.id.card_stack);
+            
+            // 2. Refresh the static UI (like the Emergency button text)
+            for (int id : ids) {
+                updateAppWidget(context, appWidgetManager, id);
+            }
         }
         super.onReceive(context, intent);
     }
