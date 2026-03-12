@@ -80,18 +80,16 @@ const AllergyCard: React.FC<AllergyCardProps> = ({ languageCode, selectedAllerge
       }
     };
     loadData();
-  }, [languageCode, selectedAllergens]); // Re-load data when props change
+  }, [languageCode, selectedAllergens]);
 
   useEffect(() => {
     const translateAllContent = async () => {
       const sessionTranslations = await storage.get<any>(STORAGE_KEYS.SESSION_TRANSLATIONS);
-      if (sessionTranslations) {
-        if (sessionTranslations.languageCode === languageCode) {
-          setTranslatedUIText(sessionTranslations.content.ui);
-          setTranslatedAllergens(sessionTranslations.content.allergens);
-          setEmergencyTranslations(sessionTranslations.content.emergency);
-          return;
-        }
+      if (sessionTranslations && sessionTranslations.languageCode === languageCode) {
+        setTranslatedUIText(sessionTranslations.content.ui);
+        setTranslatedAllergens(sessionTranslations.content.allergens);
+        setEmergencyTranslations(sessionTranslations.content.emergency);
+        return;
       }
 
       if (!languageCode || languageCode === 'en') {
@@ -166,24 +164,20 @@ const AllergyCard: React.FC<AllergyCardProps> = ({ languageCode, selectedAllerge
         setTranslatedAllergens(allergenTranslations);
       } catch (error) {
         console.error('Translation failed:', error);
-        toast.error("Translation failed. Please try again.");
       } finally {
         setIsTranslating(false);
       }
     };
 
     translateAllContent();
-  }, [languageCode, selectedAllergens, customMessages]);
+  }, [languageCode, selectedAllergens, customMessages, customAllergenTranslations]);
 
   const handleDownload = async () => {
     if (cardRef.current) {
       setIsDownloading(true);
       const success = await downloadCard(cardRef.current, `allergy-card-${languageCode}.png`);
-      if (success) {
-        toast.success("Allergy card saved to your device!");
-      } else {
-        toast.error("Failed to save card.");
-      }
+      if (success) toast.success("Allergy card saved to your device!");
+      else toast.error("Failed to save card.");
       setIsDownloading(false);
     }
   };
@@ -194,20 +188,13 @@ const AllergyCard: React.FC<AllergyCardProps> = ({ languageCode, selectedAllerge
       const shortCode = languageCode.split('-')[0].toUpperCase();
       const shareText = `My Allergy Alert Card (${shortCode})`;
       const success = await shareCard(cardRef.current, shareText, shareText);
-      if (!success) {
-        toast.error("Failed to share card.");
-      }
+      if (!success) toast.error("Failed to share card.");
       setIsSharing(false);
     }
   };
 
-  const handlePrint = () => {
-    window.print();
-  };
-
-  const handleEmergency = () => {
-    navigate(`/emergency/${languageCode}`);
-  };
+  const handlePrint = () => window.print();
+  const handleEmergency = () => navigate(`/emergency/${languageCode}`);
 
   const translatedAllergenList = selectedAllergens.map(allergen => 
     translatedAllergens[allergen] || allergen
@@ -218,17 +205,11 @@ const AllergyCard: React.FC<AllergyCardProps> = ({ languageCode, selectedAllerge
     .filter(Boolean) as typeof ALLERGEN_OPTIONS;
 
   let imageGridClasses = "";
-  if (allergensWithImages.length === 1) {
-    imageGridClasses = "grid-cols-1 grid-rows-1";
-  } else if (allergensWithImages.length === 2) {
-    imageGridClasses = "grid-cols-2 grid-rows-1";
-  } else if (allergensWithImages.length <= 4) {
-    imageGridClasses = "grid-cols-2 grid-rows-2";
-  } else if (allergensWithImages.length <= 6) {
-    imageGridClasses = "grid-cols-3 grid-rows-2";
-  } else {
-    imageGridClasses = "grid-cols-3 grid-rows-3";
-  }
+  if (allergensWithImages.length === 1) imageGridClasses = "grid-cols-1 grid-rows-1";
+  else if (allergensWithImages.length === 2) imageGridClasses = "grid-cols-2 grid-rows-1";
+  else if (allergensWithImages.length <= 4) imageGridClasses = "grid-cols-2 grid-rows-2";
+  else if (allergensWithImages.length <= 6) imageGridClasses = "grid-cols-3 grid-rows-2";
+  else imageGridClasses = "grid-cols-3 grid-rows-3";
 
   if (isTranslating) {
     return (
@@ -254,58 +235,39 @@ const AllergyCard: React.FC<AllergyCardProps> = ({ languageCode, selectedAllerge
         className="flex-1 w-full flex flex-col items-center justify-start text-center overflow-hidden p-4 sm:p-6 md:p-8 pt-[calc(1rem+env(safe-area-inset-top))] bg-white border-none"
       >
         <div className="h-6 sm:h-10 md:h-14" />
-
         <h1 className="text-2xl sm:text-4xl md:text-5xl lg:text-6xl font-black leading-tight mb-4 sm:mb-8 md:mb-12 text-red-600 uppercase tracking-tighter whitespace-nowrap">
           {translatedUIText.allergyAlert}
         </h1>
-
         <p className="text-2xl sm:text-3xl md:text-4xl font-normal text-gray-800 mb-4 sm:mb-8 md:mb-12">
           {translatedUIText.iAmAllergicTo}
         </p>
-
         <div className="flex flex-wrap justify-center gap-1 sm:gap-2 mb-2 sm:mb-4">
           {translatedAllergenList.map((allergen, index) => (
-            <span
-              key={index}
-              className="bg-red-600 text-white px-3 py-1 sm:px-4 sm:py-2 rounded-full text-base sm:text-lg md:text-xl font-normal uppercase"
-            >
+            <span key={index} className="bg-red-600 text-white px-3 py-1 sm:px-4 sm:py-2 rounded-full text-base sm:text-lg md:text-xl font-normal uppercase">
               {allergen}
             </span>
           ))}
         </div>
-
         <p className="text-2xl sm:text-3xl md:text-4xl font-normal text-gray-800 mb-2 sm:mb-3 leading-tight max-w-2xl">
           {translatedUIText.theyMakeMeSick}
         </p>
-
         <p className="text-2xl sm:text-3xl md:text-4xl font-normal text-gray-600 italic mb-4 sm:mb-6">
           {translatedUIText.thankYou}
         </p>
-
         {allergensWithImages.length > 0 && (
           <div className="relative w-full max-w-[400px] aspect-square mx-auto flex-shrink min-h-0">
             <div className="absolute inset-0 flex items-center justify-center">
               <div className={`absolute inset-0 grid ${imageGridClasses} gap-1 sm:gap-2 items-center justify-items-center z-0 p-4`}>
                 {allergensWithImages.map((allergen) => (
                   <div key={allergen.id} className="w-full h-full flex items-center justify-center">
-                    <img
-                      src={allergen.image}
-                      alt={allergen.name}
-                      className="max-w-full max-h-full object-contain"
-                    />
+                    <img src={allergen.image} alt={allergen.name} className="max-w-full max-h-full object-contain" />
                   </div>
                 ))}
               </div>
-              
-              <img
-                src="/noentry.png"
-                alt="No entry"
-                className="absolute inset-0 w-full h-full object-contain z-10 opacity-90 pointer-events-none"
-              />
+              <img src="/noentry.png" alt="No entry" className="absolute inset-0 w-full h-full object-contain z-10 opacity-90 pointer-events-none" />
             </div>
           </div>
         )}
-
         <div className="mt-auto pt-2">
           <p className="text-[20px] sm:text-2xl text-gray-400 font-light mb-0">
             Translated to {getLanguageName(languageCode)}
@@ -315,7 +277,6 @@ const AllergyCard: React.FC<AllergyCardProps> = ({ languageCode, selectedAllerge
           </p>
         </div>
       </div>
-
       <CardActions 
         onShare={handleShare}
         onDownload={handleDownload}
@@ -326,18 +287,8 @@ const AllergyCard: React.FC<AllergyCardProps> = ({ languageCode, selectedAllerge
         isSharing={isSharing}
         isDownloading={isDownloading}
       />
-
-      <CardMenu 
-        isOpen={isMenuOpen} 
-        onClose={() => setIsMenuOpen(false)} 
-        onOpenDisclaimer={() => setIsDisclaimerOpen(true)}
-      />
-
-      <DisclaimerDialog 
-        isOpen={isDisclaimerOpen} 
-        onClose={() => setIsDisclaimerOpen(false)} 
-      />
-
+      <CardMenu isOpen={isMenuOpen} onClose={() => setIsMenuOpen(false)} onOpenDisclaimer={() => setIsDisclaimerOpen(true)} />
+      <DisclaimerDialog isOpen={isDisclaimerOpen} onClose={() => setIsDisclaimerOpen(false)} />
       {fullSelectedData && (
         <SaveCardDialog
           isOpen={isSaveDialogOpen}
@@ -348,20 +299,6 @@ const AllergyCard: React.FC<AllergyCardProps> = ({ languageCode, selectedAllerge
           translatedContent={currentTranslatedContent}
         />
       )}
-
-      <style dangerouslySetInnerHTML={{ __html: `
-        @media print {
-          body * { visibility: hidden; }
-          .print\\:shadow-none, .print\\:shadow-none * { visibility: visible; }
-          .print\\:shadow-none {
-            position: absolute;
-            left: 0;
-            top: 0;
-            width: 100%;
-            height: auto;
-          }
-        }
-      `}} />
     </div>
   );
 };

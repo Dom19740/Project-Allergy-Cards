@@ -71,15 +71,15 @@ public class AllergyWidgetProvider extends AppWidgetProvider {
                 context.startActivity(appIntent);
             }
         } else if (ACTION_REFRESH.equals(intent.getAction())) {
-            int appWidgetId = intent.getIntExtra(AppWidgetManager.EXTRA_APPWIDGET_ID, AppWidgetManager.INVALID_APPWIDGET_ID);
-            if (appWidgetId != AppWidgetManager.INVALID_APPWIDGET_ID) {
-                // Notify the ListView to refresh its data
-                appWidgetManager.notifyAppWidgetViewDataChanged(appWidgetId, R.id.card_list);
-            } else {
-                // Refresh all widgets if ID is invalid
-                ComponentName componentName = new ComponentName(context, AllergyWidgetProvider.class);
-                int[] ids = appWidgetManager.getAppWidgetIds(componentName);
-                appWidgetManager.notifyAppWidgetViewDataChanged(ids, R.id.card_list);
+            ComponentName componentName = new ComponentName(context, AllergyWidgetProvider.class);
+            int[] ids = appWidgetManager.getAppWidgetIds(componentName);
+            
+            // Notify the ListView to refresh its data for all widgets
+            appWidgetManager.notifyAppWidgetViewDataChanged(ids, R.id.card_list);
+            
+            // Also trigger a full layout update for each widget
+            for (int id : ids) {
+                updateAppWidget(context, appWidgetManager, id);
             }
         }
         super.onReceive(context, intent);
