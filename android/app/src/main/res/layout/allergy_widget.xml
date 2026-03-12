@@ -31,13 +31,15 @@
         </LinearLayout>
     </RelativeLayout>
 
-    <StackView
+    <!-- AdapterViewFlipper shows one card at a time without overlap -->
+    <AdapterViewFlipper
         android:id="@+id/card_stack"
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:layout_weight="1"
         android:animateLayoutChanges="true"
-        android:loopViews="true"
+        android:autoStart="false"
+        android:flipInterval="5000"
         android:layout_marginTop="4dp"
         android:layout_marginBottom="4dp" />
 
