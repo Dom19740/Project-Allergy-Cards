@@ -37,19 +37,7 @@ public class WidgetFactory implements RemoteViewsService.RemoteViewsFactory {
         try {
             SharedPreferences prefs = context.getSharedPreferences("CapacitorStorage", Context.MODE_PRIVATE);
             
-            // Load Emergency Card first
-            String emergencyCardJson = prefs.getString("savedEmergencyCard", null);
-            if (emergencyCardJson != null) {
-                JSONObject obj = new JSONObject(emergencyCardJson);
-                cardItems.add(new CardItem(
-                        obj.getString("id"),
-                        obj.getString("name"),
-                        obj.getString("languageCode"),
-                        true
-                ));
-            }
-
-            // Load Standard Cards
+            // Load Standard Cards only (Emergency card is now handled by the dedicated button)
             String savedCardsJson = prefs.getString("savedAllergyCards", null);
             if (savedCardsJson != null) {
                 JSONArray jsonArray = new JSONArray(savedCardsJson);
@@ -85,8 +73,7 @@ public class WidgetFactory implements RemoteViewsService.RemoteViewsFactory {
         CardItem item = cardItems.get(position);
         RemoteViews views = new RemoteViews(context.getPackageName(), R.layout.widget_item);
         
-        String displayName = item.isEmergency ? "⚠️ " + item.name : item.name;
-        views.setTextViewText(R.id.card_name, displayName);
+        views.setTextViewText(R.id.card_name, item.name);
         views.setTextViewText(R.id.lang_code, item.langCode.toUpperCase());
 
         Bundle extras = new Bundle();
