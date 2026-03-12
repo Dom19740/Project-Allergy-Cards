@@ -9,25 +9,19 @@
     <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginBottom="4dp">
+        android:layout_marginBottom="8dp">
 
-        <!-- Emergency Button with Icon -->
+        <!-- Emergency Button - Now Rounded and No Icon -->
         <LinearLayout
             android:id="@+id/emergency_container"
             android:layout_width="match_parent"
             android:layout_height="54dp"
             android:layout_toStartOf="@+id/refresh_button"
             android:layout_marginEnd="8dp"
-            android:background="@android:color/holo_red_dark"
+            android:background="@drawable/rounded_red_button"
             android:gravity="center"
             android:orientation="horizontal"
             android:padding="8dp">
-
-            <ImageView
-                android:layout_width="32dp"
-                android:layout_height="32dp"
-                android:layout_marginEnd="12dp"
-                android:src="@mipmap/ic_launcher" />
 
             <TextView
                 android:layout_width="wrap_content"
@@ -38,16 +32,17 @@
                 android:textStyle="bold" />
         </LinearLayout>
 
-        <!-- Refresh Button -->
+        <!-- Refresh Button - Now Circular and Light Gray -->
         <ImageButton
             android:id="@+id/refresh_button"
             android:layout_width="54dp"
             android:layout_height="54dp"
             android:layout_alignParentEnd="true"
-            android:background="@android:color/darker_gray"
-            android:padding="12dp"
+            android:background="@drawable/widget_refresh_bg"
+            android:padding="14dp"
             android:scaleType="fitCenter"
             android:src="@android:drawable/ic_menu_rotate"
+            android:tint="#4B5563"
             android:contentDescription="Refresh" />
     </RelativeLayout>
 
@@ -56,8 +51,8 @@
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:layout_weight="1"
-        android:divider="@android:color/darker_gray"
-        android:dividerHeight="0.5dp"
+        android:divider="@android:color/transparent"
+        android:dividerHeight="4dp"
         android:layout_marginTop="4dp"
         android:layout_marginBottom="4dp" />
 

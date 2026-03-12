@@ -3,8 +3,8 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardTitle } from '@/components/ui/card';
-import { Trash2, ExternalLink, Clock } from 'lucide-react';
+import { Card, CardContent } from '@/components/ui/card';
+import { Trash2, ExternalLink, Clock, ChevronRight } from 'lucide-react';
 import { SavedCard } from '@/lib/types';
 import { toast } from 'sonner';
 import { storage, STORAGE_KEYS } from '@/lib/storage';
@@ -23,7 +23,8 @@ const SavedCardsList = () => {
     loadCards();
   }, []);
 
-  const handleDelete = async (id: string, name: string) => {
+  const handleDelete = async (e: React.MouseEvent, id: string, name: string) => {
+    e.stopPropagation();
     const updatedCards = savedCards.filter(card => card.id !== id);
     await storage.set(STORAGE_KEYS.SAVED_CARDS, updatedCards);
     setSavedCards(updatedCards);
@@ -31,12 +32,10 @@ const SavedCardsList = () => {
   };
 
   const handleLoad = async (card: SavedCard) => {
-    // Set the current session data to match the saved card
     await storage.set(STORAGE_KEYS.SELECTED_ALLERGENS, card.selectedAllergens);
     await storage.set(STORAGE_KEYS.CUSTOM_MESSAGES, card.customMessages);
     await storage.set(STORAGE_KEYS.SELECTED_LANGUAGE, card.languageCode);
     
-    // Store the translated content for this session to enable offline use
     if (card.translatedContent) {
       await storage.set(STORAGE_KEYS.SESSION_TRANSLATIONS, {
         languageCode: card.languageCode,
@@ -55,49 +54,61 @@ const SavedCardsList = () => {
   }
 
   return (
-    <div className="w-full max-w-2xl mx-auto mt-12 mb-8 p-6 bg-gray-100 dark:bg-gray-800/60 rounded-2xl border border-gray-300 dark:border-gray-600 shadow-md">
-      <div className="flex items-center justify-center mb-6">
-        <h3 className="text-xl font-medium text-gray-800 dark:text-gray-100">
-          Your Saved Cards ({savedCards.length}/3)
+    <div className="w-full mt-6 mb-4">
+      <div className="flex items-center justify-between px-6 mb-3">
+        <h3 className="text-sm font-bold text-gray-400 uppercase tracking-wider">
+          Saved Cards ({savedCards.length}/3)
         </h3>
+        {savedCards.length > 1 && (
+          <div className="flex items-center text-xs text-gray-400 animate-pulse">
+            <span>Scroll</span>
+            <ChevronRight className="h-3 w-3 ml-1" />
+          </div>
+        )}
       </div>
       
-      <div className="grid gap-4">
+      <div className="flex overflow-x-auto pb-4 px-4 gap-4 snap-x no-scrollbar">
         {savedCards.map((card) => (
-          <Card key={card.id} className="bg-white dark:bg-gray-800 border-gray-200 dark:border-gray-700 shadow-sm hover:shadow-md transition-shadow overflow-hidden">
-            <CardContent className="p-4 flex items-center justify-between">
-              <div className="flex flex-col flex-1 pr-4 text-left">
-                <CardTitle className="text-lg font-semibold text-gray-800 dark:text-gray-100">
+          <Card 
+            key={card.id} 
+            onClick={() => handleLoad(card)}
+            className="flex-shrink-0 w-[260px] snap-center bg-white dark:bg-gray-800 border-gray-200 dark:border-gray-700 shadow-md hover:shadow-lg transition-all active:scale-95 cursor-pointer overflow-hidden rounded-2xl"
+          >
+            <CardContent className="p-4 flex flex-col h-full">
+              <div className="flex justify-between items-start mb-2">
+                <div className="bg-red-50 dark:bg-red-900/20 px-2 py-1 rounded text-[10px] font-bold text-red-600 dark:text-red-400 uppercase">
+                  {card.languageCode}
+                </div>
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  onClick={(e) => handleDelete(e, card.id, card.name)}
+                  className="h-7 w-7 text-gray-400 hover:text-red-500 hover:bg-red-50 dark:hover:bg-red-900/20"
+                >
+                  <Trash2 className="h-4 w-4" />
+                </Button>
+              </div>
+              
+              <div className="flex-1">
+                <h4 className="text-lg font-bold text-gray-800 dark:text-gray-100 line-clamp-1">
                   {card.name}
-                </CardTitle>
-                <div className="flex items-center text-sm text-gray-500 dark:text-gray-400 mt-1">
+                </h4>
+                <div className="flex items-center text-xs text-gray-500 dark:text-gray-400 mt-1">
                   <Clock className="w-3 h-3 mr-1" />
-                  {new Date(card.createdAt).toLocaleDateString()} • {card.languageCode.toUpperCase()}
+                  {new Date(card.createdAt).toLocaleDateString()}
                 </div>
               </div>
-              <div className="flex space-x-2 shrink-0">
-                <Button
-                  variant="outline"
-                  size="sm"
-                  onClick={() => handleLoad(card)}
-                  className="flex items-center text-blue-600 border-blue-200 hover:bg-blue-50 dark:hover:bg-blue-900/20 dark:border-blue-900/50"
-                  title="Load Card"
-                >
-                  <ExternalLink className="w-4 h-4" />
-                </Button>
-                <Button
-                  variant="outline"
-                  size="sm"
-                  onClick={() => handleDelete(card.id, card.name)}
-                  className="flex items-center text-red-600 border-red-200 hover:bg-red-50 dark:hover:bg-red-900/20 dark:border-red-900/50"
-                  title="Delete Card"
-                >
-                  <Trash2 className="w-4 h-4" />
-                </Button>
+
+              <div className="mt-4 flex items-center text-blue-600 dark:text-blue-400 text-xs font-bold uppercase tracking-wider">
+                <ExternalLink className="w-3 h-3 mr-1.5" />
+                Open Card
               </div>
             </CardContent>
           </Card>
         ))}
+        
+        {/* Spacer for better scrolling at the end */}
+        <div className="flex-shrink-0 w-2" />
       </div>
     </div>
   );
