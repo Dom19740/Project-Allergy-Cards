@@ -31,16 +31,38 @@
         </LinearLayout>
     </RelativeLayout>
 
-    <!-- StackView is the only widget collection that supports swipe gestures -->
-    <StackView
-        android:id="@+id/card_stack"
+    <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="0dp"
-        android:layout_weight="1"
-        android:animateLayoutChanges="true"
-        android:loopViews="true"
-        android:layout_marginTop="4dp"
-        android:layout_marginBottom="4dp" />
+        android:layout_weight="1">
+
+        <AdapterViewFlipper
+            android:id="@+id/card_stack"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:animateLayoutChanges="true"
+            android:autoStart="false"
+            android:flipInterval="5000" />
+
+        <!-- Navigation Buttons -->
+        <ImageButton
+            android:id="@+id/prev_button"
+            android:layout_width="40dp"
+            android:layout_height="match_parent"
+            android:layout_alignParentLeft="true"
+            android:background="@android:color/transparent"
+            android:src="@android:drawable/ic_media_previous"
+            android:alpha="0.3" />
+
+        <ImageButton
+            android:id="@+id/next_button"
+            android:layout_width="40dp"
+            android:layout_height="match_parent"
+            android:layout_alignParentRight="true"
+            android:background="@android:color/transparent"
+            android:src="@android:drawable/ic_media_next"
+            android:alpha="0.3" />
+    </RelativeLayout>
 
     <TextView
         android:id="@+id/footer"

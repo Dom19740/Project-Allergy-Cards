@@ -15,6 +15,8 @@ public class AllergyWidgetProvider extends AppWidgetProvider {
 
     public static final String ACTION_OPEN_CARD = "com.dpbcreative.simpleallergyalert.ACTION_OPEN_CARD";
     public static final String ACTION_REFRESH = "com.dpbcreative.simpleallergyalert.ACTION_REFRESH";
+    public static final String ACTION_NEXT = "com.dpbcreative.simpleallergyalert.ACTION_NEXT";
+    public static final String ACTION_PREV = "com.dpbcreative.simpleallergyalert.ACTION_PREV";
     public static final String EXTRA_CARD_ID = "com.dpbcreative.simpleallergyalert.EXTRA_CARD_ID";
 
     @Override
@@ -28,46 +30,45 @@ public class AllergyWidgetProvider extends AppWidgetProvider {
     static void updateAppWidget(Context context, AppWidgetManager appWidgetManager, int appWidgetId) {
         RemoteViews views = new RemoteViews(context.getPackageName(), R.layout.allergy_widget);
 
-        // Update Emergency button text with 2-letter country/language code
+        // Emergency button text
         try {
             SharedPreferences prefs = context.getSharedPreferences("CapacitorStorage", Context.MODE_PRIVATE);
             String emergencyCardJson = prefs.getString("savedEmergencyCard", null);
             if (emergencyCardJson != null) {
                 JSONObject obj = new JSONObject(emergencyCardJson);
-                // Get the 2-letter code (e.g., "EN" from "en-US")
                 String langCode = obj.optString("languageCode", "").split("-")[0].toUpperCase();
                 if (!langCode.isEmpty()) {
                     views.setTextViewText(R.id.emergency_text, "EMERGENCY (" + langCode + ")");
                 }
-            } else {
-                views.setTextViewText(R.id.emergency_text, "EMERGENCY");
             }
-        } catch (Exception e) {
-            views.setTextViewText(R.id.emergency_text, "EMERGENCY");
-        }
+        } catch (Exception e) {}
 
-        // Set up the intent for the Emergency button
+        // Emergency Intent
         Intent emergencyIntent = new Intent(Intent.ACTION_VIEW, Uri.parse("simpleallergyalert://emergency"));
         PendingIntent emergencyPendingIntent = PendingIntent.getActivity(context, 0, emergencyIntent, PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_IMMUTABLE);
         views.setOnClickPendingIntent(R.id.emergency_container, emergencyPendingIntent);
 
-        // Set up the intent for the footer (open app)
-        Intent mainIntent = new Intent(context, MainActivity.class);
-        PendingIntent mainPendingIntent = PendingIntent.getActivity(context, 0, mainIntent, PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_IMMUTABLE);
-        views.setOnClickPendingIntent(R.id.footer, mainPendingIntent);
+        // Navigation Intents
+        Intent nextIntent = new Intent(context, AllergyWidgetProvider.class);
+        nextIntent.setAction(ACTION_NEXT);
+        nextIntent.putExtra(AppWidgetManager.EXTRA_APPWIDGET_ID, appWidgetId);
+        views.setOnClickPendingIntent(R.id.next_button, PendingIntent.getBroadcast(context, appWidgetId, nextIntent, PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_IMMUTABLE));
 
-        // Set up the collection (StackView)
+        Intent prevIntent = new Intent(context, AllergyWidgetProvider.class);
+        prevIntent.setAction(ACTION_PREV);
+        prevIntent.putExtra(AppWidgetManager.EXTRA_APPWIDGET_ID, appWidgetId);
+        views.setOnClickPendingIntent(R.id.prev_button, PendingIntent.getBroadcast(context, appWidgetId + 100, prevIntent, PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_IMMUTABLE));
+
+        // Adapter
         Intent serviceIntent = new Intent(context, WidgetService.class);
         serviceIntent.putExtra(AppWidgetManager.EXTRA_APPWIDGET_ID, appWidgetId);
         serviceIntent.setData(Uri.parse(serviceIntent.toUri(Intent.URI_INTENT_SCHEME)));
         views.setRemoteAdapter(R.id.card_stack, serviceIntent);
-        views.setEmptyView(R.id.card_stack, R.id.footer);
 
-        // Set up the template for list item clicks
+        // Click Template
         Intent clickIntent = new Intent(context, AllergyWidgetProvider.class);
         clickIntent.setAction(ACTION_OPEN_CARD);
-        PendingIntent clickPendingIntent = PendingIntent.getBroadcast(context, 0, clickIntent, PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_MUTABLE);
-        views.setPendingIntentTemplate(R.id.card_stack, clickPendingIntent);
+        views.setPendingIntentTemplate(R.id.card_stack, PendingIntent.getBroadcast(context, 0, clickIntent, PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_MUTABLE));
 
         appWidgetManager.updateAppWidget(appWidgetId, views);
     }
@@ -75,8 +76,17 @@ public class AllergyWidgetProvider extends AppWidgetProvider {
     @Override
     public void onReceive(Context context, Intent intent) {
         AppWidgetManager appWidgetManager = AppWidgetManager.getInstance(context);
+        int appWidgetId = intent.getIntExtra(AppWidgetManager.EXTRA_APPWIDGET_ID, AppWidgetManager.INVALID_APPWIDGET_ID);
         
-        if (ACTION_OPEN_CARD.equals(intent.getAction())) {
+        if (ACTION_NEXT.equals(intent.getAction())) {
+            RemoteViews views = new RemoteViews(context.getPackageName(), R.layout.allergy_widget);
+            views.showNext(R.id.card_stack);
+            appWidgetManager.partiallyUpdateAppWidget(appWidgetId, views);
+        } else if (ACTION_PREV.equals(intent.getAction())) {
+            RemoteViews views = new RemoteViews(context.getPackageName(), R.layout.allergy_widget);
+            views.showPrevious(R.id.card_stack);
+            appWidgetManager.partiallyUpdateAppWidget(appWidgetId, views);
+        } else if (ACTION_OPEN_CARD.equals(intent.getAction())) {
             String cardId = intent.getStringExtra(EXTRA_CARD_ID);
             if (cardId != null) {
                 Intent appIntent = new Intent(Intent.ACTION_VIEW, Uri.parse("simpleallergyalert://card/" + cardId));
@@ -87,9 +97,6 @@ public class AllergyWidgetProvider extends AppWidgetProvider {
             ComponentName componentName = new ComponentName(context, AllergyWidgetProvider.class);
             int[] ids = appWidgetManager.getAppWidgetIds(componentName);
             appWidgetManager.notifyAppWidgetViewDataChanged(ids, R.id.card_stack);
-            for (int id : ids) {
-                updateAppWidget(context, appWidgetManager, id);
-            }
         }
         super.onReceive(context, intent);
     }
