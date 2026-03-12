@@ -65,7 +65,11 @@ const SavedCardsList = () => {
       });
     }
     
-    navigate(`/alert/${card.languageCode}`);
+    if (card.id === 'emergency-slot') {
+      navigate(`/emergency/${card.languageCode}`);
+    } else {
+      navigate(`/alert/${card.languageCode}`);
+    }
   };
 
   if (allCards.length === 0) return null;
@@ -88,7 +92,7 @@ const SavedCardsList = () => {
               <CardContent className="p-4 flex flex-col">
                 <div className="flex justify-between items-start mb-2">
                   <div className={cn("px-2 py-0.5 rounded text-[10px] font-medium uppercase", card.id === 'emergency-slot' ? "bg-red-600 text-white" : "bg-red-50 dark:bg-red-900/20 text-red-600 dark:text-red-400")}>
-                    {card.id === 'emergency-slot' ? 'Emergency' : card.languageCode}
+                    {card.id === 'emergency-slot' ? `Emergency (${card.languageCode})` : card.languageCode}
                   </div>
                   <Button variant="ghost" size="icon" onClick={(e) => handleDelete(e, card)} className="h-7 w-7 text-gray-400 hover:text-red-500 hover:bg-red-50 dark:hover:bg-red-900/20">
                     <Trash2 className="h-3.5 w-3.5" />
