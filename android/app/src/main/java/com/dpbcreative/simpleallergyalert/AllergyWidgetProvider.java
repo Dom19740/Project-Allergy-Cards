@@ -28,19 +28,22 @@ public class AllergyWidgetProvider extends AppWidgetProvider {
     static void updateAppWidget(Context context, AppWidgetManager appWidgetManager, int appWidgetId) {
         RemoteViews views = new RemoteViews(context.getPackageName(), R.layout.allergy_widget);
 
-        // Update Emergency button text with language code
+        // Update Emergency button text with 2-letter country/language code
         try {
             SharedPreferences prefs = context.getSharedPreferences("CapacitorStorage", Context.MODE_PRIVATE);
             String emergencyCardJson = prefs.getString("savedEmergencyCard", null);
             if (emergencyCardJson != null) {
                 JSONObject obj = new JSONObject(emergencyCardJson);
+                // Get the 2-letter code (e.g., "EN" from "en-US")
                 String langCode = obj.optString("languageCode", "").split("-")[0].toUpperCase();
                 if (!langCode.isEmpty()) {
                     views.setTextViewText(R.id.emergency_text, "EMERGENCY (" + langCode + ")");
                 }
+            } else {
+                views.setTextViewText(R.id.emergency_text, "EMERGENCY");
             }
         } catch (Exception e) {
-            e.printStackTrace();
+            views.setTextViewText(R.id.emergency_text, "EMERGENCY");
         }
 
         // Set up the intent for the Emergency button
@@ -83,9 +86,7 @@ public class AllergyWidgetProvider extends AppWidgetProvider {
         } else if (ACTION_REFRESH.equals(intent.getAction())) {
             ComponentName componentName = new ComponentName(context, AllergyWidgetProvider.class);
             int[] ids = appWidgetManager.getAppWidgetIds(componentName);
-            
             appWidgetManager.notifyAppWidgetViewDataChanged(ids, R.id.card_stack);
-            
             for (int id : ids) {
                 updateAppWidget(context, appWidgetManager, id);
             }

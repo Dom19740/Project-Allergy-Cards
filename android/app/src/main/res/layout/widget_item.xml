@@ -13,10 +13,10 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:textColor="@android:color/black"
-        android:textSize="18sp"
+        android:textSize="20sp"
         android:textStyle="bold"
         android:gravity="center"
-        android:layout_marginBottom="8dp" />
+        android:layout_marginBottom="4dp" />
 
     <TextView
         android:id="@+id/lang_code"
@@ -25,5 +25,39 @@
         android:textColor="@android:color/holo_red_dark"
         android:textSize="16sp"
         android:textStyle="bold"
-        android:gravity="center" />
+        android:gravity="center"
+        android:layout_marginBottom="16dp" />
+
+    <!-- Dot Indicator Container -->
+    <LinearLayout
+        android:id="@+id/dots_container"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:gravity="center">
+        
+        <ImageView
+            android:id="@+id/dot_0"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_margin="4dp"
+            android:src="@drawable/dot_inactive"
+            android:visibility="gone" />
+            
+        <ImageView
+            android:id="@+id/dot_1"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_margin="4dp"
+            android:src="@drawable/dot_inactive"
+            android:visibility="gone" />
+            
+        <ImageView
+            android:id="@+id/dot_2"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_margin="4dp"
+            android:src="@drawable/dot_inactive"
+            android:visibility="gone" />
+    </LinearLayout>
 </LinearLayout>
