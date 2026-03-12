@@ -68,7 +68,7 @@ const AllergyAlertPage = () => {
       });
 
       await Share.share({
-        title: `My Allergy Alert Card (${displayLangCode})- made with Simple Allergy Alert`,
+        title: `My Allergy Alert Card (${displayLangCode})`,
         text: `My Allergy Alert Card (${displayLangCode}) - made with Simple Allergy Alert`,
         url: savedFile.uri,
         dialogTitle: 'Share Allergy Card',
