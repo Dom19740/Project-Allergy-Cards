@@ -37,7 +37,7 @@ const EmergencyPage = () => {
     emergency: "I am having a severe allergic reaction.",
     needHelp: "I need medical help immediately.",
     callServices: "Please call emergency services.",
-    dialText: "DIAL"
+    dialText: "CALL"
   });
 
   useEffect(() => {
@@ -56,7 +56,7 @@ const EmergencyPage = () => {
         const content = sessionTranslations.content.emergency;
         setTranslatedText({
           ...content,
-          dialText: content.dialText || "DIAL"
+          dialText: content.dialText || "CALL"
         });
         setFullTranslatedContent(sessionTranslations.content);
         setIsTranslating(false);
@@ -74,7 +74,7 @@ const EmergencyPage = () => {
           translateText("I am having a severe allergic reaction.", langCode),
           translateText("I need medical help immediately.", langCode),
           translateText("Please call emergency services.", langCode),
-          translateText("DIAL", langCode)
+          translateText("CALL", langCode)
         ]);
 
         setTranslatedText({ attention, emergency, needHelp, callServices, dialText });
@@ -181,7 +181,7 @@ const EmergencyPage = () => {
           translatedContent={fullTranslatedContent || {
             ui: { allergyAlert: "Allergy Alert", iAmAllergicTo: "I am allergic to:", pleaseBeCareful: "Please be careful.", thankYou: "Thank you.", theyMakeMeSick: "They make me sick." },
             allergens: {},
-            emergency: { ...translatedText, dial112: `DIAL ${emergencyNumber}` }
+            emergency: { ...translatedText, dial112: `CALL ${emergencyNumber}` }
           }}
         />
       )}
