@@ -17,9 +17,10 @@ import { storage, STORAGE_KEYS } from '@/lib/storage';
 interface AllergyCardProps {
   languageCode: LanguageCode;
   selectedAllergens: string[];
+  initialTranslations?: TranslatedContent | null;
 }
 
-const AllergyCard: React.FC<AllergyCardProps> = ({ languageCode, selectedAllergens }) => {
+const AllergyCard: React.FC<AllergyCardProps> = ({ languageCode, selectedAllergens, initialTranslations }) => {
   const cardRef = useRef<HTMLDivElement>(null);
   const navigate = useNavigate();
   const [isSharing, setIsSharing] = useState(false);
@@ -27,14 +28,14 @@ const AllergyCard: React.FC<AllergyCardProps> = ({ languageCode, selectedAllerge
   const [isSaveDialogOpen, setIsSaveDialogOpen] = useState(false);
   const [isDisclaimerOpen, setIsDisclaimerOpen] = useState(false);
   const [customAllergenTranslations, setCustomAllergenTranslations] = useState<{ [key: string]: { [lang: string]: string } }>({});
-  const [translatedAllergens, setTranslatedAllergens] = useState<{ [key: string]: string }>({});
-  const [isTranslating, setIsTranslating] = useState(false);
+  const [translatedAllergens, setTranslatedAllergens] = useState<{ [key: string]: string }>(initialTranslations?.allergens || {});
+  const [isTranslating, setIsTranslating] = useState(!initialTranslations);
   const [fullSelectedData, setFullSelectedData] = useState<SelectedAllergens | null>(null);
   const [customMessages, setCustomMessages] = useState<CustomMessages>({
     iAmAllergicTo: "I can not eat:",
     theyMakeMeSick: "They make me very sick and I could die"
   });
-  const [translatedUIText, setTranslatedUIText] = useState({
+  const [translatedUIText, setTranslatedUIText] = useState(initialTranslations?.ui || {
     allergyAlert: "ALLERGY ALERT!",
     iAmAllergicTo: "I can not eat:",
     pleaseBeCareful: "Please be careful with my food.",
@@ -42,7 +43,7 @@ const AllergyCard: React.FC<AllergyCardProps> = ({ languageCode, selectedAllerge
     languageName: "English",
     theyMakeMeSick: "They make me very sick and I could die"
   });
-  const [emergencyTranslations, setEmergencyTranslations] = useState({
+  const [emergencyTranslations, setEmergencyTranslations] = useState(initialTranslations?.emergency || {
     attention: "ATTENTION",
     emergency: "I am having a severe allergic reaction.",
     needHelp: "I need medical help immediately.",
@@ -84,11 +85,22 @@ const AllergyCard: React.FC<AllergyCardProps> = ({ languageCode, selectedAllerge
 
   useEffect(() => {
     const translateAllContent = async () => {
+      // If we already have initial translations matching the language, skip translation
+      if (initialTranslations) {
+        setTranslatedUIText(initialTranslations.ui);
+        setTranslatedAllergens(initialTranslations.allergens);
+        setEmergencyTranslations(initialTranslations.emergency);
+        setIsTranslating(false);
+        return;
+      }
+
+      // Double check storage just in case
       const sessionTranslations = await storage.get<any>(STORAGE_KEYS.SESSION_TRANSLATIONS);
       if (sessionTranslations && sessionTranslations.languageCode === languageCode) {
         setTranslatedUIText(sessionTranslations.content.ui);
         setTranslatedAllergens(sessionTranslations.content.allergens);
         setEmergencyTranslations(sessionTranslations.content.emergency);
+        setIsTranslating(false);
         return;
       }
 
@@ -112,6 +124,7 @@ const AllergyCard: React.FC<AllergyCardProps> = ({ languageCode, selectedAllerge
           }
         }
         setTranslatedAllergens(allergenTranslations);
+        setIsTranslating(false);
         return;
       }
 
@@ -170,7 +183,7 @@ const AllergyCard: React.FC<AllergyCardProps> = ({ languageCode, selectedAllerge
     };
 
     translateAllContent();
-  }, [languageCode, selectedAllergens, customMessages, customAllergenTranslations]);
+  }, [languageCode, selectedAllergens, customMessages, customAllergenTranslations, initialTranslations]);
 
   const handleDownload = async () => {
     if (cardRef.current) {

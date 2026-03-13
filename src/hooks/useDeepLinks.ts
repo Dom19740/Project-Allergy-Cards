@@ -22,9 +22,13 @@ export const useDeepLinks = () => {
           const card = savedCards.find(c => c.id === cardId);
 
           if (card) {
-            await storage.set(STORAGE_KEYS.SELECTED_ALLERGENS, card.selectedAllergens);
-            await storage.set(STORAGE_KEYS.CUSTOM_MESSAGES, card.customMessages);
-            await storage.set(STORAGE_KEYS.SELECTED_LANGUAGE, card.languageCode);
+            // Await all storage operations to ensure they are ready for the next page
+            await Promise.all([
+              storage.set(STORAGE_KEYS.SELECTED_ALLERGENS, card.selectedAllergens),
+              storage.set(STORAGE_KEYS.CUSTOM_MESSAGES, card.customMessages),
+              storage.set(STORAGE_KEYS.SELECTED_LANGUAGE, card.languageCode)
+            ]);
+
             if (card.translatedContent) {
               await storage.set(STORAGE_KEYS.SESSION_TRANSLATIONS, {
                 languageCode: card.languageCode,
@@ -36,9 +40,12 @@ export const useDeepLinks = () => {
         } else if (host === 'emergency') {
           const emergencyCard = await storage.get<SavedCard>(STORAGE_KEYS.SAVED_EMERGENCY_CARD);
           if (emergencyCard) {
-            await storage.set(STORAGE_KEYS.SELECTED_ALLERGENS, emergencyCard.selectedAllergens);
-            await storage.set(STORAGE_KEYS.CUSTOM_MESSAGES, emergencyCard.customMessages);
-            await storage.set(STORAGE_KEYS.SELECTED_LANGUAGE, emergencyCard.languageCode);
+            await Promise.all([
+              storage.set(STORAGE_KEYS.SELECTED_ALLERGENS, emergencyCard.selectedAllergens),
+              storage.set(STORAGE_KEYS.CUSTOM_MESSAGES, emergencyCard.customMessages),
+              storage.set(STORAGE_KEYS.SELECTED_LANGUAGE, emergencyCard.languageCode)
+            ]);
+
             if (emergencyCard.translatedContent) {
               await storage.set(STORAGE_KEYS.SESSION_TRANSLATIONS, {
                 languageCode: emergencyCard.languageCode,

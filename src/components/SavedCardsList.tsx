@@ -16,7 +16,6 @@ const SavedCardsList = () => {
   const [allCards, setAllCards] = useState<SavedCard[]>([]);
   const [selectedIndex, setSelectedIndex] = useState(0);
   
-  // Initialize Embla Carousel with drag support and snapping
   const [emblaRef, emblaApi] = useEmblaCarousel({ 
     loop: false, 
     align: 'center',
@@ -24,7 +23,6 @@ const SavedCardsList = () => {
     dragFree: false
   });
 
-  // Update the active dot indicator when the slide changes
   const onSelect = useCallback(() => {
     if (!emblaApi) return;
     setSelectedIndex(emblaApi.selectedScrollSnap());
@@ -62,14 +60,16 @@ const SavedCardsList = () => {
     }
     
     await loadCards();
-    // Notify other components that storage has changed
     window.dispatchEvent(new CustomEvent('storage-update'));
   };
 
   const handleLoad = async (card: SavedCard) => {
-    await storage.set(STORAGE_KEYS.SELECTED_ALLERGENS, card.selectedAllergens);
-    await storage.set(STORAGE_KEYS.CUSTOM_MESSAGES, card.customMessages);
-    await storage.set(STORAGE_KEYS.SELECTED_LANGUAGE, card.languageCode);
+    // Await all storage operations to ensure they are ready for the next page
+    await Promise.all([
+      storage.set(STORAGE_KEYS.SELECTED_ALLERGENS, card.selectedAllergens),
+      storage.set(STORAGE_KEYS.CUSTOM_MESSAGES, card.customMessages),
+      storage.set(STORAGE_KEYS.SELECTED_LANGUAGE, card.languageCode)
+    ]);
     
     if (card.translatedContent) {
       await storage.set(STORAGE_KEYS.SESSION_TRANSLATIONS, {
@@ -89,13 +89,11 @@ const SavedCardsList = () => {
 
   return (
     <div className="w-full flex flex-col items-start">
-      {/* Header with Title and Dots aligned in a row */}
       <div className="w-full mb-4 px-8 flex flex-row items-center justify-between">
         <h3 className="text-[10px] font-medium text-gray-400 uppercase tracking-widest">
           Saved Cards
         </h3>
         
-        {/* Dot Indicators moved to the top right */}
         <div className="flex justify-end gap-1.5">
           {allCards.map((_, i) => (
             <div 
@@ -109,7 +107,6 @@ const SavedCardsList = () => {
         </div>
       </div>
 
-      {/* Carousel Viewport */}
       <div className="w-full overflow-hidden cursor-grab active:cursor-grabbing" ref={emblaRef}>
         <div className="flex">
           {allCards.map((card) => (

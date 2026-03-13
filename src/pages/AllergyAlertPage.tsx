@@ -3,7 +3,7 @@
 import React, { useEffect, useState } from 'react';
 import { useParams, useLocation } from 'react-router-dom';
 import AllergyCard from '../components/AllergyCard';
-import { LanguageCode } from '@/lib/types';
+import { LanguageCode, TranslatedContent } from '@/lib/types';
 import NotFound from './NotFound';
 import { storage, STORAGE_KEYS } from '@/lib/storage';
 
@@ -11,11 +11,14 @@ const AllergyAlertPage = () => {
   const { langCode } = useParams<{ langCode: string }>();
   const location = useLocation();
   const [selectedAllergens, setSelectedAllergens] = useState<string[]>([]);
+  const [initialTranslations, setInitialTranslations] = useState<TranslatedContent | null>(null);
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
-    const loadAllergens = async () => {
+    const loadData = async () => {
       setIsLoading(true);
+      
+      // Load allergens
       const storedData = await storage.get<any>(STORAGE_KEYS.SELECTED_ALLERGENS);
       let allergens: string[] = [];
 
@@ -36,10 +39,19 @@ const AllergyAlertPage = () => {
         }
       }
       setSelectedAllergens(allergens);
+
+      // Load translations for offline support
+      const sessionTranslations = await storage.get<any>(STORAGE_KEYS.SESSION_TRANSLATIONS);
+      if (sessionTranslations && sessionTranslations.languageCode === langCode) {
+        setInitialTranslations(sessionTranslations.content);
+      } else {
+        setInitialTranslations(null);
+      }
+
       setIsLoading(false);
     };
-    loadAllergens();
-  }, [langCode, location.key]); // Reload when language or route changes
+    loadData();
+  }, [langCode, location.key]);
 
   if (!langCode) {
     return <NotFound />;
@@ -57,7 +69,8 @@ const AllergyAlertPage = () => {
     <div className="flex flex-col items-center min-h-screen bg-white dark:bg-white">
       <AllergyCard 
         languageCode={langCode as LanguageCode} 
-        selectedAllergens={selectedAllergens} 
+        selectedAllergens={selectedAllergens}
+        initialTranslations={initialTranslations}
       />
     </div>
   );
