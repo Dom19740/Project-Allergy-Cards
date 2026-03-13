@@ -1,7 +1,8 @@
 "use client";
 
-import React, { useState } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
+import useEmblaCarousel from 'embla-carousel-react';
 import { ChevronLeft, ChevronRight, ShieldAlert, Languages, Share2, AlertTriangle, Info } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import FixedHeader from '@/components/FixedHeader';
@@ -38,10 +39,28 @@ const ONBOARDING_STEPS = [
 const Onboarding = () => {
   const navigate = useNavigate();
   const [currentStep, setCurrentStep] = useState(0);
+  
+  const [emblaRef, emblaApi] = useEmblaCarousel({ 
+    loop: false,
+    dragFree: false,
+    containScroll: 'trimSnaps'
+  });
+
+  const onSelect = useCallback(() => {
+    if (!emblaApi) return;
+    setCurrentStep(emblaApi.selectedScrollSnap());
+  }, [emblaApi]);
+
+  useEffect(() => {
+    if (!emblaApi) return;
+    onSelect();
+    emblaApi.on('select', onSelect);
+    emblaApi.on('reInit', onSelect);
+  }, [emblaApi, onSelect]);
 
   const handleNext = () => {
     if (currentStep < ONBOARDING_STEPS.length - 1) {
-      setCurrentStep(prev => prev + 1);
+      emblaApi?.scrollNext();
     } else {
       navigate('/select-allergens');
     }
@@ -49,26 +68,30 @@ const Onboarding = () => {
 
   const handleBack = () => {
     if (currentStep > 0) {
-      setCurrentStep(prev => prev - 1);
+      emblaApi?.scrollPrev();
     } else {
       navigate('/select-allergens');
     }
   };
-
-  const step = ONBOARDING_STEPS[currentStep];
 
   return (
     <div className="flex flex-col h-screen bg-gray-100 dark:bg-gray-900 overflow-hidden">
       <FixedHeader />
       
       <div className="flex flex-col flex-grow w-full max-w-2xl mx-auto px-4 pt-[calc(126px+env(safe-area-inset-top))] overflow-hidden">
-        <div className="flex-grow overflow-y-auto overflow-x-hidden pt-8">
-          <OnboardingStep 
-            key={currentStep}
-            title={step.title}
-            description={step.description}
-            icon={step.icon}
-          />
+        {/* Carousel Viewport */}
+        <div className="flex-grow overflow-hidden pt-8 cursor-grab active:cursor-grabbing" ref={emblaRef}>
+          <div className="flex h-full">
+            {ONBOARDING_STEPS.map((step, index) => (
+              <div key={index} className="flex-[0_0_100%] min-w-0 px-4">
+                <OnboardingStep 
+                  title={step.title}
+                  description={step.description}
+                  icon={step.icon}
+                />
+              </div>
+            ))}
+          </div>
         </div>
 
         <div className="w-full flex flex-col items-center mt-auto mb-[calc(50px+env(safe-area-inset-bottom))] space-y-8 shrink-0">
