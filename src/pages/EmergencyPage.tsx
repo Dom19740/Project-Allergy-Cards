@@ -141,14 +141,9 @@ const EmergencyPage = () => {
           </div>
         </div>
         <div className="mt-auto w-full max-w-md pt-6">
-          <a 
-            href={`tel:${emergencyNumber}`} 
-            className="flex items-center justify-center gap-2 sm:gap-4 w-full py-4 sm:py-6 bg-red-600 hover:bg-red-700 text-white rounded-2xl text-lg sm:text-2xl md:text-3xl font-black shadow-xl transition-transform active:scale-95 whitespace-nowrap px-4"
-          >
-            <Phone className="h-6 w-6 sm:h-8 sm:w-8 md:h-10 md:w-10 fill-current shrink-0" />
-            <span className="truncate">
-              {translatedText.dialText} {emergencyNumber}
-            </span>
+          <a href={`tel:${emergencyNumber}`} className="flex items-center justify-center gap-3 sm:gap-4 w-full py-4 sm:py-6 bg-red-600 hover:bg-red-700 text-white rounded-2xl text-2xl sm:text-3xl font-black shadow-xl transition-transform active:scale-95">
+            <Phone className="h-8 w-8 sm:h-10 sm:w-10 fill-current" />
+            {translatedText.dialText} {emergencyNumber}
           </a>
         </div>
       </div>
