@@ -15,21 +15,21 @@ const StepHeader: React.FC<StepHeaderProps> = ({ title, description, icon: Icon 
   const mainText = hasWarning ? description.replace(warningText, "").trim() : description;
 
   return (
-    <div className="flex-1 w-full overflow-y-auto px-4 pb-32 flex flex-col items-center text-center space-y-4">
+    <div className="flex-1 w-full overflow-y-auto px-4 pb-32 flex flex-col items-center text-center space-y-3">
       {Icon && (
-        <div className="bg-red-100 dark:bg-red-900/30 p-4 sm:p-6 rounded-full shrink-0 mt-4">
-          <Icon className="w-12 h-12 sm:w-16 sm:h-16 text-red-600" />
+        <div className="bg-red-100 dark:bg-red-900/30 p-3 sm:p-5 rounded-full shrink-0 mt-2">
+          <Icon className="w-10 h-10 sm:w-14 sm:h-14 text-red-600" />
         </div>
       )}
       
-      <div className="space-y-3 w-full">
-        <h2 className="text-xl sm:text-2xl font-bold text-gray-800 dark:text-gray-100 leading-tight">
+      <div className="space-y-2 w-full">
+        <h2 className="text-lg sm:text-xl md:text-2xl font-bold text-gray-800 dark:text-gray-100 leading-tight">
           {title}
         </h2>
-        <div className="text-base sm:text-lg text-gray-600 dark:text-gray-400 max-w-md mx-auto leading-relaxed">
+        <div className="text-sm sm:text-base md:text-lg text-gray-600 dark:text-gray-400 max-w-md mx-auto leading-relaxed">
           <p className="break-words">{mainText}</p>
           {hasWarning && (
-            <p className="mt-2 font-bold text-red-600 dark:text-red-500 break-words">
+            <p className="mt-1 font-bold text-red-600 dark:text-red-500 break-words">
               {warningText}
             </p>
           )}
