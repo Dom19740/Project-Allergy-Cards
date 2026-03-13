@@ -1,96 +1,95 @@
 "use client";
 
-import React, { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Search, ChevronLeft, ChevronRight, Globe } from 'lucide-react';
-import { SUPPORTED_LANGUAGES } from '@/lib/languages';
-import FixedHeader from '@/components/FixedHeader';
-import StepHeader from '@/components/StepHeader';
-import { storage, STORAGE_KEYS } from '@/lib/storage';
-import { cn } from '@/lib/utils';
+import React, { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Button } from "@/components/ui/button";
+import { ChevronLeft, ChevronRight } from "lucide-react";
+import FixedHeader from "@/components/FixedHeader";
+import StepHeader from "@/components/StepHeader";
+import { getAllGoogleLanguages, SupportedLanguage } from "@/lib/translator";
+import { storage, STORAGE_KEYS } from "@/lib/storage";
 
 const LanguageSelectionPage = () => {
   const navigate = useNavigate();
-  const [searchQuery, setSearchQuery] = useState('');
-  const [selectedLanguage, setSelectedLanguage] = useState<string>('');
+  const [selectedLanguageCode, setSelectedLanguageCode] = useState<string>("en");
+  const [supportedLanguages, setSupportedLanguages] = useState<SupportedLanguage[]>([]);
 
   useEffect(() => {
-    const loadLanguage = async () => {
-      const storedLanguage = await storage.get<string>(STORAGE_KEYS.SELECTED_LANGUAGE);
-      if (storedLanguage) {
-        setSelectedLanguage(storedLanguage);
+    const loadLang = async () => {
+      const savedLang = await storage.get<string>(STORAGE_KEYS.SELECTED_LANGUAGE);
+      if (savedLang) {
+        setSelectedLanguageCode(savedLang);
       }
     };
-    loadLanguage();
+    loadLang();
   }, []);
 
-  const filteredLanguages = SUPPORTED_LANGUAGES.filter(lang => 
-    lang.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-    lang.nativeName.toLowerCase().includes(searchQuery.toLowerCase())
-  );
+  useEffect(() => {
+    let mounted = true;
+    (async () => {
+      const langs = await getAllGoogleLanguages();
+      if (!mounted) return;
+      const sortedLangs = [...langs].sort((a, b) => a.name.localeCompare(b.name));
+      setSupportedLanguages(sortedLangs);
+    })();
+    return () => { mounted = false; };
+  }, []);
 
-  const handleContinue = async () => {
-    if (!selectedLanguage) return;
-    await storage.set(STORAGE_KEYS.SELECTED_LANGUAGE, selectedLanguage);
-    navigate('/select-allergens');
+  const handleLanguageChange = async (code: string) => {
+    setSelectedLanguageCode(code);
+    await storage.set(STORAGE_KEYS.SELECTED_LANGUAGE, code);
   };
 
-  return (
-    <div className="flex flex-col min-h-screen bg-gray-100 dark:bg-gray-900">
-      <FixedHeader />
-      
-      <div className="flex flex-col flex-grow w-full max-w-2xl mx-auto px-4 pt-[80px]">
-        <div className="flex-grow pt-0">
-          <StepHeader 
-            title="Select Language"
-            description="Choose the language you want your allergy card translated into."
-          />
-          
-          <div className="relative mt-8 mb-4 px-2">
-            <Search className="absolute left-5 top-1/2 -translate-y-1/2 text-gray-400 w-5 h-5" />
-            <Input
-              type="text"
-              placeholder="Search languages..."
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              className="pl-12 bg-white dark:bg-gray-800 border-gray-200 dark:border-gray-700 rounded-xl h-12 text-base"
-            />
-          </div>
+  const handleContinue = () => {
+    if (selectedLanguageCode) {
+      navigate(`/alert/${selectedLanguageCode}`);
+    }
+  };
 
-          <div className="grid grid-cols-1 gap-2 px-2 max-h-[40vh] overflow-y-auto pb-4">
-            {filteredLanguages.map((lang) => (
-              <div 
-                key={lang.code}
-                onClick={() => setSelectedLanguage(lang.code)}
-                className={cn(
-                  "flex items-center justify-between p-4 rounded-xl shadow-sm cursor-pointer transition-all duration-200 border-2",
-                  selectedLanguage === lang.code 
-                    ? "bg-red-600 border-red-600 text-white" 
-                    : "bg-white dark:bg-gray-800 border-transparent text-gray-700 dark:text-gray-300 hover:border-red-200 dark:hover:border-red-900/30"
-                )}
-              >
-                <div className="flex items-center space-x-3">
-                  <Globe className={cn("w-5 h-5", selectedLanguage === lang.code ? "text-white" : "text-gray-400")} />
-                  <div>
-                    <p className="font-bold text-base">{lang.name}</p>
-                    <p className={cn("text-xs", selectedLanguage === lang.code ? "text-red-100" : "text-gray-500")}>
-                      {lang.nativeName}
-                    </p>
+  const selectedLanguage = supportedLanguages.find(l => l.code === selectedLanguageCode);
+
+  return (
+    <div className="flex flex-col h-screen bg-gray-100 dark:bg-gray-900 overflow-hidden">
+      <FixedHeader />
+      <div className="flex flex-col flex-grow w-full max-w-2xl mx-auto px-4 pt-[126px] overflow-hidden">
+        <div className="flex-grow overflow-y-auto pt-8">
+          <StepHeader 
+            title="Choose a Language"
+            description="Select the language you want your allergy alert to be translated into."
+          />
+
+          <div className="w-full flex justify-center pt-8 pb-4">
+            <div className="w-full max-w-xs sm:max-w-sm md:max-w-md lg:max-w-lg">
+              <Select value={selectedLanguageCode} onValueChange={handleLanguageChange}>
+                <SelectTrigger
+                  className="w-full py-4 text-lg md:text-xl h-auto bg-white text-gray-900 hover:bg-gray-50 border border-red-600 dark:border-red-500"
+                >
+                  <div className="flex items-center">
+                    {selectedLanguage ? (
+                      <span>{selectedLanguage.name}</span>
+                    ) : (
+                      <SelectValue placeholder="Select Target Language" />
+                    )}
                   </div>
-                </div>
-                {selectedLanguage === lang.code && (
-                  <div className="w-6 h-6 bg-white rounded-full flex items-center justify-center">
-                    <div className="w-3 h-3 bg-red-600 rounded-full" />
-                  </div>
-                )}
-              </div>
-            ))}
+                </SelectTrigger>
+                <SelectContent className="bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-50 max-h-[50vh]">
+                  {(supportedLanguages.length ? supportedLanguages : [{ code: "en", name: "English" }]).map((lang) => (
+                    <SelectItem
+                      key={lang.code}
+                      value={lang.code}
+                      className="py-3 text-lg md:text-xl cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-700"
+                    >
+                      {lang.name}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
           </div>
         </div>
-
-        <div className="w-full flex justify-between items-center mt-auto mb-[50px] pt-12 gap-4 shrink-0">
+        
+        <div className="w-full flex justify-between items-center mt-auto mb-[50px] gap-4 shrink-0">
           <Button
             variant="ghost"
             onClick={() => navigate(-1)}
@@ -101,7 +100,7 @@ const LanguageSelectionPage = () => {
           </Button>
           <Button
             onClick={handleContinue}
-            disabled={!selectedLanguage}
+            disabled={!selectedLanguageCode}
             className="py-3 px-8 text-lg h-auto bg-red-600 text-white hover:bg-red-700 rounded-xl shadow-lg transition-transform active:scale-95 flex items-center"
           >
             Continue

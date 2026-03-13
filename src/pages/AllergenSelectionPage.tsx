@@ -101,8 +101,8 @@ const AllergenSelectionPage = () => {
     <div className="flex flex-col min-h-screen bg-gray-100 dark:bg-gray-900">
       <FixedHeader />
       
-      <div className="flex flex-col flex-grow w-full max-w-2xl mx-auto px-4 pt-[80px]">
-        <div className="flex-grow pt-0">
+      <div className="flex flex-col flex-grow w-full max-w-2xl mx-auto px-4 pt-[126px]">
+        <div className="flex-grow pt-8">
           <StepHeader 
             title="Select Allergens"
             description="Tap the allergens you want to include on your card."
