@@ -37,7 +37,7 @@ const Home = () => {
   return (
     <div className="flex flex-col h-[100dvh] bg-gray-100 dark:bg-gray-900 overflow-hidden">
       <FixedHeader />
-      <div className="flex flex-col flex-1 w-full max-w-2xl mx-auto px-4 pt-[calc(106px+env(safe-area-inset-top)+10px)] pb-[env(safe-area-inset-bottom)] min-h-0">
+      <div className="flex flex-col flex-1 w-full max-w-2xl mx-auto px-4 pt-[calc(60px+env(safe-area-inset-top)+10px)] pb-[env(safe-area-inset-bottom)] min-h-0">
         <div className="flex-1 flex flex-col items-center text-center min-h-0">
           <div className={cn("w-full flex items-center justify-center min-h-0 p-2 transition-all duration-500 ease-in-out", hasCards ? "flex-[0.3]" : "flex-[0.5]")}>
             <img src="/logo_main.png" alt="App Logo" className={cn("max-h-full w-auto h-auto object-contain transition-all duration-500", hasCards ? "max-w-[160px]" : "max-w-[220px] md:max-w-[280px]")} />
