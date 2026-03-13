@@ -1,7 +1,6 @@
 "use client";
 
 import React from 'react';
-import { useSearchParams } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Share2, Download, ArrowLeft, Loader2, Save, Menu } from 'lucide-react';
 
@@ -24,9 +23,6 @@ const EmergencyActions: React.FC<EmergencyActionsProps> = ({
   isSharing = false,
   isDownloading = false
 }) => {
-  const [searchParams] = useSearchParams();
-  const isWidget = searchParams.get('source') === 'widget';
-
   return (
     <div className="w-full pt-2 pb-[calc(8px+env(safe-area-inset-bottom))] flex justify-center bg-white border-t border-gray-100 z-30">
       <div className="flex items-center space-x-3 bg-white p-2 rounded-full shadow-md border border-gray-200">
@@ -40,17 +36,15 @@ const EmergencyActions: React.FC<EmergencyActionsProps> = ({
           <ArrowLeft className="h-5 w-5" />
         </Button>
 
-        {!isWidget && (
-          <Button
-            onClick={onToggleMenu}
-            variant="ghost"
-            size="icon"
-            className="text-gray-500 hover:bg-gray-100 rounded-full h-10 w-10"
-            title="Menu"
-          >
-            <Menu className="h-5 w-5" />
-          </Button>
-        )}
+        <Button
+          onClick={onToggleMenu}
+          variant="ghost"
+          size="icon"
+          className="text-gray-500 hover:bg-gray-100 rounded-full h-10 w-10"
+          title="Menu"
+        >
+          <Menu className="h-5 w-5" />
+        </Button>
 
         {onSave && (
           <Button
