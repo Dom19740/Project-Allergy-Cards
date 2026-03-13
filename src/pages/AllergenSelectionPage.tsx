@@ -101,14 +101,14 @@ const AllergenSelectionPage = () => {
     <div className="flex flex-col min-h-screen bg-gray-100 dark:bg-gray-900">
       <FixedHeader />
       
-      <div className="flex flex-col flex-grow w-full max-w-2xl mx-auto px-4 pt-[126px]">
-        <div className="flex-grow pt-8">
+      <div className="flex flex-col flex-grow w-full max-w-2xl mx-auto px-4 pt-[calc(80px+env(safe-area-inset-top)+10px)]">
+        <div className="flex-grow pt-2">
           <StepHeader 
             title="Select Allergens"
             description="Tap the allergens you want to include on your card."
           />
           
-          <div className="grid grid-cols-2 gap-2 w-full pt-8">
+          <div className="grid grid-cols-2 gap-2 w-full pt-4">
             {/* Standard Allergens */}
             {ALLERGEN_OPTIONS.map((allergen) => {
               const isSelected = selectedAllergens.includes(allergen.id);
@@ -166,7 +166,7 @@ const AllergenSelectionPage = () => {
           </div>
 
           {/* Add Custom Input */}
-          <div className="w-full pt-6 px-2">
+          <div className="w-full pt-4 px-2">
             <div className="flex space-x-2">
               <Input
                 type="text"
@@ -187,7 +187,7 @@ const AllergenSelectionPage = () => {
         </div>
 
         {/* Navigation Footer */}
-        <div className="w-full flex justify-between items-center mt-auto mb-[50px] pt-12 gap-4 shrink-0">
+        <div className="w-full flex justify-between items-center mt-auto mb-[50px] pt-8 gap-4 shrink-0">
           <Button
             variant="ghost"
             onClick={() => navigate(-1)}
