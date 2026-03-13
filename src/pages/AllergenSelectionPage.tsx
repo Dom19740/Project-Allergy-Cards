@@ -117,13 +117,10 @@ const AllergenSelectionPage = () => {
                       : "bg-white dark:bg-gray-800 border-transparent text-gray-700 dark:text-gray-300 hover:border-red-200 dark:hover:border-red-900/30"
                   )}
                 >
-                  <div className={cn(
-                    "w-8 h-8 rounded-lg flex items-center justify-center p-1 shrink-0",
-                    isSelected ? "bg-white/20" : "bg-gray-100 dark:bg-gray-700"
-                  )}>
+                  <div className="w-8 h-8 rounded-lg flex items-center justify-center p-1 shrink-0 bg-white">
                     <img src={allergen.image} alt={allergen.name} className="w-full h-full object-contain" />
                   </div>
-                  <span className="text-xs font-bold leading-tight">{allergen.name}</span>
+                  <span className="text-sm font-bold leading-tight">{allergen.name}</span>
                 </div>
               );
             })}
@@ -143,22 +140,19 @@ const AllergenSelectionPage = () => {
                   )}
                 >
                   <div className="flex items-center space-x-2 overflow-hidden">
-                    <div className={cn(
-                      "w-8 h-8 rounded-lg flex items-center justify-center shrink-0",
-                      isSelected ? "bg-white/20" : "bg-gray-100 dark:bg-gray-700"
-                    )}>
-                      <Tag className="w-4 h-4" />
+                    <div className="w-8 h-8 rounded-lg flex items-center justify-center shrink-0 bg-white">
+                      <Tag className={cn("w-4 h-4", isSelected ? "text-red-600" : "text-gray-500")} />
                     </div>
-                    <span className="text-xs font-bold leading-tight truncate">{allergen}</span>
+                    <span className="text-sm font-bold leading-tight truncate">{allergen}</span>
                   </div>
                   <button 
                     onClick={(e) => removeCustomAllergen(e, allergen)}
                     className={cn(
                       "p-1 rounded-full hover:bg-black/10 transition-colors",
-                      isSelected ? "text-white/80" : "text-gray-400"
+                      isSelected ? "text-white" : "text-gray-400"
                     )}
                   >
-                    <X className="w-3 h-3" />
+                    <X className="w-5 h-5" />
                   </button>
                 </div>
               );
@@ -166,7 +160,7 @@ const AllergenSelectionPage = () => {
           </div>
 
           {/* Add Custom Input */}
-          <div className="w-full pt-6">
+          <div className="w-full pt-6 px-2">
             <div className="flex space-x-2">
               <Input
                 type="text"
