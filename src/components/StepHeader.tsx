@@ -23,10 +23,10 @@ const StepHeader: React.FC<StepHeaderProps> = ({ title, description, icon: Icon 
       )}
       
       <div className="space-y-2 w-full">
-        <h2 className="text-lg sm:text-xl md:text-2xl font-bold text-gray-800 dark:text-gray-100 leading-tight">
+        <h2 className="text-xl sm:text-2xl md:text-3xl font-bold text-gray-800 dark:text-gray-100 leading-tight">
           {title}
         </h2>
-        <div className="text-sm sm:text-base md:text-lg text-gray-600 dark:text-gray-400 max-w-md mx-auto leading-relaxed">
+        <div className="text-base sm:text-lg md:text-xl text-gray-600 dark:text-gray-400 max-w-md mx-auto leading-relaxed">
           <p className="break-words">{mainText}</p>
           {hasWarning && (
             <p className="mt-1 font-bold text-red-600 dark:text-red-500 break-words">

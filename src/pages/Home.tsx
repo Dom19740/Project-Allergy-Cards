@@ -44,10 +44,10 @@ const Home = () => {
           </div>
           <div className={cn("flex flex-col w-full py-2 min-h-0 transition-all duration-500", hasCards ? "flex-1 justify-around" : "flex-[0.5] justify-center")}>
             <div className={cn("space-y-3 transition-all duration-500", !hasCards && "mb-8")}>
-              <p className={cn("text-gray-700 dark:text-gray-300 max-w-md mx-auto px-6 leading-relaxed transition-all duration-500", hasCards ? "text-sm md:text-base" : "text-base md:text-xl")}>
+              <p className={cn("text-gray-700 dark:text-gray-300 max-w-md mx-auto px-6 leading-relaxed transition-all duration-500", hasCards ? "text-base md:text-lg" : "text-lg md:text-2xl")}>
                 Create a personalized allergy alert in multiple languages to communicate your dietary restrictions easily and safely.
               </p>
-              <p className={cn("text-gray-700 dark:text-gray-300 max-w-md mx-auto px-6 leading-relaxed transition-all duration-500", hasCards ? "text-sm md:text-base" : "text-base md:text-lg")}>
+              <p className={cn("text-gray-700 dark:text-gray-300 max-w-md mx-auto px-6 leading-relaxed transition-all duration-500", hasCards ? "text-base md:text-lg" : "text-lg md:text-xl")}>
                  Save a translated emergency alert card to communicate your need for medical attention.
               </p>
             </div>
@@ -59,7 +59,7 @@ const Home = () => {
           </div>
         </div>
         <div className="flex-shrink-0 w-full flex flex-col justify-center items-center py-4 gap-3">
-          <Button asChild className="py-3 text-lg md:text-xl h-auto transition-all duration-200 ease-in-out hover:scale-105 bg-red-600 text-white hover:bg-red-700 w-[280px]">
+          <Button asChild className="py-4 text-xl md:text-2xl h-auto transition-all duration-200 ease-in-out hover:scale-105 bg-red-600 text-white hover:bg-red-700 w-[280px]">
             <Link to="/onboarding">Get Started</Link>
           </Button>
           <p className="text-[10px] text-gray-500 dark:text-gray-400 mb-2">
