@@ -45,10 +45,10 @@ public class AllergyWidgetProvider extends AppWidgetProvider {
             views.setTextViewText(R.id.emergency_text, "EMERGENCY");
         }
 
-        // Emergency Intent
-        Intent emergencyIntent = new Intent(Intent.ACTION_VIEW, Uri.parse("simpleallergyalert://emergency"));
-        // Use CLEAR_TOP to ensure the app resets if already open
-        emergencyIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TOP);
+        // Emergency Intent - Use CLEAR_TASK to force a full app reload
+        String emergencyUri = "simpleallergyalert://emergency?t=" + System.currentTimeMillis();
+        Intent emergencyIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(emergencyUri));
+        emergencyIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
         PendingIntent emergencyPendingIntent = PendingIntent.getActivity(context, 0, emergencyIntent, PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_IMMUTABLE);
         views.setOnClickPendingIntent(R.id.emergency_container, emergencyPendingIntent);
 
@@ -73,11 +73,11 @@ public class AllergyWidgetProvider extends AppWidgetProvider {
         if (ACTION_OPEN_CARD.equals(intent.getAction())) {
             String cardId = intent.getStringExtra(EXTRA_CARD_ID);
             if (cardId != null) {
-                // Add a timestamp to the URI to ensure it's unique and triggers the deep link listener
+                // Add a timestamp to the URI to ensure it's unique
                 String uriString = "simpleallergyalert://card/" + cardId + "?t=" + System.currentTimeMillis();
                 Intent appIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(uriString));
-                // FLAG_ACTIVITY_CLEAR_TOP is key here: it clears the app state if it's already running
-                appIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TOP);
+                // FLAG_ACTIVITY_CLEAR_TASK ensures the app reloads completely from the splash screen
+                appIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
                 context.startActivity(appIntent);
             }
         } else if (ACTION_REFRESH.equals(intent.getAction())) {
