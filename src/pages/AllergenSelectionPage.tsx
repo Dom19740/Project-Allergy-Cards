@@ -95,8 +95,9 @@ const AllergenSelectionPage = () => {
     <div className="flex flex-col min-h-screen bg-gray-100 dark:bg-gray-900">
       <FixedHeader />
       
-      <div className="flex flex-col flex-grow w-full max-w-2xl mx-auto px-4 pt-[126px]">
-        <div className="flex-grow overflow-y-auto pt-4 pb-24">
+      {/* Main content area - using flex-grow and mt to account for fixed header */}
+      <div className="flex flex-col flex-grow w-full max-w-2xl mx-auto px-4 mt-[106px] pt-[env(safe-area-inset-top)]">
+        <div className="flex-grow pt-4">
           <StepHeader 
             title="Select Allergens"
             description="Tap the allergens you want to include on your card."
@@ -180,9 +181,9 @@ const AllergenSelectionPage = () => {
           </div>
         </div>
 
-        {/* Navigation Footer */}
-        <div className="fixed bottom-0 left-0 right-0 bg-gradient-to-t from-gray-100 dark:from-gray-900 via-gray-100 dark:via-gray-900 to-transparent pt-10 pb-8 px-4">
-          <div className="max-w-2xl mx-auto flex justify-between items-center gap-4">
+        {/* Navigation Footer - now part of the flow, not fixed */}
+        <div className="mt-auto pt-12 pb-24">
+          <div className="flex justify-between items-center gap-4">
             <Button
               variant="ghost"
               onClick={() => navigate(-1)}
