@@ -47,6 +47,8 @@ public class AllergyWidgetProvider extends AppWidgetProvider {
 
         // Emergency Intent
         Intent emergencyIntent = new Intent(Intent.ACTION_VIEW, Uri.parse("simpleallergyalert://emergency"));
+        // Use CLEAR_TOP to ensure the app resets if already open
+        emergencyIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TOP);
         PendingIntent emergencyPendingIntent = PendingIntent.getActivity(context, 0, emergencyIntent, PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_IMMUTABLE);
         views.setOnClickPendingIntent(R.id.emergency_container, emergencyPendingIntent);
 
@@ -71,18 +73,19 @@ public class AllergyWidgetProvider extends AppWidgetProvider {
         if (ACTION_OPEN_CARD.equals(intent.getAction())) {
             String cardId = intent.getStringExtra(EXTRA_CARD_ID);
             if (cardId != null) {
-                Intent appIntent = new Intent(Intent.ACTION_VIEW, Uri.parse("simpleallergyalert://card/" + cardId));
-                appIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                // Add a timestamp to the URI to ensure it's unique and triggers the deep link listener
+                String uriString = "simpleallergyalert://card/" + cardId + "?t=" + System.currentTimeMillis();
+                Intent appIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(uriString));
+                // FLAG_ACTIVITY_CLEAR_TOP is key here: it clears the app state if it's already running
+                appIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TOP);
                 context.startActivity(appIntent);
             }
         } else if (ACTION_REFRESH.equals(intent.getAction())) {
             ComponentName componentName = new ComponentName(context, AllergyWidgetProvider.class);
             int[] ids = appWidgetManager.getAppWidgetIds(componentName);
             
-            // 1. Refresh the list of cards
             appWidgetManager.notifyAppWidgetViewDataChanged(ids, R.id.card_stack);
             
-            // 2. Refresh the static UI (like the Emergency button text)
             for (int id : ids) {
                 updateAppWidget(context, appWidgetManager, id);
             }

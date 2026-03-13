@@ -1,5 +1,5 @@
 import { useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 import { App, URLOpenListenerEvent } from '@capacitor/app';
 import { storage, STORAGE_KEYS } from '@/lib/storage';
 import { SavedCard } from '@/lib/types';
@@ -7,6 +7,7 @@ import { toast } from 'sonner';
 
 export const useDeepLinks = () => {
   const navigate = useNavigate();
+  const location = useLocation();
 
   useEffect(() => {
     const handleDeepLink = async (event: URLOpenListenerEvent) => {
@@ -22,7 +23,6 @@ export const useDeepLinks = () => {
           const card = savedCards.find(c => c.id === cardId);
 
           if (card) {
-            // Await all storage operations to ensure they are ready for the next page
             await Promise.all([
               storage.set(STORAGE_KEYS.SELECTED_ALLERGENS, card.selectedAllergens),
               storage.set(STORAGE_KEYS.CUSTOM_MESSAGES, card.customMessages),
@@ -35,7 +35,10 @@ export const useDeepLinks = () => {
                 content: card.translatedContent
               });
             }
-            navigate(`/alert/${card.languageCode}`);
+            
+            // Force navigation by adding a unique state or checking current path
+            const targetPath = `/alert/${card.languageCode}`;
+            navigate(targetPath, { replace: true, state: { refresh: Date.now() } });
           }
         } else if (host === 'emergency') {
           const emergencyCard = await storage.get<SavedCard>(STORAGE_KEYS.SAVED_EMERGENCY_CARD);
@@ -52,7 +55,7 @@ export const useDeepLinks = () => {
                 content: emergencyCard.translatedContent
               });
             }
-            navigate(`/emergency/${emergencyCard.languageCode}`);
+            navigate(`/emergency/${emergencyCard.languageCode}`, { replace: true, state: { refresh: Date.now() } });
           } else {
             navigate('/');
             setTimeout(() => {
