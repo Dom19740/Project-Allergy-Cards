@@ -5,7 +5,7 @@ import { useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { toast } from 'sonner';
-import { X, ChevronLeft, ChevronRight, Plus } from 'lucide-react';
+import { X, ChevronLeft, ChevronRight, Tag } from 'lucide-react';
 import { ALLERGEN_OPTIONS } from '@/lib/allergens';
 import FixedHeader from '@/components/FixedHeader';
 import StepHeader from '@/components/StepHeader';
@@ -96,13 +96,13 @@ const AllergenSelectionPage = () => {
       <FixedHeader />
       
       <div className="flex flex-col flex-grow w-full max-w-2xl mx-auto px-4 pt-[126px]">
-        <div className="flex-grow overflow-y-auto pt-8 pb-24">
+        <div className="flex-grow overflow-y-auto pt-4 pb-24">
           <StepHeader 
             title="Select Allergens"
             description="Tap the allergens you want to include on your card."
           />
           
-          <div className="grid grid-cols-2 gap-3 w-full pt-8">
+          <div className="grid grid-cols-2 gap-2 w-full pt-6">
             {/* Standard Allergens */}
             {ALLERGEN_OPTIONS.map((allergen) => {
               const isSelected = selectedAllergens.includes(allergen.id);
@@ -111,19 +111,19 @@ const AllergenSelectionPage = () => {
                   key={allergen.id} 
                   onClick={() => toggleAllergen(allergen.id)}
                   className={cn(
-                    "flex items-center space-x-3 p-3 rounded-xl shadow-sm cursor-pointer transition-all duration-200 border-2",
+                    "flex items-center space-x-2 p-2 rounded-xl shadow-sm cursor-pointer transition-all duration-200 border-2",
                     isSelected 
                       ? "bg-red-600 border-red-600 text-white" 
                       : "bg-white dark:bg-gray-800 border-transparent text-gray-700 dark:text-gray-300 hover:border-red-200 dark:hover:border-red-900/30"
                   )}
                 >
                   <div className={cn(
-                    "w-10 h-10 rounded-lg flex items-center justify-center p-1.5",
+                    "w-8 h-8 rounded-lg flex items-center justify-center p-1 shrink-0",
                     isSelected ? "bg-white/20" : "bg-gray-100 dark:bg-gray-700"
                   )}>
                     <img src={allergen.image} alt={allergen.name} className="w-full h-full object-contain" />
                   </div>
-                  <span className="text-sm font-bold leading-tight">{allergen.name}</span>
+                  <span className="text-xs font-bold leading-tight">{allergen.name}</span>
                 </div>
               );
             })}
@@ -136,20 +136,20 @@ const AllergenSelectionPage = () => {
                   key={allergen} 
                   onClick={() => toggleAllergen(allergen)}
                   className={cn(
-                    "flex items-center justify-between p-3 rounded-xl shadow-sm cursor-pointer transition-all duration-200 border-2 relative group",
+                    "flex items-center justify-between p-2 rounded-xl shadow-sm cursor-pointer transition-all duration-200 border-2 relative group",
                     isSelected 
                       ? "bg-red-600 border-red-600 text-white" 
                       : "bg-white dark:bg-gray-800 border-transparent text-gray-700 dark:text-gray-300 hover:border-red-200 dark:hover:border-red-900/30"
                   )}
                 >
-                  <div className="flex items-center space-x-3 overflow-hidden">
+                  <div className="flex items-center space-x-2 overflow-hidden">
                     <div className={cn(
-                      "w-10 h-10 rounded-lg flex items-center justify-center shrink-0",
+                      "w-8 h-8 rounded-lg flex items-center justify-center shrink-0",
                       isSelected ? "bg-white/20" : "bg-gray-100 dark:bg-gray-700"
                     )}>
-                      <Plus className="w-5 h-5" />
+                      <Tag className="w-4 h-4" />
                     </div>
-                    <span className="text-sm font-bold leading-tight truncate">{allergen}</span>
+                    <span className="text-xs font-bold leading-tight truncate">{allergen}</span>
                   </div>
                   <button 
                     onClick={(e) => removeCustomAllergen(e, allergen)}
@@ -158,7 +158,7 @@ const AllergenSelectionPage = () => {
                       isSelected ? "text-white/80" : "text-gray-400"
                     )}
                   >
-                    <X className="w-4 h-4" />
+                    <X className="w-3 h-3" />
                   </button>
                 </div>
               );
@@ -166,19 +166,19 @@ const AllergenSelectionPage = () => {
           </div>
 
           {/* Add Custom Input */}
-          <div className="w-full pt-8">
+          <div className="w-full pt-6">
             <div className="flex space-x-2">
               <Input
                 type="text"
                 placeholder="Add custom allergen..."
                 value={customAllergenInput}
                 onChange={(e) => setCustomAllergenInput(e.target.value)}
-                className="flex-grow bg-white dark:bg-gray-800 border-gray-200 dark:border-gray-700 rounded-xl h-12 px-4"
+                className="flex-grow bg-white dark:bg-gray-800 border-gray-200 dark:border-gray-700 rounded-xl h-10 px-4 text-sm"
                 onKeyPress={(e) => e.key === 'Enter' && handleAddCustomAllergen()}
               />
               <Button 
                 onClick={handleAddCustomAllergen} 
-                className="h-12 px-6 bg-blue-600 text-white hover:bg-blue-700 rounded-xl"
+                className="h-10 px-4 bg-blue-600 text-white hover:bg-blue-700 rounded-xl text-sm"
               >
                 Add
               </Button>
