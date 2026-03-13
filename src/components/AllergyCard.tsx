@@ -63,24 +63,29 @@ const AllergyCard: React.FC<AllergyCardProps> = ({ languageCode, selectedAllerge
     }
   };
 
-  useEffect(() => {
-    const loadData = async () => {
-      const storedAllergens = await storage.get<SelectedAllergens>(STORAGE_KEYS.SELECTED_ALLERGENS);
-      if (storedAllergens) {
-        setFullSelectedData(storedAllergens);
-        const custom = storedAllergens.custom || {};
-        setCustomAllergenTranslations(custom);
-      }
+  const loadData = async () => {
+    const storedAllergens = await storage.get<SelectedAllergens>(STORAGE_KEYS.SELECTED_ALLERGENS);
+    if (storedAllergens) {
+      setFullSelectedData(storedAllergens);
+      const custom = storedAllergens.custom || {};
+      setCustomAllergenTranslations(custom);
+    }
 
-      const savedAlert = await storage.get<CustomMessages>(STORAGE_KEYS.CUSTOM_MESSAGES);
-      if (savedAlert) {
-        setCustomMessages({
-          iAmAllergicTo: savedAlert.iAmAllergicTo || "I can not eat:",
-          theyMakeMeSick: savedAlert.theyMakeMeSick || "They make me very sick and I could die"
-        });
-      }
-    };
+    const savedAlert = await storage.get<CustomMessages>(STORAGE_KEYS.CUSTOM_MESSAGES);
+    if (savedAlert) {
+      setCustomMessages({
+        iAmAllergicTo: savedAlert.iAmAllergicTo || "I can not eat:",
+        theyMakeMeSick: savedAlert.theyMakeMeSick || "They make me very sick and I could die"
+      });
+    }
+  };
+
+  useEffect(() => {
     loadData();
+    
+    const handleUpdate = () => loadData();
+    window.addEventListener('storage-update', handleUpdate);
+    return () => window.removeEventListener('storage-update', handleUpdate);
   }, [languageCode, selectedAllergens]);
 
   useEffect(() => {

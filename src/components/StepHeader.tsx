@@ -15,14 +15,14 @@ const StepHeader: React.FC<StepHeaderProps> = ({ title, description, icon: Icon 
   const mainText = hasWarning ? description.replace(warningText, "").trim() : description;
 
   return (
-    <div className="w-full px-4 flex flex-col items-center text-center space-y-3">
+    <div className="w-full px-4 flex flex-col items-center text-center space-y-2">
       {Icon && (
-        <div className="bg-red-100 dark:bg-red-900/30 p-3 sm:p-5 rounded-full shrink-0 mt-2">
+        <div className="bg-red-100 dark:bg-red-900/30 p-3 sm:p-5 rounded-full shrink-0">
           <Icon className="w-10 h-10 sm:w-14 sm:h-14 text-red-600" />
         </div>
       )}
       
-      <div className="space-y-2 w-full">
+      <div className="space-y-1 w-full">
         <h2 className="text-xl sm:text-2xl md:text-3xl font-bold text-gray-800 dark:text-gray-100 leading-tight">
           {title}
         </h2>
