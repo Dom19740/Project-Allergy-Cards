@@ -39,11 +39,11 @@ const SelectAlertPage = () => {
   };
 
   return (
-    <div className="flex flex-col h-screen bg-gray-100 dark:bg-gray-900 overflow-hidden">
+    <div className="flex flex-col min-h-screen bg-gray-100 dark:bg-gray-900">
       <FixedHeader />
 
-      <div className="flex flex-col flex-grow w-full max-w-2xl mx-auto px-4 pt-[126px] overflow-hidden">
-        <div className="flex-grow overflow-y-auto pt-8">
+      <div className="flex flex-col flex-grow w-full max-w-2xl mx-auto px-4 pt-[126px]">
+        <div className="flex-grow pt-8">
           <StepHeader 
             title="Customise Alert"
             description="Personalise the warning messages that will appear on your card."
@@ -84,7 +84,7 @@ const SelectAlertPage = () => {
           </div>
         </div>
 
-        <div className="w-full flex justify-between items-center mt-auto mb-[50px] gap-4 shrink-0">
+        <div className="w-full flex justify-between items-center mt-auto mb-[50px] pt-12 gap-4 shrink-0">
           <Button
             variant="ghost"
             onClick={() => navigate(-1)}

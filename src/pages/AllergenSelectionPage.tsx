@@ -18,28 +18,33 @@ const AllergenSelectionPage = () => {
   const [customAllergenInput, setCustomAllergenInput] = useState<string>('');
   const [customList, setCustomList] = useState<string[]>([]);
 
-  // Load selected allergens from storage on mount
+  // Load selected allergens and custom list from storage on mount
   useEffect(() => {
-    const loadAllergens = async () => {
-      const storedAllergens = await storage.get<any>(STORAGE_KEYS.SELECTED_ALLERGENS);
-      if (storedAllergens) {
+    const loadData = async () => {
+      const storedData = await storage.get<any>(STORAGE_KEYS.SELECTED_ALLERGENS);
+      if (storedData) {
+        // Load selected IDs
         let ids: string[] = [];
-        if (Array.isArray(storedAllergens)) {
-          ids = storedAllergens;
-        } else if (storedAllergens.ids) {
-          ids = storedAllergens.ids;
-        } else if (storedAllergens.standard) {
-          ids = [...(storedAllergens.standard || []), ...(storedAllergens.custom || [])];
+        if (Array.isArray(storedData)) {
+          ids = storedData;
+        } else if (storedData.ids) {
+          ids = storedData.ids;
+        } else if (storedData.standard) {
+          ids = [...(storedData.standard || []), ...(storedData.custom || [])];
         }
         setSelectedAllergens(ids);
         
-        // Identify which ones are custom to populate the custom list
-        const standardIds = ALLERGEN_OPTIONS.map(opt => opt.id);
-        const custom = ids.filter(id => !standardIds.includes(id));
-        setCustomList(custom);
+        // Load the persistent custom list if it exists, otherwise derive from selection
+        if (storedData.persistentCustomList) {
+          setCustomList(storedData.persistentCustomList);
+        } else {
+          const standardIds = ALLERGEN_OPTIONS.map(opt => opt.id);
+          const custom = ids.filter(id => !standardIds.includes(id));
+          setCustomList(custom);
+        }
       }
     };
-    loadAllergens();
+    loadData();
   }, []);
 
   const toggleAllergen = (id: string) => {
@@ -85,7 +90,8 @@ const AllergenSelectionPage = () => {
     await storage.set(STORAGE_KEYS.SELECTED_ALLERGENS, {
       standard,
       custom,
-      ids: selectedAllergens
+      ids: selectedAllergens,
+      persistentCustomList: customList // Save the full list of custom allergens
     });
     
     navigate('/select-alert');
@@ -95,15 +101,14 @@ const AllergenSelectionPage = () => {
     <div className="flex flex-col min-h-screen bg-gray-100 dark:bg-gray-900">
       <FixedHeader />
       
-      {/* Main content area - using flex-grow and mt to account for fixed header */}
-      <div className="flex flex-col flex-grow w-full max-w-2xl mx-auto px-4 mt-[106px] pt-[env(safe-area-inset-top)]">
-        <div className="flex-grow pt-4">
+      <div className="flex flex-col flex-grow w-full max-w-2xl mx-auto px-4 pt-[126px]">
+        <div className="flex-grow pt-8">
           <StepHeader 
             title="Select Allergens"
             description="Tap the allergens you want to include on your card."
           />
           
-          <div className="grid grid-cols-2 gap-2 w-full pt-6">
+          <div className="grid grid-cols-2 gap-2 w-full pt-8">
             {/* Standard Allergens */}
             {ALLERGEN_OPTIONS.map((allergen) => {
               const isSelected = selectedAllergens.includes(allergen.id);
@@ -181,26 +186,24 @@ const AllergenSelectionPage = () => {
           </div>
         </div>
 
-        {/* Navigation Footer - now part of the flow, not fixed */}
-        <div className="mt-auto pt-12 pb-24">
-          <div className="flex justify-between items-center gap-4">
-            <Button
-              variant="ghost"
-              onClick={() => navigate(-1)}
-              className="flex items-center text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-100"
-            >
-              <ChevronLeft className="w-5 h-5 mr-1" />
-              Back
-            </Button>
-            <Button
-              onClick={handleContinue}
-              disabled={selectedAllergens.length === 0}
-              className="py-3 px-8 text-lg h-auto bg-red-600 text-white hover:bg-red-700 rounded-xl shadow-lg transition-transform active:scale-95 flex items-center"
-            >
-              Continue
-              <ChevronRight className="w-5 h-5 ml-1" />
-            </Button>
-          </div>
+        {/* Navigation Footer */}
+        <div className="w-full flex justify-between items-center mt-auto mb-[50px] pt-12 gap-4 shrink-0">
+          <Button
+            variant="ghost"
+            onClick={() => navigate(-1)}
+            className="flex items-center text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-100"
+          >
+            <ChevronLeft className="w-5 h-5 mr-1" />
+            Back
+          </Button>
+          <Button
+            onClick={handleContinue}
+            disabled={selectedAllergens.length === 0}
+            className="py-3 px-8 text-lg h-auto bg-red-600 text-white hover:bg-red-700 rounded-xl shadow-lg transition-transform active:scale-95 flex items-center"
+          >
+            Continue
+            <ChevronRight className="w-5 h-5 ml-1" />
+          </Button>
         </div>
       </div>
     </div>
