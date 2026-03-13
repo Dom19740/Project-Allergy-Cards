@@ -121,10 +121,10 @@ const SavedCardsList = () => {
                   card.id === 'emergency-slot' && "border-red-200 dark:border-red-900/50"
                 )}
               >
-                <CardContent className="p-5 flex flex-col">
-                  <div className="flex justify-between items-start mb-3">
+                <CardContent className="p-3 flex flex-col">
+                  <div className="flex justify-between items-start mb-1">
                     <div className={cn(
-                      "px-2.5 py-1 rounded-lg text-[10px] font-bold uppercase tracking-wider", 
+                      "px-2 py-0.5 rounded-lg text-[9px] font-bold uppercase tracking-wider", 
                       card.id === 'emergency-slot' ? "bg-red-600 text-white" : "bg-red-50 dark:bg-red-900/20 text-red-600 dark:text-red-400"
                     )}>
                       {card.id === 'emergency-slot' ? `Emergency (${card.languageCode})` : card.languageCode}
@@ -133,18 +133,18 @@ const SavedCardsList = () => {
                       variant="ghost" 
                       size="icon" 
                       onClick={(e) => handleDelete(e, card)} 
-                      className="h-8 w-8 text-gray-400 hover:text-red-500 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-full"
+                      className="h-7 w-7 text-gray-400 hover:text-red-500 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-full"
                     >
-                      <Trash2 className="h-4 w-4" />
+                      <Trash2 className="h-3.5 w-3.5" />
                     </Button>
                   </div>
-                  <div className="text-center py-2">
-                    <h4 className="text-xl font-bold text-gray-800 dark:text-gray-100 line-clamp-1 flex items-center justify-center gap-2">
-                      {card.id === 'emergency-slot' && <AlertTriangle className="w-5 h-5 text-red-600" />}
+                  <div className="text-center py-1">
+                    <h4 className="text-lg font-bold text-gray-800 dark:text-gray-100 line-clamp-1 flex items-center justify-center gap-2">
+                      {card.id === 'emergency-slot' && <AlertTriangle className="w-4 h-4 text-red-600" />}
                       {card.name}
                     </h4>
-                    <div className="flex items-center justify-center text-xs text-gray-500 dark:text-gray-400 mt-1">
-                      <Clock className="w-3.5 h-3.5 mr-1.5" />
+                    <div className="flex items-center justify-center text-[10px] text-gray-500 dark:text-gray-400 mt-0.5">
+                      <Clock className="w-3 h-3 mr-1" />
                       {new Date(card.createdAt).toLocaleDateString()}
                     </div>
                   </div>
