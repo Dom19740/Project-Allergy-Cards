@@ -1,6 +1,7 @@
 "use client";
 
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
+import useEmblaCarousel from 'embla-carousel-react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -9,6 +10,7 @@ import { toast } from 'sonner';
 import { SavedCard, SelectedAllergens, CustomMessages, TranslatedContent } from '@/lib/types';
 import { storage, STORAGE_KEYS } from '@/lib/storage';
 import { Check } from 'lucide-react';
+import { cn } from '@/lib/utils';
 
 interface SaveCardDialogProps {
   isOpen: boolean;
@@ -32,8 +34,26 @@ const SaveCardDialog: React.FC<SaveCardDialogProps> = ({
   const [cardName, setCardName] = useState(isEmergency ? 'Emergency Card' : '');
   const [existingCards, setExistingCards] = useState<SavedCard[]>([]);
   const [selectedCardId, setSelectedCardId] = useState<string | null>(null);
-  const [activeIndex, setActiveIndex] = useState(0);
-  const scrollRef = useRef<HTMLDivElement>(null);
+  const [selectedIndex, setSelectedIndex] = useState(0);
+  
+  const [emblaRef, emblaApi] = useEmblaCarousel({ 
+    loop: false, 
+    align: 'center',
+    containScroll: 'trimSnaps',
+    dragFree: false
+  });
+
+  const onSelect = useCallback(() => {
+    if (!emblaApi) return;
+    setSelectedIndex(emblaApi.selectedScrollSnap());
+  }, [emblaApi]);
+
+  useEffect(() => {
+    if (!emblaApi) return;
+    onSelect();
+    emblaApi.on('select', onSelect);
+    emblaApi.on('reInit', onSelect);
+  }, [emblaApi, onSelect]);
 
   useEffect(() => {
     if (isOpen && !isEmergency) {
@@ -44,14 +64,6 @@ const SaveCardDialog: React.FC<SaveCardDialogProps> = ({
       loadCards();
     }
   }, [isOpen, isEmergency]);
-
-  const handleScroll = () => {
-    if (scrollRef.current) {
-      const { scrollLeft, clientWidth } = scrollRef.current;
-      const index = Math.round(scrollLeft / clientWidth);
-      setActiveIndex(index);
-    }
-  };
 
   const handleSave = async () => {
     if (!cardName.trim()) {
@@ -77,11 +89,9 @@ const SaveCardDialog: React.FC<SaveCardDialogProps> = ({
       
       let updatedCards: SavedCard[];
       if (selectedCardId) {
-        // Overwrite existing card
         updatedCards = savedCards.map(card => card.id === selectedCardId ? newCard : card);
         toast.success(`Card "${cardName}" updated successfully!`);
       } else {
-        // Save as new card
         if (savedCards.length >= 3) {
           toast.error("You can only save up to 3 cards. Please select one to overwrite.");
           return;
@@ -99,7 +109,7 @@ const SaveCardDialog: React.FC<SaveCardDialogProps> = ({
   const handleClose = () => {
     setCardName(isEmergency ? 'Emergency Card' : '');
     setSelectedCardId(null);
-    setActiveIndex(0);
+    setSelectedIndex(0);
     onClose();
   };
 
@@ -149,24 +159,37 @@ const SaveCardDialog: React.FC<SaveCardDialogProps> = ({
 
           {!isEmergency && existingCards.length > 0 && (
             <div className="flex flex-col gap-2 mt-2 overflow-hidden">
-              <Label className="text-xs font-bold text-gray-400">
-                Or Overwrite Existing
-              </Label>
-              <div className="relative w-full overflow-hidden">
-                <div 
-                  ref={scrollRef}
-                  onScroll={handleScroll}
-                  className="flex overflow-x-auto snap-x snap-mandatory no-scrollbar -mx-1"
-                >
+              <div className="flex items-center justify-between">
+                <Label className="text-xs font-bold text-gray-400">
+                  Or Overwrite Existing
+                </Label>
+                {existingCards.length > 1 && (
+                  <div className="flex justify-end gap-1.5">
+                    {existingCards.map((_, i) => (
+                      <div 
+                        key={i} 
+                        className={cn(
+                          "h-1.5 rounded-full transition-all duration-300", 
+                          i === selectedIndex ? "w-4 bg-red-600" : "w-1.5 bg-gray-300 dark:bg-gray-700"
+                        )} 
+                      />
+                    ))}
+                  </div>
+                )}
+              </div>
+
+              <div className="w-full overflow-hidden cursor-grab active:cursor-grabbing" ref={emblaRef}>
+                <div className="flex">
                   {existingCards.map((card) => (
-                    <div key={card.id} className="flex-none w-full snap-center px-1">
+                    <div key={card.id} className="flex-[0_0_100%] min-w-0 flex justify-center px-1">
                       <button
                         onClick={() => toggleCardSelection(card)}
-                        className={`w-full flex items-center justify-between p-4 rounded-xl border transition-all text-left ${
+                        className={cn(
+                          "w-full flex items-center justify-between p-4 rounded-xl border transition-all text-left",
                           selectedCardId === card.id 
                             ? 'border-red-500 bg-red-50 text-red-700' 
-                            : 'border-gray-100 bg-gray-50 text-gray-600 hover:border-gray-200'
-                        }`}
+                            : 'border-gray-100 bg-gray-50 text-gray-600 hover:border-gray-200 dark:bg-gray-800 dark:border-gray-700 dark:text-gray-300'
+                        )}
                       >
                         <div className="flex flex-col overflow-hidden">
                           <span className="font-medium truncate">{card.name}</span>
@@ -179,19 +202,6 @@ const SaveCardDialog: React.FC<SaveCardDialogProps> = ({
                     </div>
                   ))}
                 </div>
-                
-                {existingCards.length > 1 && (
-                  <div className="flex justify-center gap-1.5 mt-3">
-                    {existingCards.map((_, i) => (
-                      <div 
-                        key={i}
-                        className={`h-1.5 rounded-full transition-all duration-300 ${
-                          activeIndex === i ? 'w-4 bg-red-500' : 'w-1.5 bg-gray-200'
-                        }`}
-                      />
-                    ))}
-                  </div>
-                )}
               </div>
             </div>
           )}
