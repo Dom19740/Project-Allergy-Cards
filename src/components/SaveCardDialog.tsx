@@ -141,9 +141,9 @@ const SaveCardDialog: React.FC<SaveCardDialogProps> = ({
           </DialogTitle>
         </DialogHeader>
         
-        <div className="flex flex-col gap-4 py-2 overflow-hidden">
+        <div className="flex flex-col gap-4 py-2 overflow-hidden px-1">
           <div className="flex flex-col gap-2">
-            <Label htmlFor="name" className="text-xs font-bold text-gray-400">
+            <Label htmlFor="name" className="text-xs font-bold text-gray-400 px-1">
               {selectedCardId ? 'Update Card Name' : 'Card Name'}
             </Label>
             <Input
@@ -153,13 +153,13 @@ const SaveCardDialog: React.FC<SaveCardDialogProps> = ({
               onKeyDown={handleKeyDown}
               placeholder={isEmergency ? "Emergency Card" : "e.g. My Thai Card"}
               autoFocus
-              className="w-full rounded-xl border-gray-200 focus:ring-red-500 focus:border-gray-200"
+              className="w-full rounded-xl border-gray-200 focus:ring-red-500 focus:border-gray-200 px-4"
             />
           </div>
 
           {!isEmergency && existingCards.length > 0 && (
             <div className="flex flex-col gap-2 mt-2 overflow-hidden">
-              <div className="flex items-center justify-between">
+              <div className="flex items-center justify-between px-1">
                 <Label className="text-xs font-bold text-gray-400">
                   Or Overwrite Existing
                 </Label>
