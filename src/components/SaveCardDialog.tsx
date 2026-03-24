@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -32,6 +32,8 @@ const SaveCardDialog: React.FC<SaveCardDialogProps> = ({
   const [cardName, setCardName] = useState(isEmergency ? 'Emergency Card' : '');
   const [existingCards, setExistingCards] = useState<SavedCard[]>([]);
   const [selectedCardId, setSelectedCardId] = useState<string | null>(null);
+  const [activeIndex, setActiveIndex] = useState(0);
+  const scrollRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     if (isOpen && !isEmergency) {
@@ -42,6 +44,14 @@ const SaveCardDialog: React.FC<SaveCardDialogProps> = ({
       loadCards();
     }
   }, [isOpen, isEmergency]);
+
+  const handleScroll = () => {
+    if (scrollRef.current) {
+      const { scrollLeft, clientWidth } = scrollRef.current;
+      const index = Math.round(scrollLeft / clientWidth);
+      setActiveIndex(index);
+    }
+  };
 
   const handleSave = async () => {
     if (!cardName.trim()) {
@@ -89,6 +99,7 @@ const SaveCardDialog: React.FC<SaveCardDialogProps> = ({
   const handleClose = () => {
     setCardName(isEmergency ? 'Emergency Card' : '');
     setSelectedCardId(null);
+    setActiveIndex(0);
     onClose();
   };
 
@@ -141,26 +152,45 @@ const SaveCardDialog: React.FC<SaveCardDialogProps> = ({
               <Label className="text-xs font-bold text-gray-400">
                 Or Overwrite Existing
               </Label>
-              <div className="grid gap-2 max-h-[200px] overflow-y-auto pr-1">
-                {existingCards.map((card) => (
-                  <button
-                    key={card.id}
-                    onClick={() => toggleCardSelection(card)}
-                    className={`flex items-center justify-between p-3 rounded-xl border transition-all text-left ${
-                      selectedCardId === card.id 
-                        ? 'border-red-500 bg-red-50 text-red-700' 
-                        : 'border-gray-100 bg-gray-50 text-gray-600 hover:border-gray-200'
-                    }`}
-                  >
-                    <div className="flex flex-col overflow-hidden">
-                      <span className="font-medium truncate">{card.name}</span>
-                      <span className="text-[10px] opacity-60">
-                        {new Date(card.createdAt).toLocaleDateString()}
-                      </span>
-                    </div>
-                    {selectedCardId === card.id && <Check size={16} className="shrink-0 ml-2" />}
-                  </button>
-                ))}
+              <div className="relative">
+                <div 
+                  ref={scrollRef}
+                  onScroll={handleScroll}
+                  className="flex gap-3 overflow-x-auto snap-x snap-mandatory no-scrollbar pb-2"
+                >
+                  {existingCards.map((card) => (
+                    <button
+                      key={card.id}
+                      onClick={() => toggleCardSelection(card)}
+                      className={`flex-none w-[85%] snap-center flex items-center justify-between p-4 rounded-xl border transition-all text-left ${
+                        selectedCardId === card.id 
+                          ? 'border-red-500 bg-red-50 text-red-700' 
+                          : 'border-gray-100 bg-gray-50 text-gray-600 hover:border-gray-200'
+                      }`}
+                    >
+                      <div className="flex flex-col overflow-hidden">
+                        <span className="font-medium truncate">{card.name}</span>
+                        <span className="text-[10px] opacity-60">
+                          {new Date(card.createdAt).toLocaleDateString()}
+                        </span>
+                      </div>
+                      {selectedCardId === card.id && <Check size={16} className="shrink-0 ml-2" />}
+                    </button>
+                  ))}
+                </div>
+                
+                {existingCards.length > 1 && (
+                  <div className="flex justify-center gap-1.5 mt-2">
+                    {existingCards.map((_, i) => (
+                      <div 
+                        key={i}
+                        className={`h-1.5 rounded-full transition-all duration-300 ${
+                          activeIndex === i ? 'w-4 bg-red-500' : 'w-1.5 bg-gray-200'
+                        }`}
+                      />
+                    ))}
+                  </div>
+                )}
               </div>
             </div>
           )}
