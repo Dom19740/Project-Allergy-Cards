@@ -1,8 +1,9 @@
 "use client";
 
 import React, { useEffect, useState, useRef } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
+import { useParams, useNavigate, useLocation } from 'react-router-dom';
 import { AlertTriangle, Loader2, Phone } from 'lucide-react';
+
 import { translateText } from '@/lib/translator';
 import { getEmergencyNumber } from '@/lib/emergencyNumbers';
 import { shareCard, downloadCard } from '@/lib/card-utils';
@@ -17,8 +18,10 @@ import { SelectedAllergens, CustomMessages, TranslatedContent } from '@/lib/type
 const EmergencyPage = () => {
   const { langCode } = useParams<{ langCode: string }>();
   const navigate = useNavigate();
+  const location = useLocation();
+  const fromWidget = location.state?.fromWidget || false;
   const cardRef = useRef<HTMLDivElement>(null);
-  
+
   const [isTranslating, setIsTranslating] = useState(true);
   const [isSharing, setIsSharing] = useState(false);
   const [isDownloading, setIsDownloading] = useState(false);
@@ -148,21 +151,28 @@ const EmergencyPage = () => {
         </div>
       </div>
       
-      <EmergencyActions 
-        onBack={() => navigate(-1)} 
-        onShare={handleShare} 
-        onDownload={handleDownload} 
+      <EmergencyActions
+        onBack={() => {
+          if (fromWidget) {
+            navigate(`/alert/${langCode}`);
+          } else {
+            navigate(-1);
+          }
+        }}
+        onShare={handleShare}
+        onDownload={handleDownload}
         onToggleMenu={() => setIsMenuOpen(true)}
-        onSave={handleSave} 
-        isSharing={isSharing} 
-        isDownloading={isDownloading} 
+        onSave={handleSave}
+        isSharing={isSharing}
+        isDownloading={isDownloading}
       />
 
-      <CardMenu 
-        isOpen={isMenuOpen} 
-        onClose={() => setIsMenuOpen(false)} 
+      <CardMenu
+        isOpen={isMenuOpen}
+        onClose={() => setIsMenuOpen(false)}
         onOpenDisclaimer={() => setIsDisclaimerOpen(true)}
         isEmergency={true}
+        fromWidget={fromWidget}
       />
 
       <DisclaimerDialog 

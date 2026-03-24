@@ -18,10 +18,12 @@ interface AllergyCardProps {
   languageCode: LanguageCode;
   selectedAllergens: string[];
   initialTranslations?: TranslatedContent | null;
+  fromWidget?: boolean;
 }
 
-const AllergyCard: React.FC<AllergyCardProps> = ({ languageCode, selectedAllergens, initialTranslations }) => {
+const AllergyCard: React.FC<AllergyCardProps> = ({ languageCode, selectedAllergens, initialTranslations, fromWidget = false }) => {
   const cardRef = useRef<HTMLDivElement>(null);
+
   const navigate = useNavigate();
   const [isSharing, setIsSharing] = useState(false);
   const [isDownloading, setIsDownloading] = useState(false);
@@ -295,7 +297,7 @@ const AllergyCard: React.FC<AllergyCardProps> = ({ languageCode, selectedAllerge
           </p>
         </div>
       </div>
-      <CardActions 
+      <CardActions
         onShare={handleShare}
         onDownload={handleDownload}
         onPrint={handlePrint}
@@ -304,8 +306,15 @@ const AllergyCard: React.FC<AllergyCardProps> = ({ languageCode, selectedAllerge
         onEmergency={handleEmergency}
         isSharing={isSharing}
         isDownloading={isDownloading}
+        fromWidget={fromWidget}
       />
-      <CardMenu isOpen={isMenuOpen} onClose={() => setIsMenuOpen(false)} onOpenDisclaimer={() => setIsDisclaimerOpen(true)} />
+      <CardMenu
+        isOpen={isMenuOpen}
+        onClose={() => setIsMenuOpen(false)}
+        onOpenDisclaimer={() => setIsDisclaimerOpen(true)}
+        fromWidget={fromWidget}
+      />
+
       <DisclaimerDialog isOpen={isDisclaimerOpen} onClose={() => setIsDisclaimerOpen(false)} />
       {fullSelectedData && (
         <SaveCardDialog

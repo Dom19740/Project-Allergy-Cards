@@ -1,7 +1,7 @@
 "use client";
 
 import React from 'react';
-import { Link } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import { Home, ShieldAlert, MessageSquare, Languages, X, Info, Mail } from 'lucide-react';
 
 interface CardMenuProps {
@@ -9,12 +9,22 @@ interface CardMenuProps {
   onClose: () => void;
   onOpenDisclaimer: () => void;
   isEmergency?: boolean;
+  fromWidget?: boolean;
 }
 
-const CardMenu: React.FC<CardMenuProps> = ({ isOpen, onClose, onOpenDisclaimer, isEmergency = false }) => {
+const CardMenu: React.FC<CardMenuProps> = ({ isOpen, onClose, onOpenDisclaimer, isEmergency = false, fromWidget = false }) => {
+  const navigate = useNavigate();
   if (!isOpen) return null;
 
+  const handleNavigation = (to: string) => {
+    onClose();
+    // If we're from a widget, we use replace: true for the first navigation
+    // to clear the deep link state from the history stack.
+    navigate(to, { replace: fromWidget });
+  };
+
   const handleReportIssue = () => {
+
     const subject = encodeURIComponent("Simple Allergy Alert Issue Report");
     window.location.href = `mailto:happymunkeestudio@dpbcreative.com?subject=${subject}`;
     onClose();
@@ -49,17 +59,16 @@ const CardMenu: React.FC<CardMenuProps> = ({ isOpen, onClose, onOpenDisclaimer, 
               </button>
             </div>
             {menuItems.map((item) => (
-              <Link
+              <button
                 key={item.to}
-                to={item.to}
-                className="flex items-center space-x-3 px-4 py-3 text-sm font-medium text-gray-700 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-gray-700 rounded-xl transition-colors"
-                onClick={onClose}
+                onClick={() => handleNavigation(item.to)}
+                className="w-full flex items-center space-x-3 px-4 py-3 text-sm font-medium text-gray-700 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-gray-700 rounded-xl transition-colors text-left"
               >
                 <item.icon className="h-4 w-4 text-red-500" />
                 <span>{item.label}</span>
-              </Link>
+              </button>
             ))}
-            
+
             <button
               onClick={handleReportIssue}
               className="w-full flex items-center space-x-3 px-4 py-3 text-sm font-medium text-gray-700 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-gray-700 rounded-xl transition-colors text-left"
