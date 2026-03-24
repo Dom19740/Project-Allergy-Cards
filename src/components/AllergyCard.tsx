@@ -159,7 +159,7 @@ const AllergyCard: React.FC<AllergyCardProps> = ({ languageCode, selectedAllerge
           </div>
 
           <div className="grid grid-cols-2 gap-4">
-            {(translations.allergens as unknown as string[]).map((allergen, index) => (
+            {translations.allergens.map((allergen, index) => (
               <div key={index} className="flex items-center space-x-3 p-3 bg-red-50 rounded-2xl border border-red-100">
                 <div className="w-2 h-2 bg-red-600 rounded-full shrink-0" />
                 <span className="font-bold text-gray-900 leading-tight">{allergen}</span>
@@ -207,7 +207,7 @@ const AllergyCard: React.FC<AllergyCardProps> = ({ languageCode, selectedAllerge
         onClose={() => setIsSaveDialogOpen(false)}
         languageCode={languageCode}
         selectedAllergens={{
-          standard: selectedAllergens.reduce((acc, curr) => ({ ...acc, [curr]: true }), {}),
+          standard: selectedAllergens,
           custom: {},
           ids: selectedAllergens
         }}
