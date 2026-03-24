@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -8,6 +8,7 @@ import { Label } from '@/components/ui/label';
 import { toast } from 'sonner';
 import { SavedCard, SelectedAllergens, CustomMessages, TranslatedContent } from '@/lib/types';
 import { storage, STORAGE_KEYS } from '@/lib/storage';
+import { Check } from 'lucide-react';
 
 interface SaveCardDialogProps {
   isOpen: boolean;
@@ -29,6 +30,18 @@ const SaveCardDialog: React.FC<SaveCardDialogProps> = ({
   isEmergency = false
 }) => {
   const [cardName, setCardName] = useState(isEmergency ? 'Emergency Card' : '');
+  const [existingCards, setExistingCards] = useState<SavedCard[]>([]);
+  const [selectedCardId, setSelectedCardId] = useState<string | null>(null);
+
+  useEffect(() => {
+    if (isOpen && !isEmergency) {
+      const loadCards = async () => {
+        const savedCards = await storage.get<SavedCard[]>(STORAGE_KEYS.SAVED_CARDS) || [];
+        setExistingCards(savedCards);
+      };
+      loadCards();
+    }
+  }, [isOpen, isEmergency]);
 
   const handleSave = async () => {
     if (!cardName.trim()) {
@@ -37,7 +50,7 @@ const SaveCardDialog: React.FC<SaveCardDialogProps> = ({
     }
 
     const newCard: SavedCard = {
-      id: isEmergency ? 'emergency-slot' : crypto.randomUUID(),
+      id: isEmergency ? 'emergency-slot' : (selectedCardId || crypto.randomUUID()),
       name: cardName.trim(),
       languageCode,
       selectedAllergens,
@@ -51,16 +64,31 @@ const SaveCardDialog: React.FC<SaveCardDialogProps> = ({
       toast.success("Emergency card saved successfully!");
     } else {
       const savedCards = await storage.get<SavedCard[]>(STORAGE_KEYS.SAVED_CARDS) || [];
-      if (savedCards.length >= 3) {
-        toast.error("You can only save up to 3 cards. Please delete one to save a new one.");
-        return;
+      
+      let updatedCards: SavedCard[];
+      if (selectedCardId) {
+        // Overwrite existing card
+        updatedCards = savedCards.map(card => card.id === selectedCardId ? newCard : card);
+        toast.success(`Card "${cardName}" updated successfully!`);
+      } else {
+        // Save as new card
+        if (savedCards.length >= 3) {
+          toast.error("You can only save up to 3 cards. Please select one to overwrite.");
+          return;
+        }
+        updatedCards = [...savedCards, newCard];
+        toast.success(`Card "${cardName}" saved successfully!`);
       }
-      const updatedCards = [...savedCards, newCard];
+      
       await storage.set(STORAGE_KEYS.SAVED_CARDS, updatedCards);
-      toast.success(`Card "${cardName}" saved successfully!`);
     }
     
-    setCardName('');
+    handleClose();
+  };
+
+  const handleClose = () => {
+    setCardName(isEmergency ? 'Emergency Card' : '');
+    setSelectedCardId(null);
     onClose();
   };
 
@@ -71,8 +99,18 @@ const SaveCardDialog: React.FC<SaveCardDialogProps> = ({
     }
   };
 
+  const toggleCardSelection = (card: SavedCard) => {
+    if (selectedCardId === card.id) {
+      setSelectedCardId(null);
+      setCardName('');
+    } else {
+      setSelectedCardId(card.id);
+      setCardName(card.name);
+    }
+  };
+
   return (
-    <Dialog open={isOpen} onOpenChange={onClose}>
+    <Dialog open={isOpen} onOpenChange={handleClose}>
       <DialogContent 
         className="w-[90%] max-w-[400px] rounded-2xl border-gray-200 dark:border-gray-700 shadow-2xl p-6 top-[15%] sm:top-[50%] translate-y-0 sm:-translate-y-1/2 animate-in fade-in slide-in-from-bottom-8 duration-300"
       >
@@ -85,7 +123,7 @@ const SaveCardDialog: React.FC<SaveCardDialogProps> = ({
         <div className="grid gap-4 py-2">
           <div className="grid gap-2">
             <Label htmlFor="name" className="text-xs font-bold text-gray-400 uppercase tracking-wider">
-              Card Name
+              {selectedCardId ? 'Update Card Name' : 'Card Name'}
             </Label>
             <Input
               id="name"
@@ -97,12 +135,41 @@ const SaveCardDialog: React.FC<SaveCardDialogProps> = ({
               className="rounded-xl border-gray-200 focus:ring-red-500 focus:border-gray-200"
             />
           </div>
+
+          {!isEmergency && existingCards.length > 0 && (
+            <div className="grid gap-2 mt-2">
+              <Label className="text-xs font-bold text-gray-400 uppercase tracking-wider">
+                Or Overwrite Existing
+              </Label>
+              <div className="grid gap-2 max-h-[200px] overflow-y-auto pr-1">
+                {existingCards.map((card) => (
+                  <button
+                    key={card.id}
+                    onClick={() => toggleCardSelection(card)}
+                    className={`flex items-center justify-between p-3 rounded-xl border transition-all text-left ${
+                      selectedCardId === card.id 
+                        ? 'border-red-500 bg-red-50 text-red-700' 
+                        : 'border-gray-100 bg-gray-50 text-gray-600 hover:border-gray-200'
+                    }`}
+                  >
+                    <div className="flex flex-col overflow-hidden">
+                      <span className="font-medium truncate">{card.name}</span>
+                      <span className="text-[10px] opacity-60">
+                        {new Date(card.createdAt).toLocaleDateString()}
+                      </span>
+                    </div>
+                    {selectedCardId === card.id && <Check size={16} className="shrink-0 ml-2" />}
+                  </button>
+                ))}
+              </div>
+            </div>
+          )}
         </div>
 
         <DialogFooter className="flex flex-row gap-3 mt-6 sm:justify-end">
           <Button 
             variant="outline" 
-            onClick={onClose}
+            onClick={handleClose}
             className="flex-1 rounded-xl border-gray-200 text-gray-600 hover:bg-gray-50"
           >
             Cancel
@@ -111,7 +178,7 @@ const SaveCardDialog: React.FC<SaveCardDialogProps> = ({
             onClick={handleSave} 
             className="flex-1 bg-red-600 hover:bg-red-700 text-white rounded-xl shadow-md transition-all active:scale-95"
           >
-            Save Card
+            {selectedCardId ? 'Update Card' : 'Save Card'}
           </Button>
         </DialogFooter>
       </DialogContent>
