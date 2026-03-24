@@ -24,19 +24,15 @@ export interface CustomMessages {
 }
 
 export interface TranslatedContent {
-  title: string;
-  severity: string;
-  allergens: string[];
-  instructions: string;
-  footer: string;
-  ui?: {
+  ui: {
     allergyAlert: string;
     iAmAllergicTo: string;
     pleaseBeCareful: string;
     thankYou: string;
     theyMakeMeSick: string;
   };
-  emergency?: {
+  allergens: { [key: string]: string };
+  emergency: {
     attention: string;
     emergency: string;
     needHelp: string;

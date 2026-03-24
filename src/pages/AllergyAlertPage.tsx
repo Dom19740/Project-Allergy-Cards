@@ -10,7 +10,6 @@ import { storage, STORAGE_KEYS } from '@/lib/storage';
 const AllergyAlertPage = () => {
   const { langCode } = useParams<{ langCode: string }>();
   const location = useLocation();
-  const fromWidget = location.state?.fromWidget || false;
   const [selectedAllergens, setSelectedAllergens] = useState<string[]>([]);
   const [initialTranslations, setInitialTranslations] = useState<TranslatedContent | null>(null);
   const [isLoading, setIsLoading] = useState(true);
@@ -68,15 +67,13 @@ const AllergyAlertPage = () => {
 
   return (
     <div className="flex flex-col items-center min-h-screen bg-white dark:bg-white">
-      <AllergyCard
-        languageCode={langCode as LanguageCode}
+      <AllergyCard 
+        languageCode={langCode as LanguageCode} 
         selectedAllergens={selectedAllergens}
         initialTranslations={initialTranslations}
-        fromWidget={fromWidget}
       />
     </div>
   );
-
 };
 
 export default AllergyAlertPage;

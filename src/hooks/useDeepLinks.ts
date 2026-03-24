@@ -38,7 +38,7 @@ export const useDeepLinks = () => {
             
             // Force navigation by adding a unique state or checking current path
             const targetPath = `/alert/${card.languageCode}`;
-            navigate(targetPath, { replace: true, state: { refresh: Date.now(), fromWidget: true } });
+            navigate(targetPath, { replace: true, state: { refresh: Date.now() } });
           }
         } else if (host === 'emergency') {
           const emergencyCard = await storage.get<SavedCard>(STORAGE_KEYS.SAVED_EMERGENCY_CARD);
@@ -55,7 +55,7 @@ export const useDeepLinks = () => {
                 content: emergencyCard.translatedContent
               });
             }
-            navigate(`/emergency/${emergencyCard.languageCode}`, { replace: true, state: { refresh: Date.now(), fromWidget: true } });
+            navigate(`/emergency/${emergencyCard.languageCode}`, { replace: true, state: { refresh: Date.now() } });
           } else {
             navigate('/');
             setTimeout(() => {
