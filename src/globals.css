@@ -100,6 +100,16 @@
   }
 }
 
+@layer utilities {
+  .no-scrollbar::-webkit-scrollbar {
+    display: none;
+  }
+  .no-scrollbar {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+}
+
 /* Ensure toast notifications are above the Android navigation bar and the app's bottom buttons */
 [data-sonner-toaster] {
   bottom: calc(110px + env(safe-area-inset-bottom)) !important;
