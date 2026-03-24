@@ -122,7 +122,7 @@ const SaveCardDialog: React.FC<SaveCardDialogProps> = ({
         
         <div className="grid gap-4 py-2">
           <div className="grid gap-2">
-            <Label htmlFor="name" className="text-xs font-bold text-gray-400 uppercase tracking-wider">
+            <Label htmlFor="name" className="text-xs font-bold text-gray-400">
               {selectedCardId ? 'Update Card Name' : 'Card Name'}
             </Label>
             <Input
@@ -138,7 +138,7 @@ const SaveCardDialog: React.FC<SaveCardDialogProps> = ({
 
           {!isEmergency && existingCards.length > 0 && (
             <div className="grid gap-2 mt-2">
-              <Label className="text-xs font-bold text-gray-400 uppercase tracking-wider">
+              <Label className="text-xs font-bold text-gray-400">
                 Or Overwrite Existing
               </Label>
               <div className="grid gap-2 max-h-[200px] overflow-y-auto pr-1">
