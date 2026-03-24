@@ -131,7 +131,7 @@ const SaveCardDialog: React.FC<SaveCardDialogProps> = ({
           </DialogTitle>
         </DialogHeader>
         
-        <div className="grid gap-4 py-2">
+        <div className="grid gap-4 py-2 overflow-hidden">
           <div className="grid gap-2">
             <Label htmlFor="name" className="text-xs font-bold text-gray-400">
               {selectedCardId ? 'Update Card Name' : 'Card Name'}
@@ -143,26 +143,27 @@ const SaveCardDialog: React.FC<SaveCardDialogProps> = ({
               onKeyDown={handleKeyDown}
               placeholder={isEmergency ? "Emergency Card" : "e.g. My Thai Card"}
               autoFocus
-              className="rounded-xl border-gray-200 focus:ring-red-500 focus:border-gray-200"
+              className="w-full rounded-xl border-gray-200 focus:ring-red-500 focus:border-gray-200"
             />
           </div>
 
           {!isEmergency && existingCards.length > 0 && (
-            <div className="grid gap-2 mt-2">
+            <div className="grid gap-2 mt-2 overflow-hidden">
               <Label className="text-xs font-bold text-gray-400">
                 Or Overwrite Existing
               </Label>
-              <div className="relative">
+              <div className="relative w-full">
                 <div 
                   ref={scrollRef}
                   onScroll={handleScroll}
-                  className="flex gap-3 overflow-x-auto snap-x snap-mandatory no-scrollbar pb-2"
+                  className="flex gap-4 overflow-x-auto snap-x snap-mandatory no-scrollbar pb-2 -mx-1 px-1"
+                  style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}
                 >
                   {existingCards.map((card) => (
                     <button
                       key={card.id}
                       onClick={() => toggleCardSelection(card)}
-                      className={`flex-none w-[85%] snap-center flex items-center justify-between p-4 rounded-xl border transition-all text-left ${
+                      className={`flex-none w-full snap-center flex items-center justify-between p-4 rounded-xl border transition-all text-left ${
                         selectedCardId === card.id 
                           ? 'border-red-500 bg-red-50 text-red-700' 
                           : 'border-gray-100 bg-gray-50 text-gray-600 hover:border-gray-200'
