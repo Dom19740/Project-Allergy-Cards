@@ -9,12 +9,8 @@ export interface Allergen {
 }
 
 export interface SelectedAllergens {
-  standard: string[];
-  custom: {
-    [key: string]: {
-      [lang: string]: string;
-    };
-  };
+  standard: { [key: string]: boolean };
+  custom: { [key: string]: { [lang: string]: string } };
   ids: string[];
 }
 
@@ -24,15 +20,19 @@ export interface CustomMessages {
 }
 
 export interface TranslatedContent {
-  ui: {
+  title: string;
+  severity: string;
+  allergens: string[];
+  instructions: string;
+  footer: string;
+  ui?: {
     allergyAlert: string;
     iAmAllergicTo: string;
     pleaseBeCareful: string;
     thankYou: string;
     theyMakeMeSick: string;
   };
-  allergens: { [key: string]: string };
-  emergency: {
+  emergency?: {
     attention: string;
     emergency: string;
     needHelp: string;

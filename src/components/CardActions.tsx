@@ -13,6 +13,7 @@ interface CardActionsProps {
   onEmergency: () => void;
   isSharing: boolean;
   isDownloading: boolean;
+  fromWidget?: boolean;
 }
 
 const CardActions: React.FC<CardActionsProps> = ({
@@ -23,8 +24,11 @@ const CardActions: React.FC<CardActionsProps> = ({
   onToggleMenu,
   onEmergency,
   isSharing,
-  isDownloading
+  isDownloading,
+  fromWidget = false
 }) => {
+  if (fromWidget) return null;
+
   return (
     <div className="w-full pt-2 pb-[calc(8px+env(safe-area-inset-bottom))] flex justify-center bg-white border-t border-gray-100 z-30">
       <div className="flex items-center space-x-3 bg-white p-2 rounded-full shadow-md border border-gray-200">
