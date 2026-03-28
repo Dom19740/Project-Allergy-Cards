@@ -140,6 +140,11 @@ const EmergencyPage = () => {
     );
   }
 
+  // Safety check for allergens array
+  const allergensArray = (Array.isArray(translations.allergens) 
+    ? translations.allergens 
+    : Object.values(translations.allergens || {})) as string[];
+
   return (
     <div className="flex flex-col items-center min-h-screen bg-red-600 p-4 pb-24">
       <div className="w-full max-w-md mb-6 text-center text-white pt-4">
@@ -167,7 +172,7 @@ const EmergencyPage = () => {
               <span className="mr-3">⚠️</span> {translations.severity}
             </h3>
             <div className="grid gap-3">
-              {translations.allergens.map((allergen, index) => (
+              {allergensArray.map((allergen, index) => (
                 <div key={index} className="flex items-center p-4 bg-red-50 rounded-2xl border-2 border-red-100">
                   <div className="w-3 h-3 bg-red-600 rounded-full mr-4 shadow-sm" />
                   <span className="text-2xl font-black text-gray-900">{allergen}</span>

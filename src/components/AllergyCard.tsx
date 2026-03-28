@@ -30,11 +30,12 @@ const AllergyCard: React.FC<AllergyCardProps> = ({ languageCode, selectedAllerge
   const [isDisclaimerOpen, setIsDisclaimerOpen] = useState(false);
   
   const [translations, setTranslations] = useState<TranslatedContent | null>(initialTranslations || null);
-  const [translatedAllergens, setTranslatedAllergens] = useState<{ [key: string]: string }>(() => {
+  const [translatedAllergens, setTranslatedAllergens] = useState<Record<string, string>>(() => {
     if (initialTranslations?.allergens) {
-      // If we have initial translations, we map them. Since we don't have IDs here, 
-      // we use the index as key for consistency during the session.
-      return initialTranslations.allergens.reduce((acc, curr, idx) => ({ ...acc, [idx]: curr }), {});
+      const allergens = Array.isArray(initialTranslations.allergens) 
+        ? initialTranslations.allergens 
+        : Object.values(initialTranslations.allergens || {});
+      return (allergens as string[]).reduce((acc, curr, idx) => ({ ...acc, [idx]: curr }), {} as Record<string, string>);
     }
     return {};
   });
@@ -68,7 +69,11 @@ const AllergyCard: React.FC<AllergyCardProps> = ({ languageCode, selectedAllerge
           setTranslations(sessionData.content);
           if (sessionData.content.ui) setTranslatedUIText(sessionData.content.ui);
           if (sessionData.content.emergency) setEmergencyTranslations(sessionData.content.emergency);
-          setTranslatedAllergens(sessionData.content.allergens.reduce((acc, curr, idx) => ({ ...acc, [idx]: curr }), {}));
+          
+          const allergens = Array.isArray(sessionData.content.allergens) 
+            ? sessionData.content.allergens 
+            : Object.values(sessionData.content.allergens || {});
+          setTranslatedAllergens((allergens as string[]).reduce((acc, curr, idx) => ({ ...acc, [idx]: curr }), {} as Record<string, string>));
         }
       }
       
@@ -159,6 +164,11 @@ const AllergyCard: React.FC<AllergyCardProps> = ({ languageCode, selectedAllerge
 
   const languageName = languages.find(l => l.code === languageCode)?.name || languageCode;
 
+  // Safety check for allergens array
+  const allergensArray = (Array.isArray(translations.allergens) 
+    ? translations.allergens 
+    : Object.values(translations.allergens || {})) as string[];
+
   return (
     <div className="w-full max-w-md mx-auto p-4 space-y-6 animate-in fade-in slide-in-from-bottom-4 duration-500">
       <div 
@@ -188,7 +198,7 @@ const AllergyCard: React.FC<AllergyCardProps> = ({ languageCode, selectedAllerge
           </div>
 
           <div className="grid grid-cols-2 gap-4">
-            {translations.allergens.map((allergen, index) => (
+            {allergensArray.map((allergen, index) => (
               <div key={index} className="flex items-center space-x-3 p-3 bg-red-50 rounded-2xl border border-red-100">
                 <div className="w-2 h-2 bg-red-600 rounded-full shrink-0" />
                 <span className="font-bold text-gray-900 leading-tight">{allergen}</span>
