@@ -12,7 +12,6 @@ interface EmergencyActionsProps {
   onSave?: () => void;
   isSharing?: boolean;
   isDownloading?: boolean;
-  fromWidget?: boolean;
 }
 
 const EmergencyActions: React.FC<EmergencyActionsProps> = ({
@@ -22,11 +21,8 @@ const EmergencyActions: React.FC<EmergencyActionsProps> = ({
   onToggleMenu,
   onSave,
   isSharing = false,
-  isDownloading = false,
-  fromWidget = false
+  isDownloading = false
 }) => {
-  if (fromWidget) return null;
-
   return (
     <div className="w-full pt-2 pb-[calc(8px+env(safe-area-inset-bottom))] flex justify-center bg-white border-t border-gray-100 z-30">
       <div className="flex items-center space-x-3 bg-white p-2 rounded-full shadow-md border border-gray-200">
