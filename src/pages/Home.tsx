@@ -44,7 +44,7 @@ const Home = () => {
   return (
     <div className="flex flex-col h-[100dvh] bg-gray-100 dark:bg-gray-900 overflow-hidden">
       <FixedHeader />
-      <div className="flex flex-col flex-1 w-full max-w-2xl mx-auto px-4 pt-[calc(80px+env(safe-area-inset-top)+5px)] pb-[env(safe-area-inset-bottom)] min-h-0">
+      <div className="flex flex-col flex-1 w-full max-w-2xl mx-auto px-4 pt-[calc(70px+env(safe-area-inset-top)+5px)] pb-[env(safe-area-inset-bottom)] min-h-0">
         <div className="flex-1 flex flex-col items-center text-center min-h-0">
           <div className={cn("w-full flex items-center justify-center min-h-0 p-1 transition-all duration-500 ease-in-out", hasCards ? "flex-[0.35]" : "flex-[0.45]")}>
             <img 
@@ -56,8 +56,8 @@ const Home = () => {
               )} 
             />
           </div>
-          <div className={cn("flex flex-col w-full py-1 min-h-0 transition-all duration-500", hasCards ? "flex-[0.65] justify-start" : "flex-[0.55] justify-center")}>
-            <div className={cn("space-y-1.5 transition-all duration-500", !hasCards && "mb-4")}>
+          <div className={cn("flex flex-col w-full py-1 min-h-0 transition-all duration-500", hasCards ? "flex-1 justify-start" : "flex-[0.55] justify-center")}>
+            <div className={cn("space-y-1 transition-all duration-500", !hasCards && "mb-4")}>
               <p className={cn("text-gray-700 dark:text-gray-300 max-w-md mx-auto px-6 leading-tight transition-all duration-500", hasCards ? "text-sm md:text-base" : "text-lg md:text-2xl")}>
                 Create a personalized allergy alert in multiple languages to communicate your dietary restrictions easily and safely.
               </p>
@@ -72,14 +72,14 @@ const Home = () => {
             )}
           </div>
         </div>
-        <div className="flex-shrink-0 w-full flex flex-col justify-center items-center py-2 gap-2">
+        <div className="flex-shrink-0 w-full flex flex-col justify-center items-center py-1 gap-1">
           <Button 
             onClick={handleGetStarted}
-            className="py-3 text-xl md:text-2xl h-auto transition-all duration-200 ease-in-out hover:scale-105 bg-red-600 text-white hover:bg-red-700 w-[280px]"
+            className="py-2.5 text-xl md:text-2xl h-auto transition-all duration-200 ease-in-out hover:scale-105 bg-red-600 text-white hover:bg-red-700 w-[280px]"
           >
             Get Started
           </Button>
-          <p className="text-[10px] text-gray-500 dark:text-gray-400 mb-1">
+          <p className="text-[10px] text-gray-500 dark:text-gray-400 mb-0.5">
             © 2026 <a href="https://dpbcreative.com/" target="_blank" rel="noopener noreferrer" className="underline hover:text-gray-700 dark:hover:text-gray-200">dpb creative</a>. All rights reserved
           </p>
         </div>

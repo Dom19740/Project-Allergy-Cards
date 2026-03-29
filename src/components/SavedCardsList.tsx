@@ -87,8 +87,8 @@ const SavedCardsList = () => {
   if (allCards.length === 0) return null;
 
   return (
-    <div className="w-full flex flex-col items-start mt-2">
-      <div className="w-full mb-2 px-8 flex flex-row items-center justify-between">
+    <div className="w-full flex flex-col items-start mt-1">
+      <div className="w-full mb-1 px-8 flex flex-row items-center justify-between">
         <h3 className="text-[9px] font-bold text-gray-400 uppercase tracking-widest">
           Saved Cards
         </h3>
@@ -117,7 +117,7 @@ const SavedCardsList = () => {
                   card.id === 'emergency-slot' && "border-red-200 dark:border-red-900/50"
                 )}
               >
-                <CardContent className="p-2.5 flex flex-col">
+                <CardContent className="p-2 flex flex-col">
                   <div className="flex justify-between items-start mb-0.5">
                     <div className={cn(
                       "px-1.5 py-0.5 rounded-md text-[8px] font-bold uppercase tracking-wider", 
