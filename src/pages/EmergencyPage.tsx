@@ -55,8 +55,11 @@ const EmergencyPage = () => {
       if (sessionTranslations && sessionTranslations.languageCode === langCode) {
         const content = sessionTranslations.content.emergency;
         setTranslatedText({
-          ...content,
-          dialText: content.dialText || "CALL"
+          attention: content.attention,
+          emergency: content.emergency,
+          needHelp: content.needHelp,
+          callServices: content.callServices,
+          dialText: content.dial112?.replace(emergencyNumber, '').trim() || "CALL"
         });
         setFullTranslatedContent(sessionTranslations.content);
         setIsTranslating(false);
@@ -86,7 +89,7 @@ const EmergencyPage = () => {
     };
 
     loadDataAndTranslate();
-  }, [langCode]);
+  }, [langCode, emergencyNumber]);
 
   const handleShare = async () => {
     if (!cardRef.current) return;
@@ -181,7 +184,7 @@ const EmergencyPage = () => {
           translatedContent={fullTranslatedContent || {
             ui: { allergyAlert: "Allergy Alert", iAmAllergicTo: "I am allergic to:", pleaseBeCareful: "Please be careful.", thankYou: "Thank you.", theyMakeMeSick: "They make me sick." },
             allergens: {},
-            emergency: { ...translatedText, dial112: `CALL ${emergencyNumber}` }
+            emergency: { ...translatedText, dial112: `${translatedText.dialText} ${emergencyNumber}` }
           }}
         />
       )}

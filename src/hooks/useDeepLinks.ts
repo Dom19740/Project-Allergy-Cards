@@ -50,6 +50,14 @@ export const useDeepLinks = () => {
               storage.set(STORAGE_KEYS.CUSTOM_MESSAGES, emergencyCard.customMessages),
               storage.set(STORAGE_KEYS.SELECTED_LANGUAGE, emergencyCard.languageCode)
             ]);
+
+            if (emergencyCard.translatedContent) {
+              await storage.set(STORAGE_KEYS.SESSION_TRANSLATIONS, {
+                languageCode: emergencyCard.languageCode,
+                content: emergencyCard.translatedContent
+              });
+            }
+
             navigate(`/emergency/${emergencyCard.languageCode}`, { 
               replace: true,
               state: { refresh: Date.now() }
