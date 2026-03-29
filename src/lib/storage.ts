@@ -9,6 +9,7 @@ export const STORAGE_KEYS = {
   SESSION_TRANSLATIONS: 'currentSessionTranslations',
   HAS_MIGRATED: 'hasMigratedToPreferences',
   LAST_EMERGENCY_LANG: 'lastEmergencyLangCode',
+  HAS_SEEN_ONBOARDING: 'hasSeenOnboarding',
 };
 
 export const storage = {

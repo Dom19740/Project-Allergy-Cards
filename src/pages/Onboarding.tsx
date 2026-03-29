@@ -3,10 +3,11 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import useEmblaCarousel from 'embla-carousel-react';
-import { ChevronLeft, ChevronRight, ShieldAlert, Languages, Share2, AlertTriangle, Info } from 'lucide-react';
+import { ChevronLeft, ChevronRight, ShieldAlert, Languages, Share2, AlertTriangle, Info, LayoutGrid } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import FixedHeader from '@/components/FixedHeader';
 import OnboardingStep from '@/components/OnboardingStep';
+import { storage, STORAGE_KEYS } from '@/lib/storage';
 
 const ONBOARDING_STEPS = [
   {
@@ -28,6 +29,11 @@ const ONBOARDING_STEPS = [
     title: "Share & Save",
     description: "Download your card as an image, share it with others, or save up to 3 cards in the app for quick access later.",
     icon: Share2,
+  },
+  {
+    title: "Add a Widget",
+    description: "Add our widget to your home screen for instant access to your saved cards and one-tap emergency alerts, even when offline.",
+    icon: LayoutGrid,
   },
   {
     title: "Emergency Ready",
@@ -58,11 +64,16 @@ const Onboarding = () => {
     emblaApi.on('reInit', onSelect);
   }, [emblaApi, onSelect]);
 
+  const finishOnboarding = async () => {
+    await storage.set(STORAGE_KEYS.HAS_SEEN_ONBOARDING, 'true');
+    navigate('/select-allergens');
+  };
+
   const handleNext = () => {
     if (currentStep < ONBOARDING_STEPS.length - 1) {
       emblaApi?.scrollNext();
     } else {
-      navigate('/select-allergens');
+      finishOnboarding();
     }
   };
 
@@ -70,7 +81,7 @@ const Onboarding = () => {
     if (currentStep > 0) {
       emblaApi?.scrollPrev();
     } else {
-      navigate('/select-allergens');
+      finishOnboarding();
     }
   };
 
@@ -78,7 +89,7 @@ const Onboarding = () => {
     <div className="flex flex-col h-screen bg-gray-100 dark:bg-gray-900 overflow-hidden">
       <FixedHeader />
       
-      <div className="flex flex-col flex-grow w-full max-w-2xl mx-auto px-4 pt-[calc(126px+env(safe-area-inset-top))] overflow-hidden">
+      <div className="flex flex-col flex-grow w-full max-w-2xl mx-auto px-4 pt-[calc(80px+env(safe-area-inset-top)+10px)] overflow-hidden">
         {/* Carousel Viewport */}
         <div className="flex-grow overflow-hidden pt-8 cursor-grab active:cursor-grabbing" ref={emblaRef}>
           <div className="flex h-full">
