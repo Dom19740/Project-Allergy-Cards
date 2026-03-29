@@ -28,6 +28,14 @@ public class AllergyWidgetProvider extends AppWidgetProvider {
     static void updateAppWidget(Context context, AppWidgetManager appWidgetManager, int appWidgetId) {
         RemoteViews views = new RemoteViews(context.getPackageName(), R.layout.allergy_widget);
 
+        // Standard App Launch Intent
+        Intent launchIntent = context.getPackageManager().getLaunchIntentForPackage(context.getPackageName());
+        if (launchIntent != null) {
+            launchIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_RESET_TASK_IF_NEEDED);
+            PendingIntent launchPendingIntent = PendingIntent.getActivity(context, 1, launchIntent, PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_IMMUTABLE);
+            views.setOnClickPendingIntent(R.id.app_icon_launcher, launchPendingIntent);
+        }
+
         // Emergency button text
         try {
             SharedPreferences prefs = context.getSharedPreferences("CapacitorStorage", Context.MODE_PRIVATE);
@@ -45,10 +53,10 @@ public class AllergyWidgetProvider extends AppWidgetProvider {
             views.setTextViewText(R.id.emergency_text, "EMERGENCY");
         }
 
-        // Emergency Intent - Use CLEAR_TASK to force a full app reload
+        // Emergency Intent - Direct deep link
         String emergencyUri = "simpleallergyalert://emergency?t=" + System.currentTimeMillis();
         Intent emergencyIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(emergencyUri));
-        emergencyIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+        emergencyIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
         PendingIntent emergencyPendingIntent = PendingIntent.getActivity(context, 0, emergencyIntent, PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_IMMUTABLE);
         views.setOnClickPendingIntent(R.id.emergency_container, emergencyPendingIntent);
 
@@ -58,7 +66,7 @@ public class AllergyWidgetProvider extends AppWidgetProvider {
         serviceIntent.setData(Uri.parse(serviceIntent.toUri(Intent.URI_INTENT_SCHEME)));
         views.setRemoteAdapter(R.id.card_stack, serviceIntent);
 
-        // Click Template
+        // Click Template for individual cards
         Intent clickIntent = new Intent(context, AllergyWidgetProvider.class);
         clickIntent.setAction(ACTION_OPEN_CARD);
         views.setPendingIntentTemplate(R.id.card_stack, PendingIntent.getBroadcast(context, 0, clickIntent, PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_MUTABLE));
@@ -73,19 +81,20 @@ public class AllergyWidgetProvider extends AppWidgetProvider {
         if (ACTION_OPEN_CARD.equals(intent.getAction())) {
             String cardId = intent.getStringExtra(EXTRA_CARD_ID);
             if (cardId != null) {
-                // Add a timestamp to the URI to ensure it's unique
-                String uriString = "simpleallergyalert://card/" + cardId + "?t=" + System.currentTimeMillis();
-                Intent appIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(uriString));
-                // FLAG_ACTIVITY_CLEAR_TASK ensures the app reloads completely from the splash screen
-                appIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
-                context.startActivity(appIntent);
+                String uriString = "simpleallergyalert://card/" + cardId;
+                
+                // Get the standard launch intent but add the data URI
+                Intent appIntent = context.getPackageManager().getLaunchIntentForPackage(context.getPackageName());
+                if (appIntent != null) {
+                    appIntent.setData(Uri.parse(uriString));
+                    appIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_SINGLE_TOP);
+                    context.startActivity(appIntent);
+                }
             }
         } else if (ACTION_REFRESH.equals(intent.getAction())) {
             ComponentName componentName = new ComponentName(context, AllergyWidgetProvider.class);
             int[] ids = appWidgetManager.getAppWidgetIds(componentName);
-            
             appWidgetManager.notifyAppWidgetViewDataChanged(ids, R.id.card_stack);
-            
             for (int id : ids) {
                 updateAppWidget(context, appWidgetManager, id);
             }
