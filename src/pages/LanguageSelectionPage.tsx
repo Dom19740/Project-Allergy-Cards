@@ -10,7 +10,6 @@ import StepHeader from "@/components/StepHeader";
 import { getAllGoogleLanguages, SupportedLanguage } from "@/lib/translator";
 import { storage, STORAGE_KEYS } from "@/lib/storage";
 import { useNetworkStatus } from "@/hooks/useNetworkStatus";
-import { toast } from "sonner";
 
 const LanguageSelectionPage = () => {
   const navigate = useNavigate();
@@ -38,18 +37,6 @@ const LanguageSelectionPage = () => {
     })();
     return () => { mounted = false; };
   }, []);
-
-  useEffect(() => {
-    if (!isOnline) {
-      toast.error("Offline: Translation requires an internet connection.", {
-        id: 'offline-warning',
-        duration: Infinity,
-        icon: <WifiOff className="h-4 w-4" />
-      });
-    } else {
-      toast.dismiss('offline-warning');
-    }
-  }, [isOnline]);
 
   const handleLanguageChange = async (code: string) => {
     setSelectedLanguageCode(code);

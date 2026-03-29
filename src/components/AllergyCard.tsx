@@ -3,8 +3,7 @@
 import React, { useRef, useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'sonner';
-import { Loader2, WifiOff, AlertCircle } from 'lucide-react';
-import { Button } from '@/components/ui/button';
+import { Loader2 } from 'lucide-react';
 import { LanguageCode, SelectedAllergens, CustomMessages, TranslatedContent } from '@/lib/types';
 import { ALLERGEN_OPTIONS } from '@/lib/allergens';
 import { translateText } from '@/lib/translator';
@@ -34,7 +33,6 @@ const AllergyCard: React.FC<AllergyCardProps> = ({ languageCode, selectedAllerge
   const [customAllergenTranslations, setCustomAllergenTranslations] = useState<{ [key: string]: { [lang: string]: string } }>({});
   const [translatedAllergens, setTranslatedAllergens] = useState<{ [key: string]: string }>(initialTranslations?.allergens || {});
   const [isTranslating, setIsTranslating] = useState(!initialTranslations);
-  const [translationError, setTranslationError] = useState(false);
   
   const [fullSelectedData, setFullSelectedData] = useState<SelectedAllergens | null>(null);
   const [customMessages, setCustomMessages] = useState<CustomMessages>({
@@ -96,7 +94,6 @@ const AllergyCard: React.FC<AllergyCardProps> = ({ languageCode, selectedAllerge
 
   useEffect(() => {
     const translateAllContent = async () => {
-      // If we already have initial translations matching the language, skip translation
       if (initialTranslations) {
         setTranslatedUIText(initialTranslations.ui);
         setTranslatedAllergens(initialTranslations.allergens);
@@ -105,7 +102,6 @@ const AllergyCard: React.FC<AllergyCardProps> = ({ languageCode, selectedAllerge
         return;
       }
 
-      // Check storage for existing session translations
       const sessionTranslations = await storage.get<any>(STORAGE_KEYS.SESSION_TRANSLATIONS);
       if (sessionTranslations && sessionTranslations.languageCode === languageCode) {
         setTranslatedUIText(sessionTranslations.content.ui);
@@ -115,14 +111,8 @@ const AllergyCard: React.FC<AllergyCardProps> = ({ languageCode, selectedAllerge
         return;
       }
 
-      // If offline and no cached translations, we can't translate
       if (!isOnline && languageCode !== 'en') {
         setIsTranslating(false);
-        setTranslationError(true);
-        toast.error("Offline: Translation failed. Reconnect to generate this card.", {
-          id: 'offline-error',
-          icon: <WifiOff className="h-4 w-4" />
-        });
         return;
       }
 
@@ -151,7 +141,6 @@ const AllergyCard: React.FC<AllergyCardProps> = ({ languageCode, selectedAllerge
       }
 
       setIsTranslating(true);
-      setTranslationError(false);
       try {
         const [alert, allergicTo, careful, thankYou, langName, theyMeSick, att, em, help, call, dial] = await Promise.all([
           translateText("ALLERGY ALERT!", languageCode),
@@ -201,7 +190,6 @@ const AllergyCard: React.FC<AllergyCardProps> = ({ languageCode, selectedAllerge
         }
         setTranslatedAllergens(allergenTranslations);
 
-        // Save session translations for offline fallback
         await storage.set(STORAGE_KEYS.SESSION_TRANSLATIONS, {
           languageCode,
           content: { ui: uiText, allergens: allergenTranslations, emergency: emergencyText }
@@ -209,7 +197,6 @@ const AllergyCard: React.FC<AllergyCardProps> = ({ languageCode, selectedAllerge
         
       } catch (error) {
         console.error('Translation failed:', error);
-        setTranslationError(true);
       } finally {
         setIsTranslating(false);
       }
@@ -268,24 +255,6 @@ const AllergyCard: React.FC<AllergyCardProps> = ({ languageCode, selectedAllerge
     );
   }
 
-  if (translationError && languageCode !== 'en' && !initialTranslations) {
-    return (
-      <div className="flex flex-col items-center justify-center min-h-screen bg-gray-50 px-6 text-center">
-        <WifiOff className="h-16 w-16 text-gray-300 mb-6" />
-        <h2 className="text-2xl font-bold text-gray-800 mb-2">You are Offline</h2>
-        <p className="text-gray-600 mb-8 max-w-sm">
-          We couldn't generate the translation for this card because you don't have an internet connection.
-        </p>
-        <Button 
-          onClick={() => navigate('/select-language')}
-          className="bg-red-600 text-white rounded-xl py-6 px-8 text-lg"
-        >
-          Go Back
-        </Button>
-      </div>
-    );
-  }
-
   const currentTranslatedContent: TranslatedContent = {
     ui: translatedUIText,
     allergens: translatedAllergens,
@@ -294,13 +263,6 @@ const AllergyCard: React.FC<AllergyCardProps> = ({ languageCode, selectedAllerge
 
   return (
     <div className="flex flex-col w-full h-screen bg-white overflow-hidden">
-      {!isOnline && (
-        <div className="bg-amber-500 text-white text-[10px] py-1 px-4 flex items-center justify-center gap-2">
-          <WifiOff className="h-3 w-3" />
-          Offline Mode
-        </div>
-      )}
-      
       <div 
         ref={cardRef} 
         className="flex-1 w-full flex flex-col items-center justify-start text-center overflow-hidden p-4 sm:p-6 md:p-8 pt-[calc(1rem+env(safe-area-inset-top))] bg-white border-none"
