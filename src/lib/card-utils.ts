@@ -1,4 +1,9 @@
-// Ensure all exports are present
-export const shareCard = ...;
-export const downloadCard = ...;
-export const printCard = ...;
+export const shareCard = (selectedAllergens: string[], customMessages: string[], languageCode: string) => {
+  // implementation
+};
+
+export const downloadCard = (selectedAllergens: string[], customMessages: string[], languageCode: string) => {
+  // implementation};
+
+export const printCard = (selectedAllergens: string[], customMessages: string[], languageCode: string) => {
+  // implementation};

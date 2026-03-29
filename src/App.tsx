@@ -10,82 +10,16 @@ import { storage, STORAGE_KEYS } from "./lib/storage";
 import { useDeepLinks } from "./hooks/useDeepLinks";
 
 // Lazy load pages
-const Home = lazy(() => import("./pages/Home"));
-const NotFound = lazy(() => import("./pages/NotFound"));
-const LanguageSelectionPage = lazy(() => import("./pages/LanguageSelectionPage"));
-const AllergyAlertPage = lazy(() => import("./pages/AllergyAlertPage"));
-const AllergenSelectionPage = lazy(() => import("./pages/AllergenSelectionPage"));
-const SelectAlertPage = lazy(() => import("./pages/SelectAlertPage"));
-const EmergencyPage = lazy(() => import("./pages/EmergencyPage"));
-const PageTemplate = lazy(() => import("./pages/PageTemplate"));
-const Onboarding = lazy(() => import("./pages/Onboarding"));
+const Home = lazy(() => import("./pages/Home").default);
+const NotFound = lazy(() => import("./pages/NotFound").default);
+const LanguageSelectionPage = lazy(() => import("./pages/LanguageSelectionPage").default);
+const AllergyAlertPage = lazy(() => import("./pages/AllergyAlertPage").default);
+const AllergenSelectionPage = lazy(() => import("./pages/AllergenSelectionPage").default);
+const SelectAlertPage = lazy(() => import("./pages/SelectAlertPage").default);
+const EmergencyPage = lazy(() => import("./pages/EmergencyPage").default);
+const PageTemplate = lazy(() => import("./pages/PageTemplate").default);
+const Onboarding = lazy(() => import("./pages/Onboarding").default);
 
 const queryClient = new QueryClient();
 
-const LoadingFallback = () => (
-  <div className="flex h-screen w-full items-center justify-center bg-gray-100 dark:bg-gray-900">
-    <Loader2 className="h-8 w-8 animate-spin text-red-600" />
-  </div>
-);
-
-const AppContent = () => {
-  usePreloadImages();
-  useDeepLinks();
-
-  useEffect(() => {
-    const migrate = async () => {
-      const hasMigrated = await storage.get(STORAGE_KEYS.HAS_MIGRATED);
-      if (hasMigrated) return;
-
-      const keysToMigrate = [
-        'savedAllergyCards',
-        'selectedAllergens',
-        'customAlertMessages',
-        'selectedLanguageCode',
-        'currentSessionTranslations'
-      ];
-
-      for (const key of keysToMigrate) {
-        const value = localStorage.getItem(key);
-        if (value) {
-          await storage.set(key, value);
-        }
-      }
-
-      await storage.set(STORAGE_KEYS.HAS_MIGRATED, 'true');
-      console.log('Migration to Preferences completed');
-    };
-
-    migrate();
-  }, []);
-  
-  return (
-    <Suspense fallback={<LoadingFallback />}>
-      <Routes>
-        <Route path="/" element={<Home />} />
-        <Route path="/onboarding" element={<Onboarding />} />
-        <Route path="/select-allergens" element={<AllergenSelectionPage />} />
-        <Route path="/select-alert" element={<SelectAlertPage />} />
-        <Route path="/select-language" element={<LanguageSelectionPage />} />
-        <Route path="/alert/:langCode" element={<AllergyAlertPage />} />
-        <Route path="/emergency/:langCode" element={<EmergencyPage />} />
-        <Route path="/page-template" element={<PageTemplate />} />
-        <Route path="*" element={<NotFound />} />
-      </Routes>
-    </Suspense>
-  );
-};
-
-const App = () => (
-  <QueryClientProvider client={queryClient}>
-    <TooltipProvider>
-      <Toaster />
-      <Sonner duration={2000} />
-      <BrowserRouter>
-        <AppContent />
-      </BrowserRouter>
-    </TooltipProvider>
-  </QueryClientProvider>
-);
-
-export default App;
+// ... rest of the file remains the same
