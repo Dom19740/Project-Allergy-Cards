@@ -1,7 +1,8 @@
+"use client";
+
 import React from 'react';
 import { Button } from '@/components/ui/button';
 import { Share2, Download, ArrowLeft, Loader2, Save, Menu } from 'lucide-react';
-import WidgetOpenAppButton from './WidgetOpenAppButton';
 
 interface EmergencyActionsProps {
   onBack: () => void;
@@ -11,8 +12,6 @@ interface EmergencyActionsProps {
   onSave?: () => void;
   isSharing?: boolean;
   isDownloading?: boolean;
-  fromWidget: boolean;
-  onOpenApp: () => void;
 }
 
 const EmergencyActions: React.FC<EmergencyActionsProps> = ({
@@ -22,20 +21,8 @@ const EmergencyActions: React.FC<EmergencyActionsProps> = ({
   onToggleMenu,
   onSave,
   isSharing = false,
-  isDownloading = false,
-  fromWidget,
-  onOpenApp
+  isDownloading = false
 }) => {
-  if (fromWidget) {
-    return (
-      <div className="w-full pt-2 pb-[calc(8px+env(safe-area-inset-bottom))] flex justify-center bg-white border-t border-gray-100 z-30">
-        <div className="flex items-center space-x-3 bg-white p-2 rounded-full shadow-md border border-gray-200 justify-center">
-          <WidgetOpenAppButton onOpenApp={onOpenApp} />
-        </div>
-      </div>
-    );
-  }
-
   return (
     <div className="w-full pt-2 pb-[calc(8px+env(safe-area-inset-bottom))] flex justify-center bg-white border-t border-gray-100 z-30">
       <div className="flex items-center space-x-3 bg-white p-2 rounded-full shadow-md border border-gray-200">

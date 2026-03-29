@@ -1,43 +1,76 @@
 "use client";
 
-import React from 'react';
-import { useParams } from 'react-router-dom';
-import AllergyCard from '@/components/AllergyCard';
-import { TranslatedContent } from '@/lib/types';
+import React, { useEffect, useState } from 'react';
+import { useParams, useLocation } from 'react-router-dom';
+import AllergyCard from '../components/AllergyCard';
+import { LanguageCode, TranslatedContent } from '@/lib/types';
 import NotFound from './NotFound';
+import { storage, STORAGE_KEYS } from '@/lib/storage';
 
 const AllergyAlertPage = () => {
   const { langCode } = useParams<{ langCode: string }>();
+  const location = useLocation();
+  const [selectedAllergens, setSelectedAllergens] = useState<string[]>([]);
+  const [initialTranslations, setInitialTranslations] = useState<TranslatedContent | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
 
-  if (!langCode) return <NotFound />;
+  useEffect(() => {
+    const loadData = async () => {
+      setIsLoading(true);
+      
+      // Load allergens
+      const storedData = await storage.get<any>(STORAGE_KEYS.SELECTED_ALLERGENS);
+      let allergens: string[] = [];
 
-  const dummyTranslations: TranslatedContent = {
-    ui: {
-      allergyAlert: "ALLERGY ALERT",
-      iAmAllergicTo: "I am allergic to:",
-      pleaseBeCareful: "Please be careful",
-      thankYou: "Thank you",
-      theyMakeMeSick: "They make me very sick."
-    },
-    allergens: {},
-    emergency: {
-      attention: "ATTENTION",
-      emergency: "EMERGENCY",
-      needHelp: "I need help",
-      callServices: "Call services",
-      dial112: "Dial 112"
-    }
-  };
+      if (storedData) {
+        if (storedData.standard && Array.isArray(storedData.standard)) {
+          allergens = [...allergens, ...storedData.standard];
+        }
+        if (storedData.custom) {
+          if (Array.isArray(storedData.custom)) {
+            allergens = [...allergens, ...storedData.custom];
+          } else if (typeof storedData.custom === 'object') {
+            allergens = [...allergens, ...Object.keys(storedData.custom)];
+          }
+        }
+        
+        if (Array.isArray(storedData) && allergens.length === 0) {
+          allergens = storedData;
+        }
+      }
+      setSelectedAllergens(allergens);
 
-  const storedAllergensStr = localStorage.getItem('selectedAllergens');
-  const selectedAllergens = storedAllergensStr ? JSON.parse(storedAllergensStr).ids : [];
+      // Load translations for offline support
+      const sessionTranslations = await storage.get<any>(STORAGE_KEYS.SESSION_TRANSLATIONS);
+      if (sessionTranslations && sessionTranslations.languageCode === langCode) {
+        setInitialTranslations(sessionTranslations.content);
+      } else {
+        setInitialTranslations(null);
+      }
+
+      setIsLoading(false);
+    };
+    loadData();
+  }, [langCode, location.key]);
+
+  if (!langCode) {
+    return <NotFound />;
+  }
+
+  if (isLoading) {
+    return (
+      <div className="flex items-center justify-center min-h-screen bg-white">
+        <div className="animate-pulse text-gray-400">Loading...</div>
+      </div>
+    );
+  }
 
   return (
-    <div className="flex flex-col items-center min-h-screen bg-gray-100 dark:bg-gray-900">
-      <AllergyCard
-        languageCode={langCode}
+    <div className="flex flex-col items-center min-h-screen bg-white dark:bg-white">
+      <AllergyCard 
+        languageCode={langCode as LanguageCode} 
         selectedAllergens={selectedAllergens}
-        initialTranslations={dummyTranslations}
+        initialTranslations={initialTranslations}
       />
     </div>
   );
