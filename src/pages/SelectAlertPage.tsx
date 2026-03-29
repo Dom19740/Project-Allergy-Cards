@@ -11,9 +11,9 @@ import { storage, STORAGE_KEYS } from '@/lib/storage';
 
 const SelectAlertPage = () => {
   const navigate = useNavigate();
-  const [iAmAllergicTo, setIAmAllergicTo] = useState("I can not eat:");
+  const [iAmAllergicTo, setIAmAllergicTo] = useState("Please, I can not eat:");
   const [theyMakeMeSick, setTheyMakeMeSick] = useState(
-    "They make me very sick and I could die",
+    "It will make me seriously ill and I can die",
   );
 
   useEffect(() => {
@@ -61,7 +61,7 @@ const SelectAlertPage = () => {
                 id="allergic-to"
                 value={iAmAllergicTo}
                 onChange={(e) => setIAmAllergicTo(e.target.value)}
-                placeholder="e.g. I can not eat:"
+                placeholder="e.g. Please, I can not eat:"
                 className="w-[calc(100%-20px)] mx-[10px] px-4 py-3 text-base sm:text-lg bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-700 rounded-lg shadow-sm text-gray-800 dark:text-gray-200 min-h-[80px] resize-y"
               />
             </div>
@@ -77,7 +77,7 @@ const SelectAlertPage = () => {
                 id="make-me-sick"
                 value={theyMakeMeSick}
                 onChange={(e) => setTheyMakeMeSick(e.target.value)}
-                placeholder="e.g. They make me very sick..."
+                placeholder="e.g. It will make me seriously ill..."
                 className="w-[calc(100%-20px)] mx-[10px] px-4 py-3 text-base sm:text-lg bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-700 rounded-lg shadow-sm text-gray-800 dark:text-gray-200 min-h-[80px] resize-y"
               />
             </div>
