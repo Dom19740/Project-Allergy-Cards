@@ -62,10 +62,10 @@ const LanguageSelectionPage = () => {
           />
 
           {!isOnline && (
-            <div className="mx-auto max-w-md mt-4 p-4 bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-800 rounded-xl flex items-center gap-3 text-amber-800 dark:text-amber-200">
+            <div className="mx-auto max-w-md mt-4 p-4 bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-800 rounded-xl flex items-center gap-3 text-amber-800 dark:text-amber-200 text-center">
               <WifiOff className="h-5 w-5 shrink-0" />
               <p className="text-sm font-medium">
-                You are currently offline. Translations for new cards will not work until you reconnect.
+                Offline: Translations for new cards requires an internet connection
               </p>
             </div>
           )}
