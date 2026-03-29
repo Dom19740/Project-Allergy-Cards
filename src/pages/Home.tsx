@@ -67,16 +67,10 @@ const Home = () => {
             hasCards ? "flex-[0.6] justify-center" : "flex-[0.5] justify-center"
           )}>
             <div className="space-y-1.5 mb-2">
-              <p className={cn(
-                "text-gray-700 dark:text-gray-300 max-w-md mx-auto px-6 leading-tight transition-all duration-500", 
-                hasCards ? "text-sm md:text-base" : "text-lg md:text-2xl"
-              )}>
+              <p className="text-gray-700 dark:text-gray-300 max-w-md mx-auto px-6 leading-tight text-lg md:text-xl">
                 Create a personalized allergy alert in multiple languages to communicate your dietary restrictions easily and safely.
               </p>
-              <p className={cn(
-                "text-gray-700 dark:text-gray-300 max-w-md mx-auto px-6 leading-tight transition-all duration-500", 
-                hasCards ? "text-sm md:text-base" : "text-lg md:text-xl"
-              )}>
+              <p className="text-gray-700 dark:text-gray-300 max-w-md mx-auto px-6 leading-tight text-lg md:text-xl">
                  Save a translated emergency alert card to communicate your need for medical attention.
               </p>
             </div>
