@@ -28,6 +28,13 @@ public class AllergyWidgetProvider extends AppWidgetProvider {
     static void updateAppWidget(Context context, AppWidgetManager appWidgetManager, int appWidgetId) {
         RemoteViews views = new RemoteViews(context.getPackageName(), R.layout.allergy_widget);
 
+        // App Icon Intent - Opens the app main screen
+        Intent launchIntent = new Intent(context, MainActivity.class);
+        launchIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+        // Using request code 1 to distinguish from other intents
+        PendingIntent launchPendingIntent = PendingIntent.getActivity(context, 1, launchIntent, PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_IMMUTABLE);
+        views.setOnClickPendingIntent(R.id.app_icon_launcher, launchPendingIntent);
+
         // Emergency button text
         try {
             SharedPreferences prefs = context.getSharedPreferences("CapacitorStorage", Context.MODE_PRIVATE);

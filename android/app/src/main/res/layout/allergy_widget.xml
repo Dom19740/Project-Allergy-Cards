@@ -11,10 +11,24 @@
         android:layout_height="wrap_content"
         android:layout_marginBottom="8dp">
 
+        <!-- App Icon Launcher Button -->
+        <ImageView
+            android:id="@+id/app_icon_launcher"
+            android:layout_width="44dp"
+            android:layout_height="44dp"
+            android:layout_alignParentStart="true"
+            android:layout_centerVertical="true"
+            android:background="@drawable/widget_refresh_bg"
+            android:padding="8dp"
+            android:src="@mipmap/ic_launcher"
+            android:contentDescription="Open App"
+            android:scaleType="centerInside" />
+
         <LinearLayout
             android:id="@+id/emergency_container"
             android:layout_width="match_parent"
             android:layout_height="54dp"
+            android:layout_marginStart="52dp"
             android:background="@drawable/rounded_red_button"
             android:gravity="center"
             android:orientation="horizontal"
