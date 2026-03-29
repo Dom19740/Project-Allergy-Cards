@@ -23,7 +23,6 @@ export const useDeepLinks = () => {
           const card = savedCards.find(c => c.id === cardId);
 
           if (card) {
-            // Sync storage session
             await Promise.all([
               storage.set(STORAGE_KEYS.SELECTED_ALLERGENS, card.selectedAllergens),
               storage.set(STORAGE_KEYS.CUSTOM_MESSAGES, card.customMessages),
@@ -37,7 +36,11 @@ export const useDeepLinks = () => {
               });
             }
             
-            navigate(`/alert/${card.languageCode}`, { replace: true });
+            // Navigate with a fresh timestamp in state to ensure component refresh
+            navigate(`/alert/${card.languageCode}`, { 
+              replace: true,
+              state: { refresh: Date.now() }
+            });
           }
         } else if (host === 'emergency') {
           const emergencyCard = await storage.get<SavedCard>(STORAGE_KEYS.SAVED_EMERGENCY_CARD);
@@ -47,24 +50,24 @@ export const useDeepLinks = () => {
               storage.set(STORAGE_KEYS.CUSTOM_MESSAGES, emergencyCard.customMessages),
               storage.set(STORAGE_KEYS.SELECTED_LANGUAGE, emergencyCard.languageCode)
             ]);
-            navigate(`/emergency/${emergencyCard.languageCode}`, { replace: true });
+            navigate(`/emergency/${emergencyCard.languageCode}`, { 
+              replace: true,
+              state: { refresh: Date.now() }
+            });
           } else {
-            // If no emergency card is saved, we still need to go to home or onboarding
             navigate('/');
           }
         }
       } catch (e) {
-        console.error('Deep link parsing failed', e);
+        console.error('Deep link processing error', e);
       }
     };
 
     const setupListeners = async () => {
-      // Listen for deep links while app is running
       const listener = await App.addListener('appUrlOpen', (event: URLOpenListenerEvent) => {
         handleDeepLink(event.url);
       });
 
-      // Handle the initial launch URL
       if (!launchUrlProcessed.current) {
         const launchUrl = await App.getLaunchUrl();
         if (launchUrl) {

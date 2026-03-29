@@ -53,10 +53,10 @@ public class AllergyWidgetProvider extends AppWidgetProvider {
             views.setTextViewText(R.id.emergency_text, "EMERGENCY");
         }
 
-        // Emergency Intent - Direct deep link
+        // Emergency Intent - Deep link with clear task to ensure fresh load
         String emergencyUri = "simpleallergyalert://emergency?t=" + System.currentTimeMillis();
         Intent emergencyIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(emergencyUri));
-        emergencyIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+        emergencyIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
         PendingIntent emergencyPendingIntent = PendingIntent.getActivity(context, 0, emergencyIntent, PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_IMMUTABLE);
         views.setOnClickPendingIntent(R.id.emergency_container, emergencyPendingIntent);
 
@@ -83,11 +83,11 @@ public class AllergyWidgetProvider extends AppWidgetProvider {
             if (cardId != null) {
                 String uriString = "simpleallergyalert://card/" + cardId;
                 
-                // Get the standard launch intent but add the data URI
                 Intent appIntent = context.getPackageManager().getLaunchIntentForPackage(context.getPackageName());
                 if (appIntent != null) {
                     appIntent.setData(Uri.parse(uriString));
-                    appIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_SINGLE_TOP);
+                    // CLEAR_TASK effectively "restarts" the app for this intent
+                    appIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
                     context.startActivity(appIntent);
                 }
             }
