@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState, useEffect } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import FixedHeader from '@/components/FixedHeader';
 import SavedCardsList from '@/components/SavedCardsList';
@@ -12,16 +12,6 @@ import { cn } from '@/lib/utils';
 const Home = () => {
   const navigate = useNavigate();
   const [hasCards, setHasCards] = useState(false);
-
-  useEffect(() => {
-    const checkFirstLaunch = async () => {
-      const hasSeenOnboarding = await storage.get<string>(STORAGE_KEYS.HAS_SEEN_ONBOARDING);
-      if (!hasSeenOnboarding) {
-        navigate('/onboarding', { replace: true });
-      }
-    };
-    checkFirstLaunch();
-  }, [navigate]);
 
   const checkCards = async () => {
     const cards = await storage.get<SavedCard[]>(STORAGE_KEYS.SAVED_CARDS);
@@ -41,6 +31,15 @@ const Home = () => {
       window.removeEventListener('storage-update', handleStorageChange);
     };
   }, []);
+
+  const handleGetStarted = async () => {
+    const hasSeenOnboarding = await storage.get<string>(STORAGE_KEYS.HAS_SEEN_ONBOARDING);
+    if (hasSeenOnboarding === 'true') {
+      navigate('/select-allergens');
+    } else {
+      navigate('/onboarding');
+    }
+  };
 
   return (
     <div className="flex flex-col h-[100dvh] bg-gray-100 dark:bg-gray-900 overflow-hidden">
@@ -67,8 +66,11 @@ const Home = () => {
           </div>
         </div>
         <div className="flex-shrink-0 w-full flex flex-col justify-center items-center py-2 gap-2">
-          <Button asChild className="py-3 text-xl md:text-2xl h-auto transition-all duration-200 ease-in-out hover:scale-105 bg-red-600 text-white hover:bg-red-700 w-[280px]">
-            <Link to="/select-allergens">Get Started</Link>
+          <Button 
+            onClick={handleGetStarted}
+            className="py-3 text-xl md:text-2xl h-auto transition-all duration-200 ease-in-out hover:scale-105 bg-red-600 text-white hover:bg-red-700 w-[280px]"
+          >
+            Get Started
           </Button>
           <p className="text-[10px] text-gray-500 dark:text-gray-400 mb-1">
             © 2026 <a href="https://dpbcreative.com/" target="_blank" rel="noopener noreferrer" className="underline hover:text-gray-700 dark:hover:text-gray-200">dpb creative</a>. All rights reserved
