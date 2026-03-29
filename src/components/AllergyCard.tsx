@@ -3,7 +3,8 @@
 import React, { useRef, useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'sonner';
-import { Loader2 } from 'lucide-react';
+import { Loader2, WifiOff, AlertCircle } from 'lucide-react';
+import { Button } from '@/components/ui/button';
 import { LanguageCode, SelectedAllergens, CustomMessages, TranslatedContent } from '@/lib/types';
 import { ALLERGEN_OPTIONS } from '@/lib/allergens';
 import { translateText } from '@/lib/translator';
@@ -13,6 +14,7 @@ import CardActions from './CardActions';
 import CardMenu from './CardMenu';
 import DisclaimerDialog from './DisclaimerDialog';
 import { storage, STORAGE_KEYS } from '@/lib/storage';
+import { useNetworkStatus } from '@/hooks/useNetworkStatus';
 
 interface AllergyCardProps {
   languageCode: LanguageCode;
@@ -23,6 +25,8 @@ interface AllergyCardProps {
 const AllergyCard: React.FC<AllergyCardProps> = ({ languageCode, selectedAllergens, initialTranslations }) => {
   const cardRef = useRef<HTMLDivElement>(null);
   const navigate = useNavigate();
+  const isOnline = useNetworkStatus();
+  
   const [isSharing, setIsSharing] = useState(false);
   const [isDownloading, setIsDownloading] = useState(false);
   const [isSaveDialogOpen, setIsSaveDialogOpen] = useState(false);
@@ -30,6 +34,8 @@ const AllergyCard: React.FC<AllergyCardProps> = ({ languageCode, selectedAllerge
   const [customAllergenTranslations, setCustomAllergenTranslations] = useState<{ [key: string]: { [lang: string]: string } }>({});
   const [translatedAllergens, setTranslatedAllergens] = useState<{ [key: string]: string }>(initialTranslations?.allergens || {});
   const [isTranslating, setIsTranslating] = useState(!initialTranslations);
+  const [translationError, setTranslationError] = useState(false);
+  
   const [fullSelectedData, setFullSelectedData] = useState<SelectedAllergens | null>(null);
   const [customMessages, setCustomMessages] = useState<CustomMessages>({
     iAmAllergicTo: "I can not eat:",
@@ -99,13 +105,24 @@ const AllergyCard: React.FC<AllergyCardProps> = ({ languageCode, selectedAllerge
         return;
       }
 
-      // Double check storage just in case
+      // Check storage for existing session translations
       const sessionTranslations = await storage.get<any>(STORAGE_KEYS.SESSION_TRANSLATIONS);
       if (sessionTranslations && sessionTranslations.languageCode === languageCode) {
         setTranslatedUIText(sessionTranslations.content.ui);
         setTranslatedAllergens(sessionTranslations.content.allergens);
         setEmergencyTranslations(sessionTranslations.content.emergency);
         setIsTranslating(false);
+        return;
+      }
+
+      // If offline and no cached translations, we can't translate
+      if (!isOnline && languageCode !== 'en') {
+        setIsTranslating(false);
+        setTranslationError(true);
+        toast.error("Offline: Translation failed. Reconnect to generate this card.", {
+          id: 'offline-error',
+          icon: <WifiOff className="h-4 w-4" />
+        });
         return;
       }
 
@@ -134,8 +151,9 @@ const AllergyCard: React.FC<AllergyCardProps> = ({ languageCode, selectedAllerge
       }
 
       setIsTranslating(true);
+      setTranslationError(false);
       try {
-        const [alert, allergicTo, careful, thankYou, langName, theyMakeMeSick, att, em, help, call, dial] = await Promise.all([
+        const [alert, allergicTo, careful, thankYou, langName, theyMeSick, att, em, help, call, dial] = await Promise.all([
           translateText("ALLERGY ALERT!", languageCode),
           translateText(customMessages.iAmAllergicTo, languageCode),
           translateText("Please be careful with my food.", languageCode),
@@ -149,22 +167,24 @@ const AllergyCard: React.FC<AllergyCardProps> = ({ languageCode, selectedAllerge
           translateText("DIAL 112", languageCode)
         ]);
 
-        setTranslatedUIText({
+        const uiText = {
           allergyAlert: alert,
           iAmAllergicTo: allergicTo,
           pleaseBeCareful: careful,
           thankYou: thankYou,
           languageName: langName,
-          theyMakeMeSick: theyMakeMeSick
-        });
+          theyMakeMeSick: theyMeSick
+        };
+        setTranslatedUIText(uiText);
 
-        setEmergencyTranslations({
+        const emergencyText = {
           attention: att,
           emergency: em,
           needHelp: help,
           callServices: call,
           dial112: dial
-        });
+        };
+        setEmergencyTranslations(emergencyText);
 
         const allergenTranslations: { [key: string]: string } = {};
         for (const allergenId of selectedAllergens) {
@@ -180,15 +200,23 @@ const AllergyCard: React.FC<AllergyCardProps> = ({ languageCode, selectedAllerge
           }
         }
         setTranslatedAllergens(allergenTranslations);
+
+        // Save session translations for offline fallback
+        await storage.set(STORAGE_KEYS.SESSION_TRANSLATIONS, {
+          languageCode,
+          content: { ui: uiText, allergens: allergenTranslations, emergency: emergencyText }
+        });
+        
       } catch (error) {
         console.error('Translation failed:', error);
+        setTranslationError(true);
       } finally {
         setIsTranslating(false);
       }
     };
 
     translateAllContent();
-  }, [languageCode, selectedAllergens, customMessages, customAllergenTranslations, initialTranslations]);
+  }, [languageCode, selectedAllergens, customMessages, customAllergenTranslations, initialTranslations, isOnline]);
 
   const handleDownload = async () => {
     if (cardRef.current) {
@@ -204,7 +232,7 @@ const AllergyCard: React.FC<AllergyCardProps> = ({ languageCode, selectedAllerge
     if (cardRef.current) {
       setIsSharing(true);
       const shortCode = languageCode.split('-')[0].toUpperCase();
-      const shareText = `My Allergy Alert Card (${shortCode}) made with Simple Allery Alert`;
+      const shareText = `My Allergy Alert Card (${shortCode}) made with Simple Allergy Alert`;
       const success = await shareCard(cardRef.current, shareText, shareText);
       if (!success) toast.error("Failed to share card.");
       setIsSharing(false);
@@ -240,6 +268,24 @@ const AllergyCard: React.FC<AllergyCardProps> = ({ languageCode, selectedAllerge
     );
   }
 
+  if (translationError && languageCode !== 'en' && !initialTranslations) {
+    return (
+      <div className="flex flex-col items-center justify-center min-h-screen bg-gray-50 px-6 text-center">
+        <WifiOff className="h-16 w-16 text-gray-300 mb-6" />
+        <h2 className="text-2xl font-bold text-gray-800 mb-2">You are Offline</h2>
+        <p className="text-gray-600 mb-8 max-w-sm">
+          We couldn't generate the translation for this card because you don't have an internet connection.
+        </p>
+        <Button 
+          onClick={() => navigate('/select-language')}
+          className="bg-red-600 text-white rounded-xl py-6 px-8 text-lg"
+        >
+          Go Back
+        </Button>
+      </div>
+    );
+  }
+
   const currentTranslatedContent: TranslatedContent = {
     ui: translatedUIText,
     allergens: translatedAllergens,
@@ -248,6 +294,13 @@ const AllergyCard: React.FC<AllergyCardProps> = ({ languageCode, selectedAllerge
 
   return (
     <div className="flex flex-col w-full h-screen bg-white overflow-hidden">
+      {!isOnline && (
+        <div className="bg-amber-500 text-white text-[10px] py-1 px-4 flex items-center justify-center gap-2">
+          <WifiOff className="h-3 w-3" />
+          Offline Mode
+        </div>
+      )}
+      
       <div 
         ref={cardRef} 
         className="flex-1 w-full flex flex-col items-center justify-start text-center overflow-hidden p-4 sm:p-6 md:p-8 pt-[calc(1rem+env(safe-area-inset-top))] bg-white border-none"

@@ -4,14 +4,17 @@ import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Button } from "@/components/ui/button";
-import { ChevronLeft, ChevronRight } from "lucide-react";
+import { ChevronLeft, ChevronRight, WifiOff } from "lucide-react";
 import FixedHeader from "@/components/FixedHeader";
 import StepHeader from "@/components/StepHeader";
 import { getAllGoogleLanguages, SupportedLanguage } from "@/lib/translator";
 import { storage, STORAGE_KEYS } from "@/lib/storage";
+import { useNetworkStatus } from "@/hooks/useNetworkStatus";
+import { toast } from "sonner";
 
 const LanguageSelectionPage = () => {
   const navigate = useNavigate();
+  const isOnline = useNetworkStatus();
   const [selectedLanguageCode, setSelectedLanguageCode] = useState<string>("en");
   const [supportedLanguages, setSupportedLanguages] = useState<SupportedLanguage[]>([]);
 
@@ -36,6 +39,18 @@ const LanguageSelectionPage = () => {
     return () => { mounted = false; };
   }, []);
 
+  useEffect(() => {
+    if (!isOnline) {
+      toast.error("Offline: Translation requires an internet connection.", {
+        id: 'offline-warning',
+        duration: Infinity,
+        icon: <WifiOff className="h-4 w-4" />
+      });
+    } else {
+      toast.dismiss('offline-warning');
+    }
+  }, [isOnline]);
+
   const handleLanguageChange = async (code: string) => {
     setSelectedLanguageCode(code);
     await storage.set(STORAGE_KEYS.SELECTED_LANGUAGE, code);
@@ -59,9 +74,18 @@ const LanguageSelectionPage = () => {
             description="Select the language you want your allergy alert to be translated into."
           />
 
+          {!isOnline && (
+            <div className="mx-auto max-w-md mt-4 p-4 bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-800 rounded-xl flex items-center gap-3 text-amber-800 dark:text-amber-200">
+              <WifiOff className="h-5 w-5 shrink-0" />
+              <p className="text-sm font-medium">
+                You are currently offline. Translations for new cards will not work until you reconnect.
+              </p>
+            </div>
+          )}
+
           <div className="w-full flex justify-center pt-8 pb-4">
             <div className="w-full max-w-xs sm:max-w-sm md:max-w-md lg:max-w-lg">
-              <Select value={selectedLanguageCode} onValueChange={handleLanguageChange}>
+              <Select value={selectedLanguageCode} onValueChange={handleLanguageChange} disabled={!isOnline}>
                 <SelectTrigger
                   className="w-full py-4 text-lg md:text-xl h-auto bg-white text-gray-900 hover:bg-gray-50 border border-red-600 dark:border-red-500"
                 >
@@ -100,7 +124,7 @@ const LanguageSelectionPage = () => {
           </Button>
           <Button
             onClick={handleContinue}
-            disabled={!selectedLanguageCode}
+            disabled={!selectedLanguageCode || (!isOnline && selectedLanguageCode !== 'en')}
             className="py-3 px-8 text-lg h-auto bg-red-600 text-white hover:bg-red-700 rounded-xl shadow-lg transition-transform active:scale-95 flex items-center"
           >
             Continue
