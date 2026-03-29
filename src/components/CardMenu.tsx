@@ -31,15 +31,12 @@ const CardMenu: React.FC<CardMenuProps> = ({ isOpen, onClose, onOpenDisclaimer, 
 
   return (
     <>
-      {/* Backdrop */}
       <div 
-        className="fixed inset-0 bg-black/20 backdrop-blur-sm z-40 animate-in fade-in duration-300" 
+        className="fixed inset-0 bg-black/20 backdrop-blur-sm z-50 animate-in fade-in duration-300" 
         onClick={onClose}
       />
       
-      {/* Centering Container */}
-      <div className="fixed bottom-24 left-1/2 -translate-x-1/2 z-50 pointer-events-none">
-        {/* Animated Menu Content */}
+      <div className="fixed bottom-24 left-1/2 -translate-x-1/2 z-[60] pointer-events-none">
         <div className="w-64 bg-white dark:bg-gray-800 rounded-2xl shadow-2xl border border-gray-200 dark:border-gray-700 overflow-hidden pointer-events-auto animate-in fade-in slide-in-from-bottom-full duration-500 ease-out">
           <div className="p-2">
             <div className="flex items-center justify-between px-4 py-2 border-b border-gray-100 dark:border-gray-700 mb-1">

@@ -10,11 +10,7 @@ export interface Allergen {
 
 export interface SelectedAllergens {
   standard: string[];
-  custom: {
-    [key: string]: {
-      [lang: string]: string;
-    };
-  };
+  custom: string[];
   ids: string[];
 }
 
