@@ -31,14 +31,14 @@ const ONBOARDING_STEPS = [
     icon: Share2,
   },
   {
-    title: "Add a Widget",
-    description: "Add our widget to your home screen for instant access to your saved cards and one-tap emergency alerts, even when offline.",
-    icon: LayoutGrid,
-  },
-  {
     title: "Emergency Ready",
     description: "In urgent situations, use the Emergency Card to quickly communicate your need for medical attention.",
     icon: AlertTriangle,
+  },
+  {
+    title: "Add a Widget",
+    description: "Add our widget to your home screen for instant access to your saved cards and one-tap emergency alerts, even when offline.",
+    icon: LayoutGrid,
   }
 ];
 
