@@ -1,193 +1,78 @@
-import React, { useState, useEffect } from 'react';
-import { useLocation, useNavigate } from 'react-router-dom';
+"use client";
+
+import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
-import { Share2, Download, Save, Loader2, Menu, AlertTriangle, Printer } from 'lucide-react';
-import { useToast } from '@/hooks/use-toast';
-import { storage } from '@/lib/storage';
-import { STORAGE_KEYS } from '@/lib/constants';
-import { SavedCard } from '@/lib/types';
 import { shareCard, downloadCard, printCard } from '@/lib/card-utils';
+import { storage, STORAGE_KEYS } from '@/lib/storage';
+import { SavedCard, TranslatedContent } from '@/lib/types';
 import CardActions from './CardActions';
 import CardMenu from './CardMenu';
-import { useTranslation } from 'react-i18next';
+import { toast } from 'sonner';
 
 interface AllergyCardProps {
   languageCode: string;
   selectedAllergens: string[];
-  initialTranslations: {
-    ui: {
-      allergyAlert: string;
-      iAmAllergicTo: string;
-      pleaseBeCareful: string;
-      thankYou: string;
-      theyMakeMeSick: string;
-    };
-    allergens: { [key: string]: string };
-    emergency: {
-      attention: string;
-      emergency: string;
-      needHelp: string;
-      callServices: string;
-      dial112: string;
-    };
-  };
+  initialTranslations: TranslatedContent;
 }
 
 const AllergyCard: React.FC<AllergyCardProps> = ({ languageCode, selectedAllergens, initialTranslations }) => {
-  const { t } = useTranslation();
-  const location = useLocation();
   const navigate = useNavigate();
-  const { toast } = useToast();
-  
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isSharing, setIsSharing] = useState(false);
   const [isDownloading, setIsDownloading] = useState(false);
-  const [isMenuOpen, setIsMenuOpen] = useState(false);
-    const fromWidget = location.state?.fromWidget || false;
-
-  useEffect(() => {
-    // Load card data if needed
-  }, [languageCode, selectedAllergens, initialTranslations]);
-
-  const handleShare = async () => {
-    setIsSharing(true);
-    try {
-      await shareCard(selectedAllergens, [], languageCode); // Assuming customMessages is handled elsewhere
-      toast({
-        title: t('success.title'),
-        description: t('success.share'),
-      });
-    } catch (error) {
-      toast({
-        title: t('error.title'),
-        description: t('error.share'),
-        variant: 'destructive',
-      });
-    } finally {
-      setIsSharing(false);
-    }
-  };
-
-  const handleDownload = async () => {
-    setIsDownloading(true);
-    try {
-      await downloadCard(selectedAllergens, [], languageCode);
-      toast({
-        title: t('success.title'),
-        description: t('success.download'),
-      });
-    } catch (error) {
-      toast({
-        title: t('error.title'),
-        description: t('error.download'),
-        variant: 'destructive',
-      });
-    } finally {
-      setIsDownloading(false);
-    }
-  };
-
-  const handlePrint = () => {
-    printCard(selectedAllergens, [], languageCode);
-  };
 
   const handleSave = async () => {
-    try {
-      const cardToSave: SavedCard = {
-        id: Date.now().toString(),
-        selectedAllergens: { standard: [], custom: selectedAllergens, ids: selectedAllergens },
-        customMessages: { iAmAllergicTo: '', theyMakeMeSick: '' }, // This should be set from state
-        languageCode,
-        createdAt: new Date().toISOString(),
-      };
-      const savedCards = await storage.get<SavedCard[]>(STORAGE_KEYS.SAVED_CARDS) || [];
-      savedCards.push(cardToSave);
-      await storage.set(STORAGE_KEYS.SAVED_CARDS, savedCards);
-      toast({
-        title: t('success.title'),
-        description: t('success.save'),
-      });
-    } catch (error) {
-      toast({
-        title: t('error.title'),
-        description: t('error.save'),
-        variant: 'destructive',
-      });
-    }
-  };
+    const cardToSave: SavedCard = {
+      id: crypto.randomUUID(),
+      name: `Allergy Card (${languageCode.toUpperCase()})`,
+      selectedAllergens: { standard: [], custom: selectedAllergens, ids: selectedAllergens },
+      customMessages: { iAmAllergicTo: "I can not eat:", theyMakeMeSick: "They make me sick" },
+      languageCode,
+      createdAt: new Date().toISOString()
+    };
 
-  const handleEmergency = () => {
-    navigate(`/emergency/${languageCode}`, { state: { fromWidget } });
+    const currentCards = await storage.get<SavedCard[]>(STORAGE_KEYS.SAVED_CARDS) || [];
+    await storage.set(STORAGE_KEYS.SAVED_CARDS, [...currentCards, cardToSave]);
+    toast.success("Card saved successfully!");
   };
-
-  const toggleMenu = () => {
-    setIsMenuOpen(!isMenuOpen);
-  };
-
-  const openApp = () => {
-    navigate('/', { replace: true, state: { fromWidget: false } });
-  };
-
-  if (selectedAllergens.length === 0) {
-    return (
-      <div className="min-h-screen flex items-center justify-center bg-gray-50">
-        <div className="text-center">
-          <p className="text-gray-600">{t('card.noAllergens')}</p>
-          <Button onClick={() => navigate('/')} className="mt-4">
-            {t('common.back')}
-          </Button>
-        </div>
-      </div>
-    );
-  }
 
   return (
-    <div className="min-h-screen flex flex-col bg-gray-50">
-      <div className="flex-1 p-4 pb-24 overflow-y-auto">
-        <div className="max-w-2xl mx-auto space-y-4">
-          {selectedAllergens.map((allergen) => (
-            <div key={allergen} className="bg-white rounded-lg shadow p-4">
-              <h3 className="font-medium text-lg text-red-600">{allergen}</h3>
-            </div>
-          ))}
+    <div className="w-full h-full flex flex-col">
+      <div className="flex-grow p-6">
+        <div className="bg-white dark:bg-gray-800 rounded-3xl shadow-xl p-8 border-t-8 border-red-600 text-left">
+          <h2 className="text-3xl font-black text-red-600 mb-4">{initialTranslations.ui.allergyAlert}</h2>
+          <p className="text-xl font-bold mb-4">{initialTranslations.ui.iAmAllergicTo}</p>
+          <ul className="space-y-2 mb-6">
+            {selectedAllergens.map(id => (
+              <li key={id} className="text-2xl font-black uppercase text-gray-800 dark:text-gray-100">• {id}</li>
+            ))}
+          </ul>
+          <p className="text-lg text-gray-600 dark:text-gray-400 font-medium italic">{initialTranslations.ui.theyMakeMeSick}</p>
         </div>
       </div>
 
-      <CardMenu
-        isOpen={isMenuOpen}
-        onClose={() => setIsMenuOpen(false)}
-        onEdit={() => navigate('/')}
-        onDelete={async () => {
-          try {
-            const savedCards = await storage.get<SavedCard[]>(STORAGE_KEYS.SAVED_CARDS) || [];
-            const updatedCards = savedCards.filter(card => card.languageCode !== languageCode);
-            await storage.set(STORAGE_KEYS.SAVED_CARDS, updatedCards);
-            toast({
-              title: t('success.title'),
-              description: t('success.delete'),
-            });
-            navigate('/');
-          } catch (error) {
-            toast({
-              title: t('error.title'),
-              description: t('error.delete'),
-              variant: 'destructive',
-            });
-          }
-        }}
-        fromWidget={fromWidget}
-      />
-
-      <CardActions
-        onShare={handleShare}
-        onDownload={handleDownload}
-        onPrint={handlePrint}
+      <CardActions 
+        onShare={() => shareCard(selectedAllergens, [], languageCode)}
+        onDownload={() => downloadCard(selectedAllergens, [], languageCode)}
+        onPrint={() => printCard(selectedAllergens, [], languageCode)}
         onSave={handleSave}
-        onToggleMenu={toggleMenu}
-        onEmergency={handleEmergency}
+        onToggleMenu={() => setIsMenuOpen(true)}
+        onEmergency={() => navigate(`/emergency/${languageCode}`)}
         isSharing={isSharing}
         isDownloading={isDownloading}
-        fromWidget={fromWidget}
-        onOpenApp={openApp}
+        fromWidget={false}
+        onOpenApp={() => navigate('/')}
+      />
+
+      <CardMenu 
+        isOpen={isMenuOpen}
+        onClose={() => setIsMenuOpen(false)}
+        onDelete={async () => {
+          toast.info("Delete functionality would go here");
+        }}
+        onEdit={() => navigate('/select-allergens')}
+        fromWidget={false}
       />
     </div>
   );

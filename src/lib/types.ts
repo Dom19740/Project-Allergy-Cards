@@ -1,3 +1,5 @@
+"use client";
+
 export interface SelectedAllergens {
   standard: string[];
   custom: string[];
@@ -29,8 +31,11 @@ export interface TranslatedContent {
 
 export interface SavedCard {
   id: string;
+  name: string;
   selectedAllergens: SelectedAllergens;
   customMessages: CustomMessages;
   languageCode: string;
-  createdAt: string; // string, not number
+  createdAt: string;
 }
+
+export type LanguageCode = string;

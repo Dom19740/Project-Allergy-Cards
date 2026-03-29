@@ -1,9 +1,21 @@
-import { storage, STORAGE_KEYS } from '@/lib/storage';
-import { SavedCard } from '@/lib/types';
+"use client";
 
-interface SavedCard {
-  translatedContent: string;
-  // ... other properties from original SavedCard
-}
+import { useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { App, URLOpenListenerEvent } from '@capacitor/app';
 
-// ... rest of the file remains the same, but now SavedCard has translatedContent
+export const useDeepLinks = () => {
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    const setupListener = async () => {
+      App.addListener('appUrlOpen', (event: URLOpenListenerEvent) => {
+        const slug = event.url.split('.com').pop() || event.url.split('://').pop();
+        if (slug) {
+          navigate(slug);
+        }
+      });
+    };
+    setupListener();
+  }, [navigate]);
+};
