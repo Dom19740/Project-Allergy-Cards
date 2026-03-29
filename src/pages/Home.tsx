@@ -66,7 +66,7 @@ const Home = () => {
             "flex flex-col w-full py-1 min-h-0 transition-all duration-500", 
             hasCards ? "flex-[0.6] justify-center" : "flex-[0.5] justify-center"
           )}>
-            <div className="space-y-1.5 mb-2">
+            <div className="space-y-3 mb-2">
               <p className="text-gray-700 dark:text-gray-300 max-w-md mx-auto px-6 leading-tight text-lg md:text-xl">
                 Create a personalized allergy alert in multiple languages to communicate your dietary restrictions easily and safely.
               </p>
