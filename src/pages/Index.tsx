@@ -19,7 +19,10 @@ const Index = () => {
   const cardRef = React.useRef<HTMLDivElement>(null);
   
   const [selectedAllergens, setSelectedAllergens] = useState<SelectedAllergens | null>(null);
-  const [customMessages, setCustomMessages] = useState<CustomMessages | null>(null);
+  const [customMessages, setCustomMessages] = useState<CustomMessages>({
+    iAmAllergicTo: "I can not eat:",
+    theyMakeMeSick: "They make me very sick and I could die"
+  });
   const [translatedContent, setTranslatedContent] = useState<TranslatedContent | null>(null);
   const [languageCode, setLanguageCode] = useState<string>('en');
   
@@ -43,7 +46,9 @@ const Index = () => {
       }
 
       setSelectedAllergens(allergens);
-      setCustomMessages(messages || { note: "" });
+      if (messages) {
+        setCustomMessages(messages);
+      }
       
       if (translations) {
         setTranslatedContent(translations.content);
@@ -91,9 +96,9 @@ const Index = () => {
       <main className="flex-1 flex flex-col items-center justify-center p-4 pb-24">
         <div ref={cardRef} className="w-full max-w-md">
           <AllergyCard 
-            selectedAllergens={selectedAllergens}
-            customMessages={customMessages || { note: "" }}
-            translatedContent={translatedContent}
+            languageCode={languageCode}
+            selectedAllergens={selectedAllergens.ids}
+            initialTranslations={translatedContent}
           />
         </div>
       </main>
@@ -127,7 +132,7 @@ const Index = () => {
         onClose={() => setIsSaveDialogOpen(false)}
         languageCode={languageCode}
         selectedAllergens={selectedAllergens}
-        customMessages={customMessages || { note: "" }}
+        customMessages={customMessages}
         translatedContent={translatedContent}
       />
 

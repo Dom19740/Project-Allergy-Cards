@@ -6,7 +6,6 @@ import {
   DialogContent,
   DialogHeader,
   DialogTitle,
-  DialogDescription,
   DialogFooter,
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
@@ -62,9 +61,9 @@ const EmergencyNumberDialog: React.FC<EmergencyNumberDialogProps> = ({
             <AlertCircle className="h-5 w-5" />
             Verify Emergency Number
           </DialogTitle>
-          <DialogDescription>
+          <div className="text-sm text-muted-foreground">
             Please confirm the correct emergency services number for your current location.
-          </DialogDescription>
+          </div>
         </DialogHeader>
 
         <div className="py-4">

@@ -12,6 +12,7 @@ import SaveCardDialog from './SaveCardDialog';
 import CardActions from './CardActions';
 import CardMenu from './CardMenu';
 import DisclaimerDialog from './DisclaimerDialog';
+import EmergencyNumberDialog from './EmergencyNumberDialog';
 import { storage, STORAGE_KEYS } from '@/lib/storage';
 import { useNetworkStatus } from '@/hooks/useNetworkStatus';
 
@@ -30,6 +31,7 @@ const AllergyCard: React.FC<AllergyCardProps> = ({ languageCode, selectedAllerge
   const [isDownloading, setIsDownloading] = useState(false);
   const [isSaveDialogOpen, setIsSaveDialogOpen] = useState(false);
   const [isDisclaimerOpen, setIsDisclaimerOpen] = useState(false);
+  const [isEmergencyDialogOpen, setIsEmergencyDialogOpen] = useState(false);
   const [customAllergenTranslations, setCustomAllergenTranslations] = useState<{ [key: string]: { [lang: string]: string } }>({});
   const [translatedAllergens, setTranslatedAllergens] = useState<{ [key: string]: string }>(initialTranslations?.allergens || {});
   const [isTranslating, setIsTranslating] = useState(!initialTranslations);
@@ -227,7 +229,15 @@ const AllergyCard: React.FC<AllergyCardProps> = ({ languageCode, selectedAllerge
   };
 
   const handlePrint = () => window.print();
-  const handleEmergency = () => navigate(`/emergency/${languageCode}`);
+  
+  const handleEmergencyClick = () => {
+    setIsEmergencyDialogOpen(true);
+  };
+
+  const handleEmergencyConfirm = (number: string) => {
+    setIsEmergencyDialogOpen(false);
+    navigate(`/emergency/${languageCode}?num=${encodeURIComponent(number)}`);
+  };
 
   const translatedAllergenList = selectedAllergens.map(allergen => 
     translatedAllergens[allergen] || allergen
@@ -316,12 +326,18 @@ const AllergyCard: React.FC<AllergyCardProps> = ({ languageCode, selectedAllerge
         onPrint={handlePrint}
         onSave={() => setIsSaveDialogOpen(true)}
         onToggleMenu={() => setIsMenuOpen(!isMenuOpen)}
-        onEmergency={handleEmergency}
+        onEmergency={handleEmergencyClick}
         isSharing={isSharing}
         isDownloading={isDownloading}
       />
       <CardMenu isOpen={isMenuOpen} onClose={() => setIsMenuOpen(false)} onOpenDisclaimer={() => setIsDisclaimerOpen(true)} />
       <DisclaimerDialog isOpen={isDisclaimerOpen} onClose={() => setIsDisclaimerOpen(false)} />
+      <EmergencyNumberDialog 
+        isOpen={isEmergencyDialogOpen} 
+        onClose={() => setIsEmergencyDialogOpen(false)} 
+        onConfirm={handleEmergencyConfirm}
+        langCode={languageCode}
+      />
       {fullSelectedData && (
         <SaveCardDialog
           isOpen={isSaveDialogOpen}
