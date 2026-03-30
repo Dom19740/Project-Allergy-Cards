@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useEffect, useState, useRef } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
+import { useParams, useNavigate, useSearchParams } from 'react-router-dom';
 import { AlertTriangle, Loader2, Phone } from 'lucide-react';
 import { translateText } from '@/lib/translator';
 import { getEmergencyNumber } from '@/lib/emergencyNumbers';
@@ -16,6 +16,7 @@ import { SelectedAllergens, CustomMessages, TranslatedContent } from '@/lib/type
 
 const EmergencyPage = () => {
   const { langCode } = useParams<{ langCode: string }>();
+  const [searchParams] = useSearchParams();
   const navigate = useNavigate();
   const cardRef = useRef<HTMLDivElement>(null);
   
@@ -30,7 +31,8 @@ const EmergencyPage = () => {
   const [customMessages, setCustomMessages] = useState<CustomMessages | null>(null);
   const [fullTranslatedContent, setFullTranslatedContent] = useState<TranslatedContent | null>(null);
 
-  const emergencyNumber = getEmergencyNumber(langCode);
+  // Use the number from URL if available, otherwise fallback to default for language
+  const emergencyNumber = searchParams.get('num') || getEmergencyNumber(langCode);
   
   const [translatedText, setTranslatedText] = useState({
     attention: "ATTENTION",
@@ -59,7 +61,7 @@ const EmergencyPage = () => {
           emergency: content.emergency,
           needHelp: content.needHelp,
           callServices: content.callServices,
-          dialText: content.dial112?.replace(emergencyNumber, '').trim() || "CALL"
+          dialText: content.dial112?.replace(/\d+/g, '').trim() || "CALL"
         });
         setFullTranslatedContent(sessionTranslations.content);
         setIsTranslating(false);
@@ -89,7 +91,7 @@ const EmergencyPage = () => {
     };
 
     loadDataAndTranslate();
-  }, [langCode, emergencyNumber]);
+  }, [langCode]);
 
   const handleShare = async () => {
     if (!cardRef.current) return;
