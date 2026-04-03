@@ -284,7 +284,7 @@ const AllergyCard: React.FC<AllergyCardProps> = ({ languageCode, selectedAllerge
         <p className="text-2xl sm:text-3xl md:text-4xl font-normal text-gray-800 mb-4 sm:mb-8 md:mb-12">
           {translatedUIText.iAmAllergicTo}
         </p>
-        <div className="flex flex-wrap justify-center gap-1 sm:gap-2 mb-2 sm:mb-4">
+        <div className="flex flex-wrap justify-center gap-1 sm:gap-2 mb-4 sm:mb-8 md:mb-12">
           {translatedAllergenList.map((allergen, index) => (
             <span key={index} className="bg-red-600 text-white px-3 py-1 sm:px-4 sm:py-2 rounded-full text-base sm:text-lg md:text-xl font-normal uppercase">
               {allergen}
