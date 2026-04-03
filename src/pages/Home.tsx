@@ -33,8 +33,9 @@ const Home = () => {
   }, []);
 
   const handleGetStarted = async () => {
-    const hasSeenOnboarding = await storage.get<string>(STORAGE_KEYS.HAS_SEEN_ONBOARDING);
-    if (hasSeenOnboarding === 'true') {
+    const hasSeenOnboarding = await storage.get<any>(STORAGE_KEYS.HAS_SEEN_ONBOARDING);
+    // Check for both string 'true' and boolean true due to storage parsing
+    if (hasSeenOnboarding === 'true' || hasSeenOnboarding === true) {
       navigate('/select-allergens');
     } else {
       navigate('/onboarding');
