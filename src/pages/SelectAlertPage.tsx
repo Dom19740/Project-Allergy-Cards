@@ -28,6 +28,9 @@ const SelectAlertPage = () => {
   }, []);
 
   const handleContinue = async () => {
+    // Clear session translations to force re-translation with new messages
+    await storage.remove(STORAGE_KEYS.SESSION_TRANSLATIONS);
+    
     await storage.set(
       STORAGE_KEYS.CUSTOM_MESSAGES,
       {

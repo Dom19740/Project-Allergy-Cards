@@ -87,6 +87,9 @@ const AllergenSelectionPage = () => {
     const standard = selectedAllergens.filter(id => standardIds.includes(id));
     const custom = selectedAllergens.filter(id => !standardIds.includes(id));
     
+    // Clear session translations to force re-translation with new allergens
+    await storage.remove(STORAGE_KEYS.SESSION_TRANSLATIONS);
+    
     await storage.set(STORAGE_KEYS.SELECTED_ALLERGENS, {
       standard,
       custom,
