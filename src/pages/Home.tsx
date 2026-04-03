@@ -12,7 +12,6 @@ import { cn } from '@/lib/utils';
 const Home = () => {
   const navigate = useNavigate();
   const [hasCards, setHasCards] = useState(false);
-  const [isCheckingOnboarding, setIsCheckingOnboarding] = useState(true);
 
   const checkCards = async () => {
     const cards = await storage.get<SavedCard[]>(STORAGE_KEYS.SAVED_CARDS);
@@ -21,19 +20,7 @@ const Home = () => {
   };
 
   useEffect(() => {
-    const init = async () => {
-      // Check if user needs onboarding
-      const hasSeenOnboarding = await storage.get<string>(STORAGE_KEYS.HAS_SEEN_ONBOARDING);
-      if (hasSeenOnboarding !== 'true') {
-        navigate('/onboarding', { replace: true });
-        return;
-      }
-      
-      setIsCheckingOnboarding(false);
-      checkCards();
-    };
-
-    init();
+    checkCards();
     
     const handleStorageChange = () => checkCards();
     window.addEventListener('storage', handleStorageChange);
@@ -43,19 +30,16 @@ const Home = () => {
       window.removeEventListener('storage', handleStorageChange);
       window.removeEventListener('storage-update', handleStorageChange);
     };
-  }, [navigate]);
+  }, []);
 
   const handleGetStarted = async () => {
-    navigate('/select-allergens');
+    const hasSeenOnboarding = await storage.get<string>(STORAGE_KEYS.HAS_SEEN_ONBOARDING);
+    if (hasSeenOnboarding === 'true') {
+      navigate('/select-allergens');
+    } else {
+      navigate('/onboarding');
+    }
   };
-
-  if (isCheckingOnboarding) {
-    return (
-      <div className="flex h-screen w-full items-center justify-center bg-gray-100 dark:bg-gray-900">
-        <div className="animate-pulse text-red-600 font-bold">Loading...</div>
-      </div>
-    );
-  }
 
   return (
     <div className="flex flex-col h-[100dvh] bg-gray-100 dark:bg-gray-900 overflow-hidden">
