@@ -7,7 +7,7 @@ export const ALLERGEN_OPTIONS = [
   { id: "milk", name: "Milk", image: "/allergens/milk.png" },
   { id: "eggs", name: "Eggs", image: "/allergens/eggs.png" },
   { id: "peanut", name: "Peanuts", image: "/allergens/peanuts.png" },
-  { id: "treeNuts", name: "Tree nuts", image: "/allergens/treeNuts.png" },
+  { id: "treeNuts", name: "Tree nuts", image: "/allergens/treenuts.png" },
   { id: "gluten", name: "Gluten", image: "/allergens/gluten.png" },
   { id: "soy", name: "Soy", image: "/allergens/soy.png" },
   { id: "fish", name: "Fish", image: "/allergens/fish.png" },
