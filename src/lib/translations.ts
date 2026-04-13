@@ -5,19 +5,19 @@
 // All translation functionality has been moved to the live translation system.
 
 export type TranslationKey =
-  | 'eggs'
-  | 'fish'
   | 'milk'
+  | 'eggs'
   | 'peanut'
-  | 'sesame'
-  | 'crustaceans'
-  | 'soy'
   | 'treeNuts'
   | 'gluten'
+  | 'soy'
+  | 'fish'
+  | 'crustaceans'
+  | 'sesame'
   | 'molluscs'
-  | 'celery'
   | 'mustard'
   | 'sulphites'
+  | 'celery'
   | 'lupin'
   | 'allergenId'
   | 'Title'
@@ -31,19 +31,19 @@ export type LanguageCode = 'en' | 'fr' | 'de' | 'it' | 'pt' | 'es-ES' | 'es-419'
 
 export const translations: Record<LanguageCode, Record<TranslationKey, string>> = {
   en: {
-    eggs: 'Eggs',
-    fish: 'Fish',
     milk: 'Milk',
+    eggs: 'Eggs',
     peanut: 'Peanuts',
-    sesame: 'Sesame',
-    crustaceans: 'Crustaceans',
-    soy: 'Soy',
     treeNuts: 'Tree nuts',
     gluten: 'Gluten',
+    soy: 'Soy',
+    fish: 'Fish',
+    crustaceans: 'Crustaceans',
+    sesame: 'Sesame',
     molluscs: 'Molluscs',
-    celery: 'Celery',
     mustard: 'Mustard',
     sulphites: 'Sulphites',
+    celery: 'Celery',
     lupin: 'Lupin',
     allergenId: 'Allergen ID',
     Title: 'Title',
