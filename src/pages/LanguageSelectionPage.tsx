@@ -4,16 +4,19 @@ import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Button } from "@/components/ui/button";
-import { ChevronLeft, ChevronRight, WifiOff } from "lucide-react";
+import { ChevronLeft, ChevronRight, WifiOff, Crown } from "lucide-react";
 import FixedHeader from "@/components/FixedHeader";
 import StepHeader from "@/components/StepHeader";
 import { getAllGoogleLanguages, SupportedLanguage } from "@/lib/translator";
 import { storage, STORAGE_KEYS } from "@/lib/storage";
 import { useNetworkStatus } from "@/hooks/useNetworkStatus";
+import { useBilling } from "@/hooks/useBilling";
+import { FREE_LANGUAGES } from "@/lib/premium-config";
 
 const LanguageSelectionPage = () => {
   const navigate = useNavigate();
   const isOnline = useNetworkStatus();
+  const { isPremium } = useBilling();
   const [selectedLanguageCode, setSelectedLanguageCode] = useState<string>("en");
   const [supportedLanguages, setSupportedLanguages] = useState<SupportedLanguage[]>([]);
 
@@ -32,11 +35,17 @@ const LanguageSelectionPage = () => {
     (async () => {
       const langs = await getAllGoogleLanguages();
       if (!mounted) return;
-      const sortedLangs = [...langs].sort((a, b) => a.name.localeCompare(b.name));
+      
+      // Filter languages if not premium
+      const filteredLangs = isPremium 
+        ? langs 
+        : langs.filter(l => FREE_LANGUAGES.includes(l.code));
+        
+      const sortedLangs = [...filteredLangs].sort((a, b) => a.name.localeCompare(b.name));
       setSupportedLanguages(sortedLangs);
     })();
     return () => { mounted = false; };
-  }, []);
+  }, [isPremium]);
 
   const handleLanguageChange = async (code: string) => {
     setSelectedLanguageCode(code);
@@ -58,7 +67,7 @@ const LanguageSelectionPage = () => {
         <div className="flex-grow overflow-y-auto pt-2">
           <StepHeader 
             title="Choose a Language"
-            description="Select the language you want your allergy alert to be translated into."
+            description={isPremium ? "Select any language for your alert." : "Select from 5 free languages or upgrade to unlock all 100+."}
           />
 
           {!isOnline && (
@@ -85,7 +94,7 @@ const LanguageSelectionPage = () => {
                   </div>
                 </SelectTrigger>
                 <SelectContent className="bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-50 max-h-[50vh]">
-                  {(supportedLanguages.length ? supportedLanguages : [{ code: "en", name: "English" }]).map((lang) => (
+                  {supportedLanguages.map((lang) => (
                     <SelectItem
                       key={lang.code}
                       value={lang.code}
@@ -96,6 +105,16 @@ const LanguageSelectionPage = () => {
                   ))}
                 </SelectContent>
               </Select>
+              
+              {!isPremium && (
+                <button 
+                  onClick={() => navigate('/')}
+                  className="mt-4 w-full flex items-center justify-center gap-2 text-amber-600 font-bold text-sm hover:underline"
+                >
+                  <Crown className="h-4 w-4" />
+                  Unlock 100+ more languages
+                </button>
+              )}
             </div>
           </div>
         </div>

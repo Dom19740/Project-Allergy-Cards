@@ -4,13 +4,15 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Label } from '@/components/ui/label';
-import { ChevronLeft, ChevronRight } from 'lucide-react';
+import { ChevronLeft, ChevronRight, Crown } from 'lucide-react';
 import FixedHeader from '@/components/FixedHeader';
 import StepHeader from '@/components/StepHeader';
 import { storage, STORAGE_KEYS } from '@/lib/storage';
+import { useBilling } from '@/hooks/useBilling';
 
 const SelectAlertPage = () => {
   const navigate = useNavigate();
+  const { isPremium } = useBilling();
   const [iAmAllergicTo, setIAmAllergicTo] = useState("Please, I can not eat:");
   const [theyMakeMeSick, setTheyMakeMeSick] = useState(
     "It will make me seriously ill and I can die",
@@ -28,7 +30,6 @@ const SelectAlertPage = () => {
   }, []);
 
   const handleContinue = async () => {
-    // Clear session translations to force re-translation with new messages
     await storage.remove(STORAGE_KEYS.SESSION_TRANSLATIONS);
     
     await storage.set(
@@ -49,41 +50,55 @@ const SelectAlertPage = () => {
         <div className="flex-grow pt-2">
           <StepHeader 
             title="Customise Alert"
-            description="Personalise the warning messages that will appear on your card."
+            description={isPremium ? "Personalise the warning messages that will appear on your card." : "Upgrade to Premium to customise your alert messages."}
           />
 
           <div className="w-full space-y-6 text-left pt-8 pb-4">
             <div className="space-y-2">
-              <Label
-                htmlFor="allergic-to"
-                className="text-sm font-medium text-gray-500 dark:text-gray-400 ml-2"
-              >
-                Primary Warning
-              </Label>
+              <div className="flex items-center justify-between ml-2">
+                <Label
+                  htmlFor="allergic-to"
+                  className="text-sm font-medium text-gray-500 dark:text-gray-400"
+                >
+                  Primary Warning
+                </Label>
+                {!isPremium && <Crown className="h-3 w-3 text-amber-600" />}
+              </div>
               <textarea
                 id="allergic-to"
                 value={iAmAllergicTo}
                 onChange={(e) => setIAmAllergicTo(e.target.value)}
+                disabled={!isPremium}
                 placeholder="e.g. Please, I can not eat:"
-                className="w-[calc(100%-20px)] mx-[10px] px-4 py-3 text-base sm:text-lg bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-700 rounded-lg shadow-sm text-gray-800 dark:text-gray-200 min-h-[80px] resize-y"
+                className="w-[calc(100%-20px)] mx-[10px] px-4 py-3 text-base sm:text-lg bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-700 rounded-lg shadow-sm text-gray-800 dark:text-gray-200 min-h-[80px] resize-y disabled:opacity-70"
               />
             </div>
 
             <div className="space-y-2">
-              <Label
-                htmlFor="make-me-sick"
-                className="text-sm font-medium text-gray-500 dark:text-gray-400 ml-2"
-              >
-                Secondary Warning
-              </Label>
+              <div className="flex items-center justify-between ml-2">
+                <Label
+                  htmlFor="make-me-sick"
+                  className="text-sm font-medium text-gray-500 dark:text-gray-400"
+                >
+                  Secondary Warning
+                </Label>
+                {!isPremium && <Crown className="h-3 w-3 text-amber-600" />}
+              </div>
               <textarea
                 id="make-me-sick"
                 value={theyMakeMeSick}
                 onChange={(e) => setTheyMakeMeSick(e.target.value)}
+                disabled={!isPremium}
                 placeholder="e.g. It will make me seriously ill..."
-                className="w-[calc(100%-20px)] mx-[10px] px-4 py-3 text-base sm:text-lg bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-700 rounded-lg shadow-sm text-gray-800 dark:text-gray-200 min-h-[80px] resize-y"
+                className="w-[calc(100%-20px)] mx-[10px] px-4 py-3 text-base sm:text-lg bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-700 rounded-lg shadow-sm text-gray-800 dark:text-gray-200 min-h-[80px] resize-y disabled:opacity-70"
               />
             </div>
+            
+            {!isPremium && (
+              <p className="text-xs text-amber-600 font-medium text-center px-4">
+                Custom alerts are a premium feature. Upgrade to change these messages.
+              </p>
+            )}
           </div>
         </div>
 

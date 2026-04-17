@@ -68,6 +68,11 @@ const SaveCardDialog: React.FC<SaveCardDialogProps> = ({
   }, [isOpen, isEmergency]);
 
   const handleSave = async () => {
+    if (!isPremium) {
+      toast.error("Saving cards is a premium feature. Please upgrade to unlock!");
+      return;
+    }
+
     if (!cardName.trim()) {
       toast.error("Please enter a name for your card.");
       return;
@@ -94,9 +99,9 @@ const SaveCardDialog: React.FC<SaveCardDialogProps> = ({
         updatedCards = savedCards.map(card => card.id === selectedCardId ? newCard : card);
         toast.success(`Card "${cardName}" updated successfully!`);
       } else {
-        // Check limit for non-premium users
-        if (!isPremium && savedCards.length >= 3) {
-          toast.error("Free users can only save up to 3 cards. Please upgrade to Premium for unlimited cards!");
+        // Check limit for premium users (3 cards)
+        if (savedCards.length >= 3) {
+          toast.error("You can save up to 3 cards. Please overwrite an existing card.");
           return;
         }
         updatedCards = [...savedCards, newCard];

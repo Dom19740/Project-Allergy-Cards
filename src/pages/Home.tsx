@@ -9,9 +9,11 @@ import PremiumUnlock from '@/components/PremiumUnlock';
 import { storage, STORAGE_KEYS } from '@/lib/storage';
 import { SavedCard } from '@/lib/types';
 import { cn } from '@/lib/utils';
+import { useBilling } from '@/hooks/useBilling';
 
 const Home = () => {
   const navigate = useNavigate();
+  const { isPremium } = useBilling();
   const [hasCards, setHasCards] = useState(false);
 
   const checkCards = async () => {
@@ -50,14 +52,14 @@ const Home = () => {
           {/* Logo Area */}
           <div className={cn(
             "w-full flex items-center justify-center min-h-0 p-1 transition-all duration-500 ease-in-out", 
-            hasCards ? "flex-[0.3]" : "flex-[0.4]"
+            hasCards && isPremium ? "flex-[0.3]" : "flex-[0.4]"
           )}>
             <img 
               src="/logo_main.png" 
               alt="App Logo" 
               className={cn(
                 "max-h-full w-auto h-auto object-contain transition-all duration-500", 
-                hasCards ? "max-w-[180px] md:max-w-[240px]" : "max-w-[240px] md:max-w-[300px]"
+                hasCards && isPremium ? "max-w-[180px] md:max-w-[240px]" : "max-w-[240px] md:max-w-[300px]"
               )} 
             />
           </div>
@@ -65,7 +67,7 @@ const Home = () => {
           {/* Text and Cards Area */}
           <div className={cn(
             "flex flex-col w-full py-1 min-h-0 transition-all duration-500", 
-            hasCards ? "flex-[0.7] justify-start" : "flex-[0.6] justify-center"
+            hasCards && isPremium ? "flex-[0.7] justify-start" : "flex-[0.6] justify-center"
           )}>
             <div className="space-y-2 mb-4">
               <p className="text-gray-700 dark:text-gray-300 max-w-md mx-auto px-6 leading-tight text-base md:text-lg">
@@ -74,7 +76,7 @@ const Home = () => {
             </div>
             
             <div className="w-full space-y-4">
-              {hasCards && (
+              {hasCards && isPremium && (
                 <div className="w-full animate-in fade-in slide-in-from-bottom-4 duration-700">
                   <SavedCardsList />
                 </div>

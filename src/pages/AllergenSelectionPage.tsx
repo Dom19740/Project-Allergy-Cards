@@ -5,25 +5,25 @@ import { useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { toast } from 'sonner';
-import { X, ChevronLeft, ChevronRight, Tag } from 'lucide-react';
+import { X, ChevronLeft, ChevronRight, Tag, Crown } from 'lucide-react';
 import { ALLERGEN_OPTIONS } from '@/lib/allergens';
 import FixedHeader from '@/components/FixedHeader';
 import StepHeader from '@/components/StepHeader';
 import { storage, STORAGE_KEYS } from '@/lib/storage';
 import { cn } from '@/lib/utils';
+import { useBilling } from '@/hooks/useBilling';
 
 const AllergenSelectionPage = () => {
   const navigate = useNavigate();
+  const { isPremium } = useBilling();
   const [selectedAllergens, setSelectedAllergens] = useState<string[]>([]);
   const [customAllergenInput, setCustomAllergenInput] = useState<string>('');
   const [customList, setCustomList] = useState<string[]>([]);
 
-  // Load selected allergens and custom list from storage on mount
   useEffect(() => {
     const loadData = async () => {
       const storedData = await storage.get<any>(STORAGE_KEYS.SELECTED_ALLERGENS);
       if (storedData) {
-        // Load selected IDs
         let ids: string[] = [];
         if (Array.isArray(storedData)) {
           ids = storedData;
@@ -34,7 +34,6 @@ const AllergenSelectionPage = () => {
         }
         setSelectedAllergens(ids);
         
-        // Load the persistent custom list if it exists, otherwise derive from selection
         if (storedData.persistentCustomList) {
           setCustomList(storedData.persistentCustomList);
         } else {
@@ -54,6 +53,11 @@ const AllergenSelectionPage = () => {
   };
 
   const handleAddCustomAllergen = () => {
+    if (!isPremium) {
+      toast.error("Custom allergens are a premium feature.");
+      return;
+    }
+
     const trimmedInput = customAllergenInput.trim();
     if (!trimmedInput) {
       toast.error("Custom allergen cannot be empty.");
@@ -87,14 +91,13 @@ const AllergenSelectionPage = () => {
     const standard = selectedAllergens.filter(id => standardIds.includes(id));
     const custom = selectedAllergens.filter(id => !standardIds.includes(id));
     
-    // Clear session translations to force re-translation with new allergens
     await storage.remove(STORAGE_KEYS.SESSION_TRANSLATIONS);
     
     await storage.set(STORAGE_KEYS.SELECTED_ALLERGENS, {
       standard,
       custom,
       ids: selectedAllergens,
-      persistentCustomList: customList // Save the full list of custom allergens
+      persistentCustomList: customList
     });
     
     navigate('/select-alert');
@@ -112,7 +115,6 @@ const AllergenSelectionPage = () => {
           />
           
           <div className="grid grid-cols-2 gap-2 w-full pt-4">
-            {/* Standard Allergens */}
             {ALLERGEN_OPTIONS.map((allergen) => {
               const isSelected = selectedAllergens.includes(allergen.id);
               return (
@@ -134,7 +136,6 @@ const AllergenSelectionPage = () => {
               );
             })}
 
-            {/* Custom Allergens */}
             {customList.map((allergen) => {
               const isSelected = selectedAllergens.includes(allergen);
               return (
@@ -168,28 +169,33 @@ const AllergenSelectionPage = () => {
             })}
           </div>
 
-          {/* Add Custom Input */}
           <div className="w-full pt-4 px-2">
             <div className="flex space-x-2">
               <Input
                 type="text"
-                placeholder="Add custom allergen..."
+                placeholder={isPremium ? "Add custom allergen..." : "Premium: Add custom allergens"}
                 value={customAllergenInput}
                 onChange={(e) => setCustomAllergenInput(e.target.value)}
+                disabled={!isPremium}
                 className="flex-grow bg-white dark:bg-gray-800 border-gray-200 dark:border-gray-700 rounded-xl h-10 px-4 text-sm"
                 onKeyPress={(e) => e.key === 'Enter' && handleAddCustomAllergen()}
               />
               <Button 
                 onClick={handleAddCustomAllergen} 
+                disabled={!isPremium}
                 className="h-10 px-4 bg-blue-600 text-white hover:bg-blue-700 rounded-xl text-sm"
               >
-                Add
+                {isPremium ? "Add" : <Crown className="h-4 w-4" />}
               </Button>
             </div>
+            {!isPremium && (
+              <p className="text-[10px] text-amber-600 font-medium mt-1 ml-2">
+                Upgrade to add your own custom allergens
+              </p>
+            )}
           </div>
         </div>
 
-        {/* Navigation Footer */}
         <div className="w-full flex justify-between items-center mt-auto mb-[50px] pt-8 gap-4 shrink-0">
           <Button
             variant="ghost"

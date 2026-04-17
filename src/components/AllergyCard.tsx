@@ -15,6 +15,7 @@ import DisclaimerDialog from './DisclaimerDialog';
 import EmergencyNumberDialog from './EmergencyNumberDialog';
 import { storage, STORAGE_KEYS } from '@/lib/storage';
 import { useNetworkStatus } from '@/hooks/useNetworkStatus';
+import { useBilling } from '@/hooks/useBilling';
 
 interface AllergyCardProps {
   languageCode: LanguageCode;
@@ -26,6 +27,7 @@ const AllergyCard: React.FC<AllergyCardProps> = ({ languageCode, selectedAllerge
   const cardRef = useRef<HTMLDivElement>(null);
   const navigate = useNavigate();
   const isOnline = useNetworkStatus();
+  const { isPremium } = useBilling();
   
   const [isSharing, setIsSharing] = useState(false);
   const [isDownloading, setIsDownloading] = useState(false);
@@ -321,9 +323,11 @@ const AllergyCard: React.FC<AllergyCardProps> = ({ languageCode, selectedAllerge
           <p className="text-[20px] sm:text-2xl text-gray-400 font-light mb-0">
             Translated to {getLanguageName(languageCode)}
           </p>
-          <p className="text-[13px] sm:text-base text-gray-400 font-light">
-            created with Simple Allergy Alert © 2026 dpbcreative
-          </p>
+          {!isPremium && (
+            <p className="text-[13px] sm:text-base text-gray-400 font-light">
+              created with Simple Allergy Alert © 2026 dpbcreative
+            </p>
+          )}
         </div>
       </div>
       <CardActions 
