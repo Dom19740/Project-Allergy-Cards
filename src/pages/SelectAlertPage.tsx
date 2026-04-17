@@ -50,7 +50,7 @@ const SelectAlertPage = () => {
         <div className="flex-grow pt-2">
           <StepHeader 
             title="Customise Alert"
-            description={isPremium ? "Personalise the warning messages that will appear on your card." : "Upgrade to Premium to customise your alert messages."}
+            description="Personalise the warning messages that will appear on the card."
           />
 
           <div className="w-full space-y-6 text-left pt-8 pb-4">
