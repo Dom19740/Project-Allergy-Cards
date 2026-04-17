@@ -62,7 +62,6 @@ const SelectAlertPage = () => {
                 >
                   Primary Warning
                 </Label>
-                {!isPremium && <Crown className="h-3 w-3 text-amber-600" />}
               </div>
               <textarea
                 id="allergic-to"
@@ -82,7 +81,6 @@ const SelectAlertPage = () => {
                 >
                   Secondary Warning
                 </Label>
-                {!isPremium && <Crown className="h-3 w-3 text-amber-600" />}
               </div>
               <textarea
                 id="make-me-sick"
@@ -100,7 +98,7 @@ const SelectAlertPage = () => {
                 className="mt-4 w-full flex items-center justify-center gap-2 text-amber-600 font-bold text-sm hover:underline"
               >
                 <Crown className="h-4 w-4" />
-                Custom alerts are a premium feature. Upgrade to change these messages.
+                Unlock customise alerts
               </button>
             )}
           </div>
