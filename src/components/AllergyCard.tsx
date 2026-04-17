@@ -3,7 +3,7 @@
 import React, { useRef, useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'sonner';
-import { Loader2, AlertTriangle } from 'lucide-react';
+import { Loader2, Utensils } from 'lucide-react';
 import { LanguageCode, SelectedAllergens, CustomMessages, TranslatedContent } from '@/lib/types';
 import { ALLERGEN_OPTIONS } from '@/lib/allergens';
 import { translateText } from '@/lib/translator';
@@ -310,7 +310,7 @@ const AllergyCard: React.FC<AllergyCardProps> = ({ languageCode, selectedAllerge
               </div>
             ) : (
               <div className="absolute inset-0 flex items-center justify-center z-0">
-                <AlertTriangle className="w-1/2 h-1/2 text-red-600 opacity-20" />
+                <Utensils className="w-1/2 h-1/2 text-red-600 opacity-20" />
               </div>
             )}
             <img src="/noentry.png" alt="No entry" className="absolute inset-0 w-full h-full object-contain z-10 opacity-90 pointer-events-none" />
