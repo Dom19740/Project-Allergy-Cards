@@ -189,9 +189,13 @@ const AllergenSelectionPage = () => {
               </Button>
             </div>
             {!isPremium && (
-              <p className="text-[10px] text-amber-600 font-medium mt-1 ml-2">
+              <button 
+                onClick={() => navigate('/')}
+                className="mt-2 w-full flex items-center justify-center gap-2 text-amber-600 font-bold text-sm hover:underline"
+              >
+                <Crown className="h-4 w-4" />
                 Upgrade to add your own custom allergens
-              </p>
+              </button>
             )}
           </div>
         </div>

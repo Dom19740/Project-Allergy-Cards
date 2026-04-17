@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useState, useEffect, useCallback } from 'react';
+import { useNavigate } from 'react-router-dom';
 import useEmblaCarousel from 'embla-carousel-react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
@@ -9,7 +10,7 @@ import { Label } from '@/components/ui/label';
 import { toast } from 'sonner';
 import { SavedCard, SelectedAllergens, CustomMessages, TranslatedContent } from '@/lib/types';
 import { storage, STORAGE_KEYS } from '@/lib/storage';
-import { Check } from 'lucide-react';
+import { Check, Crown } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useBilling } from '@/hooks/useBilling';
 
@@ -32,6 +33,7 @@ const SaveCardDialog: React.FC<SaveCardDialogProps> = ({
   translatedContent,
   isEmergency = false
 }) => {
+  const navigate = useNavigate();
   const { isPremium } = useBilling();
   const [cardName, setCardName] = useState(isEmergency ? 'Emergency Card' : '');
   const [existingCards, setExistingCards] = useState<SavedCard[]>([]);
@@ -159,10 +161,23 @@ const SaveCardDialog: React.FC<SaveCardDialogProps> = ({
               value={cardName}
               onChange={(e) => setCardName(e.target.value)}
               onKeyDown={handleKeyDown}
+              disabled={!isPremium}
               placeholder={isEmergency ? "Emergency Card" : "e.g. My Thai Card"}
               autoFocus
-              className="w-full h-11 rounded-xl border-gray-200 focus:ring-red-500 focus:border-gray-200 px-4"
+              className="w-full h-11 rounded-xl border-gray-200 focus:ring-red-500 focus:border-gray-200 px-4 disabled:opacity-50"
             />
+            {!isPremium && (
+              <button 
+                onClick={() => {
+                  handleClose();
+                  navigate('/');
+                }}
+                className="mt-2 w-full flex items-center justify-center gap-2 text-amber-600 font-bold text-sm hover:underline"
+              >
+                <Crown className="h-4 w-4" />
+                Upgrade to save your cards
+              </button>
+            )}
           </div>
 
           {!isEmergency && existingCards.length > 0 && (
@@ -192,8 +207,9 @@ const SaveCardDialog: React.FC<SaveCardDialogProps> = ({
                     <div key={card.id} className="flex-[0_0_100%] min-w-0 flex justify-center px-1">
                       <button
                         onClick={() => toggleCardSelection(card)}
+                        disabled={!isPremium}
                         className={cn(
-                          "w-full flex items-center justify-between p-3.5 rounded-xl border transition-all text-left",
+                          "w-full flex items-center justify-between p-3.5 rounded-xl border transition-all text-left disabled:opacity-50",
                           selectedCardId === card.id 
                             ? 'border-red-500 bg-red-50 text-red-700' 
                             : 'border-gray-100 bg-gray-50 text-gray-600 hover:border-gray-200 dark:bg-gray-800 dark:border-gray-700 dark:text-gray-300'
@@ -225,7 +241,8 @@ const SaveCardDialog: React.FC<SaveCardDialogProps> = ({
           </Button>
           <Button 
             onClick={handleSave} 
-            className="flex-1 h-11 bg-red-600 hover:bg-red-700 text-white rounded-xl shadow-sm transition-all active:scale-95 font-medium"
+            disabled={!isPremium}
+            className="flex-1 h-11 bg-red-600 hover:bg-red-700 text-white rounded-xl shadow-sm transition-all active:scale-95 font-medium disabled:opacity-50"
           >
             {selectedCardId ? 'Update' : 'Save'}
           </Button>

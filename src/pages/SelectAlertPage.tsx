@@ -95,9 +95,13 @@ const SelectAlertPage = () => {
             </div>
             
             {!isPremium && (
-              <p className="text-xs text-amber-600 font-medium text-center px-4">
+              <button 
+                onClick={() => navigate('/')}
+                className="mt-4 w-full flex items-center justify-center gap-2 text-amber-600 font-bold text-sm hover:underline"
+              >
+                <Crown className="h-4 w-4" />
                 Custom alerts are a premium feature. Upgrade to change these messages.
-              </p>
+              </button>
             )}
           </div>
         </div>
