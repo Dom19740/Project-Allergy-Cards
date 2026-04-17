@@ -11,6 +11,7 @@ import { SavedCard, SelectedAllergens, CustomMessages, TranslatedContent } from 
 import { storage, STORAGE_KEYS } from '@/lib/storage';
 import { Check } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import { useBilling } from '@/hooks/useBilling';
 
 interface SaveCardDialogProps {
   isOpen: boolean;
@@ -31,6 +32,7 @@ const SaveCardDialog: React.FC<SaveCardDialogProps> = ({
   translatedContent,
   isEmergency = false
 }) => {
+  const { isPremium } = useBilling();
   const [cardName, setCardName] = useState(isEmergency ? 'Emergency Card' : '');
   const [existingCards, setExistingCards] = useState<SavedCard[]>([]);
   const [selectedCardId, setSelectedCardId] = useState<string | null>(null);
@@ -92,8 +94,9 @@ const SaveCardDialog: React.FC<SaveCardDialogProps> = ({
         updatedCards = savedCards.map(card => card.id === selectedCardId ? newCard : card);
         toast.success(`Card "${cardName}" updated successfully!`);
       } else {
-        if (savedCards.length >= 3) {
-          toast.error("You can only save up to 3 cards. Please select one to overwrite.");
+        // Check limit for non-premium users
+        if (!isPremium && savedCards.length >= 3) {
+          toast.error("Free users can only save up to 3 cards. Please upgrade to Premium for unlimited cards!");
           return;
         }
         updatedCards = [...savedCards, newCard];
