@@ -3,13 +3,18 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import useEmblaCarousel from 'embla-carousel-react';
-import { ChevronLeft, ChevronRight, ShieldAlert, Languages, Share2, AlertTriangle, LayoutGrid } from 'lucide-react';
+import { ChevronLeft, ChevronRight, ShieldAlert, Languages, Share2, AlertTriangle, Info, LayoutGrid } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import FixedHeader from '@/components/FixedHeader';
 import OnboardingStep from '@/components/OnboardingStep';
 import { storage, STORAGE_KEYS } from '@/lib/storage';
 
 const ONBOARDING_STEPS = [
+  {
+    title: "Safety First",
+    description: "This app provides translated allergy alerts for convenience. While we aim for accuracy, translations and emergency numbers may not always be correct. Always verify important information locally when possible. If in doubt, do not eat.",
+    icon: Info,
+  },
   {
     title: "Select Your Allergens",
     description: "Choose from our standard list or add your own custom allergens. Customise your allergy alert warnings.",
