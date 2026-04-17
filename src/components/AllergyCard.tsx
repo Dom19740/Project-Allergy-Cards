@@ -3,7 +3,7 @@
 import React, { useRef, useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'sonner';
-import { Loader2 } from 'lucide-react';
+import { Loader2, AlertTriangle } from 'lucide-react';
 import { LanguageCode, SelectedAllergens, CustomMessages, TranslatedContent } from '@/lib/types';
 import { ALLERGEN_OPTIONS } from '@/lib/allergens';
 import { translateText } from '@/lib/translator';
@@ -297,9 +297,10 @@ const AllergyCard: React.FC<AllergyCardProps> = ({ languageCode, selectedAllerge
         <p className="text-2xl sm:text-3xl md:text-4xl font-normal text-gray-600 italic mb-4 sm:mb-6">
           {translatedUIText.thankYou}
         </p>
-        {allergensWithImages.length > 0 && (
-          <div className="relative w-full max-w-[400px] aspect-square mx-auto flex-shrink min-h-0">
-            <div className="absolute inset-0 flex items-center justify-center">
+        
+        <div className="relative w-full max-w-[400px] aspect-square mx-auto flex-shrink min-h-0">
+          <div className="absolute inset-0 flex items-center justify-center">
+            {allergensWithImages.length > 0 ? (
               <div className={`absolute inset-0 grid ${imageGridClasses} gap-1 sm:gap-2 items-center justify-items-center z-0 p-4`}>
                 {allergensWithImages.map((allergen) => (
                   <div key={allergen.id} className="w-full h-full flex items-center justify-center">
@@ -307,10 +308,15 @@ const AllergyCard: React.FC<AllergyCardProps> = ({ languageCode, selectedAllerge
                   </div>
                 ))}
               </div>
-              <img src="/noentry.png" alt="No entry" className="absolute inset-0 w-full h-full object-contain z-10 opacity-90 pointer-events-none" />
-            </div>
+            ) : (
+              <div className="absolute inset-0 flex items-center justify-center z-0">
+                <AlertTriangle className="w-1/2 h-1/2 text-red-600 opacity-20" />
+              </div>
+            )}
+            <img src="/noentry.png" alt="No entry" className="absolute inset-0 w-full h-full object-contain z-10 opacity-90 pointer-events-none" />
           </div>
-        )}
+        </div>
+
         <div className="mt-auto pt-2">
           <p className="text-[20px] sm:text-2xl text-gray-400 font-light mb-0">
             Translated to {getLanguageName(languageCode)}
