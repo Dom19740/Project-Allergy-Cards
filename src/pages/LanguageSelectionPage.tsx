@@ -37,7 +37,23 @@ const LanguageSelectionPage = () => {
       const langs = await getAllGoogleLanguages();
       if (!mounted) return;
       
-      const sortedLangs = [...langs].sort((a, b) => a.name.localeCompare(b.name));
+      const sortedLangs = [...langs].sort((a, b) => {
+        const aFree = FREE_LANGUAGES.includes(a.code);
+        const bFree = FREE_LANGUAGES.includes(b.code);
+        
+        // 1. Prioritize free languages at the top
+        if (aFree && !bFree) return -1;
+        if (!aFree && bFree) return 1;
+        
+        // 2. Within the same category (both free or both premium)
+        // Always put English ('en') at the very top of its category
+        if (a.code === 'en') return -1;
+        if (b.code === 'en') return 1;
+        
+        // 3. Otherwise sort alphabetically by name
+        return a.name.localeCompare(b.name);
+      });
+      
       setSupportedLanguages(sortedLangs);
     })();
     return () => { mounted = false; };
