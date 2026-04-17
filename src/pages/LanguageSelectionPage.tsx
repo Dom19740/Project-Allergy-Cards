@@ -4,7 +4,7 @@ import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Button } from "@/components/ui/button";
-import { ChevronLeft, ChevronRight, WifiOff, Crown } from "lucide-react";
+import { ChevronLeft, ChevronRight, WifiOff, Crown, Lock } from "lucide-react";
 import FixedHeader from "@/components/FixedHeader";
 import StepHeader from "@/components/StepHeader";
 import { getAllGoogleLanguages, SupportedLanguage } from "@/lib/translator";
@@ -12,12 +12,13 @@ import { storage, STORAGE_KEYS } from "@/lib/storage";
 import { useNetworkStatus } from "@/hooks/useNetworkStatus";
 import { useBilling } from "@/hooks/useBilling";
 import { FREE_LANGUAGES } from "@/lib/premium-config";
+import { toast } from "sonner";
 
 const LanguageSelectionPage = () => {
   const navigate = useNavigate();
   const isOnline = useNetworkStatus();
   const { isPremium } = useBilling();
-  const [selectedLanguageCode, setSelectedLanguageCode] = useState<string>("en");
+  const [selectedLanguageCode, setSelectedLanguageCode] = useState<string>("es-ES");
   const [supportedLanguages, setSupportedLanguages] = useState<SupportedLanguage[]>([]);
 
   useEffect(() => {
@@ -36,18 +37,25 @@ const LanguageSelectionPage = () => {
       const langs = await getAllGoogleLanguages();
       if (!mounted) return;
       
-      // Filter languages if not premium
-      const filteredLangs = isPremium 
-        ? langs 
-        : langs.filter(l => FREE_LANGUAGES.includes(l.code));
-        
-      const sortedLangs = [...filteredLangs].sort((a, b) => a.name.localeCompare(b.name));
+      const sortedLangs = [...langs].sort((a, b) => a.name.localeCompare(b.name));
       setSupportedLanguages(sortedLangs);
     })();
     return () => { mounted = false; };
-  }, [isPremium]);
+  }, []);
 
   const handleLanguageChange = async (code: string) => {
+    const isFree = FREE_LANGUAGES.includes(code);
+    
+    if (!isPremium && !isFree) {
+      toast.error("This language is a premium feature. Please upgrade to unlock all 100+ languages!", {
+        action: {
+          label: "Upgrade",
+          onClick: () => navigate('/')
+        }
+      });
+      return;
+    }
+
     setSelectedLanguageCode(code);
     await storage.set(STORAGE_KEYS.SELECTED_LANGUAGE, code);
   };
@@ -67,7 +75,7 @@ const LanguageSelectionPage = () => {
         <div className="flex-grow overflow-y-auto pt-2">
           <StepHeader 
             title="Choose a Language"
-            description={isPremium ? "Select any language for your alert." : "Select from 5 free languages or upgrade to unlock all 100+."}
+            description={isPremium ? "Select any language for your alert." : "Select from our free languages or upgrade to unlock all 100+."}
           />
 
           {!isOnline && (
@@ -94,15 +102,21 @@ const LanguageSelectionPage = () => {
                   </div>
                 </SelectTrigger>
                 <SelectContent className="bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-50 max-h-[50vh]">
-                  {supportedLanguages.map((lang) => (
-                    <SelectItem
-                      key={lang.code}
-                      value={lang.code}
-                      className="py-3 text-lg md:text-xl cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-700"
-                    >
-                      {lang.name}
-                    </SelectItem>
-                  ))}
+                  {supportedLanguages.map((lang) => {
+                    const isLocked = !isPremium && !FREE_LANGUAGES.includes(lang.code);
+                    return (
+                      <SelectItem
+                        key={lang.code}
+                        value={lang.code}
+                        className="py-3 text-lg md:text-xl cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-700"
+                      >
+                        <div className="flex items-center justify-between w-full gap-4">
+                          <span>{lang.name}</span>
+                          {isLocked && <Lock className="h-4 w-4 text-amber-500" />}
+                        </div>
+                      </SelectItem>
+                    );
+                  })}
                 </SelectContent>
               </Select>
               
