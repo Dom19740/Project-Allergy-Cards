@@ -175,7 +175,7 @@ const SaveCardDialog: React.FC<SaveCardDialogProps> = ({
                 className="mt-2 w-full flex items-center justify-center gap-2 text-amber-600 font-bold text-sm hover:underline"
               >
                 <Crown className="h-4 w-4" />
-                Upgrade to save your cards
+                Unlock Save Cards
               </button>
             )}
           </div>
