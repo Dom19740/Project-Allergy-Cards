@@ -5,6 +5,7 @@ import { useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import FixedHeader from '@/components/FixedHeader';
 import SavedCardsList from '@/components/SavedCardsList';
+import PremiumUnlock from '@/components/PremiumUnlock';
 import { storage, STORAGE_KEYS } from '@/lib/storage';
 import { SavedCard } from '@/lib/types';
 import { cn } from '@/lib/utils';
@@ -34,7 +35,6 @@ const Home = () => {
 
   const handleGetStarted = async () => {
     const hasSeenOnboarding = await storage.get<any>(STORAGE_KEYS.HAS_SEEN_ONBOARDING);
-    // Check for both string 'true' and boolean true due to storage parsing
     if (hasSeenOnboarding === 'true' || hasSeenOnboarding === true) {
       navigate('/select-allergens');
     } else {
@@ -50,14 +50,14 @@ const Home = () => {
           {/* Logo Area */}
           <div className={cn(
             "w-full flex items-center justify-center min-h-0 p-1 transition-all duration-500 ease-in-out", 
-            hasCards ? "flex-[0.4]" : "flex-[0.5]"
+            hasCards ? "flex-[0.3]" : "flex-[0.4]"
           )}>
             <img 
               src="/logo_main.png" 
               alt="App Logo" 
               className={cn(
                 "max-h-full w-auto h-auto object-contain transition-all duration-500", 
-                hasCards ? "max-w-[220px] md:max-w-[280px]" : "max-w-[260px] md:max-w-[340px]"
+                hasCards ? "max-w-[180px] md:max-w-[240px]" : "max-w-[240px] md:max-w-[300px]"
               )} 
             />
           </div>
@@ -65,22 +65,25 @@ const Home = () => {
           {/* Text and Cards Area */}
           <div className={cn(
             "flex flex-col w-full py-1 min-h-0 transition-all duration-500", 
-            hasCards ? "flex-[0.6] justify-center" : "flex-[0.5] justify-center"
+            hasCards ? "flex-[0.7] justify-start" : "flex-[0.6] justify-center"
           )}>
-            <div className="space-y-3 mb-2">
-              <p className="text-gray-700 dark:text-gray-300 max-w-md mx-auto px-6 leading-tight text-lg md:text-xl">
+            <div className="space-y-2 mb-4">
+              <p className="text-gray-700 dark:text-gray-300 max-w-md mx-auto px-6 leading-tight text-base md:text-lg">
                 Create a personalized allergy alert in multiple languages to communicate your dietary restrictions easily and safely.
-              </p>
-              <p className="text-gray-700 dark:text-gray-300 max-w-md mx-auto px-6 leading-tight text-lg md:text-xl">
-                 Save a translated emergency alert card to communicate your need for medical attention.
               </p>
             </div>
             
-            {hasCards && (
-              <div className="w-full mt-1 animate-in fade-in slide-in-from-bottom-4 duration-700">
-                <SavedCardsList />
+            <div className="w-full space-y-4">
+              {hasCards && (
+                <div className="w-full animate-in fade-in slide-in-from-bottom-4 duration-700">
+                  <SavedCardsList />
+                </div>
+              )}
+              
+              <div className="px-4">
+                <PremiumUnlock />
               </div>
-            )}
+            </div>
           </div>
         </div>
 

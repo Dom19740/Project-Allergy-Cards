@@ -8,6 +8,7 @@ import { usePreloadImages } from "./hooks/usePreloadImages";
 import { Loader2 } from "lucide-react";
 import { storage, STORAGE_KEYS } from "./lib/storage";
 import { useDeepLinks } from "./hooks/useDeepLinks";
+import { initBilling } from "./lib/billing";
 
 // Lazy load pages
 const Home = lazy(() => import("./pages/Home"));
@@ -33,6 +34,9 @@ const AppContent = () => {
   useDeepLinks();
 
   useEffect(() => {
+    // Initialize billing system
+    initBilling();
+
     const migrate = async () => {
       const hasMigrated = await storage.get(STORAGE_KEYS.HAS_MIGRATED);
       if (hasMigrated) return;
