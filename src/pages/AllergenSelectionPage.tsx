@@ -114,7 +114,7 @@ const AllergenSelectionPage = () => {
             description="Tap the allergens you want to include on your card."
           />
           
-          <div className="grid grid-cols-2 gap-2 w-full pt-4">
+          <div className="grid grid-cols-3 gap-2 w-full pt-4">
             {ALLERGEN_OPTIONS.map((allergen) => {
               const isSelected = selectedAllergens.includes(allergen.id);
               return (
@@ -122,16 +122,16 @@ const AllergenSelectionPage = () => {
                   key={allergen.id} 
                   onClick={() => toggleAllergen(allergen.id)}
                   className={cn(
-                    "flex items-center space-x-2 py-1.5 px-2 rounded-xl shadow-sm cursor-pointer transition-all duration-200 border-2",
+                    "flex flex-col items-center justify-center space-y-1 py-2 px-1 rounded-xl shadow-sm cursor-pointer transition-all duration-200 border-2 text-center",
                     isSelected 
                       ? "bg-red-600 border-red-600 text-white" 
                       : "bg-white dark:bg-gray-800 border-transparent text-gray-700 dark:text-gray-300 hover:border-red-200 dark:hover:border-red-900/30"
                   )}
                 >
-                  <div className="w-8 h-8 rounded-lg flex items-center justify-center p-1 shrink-0 bg-white">
+                  <div className="w-10 h-10 rounded-lg flex items-center justify-center p-1.5 shrink-0 bg-white">
                     <img src={allergen.image} alt={allergen.name} className="w-full h-full object-contain" />
                   </div>
-                  <span className="text-sm font-bold leading-tight">{allergen.name}</span>
+                  <span className="text-[11px] font-bold leading-tight">{allergen.name}</span>
                 </div>
               );
             })}
@@ -143,27 +143,25 @@ const AllergenSelectionPage = () => {
                   key={allergen} 
                   onClick={() => toggleAllergen(allergen)}
                   className={cn(
-                    "flex items-center justify-between py-1.5 px-2 rounded-xl shadow-sm cursor-pointer transition-all duration-200 border-2 relative group",
+                    "flex flex-col items-center justify-center space-y-1 py-2 px-1 rounded-xl shadow-sm cursor-pointer transition-all duration-200 border-2 relative group text-center",
                     isSelected 
                       ? "bg-red-600 border-red-600 text-white" 
                       : "bg-white dark:bg-gray-800 border-transparent text-gray-700 dark:text-gray-300 hover:border-red-200 dark:hover:border-red-900/30"
                   )}
                 >
-                  <div className="flex items-center space-x-2 overflow-hidden">
-                    <div className="w-8 h-8 rounded-lg flex items-center justify-center shrink-0 bg-white">
-                      <Tag className={cn("w-4 h-4", isSelected ? "text-red-600" : "text-gray-500")} />
-                    </div>
-                    <span className="text-sm font-bold leading-tight truncate">{allergen}</span>
-                  </div>
                   <button 
                     onClick={(e) => removeCustomAllergen(e, allergen)}
                     className={cn(
-                      "p-1 rounded-full hover:bg-black/10 transition-colors",
+                      "absolute top-1 right-1 p-0.5 rounded-full hover:bg-black/10 transition-colors",
                       isSelected ? "text-white" : "text-gray-400"
                     )}
                   >
-                    <X className="w-5 h-5" />
+                    <X className="w-3.5 h-3.5" />
                   </button>
+                  <div className="w-10 h-10 rounded-lg flex items-center justify-center shrink-0 bg-white">
+                    <Tag className={cn("w-5 h-5", isSelected ? "text-red-600" : "text-gray-500")} />
+                  </div>
+                  <span className="text-[11px] font-bold leading-tight truncate w-full px-1">{allergen}</span>
                 </div>
               );
             })}
