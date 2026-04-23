@@ -5,7 +5,7 @@ import { useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { toast } from 'sonner';
-import { X, ChevronLeft, ChevronRight, Tag, Crown } from 'lucide-react';
+import { X, ChevronLeft, ChevronRight, Utensils, Crown } from 'lucide-react';
 import { ALLERGEN_OPTIONS } from '@/lib/allergens';
 import FixedHeader from '@/components/FixedHeader';
 import StepHeader from '@/components/StepHeader';
@@ -167,7 +167,7 @@ const AllergenSelectionPage = () => {
                     <X className="w-3.5 h-3.5" />
                   </button>
                   <div className="w-10 h-10 rounded-lg flex items-center justify-center shrink-0 bg-white">
-                    <Tag className={cn("w-5 h-5", isSelected ? "text-red-600" : "text-gray-500")} />
+                    <Utensils className={cn("w-5 h-5", isSelected ? "text-red-600" : "text-gray-500")} />
                   </div>
                   <span className="text-[14px] font-bold leading-tight truncate w-full px-1">{allergen}</span>
                 </div>
