@@ -32,7 +32,6 @@ const PremiumUnlock = () => {
         </div>
         <div>
           <h3 className="text-lg font-bold text-amber-900 dark:text-amber-100">Upgrade to Premium</h3>
-          <p className="text-xs text-amber-700 dark:text-amber-300">Unlock unlimited cards and advanced features.</p>
         </div>
       </div>
       
