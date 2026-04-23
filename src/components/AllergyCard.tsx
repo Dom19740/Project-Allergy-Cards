@@ -13,6 +13,7 @@ import CardActions from './CardActions';
 import CardMenu from './CardMenu';
 import DisclaimerDialog from './DisclaimerDialog';
 import EmergencyNumberDialog from './EmergencyNumberDialog';
+import FullscreenImageOverlay from './FullscreenImageOverlay';
 import { storage, STORAGE_KEYS } from '@/lib/storage';
 import { useNetworkStatus } from '@/hooks/useNetworkStatus';
 import { useBilling } from '@/hooks/useBilling';
@@ -36,6 +37,7 @@ const AllergyCard: React.FC<AllergyCardProps> = ({ languageCode, selectedAllerge
   const [isSaveDialogOpen, setIsSaveDialogOpen] = useState(false);
   const [isDisclaimerOpen, setIsDisclaimerOpen] = useState(false);
   const [isEmergencyDialogOpen, setIsEmergencyDialogOpen] = useState(false);
+  const [isImageFullscreen, setIsImageFullscreen] = useState(false);
   const [customAllergenTranslations, setCustomAllergenTranslations] = useState<{ [key: string]: { [lang: string]: string } }>({});
   const [translatedAllergens, setTranslatedAllergens] = useState<{ [key: string]: string }>(initialTranslations?.allergens || {});
   const [isTranslating, setIsTranslating] = useState(!initialTranslations);
@@ -345,7 +347,10 @@ const AllergyCard: React.FC<AllergyCardProps> = ({ languageCode, selectedAllerge
           {translatedUIText.thankYou}
         </p>
         
-        <div className="relative w-full max-w-[400px] aspect-square mx-auto flex-shrink min-h-0">
+        <div 
+          className="relative w-full max-w-[400px] aspect-square mx-auto flex-shrink min-h-0 cursor-pointer"
+          onClick={() => setIsImageFullscreen(true)}
+        >
           <div className="absolute inset-0 flex items-center justify-center">
             {allergensWithImages.length > 0 ? (
               <div className={`absolute inset-0 grid ${imageGridClasses} gap-1 sm:gap-2 items-center justify-items-center z-0 p-4`}>
@@ -394,6 +399,12 @@ const AllergyCard: React.FC<AllergyCardProps> = ({ languageCode, selectedAllerge
         onClose={() => setIsEmergencyDialogOpen(false)} 
         onConfirm={handleEmergencyConfirm}
         langCode={languageCode}
+      />
+      <FullscreenImageOverlay 
+        isOpen={isImageFullscreen} 
+        onClose={() => setIsImageFullscreen(false)} 
+        allergensWithImages={allergensWithImages}
+        imageGridClasses={imageGridClasses}
       />
       {fullSelectedData && (
         <SaveCardDialog
