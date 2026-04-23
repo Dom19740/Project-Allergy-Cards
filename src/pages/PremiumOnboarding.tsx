@@ -49,14 +49,16 @@ const PremiumOnboarding = () => {
           <div className="space-y-2">
             <div className="flex items-center justify-center gap-2">
               <h2 className="text-3xl font-bold text-gray-900 dark:text-white">
-                Unlock Premium
+                {isPremium ? "Premium Unlocked" : "Unlock Premium"}
               </h2>
               <div className="bg-amber-100 dark:bg-amber-900/30 p-1.5 rounded-lg">
                 <Crown className="h-5 w-5 text-amber-600 fill-amber-600/20" />
               </div>
             </div>
             <p className="text-base text-gray-500 dark:text-gray-400 leading-relaxed">
-              Get the full power of Simple Allergy Alert and travel with total peace of mind.
+              {isPremium 
+                ? "You have full access to all features. Travel with total peace of mind."
+                : "Get the full power of Simple Allergy Alert and travel with total peace of mind."}
             </p>
           </div>
 
@@ -80,23 +82,21 @@ const PremiumOnboarding = () => {
 
         <div className="w-full flex flex-col gap-3 mt-8">
           {!isPremium && (
-            <>
-              <Button 
-                onClick={purchasePremium}
-                className="w-full h-14 text-lg font-bold bg-amber-500 hover:bg-amber-600 text-white rounded-xl shadow-lg shadow-amber-500/20 transition-all active:scale-[0.98] flex flex-col items-center justify-center"
-              >
-                <span>Unlock Everything</span>
-                <span className="text-[10px] font-medium opacity-80 uppercase tracking-wider">One-time payment of {price}</span>
-              </Button>
-              
-              <button 
-                onClick={() => setIsPromoOpen(true)}
-                className="text-[11px] font-bold text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 uppercase tracking-widest transition-colors py-1"
-              >
-                Redeem Promo Code
-              </button>
-            </>
+            <Button 
+              onClick={purchasePremium}
+              className="w-full h-14 text-lg font-bold bg-amber-500 hover:bg-amber-600 text-white rounded-xl shadow-lg shadow-amber-500/20 transition-all active:scale-[0.98] flex flex-col items-center justify-center"
+            >
+              <span>Unlock Everything</span>
+              <span className="text-[10px] font-medium opacity-80 uppercase tracking-wider">One-time payment of {price}</span>
+            </Button>
           )}
+          
+          <button 
+            onClick={() => setIsPromoOpen(true)}
+            className="text-[11px] font-bold text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 uppercase tracking-widest transition-colors py-1"
+          >
+            Redeem Promo Code
+          </button>
           
           <Button 
             variant="ghost"
