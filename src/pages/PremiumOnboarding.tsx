@@ -1,17 +1,36 @@
 "use client";
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Crown, Check, ChevronRight, Languages, ShieldAlert, MessageSquare, Save, Smartphone } from 'lucide-react';
 import { useBilling } from '@/hooks/useBilling';
 import FixedHeader from '@/components/FixedHeader';
 import PromoCodeDialog from '@/components/PromoCodeDialog';
+import { getPremiumPrice } from '@/lib/billing';
 
 const PremiumOnboarding = () => {
   const navigate = useNavigate();
-  const { purchasePremium, isPremium, price } = useBilling();
+  const { purchasePremium, isPremium } = useBilling();
   const [isPromoOpen, setIsPromoOpen] = useState(false);
+  const [price, setPrice] = useState('€3.99');
+
+  useEffect(() => {
+    // Poll until the store has loaded the product
+    const interval = setInterval(() => {
+      const p = getPremiumPrice();
+      if (p && p !== '€3.99') {
+        setPrice(p);
+        clearInterval(interval);
+      }
+    }, 500);
+    
+    // Also set initial price if available
+    const initialPrice = getPremiumPrice();
+    if (initialPrice) setPrice(initialPrice);
+
+    return () => clearInterval(interval);
+  }, []);
 
   const benefits = [
     {
@@ -44,7 +63,7 @@ const PremiumOnboarding = () => {
     <div className="flex flex-col min-h-screen bg-gray-50 dark:bg-gray-900">
       <FixedHeader />
       
-      <div className="flex flex-col flex-grow w-full max-w-md mx-auto px-6 pt-[calc(80px+env(safe-area-inset-top)+20px)] pb-8">
+      <div className="flex flex-col flex-grow w-full max-md mx-auto px-6 pt-[calc(80px+env(safe-area-inset-top)+20px)] pb-8">
         <div className="flex-grow flex flex-col items-center text-center space-y-6">
           <div className="space-y-2">
             <div className="flex items-center justify-center gap-2">
