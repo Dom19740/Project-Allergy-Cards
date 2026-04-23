@@ -1,41 +1,38 @@
-"use client";
+import { Preferences } from '@capacitor/preferences';
 
 export const STORAGE_KEYS = {
-  SAVED_CARDS: 'saved_cards',
-  SAVED_EMERGENCY_CARD: 'saved_emergency_card',
-  SELECTED_ALLERGENS: 'selected_allergens',
-  CUSTOM_MESSAGES: 'custom_messages',
-  SELECTED_LANGUAGE: 'selected_language',
-  SESSION_TRANSLATIONS: 'session_translations',
-  HAS_MIGRATED: 'has_migrated',
-  LAST_EMERGENCY_LANG: 'last_emergency_lang',
-  HAS_SEEN_ONBOARDING: 'has_seen_onboarding',
-  IS_PREMIUM: 'is_premium',
-  LANGUAGE: 'selected_language',
+  SAVED_CARDS: 'savedAllergyCards',
+  SAVED_EMERGENCY_CARD: 'savedEmergencyCard', // New dedicated slot
+  SELECTED_ALLERGENS: 'selectedAllergens',
+  CUSTOM_MESSAGES: 'customAlertMessages',
+  SELECTED_LANGUAGE: 'selectedLanguageCode',
+  SESSION_TRANSLATIONS: 'currentSessionTranslations',
+  HAS_MIGRATED: 'hasMigratedToPreferences',
+  LAST_EMERGENCY_LANG: 'lastEmergencyLangCode',
+  HAS_SEEN_ONBOARDING: 'hasSeenOnboarding',
 };
 
 export const storage = {
-  get: <T = any>(key: string): T | null => {
-    if (typeof window === 'undefined') return null;
-    const item = localStorage.getItem(key);
-    if (!item) return null;
+  async get<T>(key: string): Promise<T | null> {
+    const { value } = await Preferences.get({ key });
+    if (!value) return null;
     try {
-      return JSON.parse(item) as T;
-    } catch {
-      return item as unknown as T;
+      return JSON.parse(value) as T;
+    } catch (e) {
+      return value as unknown as T;
     }
   },
-  set: (key: string, value: any): void => {
-    if (typeof window === 'undefined') return;
+
+  async set(key: string, value: any): Promise<void> {
     const stringValue = typeof value === 'string' ? value : JSON.stringify(value);
-    localStorage.setItem(key, stringValue);
+    await Preferences.set({ key, value: stringValue });
   },
-  remove: (key: string): void => {
-    if (typeof window === 'undefined') return;
-    localStorage.removeItem(key);
+
+  async remove(key: string): Promise<void> {
+    await Preferences.remove({ key });
   },
-  clear: (): void => {
-    if (typeof window === 'undefined') return;
-    localStorage.clear();
+
+  async clear(): Promise<void> {
+    await Preferences.clear();
   }
 };

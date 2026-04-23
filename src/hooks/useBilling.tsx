@@ -1,64 +1,85 @@
 "use client";
 
-import React, { createContext, useContext, useState, useEffect } from 'react';
-import { storage, STORAGE_KEYS } from '@/lib/storage';
+import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
+import { isPremiumUser, purchasePremium, restorePurchases, PREMIUM_PRODUCT_ID } from '@/lib/billing';
 import { toast } from 'sonner';
 
 interface BillingContextType {
   isPremium: boolean;
   isLoading: boolean;
+  price: string;
   purchasePremium: () => Promise<void>;
   restorePurchases: () => Promise<void>;
-  price: string;
 }
 
 const BillingContext = createContext<BillingContextType | undefined>(undefined);
 
-export const BillingProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+export const BillingProvider = ({ children }: { children: ReactNode }): React.ReactElement => {
   const [isPremium, setIsPremium] = useState<boolean>(false);
   const [isLoading, setIsLoading] = useState<boolean>(true);
-  const [price] = useState<string>("$4.99");
+  const [price, setPrice] = useState<string>("$4.99"); // Fallback price
 
   useEffect(() => {
-    const status = storage.get<boolean>(STORAGE_KEYS.IS_PREMIUM);
-    setIsPremium(!!status);
-    setIsLoading(false);
+    const checkStatus = async () => {
+      const status = await isPremiumUser();
+      setIsPremium(status);
+      setIsLoading(false);
+    };
+
+    checkStatus();
+
+    // Function to update price from the store
+    const updatePrice = () => {
+      if (typeof window !== 'undefined' && (window as any).CdvPurchase) {
+        const { store } = (window as any).CdvPurchase;
+        const product = store.get(PREMIUM_PRODUCT_ID);
+        if (product && product.getOffer()) {
+          setPrice(product.getOffer().price);
+        }
+      }
+    };
+
+    // Listen for store updates to get the localized price
+    if (typeof window !== 'undefined' && (window as any).CdvPurchase) {
+      const { store } = (window as any).CdvPurchase;
+      store.when().updated(updatePrice);
+      updatePrice(); // Initial check
+    }
+
+    const handleStatusChange = (e: any) => {
+      setIsPremium(e.detail);
+    };
+
+    window.addEventListener('premium-status-changed', handleStatusChange);
+    return () => window.removeEventListener('premium-status-changed', handleStatusChange);
   }, []);
 
-  const purchasePremium = async () => {
-    setIsLoading(true);
+  const handlePurchase = async () => {
     try {
-      await new Promise(resolve => setTimeout(resolve, 1500));
-      storage.set(STORAGE_KEYS.IS_PREMIUM, true);
-      setIsPremium(true);
-      toast.success("Premium unlocked!");
+      await purchasePremium();
     } catch (error) {
-      toast.error("Purchase failed.");
-    } finally {
-      setIsLoading(false);
+      toast.error("Purchase failed. Please try again.");
+      console.error(error);
     }
   };
 
-  const restorePurchases = async () => {
-    setIsLoading(true);
+  const handleRestore = async () => {
     try {
-      await new Promise(resolve => setTimeout(resolve, 1000));
-      const status = storage.get<boolean>(STORAGE_KEYS.IS_PREMIUM);
-      if (status) {
-        setIsPremium(true);
-        toast.success("Purchases restored.");
-      } else {
-        toast.info("No purchases found.");
-      }
+      await restorePurchases();
+      toast.success("Checking for previous purchases...");
     } catch (error) {
       toast.error("Restore failed.");
-    } finally {
-      setIsLoading(false);
     }
   };
 
   return (
-    <BillingContext.Provider value={{ isPremium, isLoading, purchasePremium, restorePurchases, price }}>
+    <BillingContext.Provider value={{ 
+      isPremium, 
+      isLoading, 
+      price,
+      purchasePremium: handlePurchase, 
+      restorePurchases: handleRestore 
+    }}>
       {children}
     </BillingContext.Provider>
   );

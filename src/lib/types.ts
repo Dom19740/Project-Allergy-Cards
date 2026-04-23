@@ -4,7 +4,6 @@ export interface Allergen {
   id: string;
   name: string;
   icon: string;
-  image?: string; // Added to support both icon and image properties
 }
 
 export interface CardData {
@@ -24,10 +23,20 @@ export interface CustomMessages {
   [key: string]: string;
 }
 
+export interface SavedCard {
+  id: string;
+  name: string;
+  languageCode: string;
+  selectedAllergens: SelectedAllergens;
+  customMessages: CustomMessages;
+  createdAt: number;
+}
+
 export interface TranslatedContent {
   title: string;
   alerts: string[];
   allergens: string[];
+  // Added to support EmergencyPage structure
   ui?: {
     allergyAlert: string;
     iAmAllergicTo: string;
@@ -40,21 +49,5 @@ export interface TranslatedContent {
     subtitle: string;
     callEmergency: string;
     medicalInfo: string;
-    dial112?: string;
-    attention?: string;
-    emergency?: string;
-    needHelp?: string;
-    callServices?: string;
-    dialText?: string;
   };
-}
-
-export interface SavedCard {
-  id: string;
-  name: string;
-  languageCode: string;
-  selectedAllergens: SelectedAllergens;
-  customMessages: CustomMessages;
-  translatedContent?: TranslatedContent; // Added missing property
-  createdAt: number;
 }
