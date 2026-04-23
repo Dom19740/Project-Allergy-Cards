@@ -2,7 +2,7 @@
 
 import React from 'react';
 import { Button } from '@/components/ui/button';
-import { Crown, CheckCircle2, RefreshCw } from 'lucide-react';
+import { Crown, RefreshCw } from 'lucide-react';
 import { useBilling } from '@/hooks/useBilling';
 
 const PremiumUnlock = () => {
@@ -25,22 +25,14 @@ const PremiumUnlock = () => {
   }
 
   return (
-    <div className="w-[280px] mx-auto p-5 bg-gradient-to-br from-amber-50 to-orange-50 dark:from-amber-900/10 dark:to-orange-900/10 border border-amber-200 dark:border-amber-800 rounded-2xl shadow-sm">
-      <div className="flex items-center gap-3 mb-4">
-        <div className="bg-amber-100 dark:bg-amber-900/40 p-2 rounded-full">
-          <Crown className="h-6 w-6 text-amber-600 dark:text-amber-400" />
-        </div>
-        <div>
-          <h3 className="text-lg font-bold text-amber-900 dark:text-amber-100">Upgrade</h3>
-        </div>
-      </div>
-      
+    <div className="w-[280px] mx-auto p-4 bg-gradient-to-br from-amber-50 to-orange-50 dark:from-amber-900/10 dark:to-orange-900/10 border border-amber-200 dark:border-amber-800 rounded-2xl shadow-sm">
       <div className="flex flex-col gap-2">
         <Button 
           onClick={purchasePremium}
-          className="w-full bg-amber-600 hover:bg-amber-700 text-white rounded-xl py-6 text-lg font-bold shadow-md transition-transform active:scale-95"
+          className="w-full bg-amber-600 hover:bg-amber-700 text-white rounded-xl py-6 text-lg font-bold shadow-md transition-transform active:scale-95 flex items-center justify-center gap-2"
         >
-          Unlock Now
+          <Crown className="h-5 w-5" />
+          Unlock Premium
         </Button>
         
         <button 
