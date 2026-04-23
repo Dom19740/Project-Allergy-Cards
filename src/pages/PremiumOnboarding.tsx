@@ -63,7 +63,7 @@ const PremiumOnboarding = () => {
     <div className="flex flex-col min-h-screen bg-gray-50 dark:bg-gray-900">
       <FixedHeader />
       
-      <div className="flex flex-col flex-grow w-full max-md mx-auto px-6 pt-[calc(80px+env(safe-area-inset-top)+20px)] pb-8">
+      <div className="flex flex-col flex-grow w-full max-w-md mx-auto px-6 pt-[calc(80px+env(safe-area-inset-top)+20px)] pb-8">
         <div className="flex-grow flex flex-col items-center text-center space-y-6">
           <div className="space-y-2">
             <div className="flex items-center justify-center gap-2">
@@ -103,10 +103,9 @@ const PremiumOnboarding = () => {
           {!isPremium && (
             <Button 
               onClick={purchasePremium}
-              className="w-full h-14 text-lg font-bold bg-amber-500 hover:bg-amber-600 text-white rounded-xl shadow-lg shadow-amber-500/20 transition-all active:scale-[0.98] flex flex-col items-center justify-center"
+              className="w-full h-14 text-lg font-bold bg-amber-500 hover:bg-amber-600 text-white rounded-xl shadow-lg shadow-amber-500/20 transition-all active:scale-[0.98]"
             >
-              <span>Unlock Everything</span>
-              <span className="text-[10px] font-medium opacity-80 uppercase tracking-wider">One-time payment of {price}</span>
+              One-time payment of {price}
             </Button>
           )}
           
