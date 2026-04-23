@@ -13,13 +13,13 @@ const PremiumOnboarding = () => {
   const navigate = useNavigate();
   const { purchasePremium, isPremium } = useBilling();
   const [isPromoOpen, setIsPromoOpen] = useState(false);
-  const [price, setPrice] = useState('€3.99');
+  const [price, setPrice] = useState('Loading...');
 
   useEffect(() => {
     // Poll until the store has loaded the product
     const interval = setInterval(() => {
       const p = getPremiumPrice();
-      if (p && p !== '€3.99') {
+      if (p && p !== 'Loading...') {
         setPrice(p);
         clearInterval(interval);
       }
@@ -105,7 +105,7 @@ const PremiumOnboarding = () => {
               onClick={purchasePremium}
               className="w-full h-14 text-lg font-bold bg-amber-500 hover:bg-amber-600 text-white rounded-xl shadow-lg shadow-amber-500/20 transition-all active:scale-[0.98]"
             >
-              One-time payment of {price}
+              {price === 'Loading...' ? 'Loading Price...' : `One-time payment of ${price}`}
             </Button>
           )}
           

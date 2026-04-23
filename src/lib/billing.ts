@@ -16,12 +16,10 @@ export const initBilling = () => {
       platform: Platform.GOOGLE_PLAY,
     }]);
 
-    // Handle approved purchases
     store.when().approved((transaction: any) => {
       transaction.verify();
     });
 
-    // Handle verified purchases
     store.when().verified((receipt: any) => {
       receipt.finish();
       localStorage.setItem('isPremium', 'true');
@@ -32,9 +30,6 @@ export const initBilling = () => {
   }
 };
 
-/**
- * Checks if the user has already purchased the premium version.
- */
 export const isPremiumUser = async (): Promise<boolean> => {
   if (localStorage.getItem('isPremium') === 'true') return true;
   
@@ -47,9 +42,6 @@ export const isPremiumUser = async (): Promise<boolean> => {
   return product?.owned || false;
 };
 
-/**
- * Initiates the purchase flow for the premium product.
- */
 export const purchasePremium = async () => {
   if (typeof window !== 'undefined' && (window as any).CdvPurchase) {
     const { store } = (window as any).CdvPurchase;
@@ -63,9 +55,6 @@ export const purchasePremium = async () => {
   }
 };
 
-/**
- * Restores previous purchases.
- */
 export const restorePurchases = async () => {
   if (typeof window !== 'undefined' && (window as any).CdvPurchase) {
     const { store } = (window as any).CdvPurchase;
@@ -77,15 +66,22 @@ export const restorePurchases = async () => {
  * Fetches the localized price for the premium product.
  */
 export function getPremiumPrice(): string {
+  const FALLBACK = 'Loading...';
+
   if (typeof window === 'undefined' || !(window as any).CdvPurchase) {
-    return '€3.99';
+    return FALLBACK;
   }
 
   try {
     const { store } = (window as any).CdvPurchase;
     const product = store.get(PREMIUM_PRODUCT_ID);
-    return product?.offers?.[0]?.pricingPhases?.[0]?.price ?? '€3.99';
+    
+    if (product && product.offers && product.offers[0]) {
+      return product.offers[0].pricingPhases[0].price;
+    }
+    
+    return FALLBACK;
   } catch (error) {
-    return '€3.99';
+    return FALLBACK;
   }
 }
