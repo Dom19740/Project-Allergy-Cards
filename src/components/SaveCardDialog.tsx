@@ -170,7 +170,7 @@ const SaveCardDialog: React.FC<SaveCardDialogProps> = ({
               <button 
                 onClick={() => {
                   handleClose();
-                  navigate('/premium');
+                  navigate('/premium-onboarding');
                 }}
                 className="mt-2 w-full flex items-center justify-center gap-2 text-amber-600 font-bold text-sm hover:underline"
               >
