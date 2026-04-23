@@ -9,7 +9,7 @@ import FixedHeader from '@/components/FixedHeader';
 
 const PremiumOnboarding = () => {
   const navigate = useNavigate();
-  const { purchasePremium, isPremium } = useBilling();
+  const { purchasePremium, isPremium, price } = useBilling();
 
   const benefits = [
     {
@@ -83,7 +83,7 @@ const PremiumOnboarding = () => {
                 <Crown className="h-6 w-6" />
                 <span>Unlock Everything</span>
               </div>
-              <span className="text-xs font-normal opacity-90 mt-1">One-time payment of $4.99</span>
+              <span className="text-xs font-normal opacity-90 mt-1">One-time payment of {price}</span>
             </Button>
           )}
           

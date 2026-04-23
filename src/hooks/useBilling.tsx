@@ -1,12 +1,13 @@
 "use client";
 
 import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
-import { isPremiumUser, purchasePremium, restorePurchases } from '@/lib/billing';
+import { isPremiumUser, purchasePremium, restorePurchases, PREMIUM_PRODUCT_ID } from '@/lib/billing';
 import { toast } from 'sonner';
 
 interface BillingContextType {
   isPremium: boolean;
   isLoading: boolean;
+  price: string;
   purchasePremium: () => Promise<void>;
   restorePurchases: () => Promise<void>;
 }
@@ -16,6 +17,7 @@ const BillingContext = createContext<BillingContextType | undefined>(undefined);
 export const BillingProvider = ({ children }: { children: ReactNode }): React.ReactElement => {
   const [isPremium, setIsPremium] = useState<boolean>(false);
   const [isLoading, setIsLoading] = useState<boolean>(true);
+  const [price, setPrice] = useState<string>("$4.99"); // Fallback price
 
   useEffect(() => {
     const checkStatus = async () => {
@@ -25,6 +27,24 @@ export const BillingProvider = ({ children }: { children: ReactNode }): React.Re
     };
 
     checkStatus();
+
+    // Function to update price from the store
+    const updatePrice = () => {
+      if (typeof window !== 'undefined' && (window as any).CdvPurchase) {
+        const { store } = (window as any).CdvPurchase;
+        const product = store.get(PREMIUM_PRODUCT_ID);
+        if (product && product.getOffer()) {
+          setPrice(product.getOffer().price);
+        }
+      }
+    };
+
+    // Listen for store updates to get the localized price
+    if (typeof window !== 'undefined' && (window as any).CdvPurchase) {
+      const { store } = (window as any).CdvPurchase;
+      store.when().updated(updatePrice);
+      updatePrice(); // Initial check
+    }
 
     const handleStatusChange = (e: any) => {
       setIsPremium(e.detail);
@@ -56,6 +76,7 @@ export const BillingProvider = ({ children }: { children: ReactNode }): React.Re
     <BillingContext.Provider value={{ 
       isPremium, 
       isLoading, 
+      price,
       purchasePremium: handlePurchase, 
       restorePurchases: handleRestore 
     }}>
