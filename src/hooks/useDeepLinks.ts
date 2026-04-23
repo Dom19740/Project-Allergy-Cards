@@ -36,7 +36,6 @@ export const useDeepLinks = () => {
               });
             }
             
-            // Navigate with a fresh timestamp in state to ensure component refresh
             navigate(`/alert/${card.languageCode}`, { 
               replace: true,
               state: { refresh: Date.now() }
@@ -65,6 +64,8 @@ export const useDeepLinks = () => {
           } else {
             navigate('/');
           }
+        } else if (host === 'premium') {
+          navigate('/premium-onboarding', { replace: true });
         }
       } catch (e) {
         console.error('Deep link processing error', e);
