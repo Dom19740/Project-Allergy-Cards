@@ -2,7 +2,7 @@
 
 import React from 'react';
 import { Button } from '@/components/ui/button';
-import { Share2, Download, Save, Loader2, Menu, AlertTriangle } from 'lucide-react';
+import { Share2, Download, Save, Loader2, Menu, AlertTriangle, Volume2, Square } from 'lucide-react';
 
 interface CardActionsProps {
   onShare: () => void;
@@ -11,8 +11,10 @@ interface CardActionsProps {
   onSave: () => void;
   onToggleMenu: () => void;
   onEmergency: () => void;
+  onReadAloud: () => void;
   isSharing: boolean;
   isDownloading: boolean;
+  isSpeaking: boolean;
 }
 
 const CardActions: React.FC<CardActionsProps> = ({
@@ -22,8 +24,10 @@ const CardActions: React.FC<CardActionsProps> = ({
   onSave,
   onToggleMenu,
   onEmergency,
+  onReadAloud,
   isSharing,
-  isDownloading
+  isDownloading,
+  isSpeaking
 }) => {
   return (
     <div className="w-full pt-2 pb-[calc(8px+env(safe-area-inset-bottom))] flex justify-center bg-white border-t border-gray-100 z-30">
@@ -48,7 +52,7 @@ const CardActions: React.FC<CardActionsProps> = ({
         >
           <Save className="h-5 w-5" />
         </Button>
-        
+
         <Button
           onClick={onShare}
           disabled={isSharing}
@@ -69,6 +73,16 @@ const CardActions: React.FC<CardActionsProps> = ({
           title="Download Card"
         >
           {isDownloading ? <Loader2 className="h-5 w-5 animate-spin" /> : <Download className="h-5 w-5" />}
+        </Button>
+
+        <Button
+          onClick={onReadAloud}
+          variant="ghost"
+          size="icon"
+          className={`${isSpeaking ? 'text-red-600 bg-red-50' : 'text-purple-600 hover:bg-purple-50'} rounded-full h-10 w-10 transition-colors`}
+          title={isSpeaking ? "Stop Reading" : "Read Aloud"}
+        >
+          {isSpeaking ? <Square className="h-5 w-5 fill-current" /> : <Volume2 className="h-5 w-5" />}
         </Button>
 
         <Button

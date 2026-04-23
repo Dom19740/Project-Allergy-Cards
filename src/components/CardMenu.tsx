@@ -1,7 +1,7 @@
 "use client";
 
 import React from 'react';
-import { Link } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import { Home, ShieldAlert, MessageSquare, Languages, X, Info, Mail } from 'lucide-react';
 
 interface CardMenuProps {
@@ -12,7 +12,16 @@ interface CardMenuProps {
 }
 
 const CardMenu: React.FC<CardMenuProps> = ({ isOpen, onClose, onOpenDisclaimer, isEmergency = false }) => {
+  const navigate = useNavigate();
   if (!isOpen) return null;
+
+  const handleNavigation = (to: string) => {
+    onClose();
+    // Small delay to allow the menu animation to start closing or just to be safe
+    setTimeout(() => {
+      navigate(to);
+    }, 10);
+  };
 
   const handleReportIssue = () => {
     const subject = encodeURIComponent("Simple Allergy Alert Issue Report");
@@ -32,8 +41,8 @@ const CardMenu: React.FC<CardMenuProps> = ({ isOpen, onClose, onOpenDisclaimer, 
   return (
     <>
       {/* Backdrop */}
-      <div 
-        className="fixed inset-0 bg-black/20 backdrop-blur-sm z-40 animate-in fade-in duration-300" 
+      <div
+        className="fixed inset-0 bg-black/20 backdrop-blur-sm z-40 animate-in fade-in duration-300"
         onClick={onClose}
       />
       
@@ -49,15 +58,14 @@ const CardMenu: React.FC<CardMenuProps> = ({ isOpen, onClose, onOpenDisclaimer, 
               </button>
             </div>
             {menuItems.map((item) => (
-              <Link
+              <button
                 key={item.to}
-                to={item.to}
-                className="flex items-center space-x-3 px-4 py-3 text-sm font-medium text-gray-700 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-gray-700 rounded-xl transition-colors"
-                onClick={onClose}
+                onClick={() => handleNavigation(item.to)}
+                className="w-full flex items-center space-x-3 px-4 py-3 text-sm font-medium text-gray-700 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-gray-700 rounded-xl transition-colors text-left"
               >
                 <item.icon className="h-4 w-4 text-red-500" />
                 <span>{item.label}</span>
-              </Link>
+              </button>
             ))}
             
             <button
