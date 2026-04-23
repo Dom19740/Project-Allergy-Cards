@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -19,6 +19,7 @@ const AllergenSelectionPage = () => {
   const [selectedAllergens, setSelectedAllergens] = useState<string[]>([]);
   const [customAllergenInput, setCustomAllergenInput] = useState<string>('');
   const [customList, setCustomList] = useState<string[]>([]);
+  const bottomRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     const loadData = async () => {
@@ -52,6 +53,10 @@ const AllergenSelectionPage = () => {
     );
   };
 
+  const scrollToBottom = () => {
+    bottomRef.current?.scrollIntoView({ behavior: 'smooth' });
+  };
+
   const handleAddCustomAllergen = () => {
     if (!isPremium) {
       toast.error("Custom allergens are a premium feature.");
@@ -72,6 +77,9 @@ const AllergenSelectionPage = () => {
     setSelectedAllergens(prev => [...prev, trimmedInput]);
     setCustomAllergenInput('');
     toast.success(`"${trimmedInput}" added.`);
+    
+    // Small timeout to allow the DOM to update before scrolling
+    setTimeout(scrollToBottom, 100);
   };
 
   const removeCustomAllergen = (e: React.MouseEvent, allergen: string) => {
@@ -198,7 +206,7 @@ const AllergenSelectionPage = () => {
           </div>
         </div>
 
-        <div className="w-full flex justify-between items-center mt-auto mb-[50px] pt-8 gap-4 shrink-0">
+        <div ref={bottomRef} className="w-full flex justify-between items-center mt-auto mb-[50px] pt-8 gap-4 shrink-0">
           <Button
             variant="ghost"
             onClick={() => navigate(-1)}
