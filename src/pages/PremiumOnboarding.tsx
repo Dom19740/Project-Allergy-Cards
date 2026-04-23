@@ -43,8 +43,8 @@ const PremiumOnboarding = () => {
       <FixedHeader />
       
       <div className="flex flex-col flex-grow w-full max-w-md mx-auto px-6 pt-[calc(80px+env(safe-area-inset-top)+20px)] pb-8">
-        <div className="flex-grow flex flex-col items-center text-center space-y-8">
-          <div className="space-y-3">
+        <div className="flex-grow flex flex-col items-center text-center space-y-6">
+          <div className="space-y-2">
             <div className="flex items-center justify-center gap-2">
               <h2 className="text-3xl font-bold text-gray-900 dark:text-white">
                 Unlock Premium
@@ -58,13 +58,13 @@ const PremiumOnboarding = () => {
             </p>
           </div>
 
-          <div className="w-full space-y-2.5">
+          <div className="w-full space-y-1.5">
             {benefits.map((benefit, index) => (
               <div 
                 key={index} 
-                className="flex items-center space-x-3.5 p-4 bg-white dark:bg-gray-800 rounded-xl border border-gray-100 dark:border-gray-700 text-left shadow-sm"
+                className="flex items-center space-x-3.5 p-2.5 bg-white dark:bg-gray-800 rounded-xl border border-gray-100 dark:border-gray-700 text-left shadow-sm"
               >
-                <div className="bg-red-50 dark:bg-red-900/20 p-2 rounded-lg shrink-0">
+                <div className="bg-red-50 dark:bg-red-900/20 p-1.5 rounded-lg shrink-0">
                   <benefit.icon className="h-5 w-5 text-red-600" />
                 </div>
                 <div className="flex-grow">
@@ -76,7 +76,7 @@ const PremiumOnboarding = () => {
           </div>
         </div>
 
-        <div className="w-full flex flex-col gap-3 mt-10">
+        <div className="w-full flex flex-col gap-3 mt-8">
           {!isPremium && (
             <Button 
               onClick={purchasePremium}
