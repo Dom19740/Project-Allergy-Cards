@@ -15,7 +15,7 @@ const FloatingMenu: React.FC<FloatingMenuProps> = ({ isOpen, onClose, onOpenDisc
 
   const handleReportIssue = () => {
     const subject = encodeURIComponent("Simple Allergy Alert Issue Report");
-    window.location.href = `mailto:happymunkeestudio@dpbcreative.com?subject=${subject}`;
+    window.location.href = `mailto:info@simplealllergyalert.com?subject=${subject}`;
     onClose();
   };
 
