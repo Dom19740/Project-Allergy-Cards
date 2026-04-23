@@ -122,7 +122,7 @@ const AllergenSelectionPage = () => {
                   key={allergen.id} 
                   onClick={() => toggleAllergen(allergen.id)}
                   className={cn(
-                    "flex flex-col items-center justify-center space-y-1 py-2 px-1 rounded-xl shadow-sm cursor-pointer transition-all duration-200 border-2 text-center",
+                    "flex flex-col items-center justify-center space-y-1 py-1 px-1 rounded-xl shadow-sm cursor-pointer transition-all duration-200 border-2 text-center",
                     isSelected 
                       ? "bg-red-600 border-red-600 text-white" 
                       : "bg-white dark:bg-gray-800 border-transparent text-gray-700 dark:text-gray-300 hover:border-red-200 dark:hover:border-red-900/30"
@@ -143,7 +143,7 @@ const AllergenSelectionPage = () => {
                   key={allergen} 
                   onClick={() => toggleAllergen(allergen)}
                   className={cn(
-                    "flex flex-col items-center justify-center space-y-1 py-2 px-1 rounded-xl shadow-sm cursor-pointer transition-all duration-200 border-2 relative group text-center",
+                    "flex flex-col items-center justify-center space-y-1 py-1 px-1 rounded-xl shadow-sm cursor-pointer transition-all duration-200 border-2 relative group text-center",
                     isSelected 
                       ? "bg-red-600 border-red-600 text-white" 
                       : "bg-white dark:bg-gray-800 border-transparent text-gray-700 dark:text-gray-300 hover:border-red-200 dark:hover:border-red-900/30"
