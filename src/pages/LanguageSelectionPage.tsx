@@ -1,141 +1,168 @@
 "use client";
 
-import React, { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
-import { Button } from '@/components/ui/button';
-import { ChevronLeft, ChevronRight, Search, Globe, Crown } from 'lucide-react';
-import { Input } from '@/components/ui/input';
-import FixedHeader from '@/components/FixedHeader';
-import StepHeader from '@/components/StepHeader';
-import { storage, STORAGE_KEYS } from '@/lib/storage';
-import { SUPPORTED_LANGUAGES } from '@/lib/languages';
-import { cn } from '@/lib/utils';
-import { useBilling } from '@/hooks/useBilling';
+import React, { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Button } from "@/components/ui/button";
+import { ChevronLeft, ChevronRight, WifiOff, Crown, Lock } from "lucide-react";
+import FixedHeader from "@/components/FixedHeader";
+import StepHeader from "@/components/StepHeader";
+import { getAllGoogleLanguages, SupportedLanguage } from "@/lib/translator";
+import { storage, STORAGE_KEYS } from "@/lib/storage";
+import { useNetworkStatus } from "@/hooks/useNetworkStatus";
+import { useBilling } from "@/hooks/useBilling";
+import { FREE_LANGUAGES } from "@/lib/premium-config";
+import { toast } from "sonner";
 
 const LanguageSelectionPage = () => {
   const navigate = useNavigate();
+  const isOnline = useNetworkStatus();
   const { isPremium } = useBilling();
-  const [searchQuery, setSearchQuery] = useState('');
-  const [selectedLanguages, setSelectedLanguages] = useState<string[]>(['en']);
+  const [selectedLanguageCode, setSelectedLanguageCode] = useState<string>("es-ES");
+  const [supportedLanguages, setSupportedLanguages] = useState<SupportedLanguage[]>([]);
+  const [isLoadingLangs, setIsLoadingLangs] = useState(true);
 
   useEffect(() => {
-    const loadData = async () => {
-      const storedLangs = await storage.get<string[]>(STORAGE_KEYS.SELECTED_LANGUAGES);
-      if (storedLangs && storedLangs.length > 0) {
-        setSelectedLanguages(storedLangs);
+    const loadLang = async () => {
+      try {
+        const savedLang = await storage.get<string>(STORAGE_KEYS.SELECTED_LANGUAGE);
+        if (savedLang) {
+          setSelectedLanguageCode(savedLang);
+        }
+      } catch (e) {
+        console.error("Failed to load saved language", e);
       }
     };
-    loadData();
+    loadLang();
   }, []);
 
-  const toggleLanguage = (code: string) => {
-    if (code === 'en') return; // English is always selected
+  useEffect(() => {
+    let mounted = true;
+    (async () => {
+      try {
+        const langs = await getAllGoogleLanguages();
+        if (!mounted) return;
+        
+        const sortedLangs = [...langs].sort((a, b) => {
+          const aFree = FREE_LANGUAGES.includes(a.code);
+          const bFree = FREE_LANGUAGES.includes(b.code);
+          
+          if (aFree && !bFree) return -1;
+          if (!aFree && bFree) return 1;
+          
+          if (a.code === 'en') return -1;
+          if (b.code === 'en') return 1;
+          
+          return a.name.localeCompare(b.name);
+        });
+        
+        setSupportedLanguages(sortedLangs);
+      } catch (e) {
+        console.error("Failed to load languages", e);
+      } finally {
+        if (mounted) setIsLoadingLangs(false);
+      }
+    })();
+    return () => { mounted = false; };
+  }, []);
 
-    if (!isPremium && !selectedLanguages.includes(code) && selectedLanguages.length >= 2) {
-      navigate('/premium-onboarding');
+  const handleLanguageChange = (code: string) => {
+    const isFree = FREE_LANGUAGES.includes(code);
+    
+    if (!isPremium && !isFree) {
+      toast.error("This language is a premium feature. Please upgrade to unlock all 100+ languages!", {
+        action: {
+          label: "Upgrade",
+          onClick: () => navigate('/premium-onboarding')
+        }
+      });
       return;
     }
 
-    setSelectedLanguages(prev => 
-      prev.includes(code) 
-        ? prev.filter(c => c !== code) 
-        : [...prev, code]
-    );
+    setSelectedLanguageCode(code);
+    storage.set(STORAGE_KEYS.SELECTED_LANGUAGE, code);
   };
 
-  const filteredLanguages = SUPPORTED_LANGUAGES.filter(lang => 
-    lang.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-    lang.nativeName.toLowerCase().includes(searchQuery.toLowerCase())
-  );
-
-  const handleContinue = async () => {
-    await storage.set(STORAGE_KEYS.SELECTED_LANGUAGES, selectedLanguages);
-    navigate('/preview');
+  const handleContinue = () => {
+    if (selectedLanguageCode) {
+      navigate(`/alert/${selectedLanguageCode}`);
+    }
   };
+
+  const selectedLanguage = supportedLanguages.find(l => l.code === selectedLanguageCode);
 
   return (
-    <div className="flex flex-col min-h-screen bg-gray-100 dark:bg-gray-900">
+    <div className="flex flex-col h-screen bg-gray-100 dark:bg-gray-900 overflow-hidden">
       <FixedHeader />
-      
-      <div className="flex flex-col flex-grow w-full max-w-2xl mx-auto px-4 pt-[calc(env(safe-area-inset-top)+10px)]">
-        <div className="flex-grow pt-2">
+      <div className="flex flex-col flex-grow w-full max-w-2xl mx-auto px-4 pt-[calc(80px+env(safe-area-inset-top)+10px)] overflow-hidden">
+        <div className="flex-grow overflow-y-auto pt-2">
           <StepHeader 
-            title="Select Languages"
-            description={isPremium 
-              ? "Choose as many languages as you need for your card." 
-              : "Choose up to 2 languages. Upgrade to Premium for unlimited."}
+            title="Choose a Language"
+            description={isPremium ? "Select any language for your alert." : "Select from our free languages or upgrade to unlock all 100+."}
           />
-          
-          <div className="pt-6 space-y-4">
-            <div className="relative">
-              <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
-              <Input
-                type="text"
-                placeholder="Search languages..."
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-                className="pl-10 bg-white dark:bg-gray-800 border-gray-200 dark:border-gray-700 rounded-xl h-12"
-              />
-            </div>
 
-            <div className="grid grid-cols-1 gap-2 max-h-[40vh] overflow-y-auto pr-1 custom-scrollbar">
-              {filteredLanguages.map((lang) => {
-                const isSelected = selectedLanguages.includes(lang.code);
-                const isEnglish = lang.code === 'en';
-                
-                return (
-                  <div 
-                    key={lang.code}
-                    onClick={() => toggleLanguage(lang.code)}
-                    className={cn(
-                      "flex items-center justify-between p-3 rounded-xl border-2 transition-all duration-200 cursor-pointer",
-                      isSelected 
-                        ? "bg-red-50 border-red-600 dark:bg-red-900/20" 
-                        : "bg-white dark:bg-gray-800 border-transparent hover:border-gray-200 dark:hover:border-gray-700"
-                    )}
-                  >
-                    <div className="flex items-center space-x-3">
-                      <div className="w-10 h-10 rounded-full bg-gray-100 dark:bg-gray-700 flex items-center justify-center text-xl">
-                        <Globe className="w-5 h-5 text-gray-500" />
-                      </div>
-                      <div>
-                        <p className="font-bold text-gray-900 dark:text-white">{lang.name}</p>
-                        <p className="text-xs text-gray-500 dark:text-gray-400">{lang.nativeName}</p>
-                      </div>
-                    </div>
-                    <div className={cn(
-                      "w-6 h-6 rounded-full border-2 flex items-center justify-center",
-                      isSelected ? "border-red-600 bg-red-600" : "border-gray-300 dark:border-gray-600",
-                      isEnglish && "opacity-50 cursor-not-allowed"
-                    )}>
-                      {isSelected && <div className="w-2 h-2 rounded-full bg-white" />}
-                    </div>
-                  </div>
-                );
-              })}
+          {!isOnline && (
+            <div className="mx-auto max-w-md mt-4 p-4 bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-800 rounded-xl flex items-center gap-3 text-amber-800 dark:text-amber-200 text-center">
+              <WifiOff className="h-5 w-5 shrink-0" />
+              <p className="text-sm font-medium">
+                Offline: Translations for new cards requires an internet connection
+              </p>
             </div>
+          )}
 
-            {!isPremium && (
-              <button 
-                onClick={() => navigate('/premium-onboarding')}
-                className="w-full p-4 rounded-2xl bg-amber-50 dark:bg-amber-900/20 border-2 border-amber-200 dark:border-amber-900/30 flex items-center justify-between group hover:border-amber-400 transition-all"
-              >
-                <div className="flex items-center space-x-3">
-                  <div className="p-2 bg-amber-100 dark:bg-amber-900/40 rounded-lg text-amber-600">
-                    <Crown className="w-5 h-5" />
-                  </div>
-                  <div className="text-left">
-                    <p className="font-bold text-amber-900 dark:text-amber-100">Unlock Unlimited Languages</p>
-                    <p className="text-xs text-amber-700 dark:text-amber-300">Get access to all 50+ languages</p>
-                  </div>
+          <div className="w-full flex justify-center pt-8 pb-4">
+            <div className="w-full max-w-xs sm:max-w-sm md:max-w-md lg:max-w-lg">
+              {isLoadingLangs ? (
+                <div className="w-full py-4 flex items-center justify-center bg-white border border-gray-200 rounded-md">
+                  <span className="text-gray-400">Loading languages...</span>
                 </div>
-                <ChevronRight className="w-5 h-5 text-amber-400 group-hover:translate-x-1 transition-transform" />
-              </button>
-            )}
+              ) : (
+                <Select value={selectedLanguageCode} onValueChange={handleLanguageChange} disabled={!isOnline}>
+                  <SelectTrigger
+                    className="w-full py-4 text-lg md:text-xl h-auto bg-white text-gray-900 hover:bg-gray-50 border border-red-600 dark:border-red-500"
+                  >
+                    <div className="flex items-center">
+                      {selectedLanguage ? (
+                        <span>{selectedLanguage.name}</span>
+                      ) : (
+                        <SelectValue placeholder="Select Target Language" />
+                      )}
+                    </div>
+                  </SelectTrigger>
+                  <SelectContent className="bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-50 max-h-[50vh]">
+                    {supportedLanguages.map((lang) => {
+                      const isLocked = !isPremium && !FREE_LANGUAGES.includes(lang.code);
+                      return (
+                        <SelectItem
+                          key={lang.code}
+                          value={lang.code}
+                          className="py-3 text-lg md:text-xl cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-700"
+                        >
+                          <div className="flex items-center justify-between w-full gap-4">
+                            <span>{lang.name}</span>
+                            {isLocked && <Lock className="h-4 w-4 text-amber-500" />}
+                          </div>
+                        </SelectItem>
+                      );
+                    })}
+                  </SelectContent>
+                </Select>
+              )}
+              
+              {!isPremium && (
+                <button 
+                  onClick={() => navigate('/premium-onboarding')}
+                  className="mt-6 w-full flex items-center justify-center gap-2 text-amber-600 font-bold text-sm hover:underline"
+                >
+                  <Crown className="h-4 w-4" />
+                  Unlock 100+ more languages
+                </button>
+              )}
+            </div>
           </div>
         </div>
-
-        <div className="w-full flex justify-between items-center mt-auto mb-[50px] pt-8 gap-4 shrink-0">
+        
+        <div className="w-full flex justify-between items-center mt-auto mb-[50px] gap-4 shrink-0">
           <Button
             variant="ghost"
             onClick={() => navigate(-1)}
@@ -146,6 +173,7 @@ const LanguageSelectionPage = () => {
           </Button>
           <Button
             onClick={handleContinue}
+            disabled={!selectedLanguageCode || (!isOnline && selectedLanguageCode !== 'en')}
             className="py-3 px-8 text-lg h-auto bg-red-600 text-white hover:bg-red-700 rounded-xl shadow-lg transition-transform active:scale-95 flex items-center"
           >
             Continue
