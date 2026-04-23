@@ -20,7 +20,7 @@ export const BillingProvider: React.FC<{ children: React.ReactNode }> = ({ child
   const [price] = useState<string>("$4.99");
 
   useEffect(() => {
-    const status = storage.get<boolean>(STORAGE_KEYS.IS_PREMIUM);
+    const status = storage.get(STORAGE_KEYS.IS_PREMIUM);
     setIsPremium(!!status);
     setIsLoading(false);
   }, []);
@@ -43,7 +43,7 @@ export const BillingProvider: React.FC<{ children: React.ReactNode }> = ({ child
     setIsLoading(true);
     try {
       await new Promise(resolve => setTimeout(resolve, 1000));
-      const status = storage.get<boolean>(STORAGE_KEYS.IS_PREMIUM);
+      const status = storage.get(STORAGE_KEYS.IS_PREMIUM);
       if (status) {
         setIsPremium(true);
         toast.success("Purchases restored.");
