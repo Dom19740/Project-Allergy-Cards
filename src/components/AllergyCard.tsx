@@ -31,6 +31,7 @@ const AllergyCard: React.FC<AllergyCardProps> = ({ languageCode, selectedAllerge
   
   const [isSharing, setIsSharing] = useState(false);
   const [isDownloading, setIsDownloading] = useState(false);
+  const [isSpeaking, setIsSpeaking] = useState(false);
   const [isSaveDialogOpen, setIsSaveDialogOpen] = useState(false);
   const [isDisclaimerOpen, setIsDisclaimerOpen] = useState(false);
   const [isEmergencyDialogOpen, setIsEmergencyDialogOpen] = useState(false);
@@ -232,6 +233,37 @@ const AllergyCard: React.FC<AllergyCardProps> = ({ languageCode, selectedAllerge
 
   const handlePrint = () => window.print();
   
+  const handleReadAloud = () => {
+    if (isSpeaking) {
+      window.speechSynthesis.cancel();
+      setIsSpeaking(false);
+      return;
+    }
+
+    const textToRead = [
+      translatedUIText.allergyAlert,
+      translatedUIText.iAmAllergicTo,
+      ...translatedAllergenList,
+      translatedUIText.theyMakeMeSick,
+      translatedUIText.thankYou
+    ].join(". ");
+
+    const utterance = new SpeechSynthesisUtterance(textToRead);
+    utterance.lang = languageCode;
+    
+    utterance.onstart = () => setIsSpeaking(true);
+    utterance.onend = () => setIsSpeaking(false);
+    utterance.onerror = () => setIsSpeaking(false);
+
+    window.speechSynthesis.speak(utterance);
+  };
+
+  useEffect(() => {
+    return () => {
+      window.speechSynthesis.cancel();
+    };
+  }, []);
+  
   const handleEmergencyClick = () => {
     setIsEmergencyDialogOpen(true);
   };
@@ -330,15 +362,17 @@ const AllergyCard: React.FC<AllergyCardProps> = ({ languageCode, selectedAllerge
           )}
         </div>
       </div>
-      <CardActions 
+      <CardActions
         onShare={handleShare}
         onDownload={handleDownload}
         onPrint={handlePrint}
         onSave={() => setIsSaveDialogOpen(true)}
         onToggleMenu={() => setIsMenuOpen(!isMenuOpen)}
         onEmergency={handleEmergencyClick}
+        onReadAloud={handleReadAloud}
         isSharing={isSharing}
         isDownloading={isDownloading}
+        isSpeaking={isSpeaking}
       />
       <CardMenu isOpen={isMenuOpen} onClose={() => setIsMenuOpen(false)} onOpenDisclaimer={() => setIsDisclaimerOpen(true)} />
       <DisclaimerDialog isOpen={isDisclaimerOpen} onClose={() => setIsDisclaimerOpen(false)} />
