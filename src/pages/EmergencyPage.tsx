@@ -13,6 +13,7 @@ import DisclaimerDialog from '@/components/DisclaimerDialog';
 import { toast } from 'sonner';
 import { storage, STORAGE_KEYS } from '@/lib/storage';
 import { SelectedAllergens, CustomMessages, TranslatedContent } from '@/lib/types';
+import { TextToSpeech } from '@capacitor-community/text-to-speech';
 
 const EmergencyPage = () => {
   const { langCode } = useParams<{ langCode: string }>();
@@ -23,6 +24,7 @@ const EmergencyPage = () => {
   const [isTranslating, setIsTranslating] = useState(true);
   const [isSharing, setIsSharing] = useState(false);
   const [isDownloading, setIsDownloading] = useState(false);
+  const [isSpeaking, setIsSpeaking] = useState(false);
   const [isSaveDialogOpen, setIsSaveDialogOpen] = useState(false);
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isDisclaimerOpen, setIsDisclaimerOpen] = useState(false);
@@ -111,6 +113,38 @@ const EmergencyPage = () => {
     setIsDownloading(false);
   };
 
+  const handleReadAloud = async () => {
+    if (isSpeaking) {
+      await TextToSpeech.stop();
+      setIsSpeaking(false);
+      return;
+    }
+
+    const textToRead = [
+      translatedText.attention,
+      translatedText.emergency,
+      translatedText.needHelp,
+      translatedText.callServices
+    ].join(". ");
+
+    try {
+      setIsSpeaking(true);
+      await TextToSpeech.speak({
+        text: textToRead,
+        lang: langCode || 'en',
+        rate: 0.9,
+        pitch: 1.0,
+        volume: 1.0,
+        category: 'ambient',
+      });
+    } catch (error) {
+      console.error('TTS Error:', error);
+      toast.error("Speech failed. Please check your device volume and settings.");
+    } finally {
+      setIsSpeaking(false);
+    }
+  };
+
   const handleSave = () => {
     if (!selectedAllergens || !customMessages) {
       toast.error("Missing allergen data to save card.");
@@ -118,6 +152,12 @@ const EmergencyPage = () => {
     }
     setIsSaveDialogOpen(true);
   };
+
+  useEffect(() => {
+    return () => {
+      TextToSpeech.stop();
+    };
+  }, []);
 
   if (isTranslating) {
     return (
@@ -158,9 +198,11 @@ const EmergencyPage = () => {
         onShare={handleShare} 
         onDownload={handleDownload} 
         onToggleMenu={() => setIsMenuOpen(true)}
+        onReadAloud={handleReadAloud}
         onSave={handleSave} 
         isSharing={isSharing} 
         isDownloading={isDownloading} 
+        isSpeaking={isSpeaking}
       />
 
       <CardMenu 
