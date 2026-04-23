@@ -16,6 +16,7 @@ import EmergencyNumberDialog from './EmergencyNumberDialog';
 import { storage, STORAGE_KEYS } from '@/lib/storage';
 import { useNetworkStatus } from '@/hooks/useNetworkStatus';
 import { useBilling } from '@/hooks/useBilling';
+import { TextToSpeech } from '@capacitor-community/text-to-speech';
 
 interface AllergyCardProps {
   languageCode: LanguageCode;
@@ -233,49 +234,16 @@ const AllergyCard: React.FC<AllergyCardProps> = ({ languageCode, selectedAllerge
 
   const handlePrint = () => window.print();
   
-  useEffect(() => {
-    // Prime the speech synthesis engine on mount (iOS requirement)
-    // This needs to be triggered by a user interaction
-    const primeSpeech = () => {
-      if (typeof window !== 'undefined' && window.speechSynthesis) {
-        const utterance = new SpeechSynthesisUtterance("");
-        utterance.volume = 0;
-        window.speechSynthesis.speak(utterance);
-      }
-    };
-    
-    const handleFirstInteraction = () => {
-      primeSpeech();
-      window.removeEventListener('click', handleFirstInteraction);
-      window.removeEventListener('touchstart', handleFirstInteraction);
-    };
-    
-    window.addEventListener('click', handleFirstInteraction);
-    window.addEventListener('touchstart', handleFirstInteraction);
-
-    return () => {
-      window.removeEventListener('click', handleFirstInteraction);
-      window.removeEventListener('touchstart', handleFirstInteraction);
-      if (typeof window !== 'undefined' && window.speechSynthesis) {
-        window.speechSynthesis.cancel();
-      }
-    };
-  }, []);
-
-  const handleReadAloud = () => {
-    if (typeof window === 'undefined' || !window.speechSynthesis) {
-      toast.error("Speech synthesis is not supported on this browser.");
-      return;
-    }
-
+  const handleReadAloud = async () => {
     if (isSpeaking) {
-      window.speechSynthesis.cancel();
+      await TextToSpeech.stop();
       setIsSpeaking(false);
       return;
     }
 
-    // Cancel any ongoing speech before starting new one
-    window.speechSynthesis.cancel();
+    const translatedAllergenList = selectedAllergens.map(allergen => 
+      translatedAllergens[allergen] || allergen
+    );
 
     const textToRead = [
       translatedUIText.allergyAlert,
@@ -285,44 +253,29 @@ const AllergyCard: React.FC<AllergyCardProps> = ({ languageCode, selectedAllerge
       translatedUIText.thankYou
     ].join(". ");
 
-    const utterance = new SpeechSynthesisUtterance(textToRead);
-    
-    // Map some common codes to BCP 47 if needed
-    let speechLang = languageCode;
-    if (languageCode === 'zh-CN') speechLang = 'zh-CN';
-    if (languageCode === 'iw') speechLang = 'he-IL';
-    
-    utterance.lang = speechLang;
-    utterance.rate = 0.9;
-    utterance.pitch = 1.0;
-    
-    utterance.onstart = () => setIsSpeaking(true);
-    utterance.onend = () => setIsSpeaking(false);
-    utterance.onerror = (event) => {
-      console.error('SpeechSynthesisUtterance error', event);
+    try {
+      setIsSpeaking(true);
+      await TextToSpeech.speak({
+        text: textToRead,
+        lang: languageCode,
+        rate: 0.9,
+        pitch: 1.0,
+        volume: 1.0,
+        category: 'ambient',
+      });
+    } catch (error) {
+      console.error('TTS Error:', error);
+      toast.error("Speech failed. Please check your device volume and settings.");
+    } finally {
       setIsSpeaking(false);
-      // If it's a "not-allowed" error, it might be because of a lack of user interaction
-      if ((event as any).error === 'not-allowed') {
-        toast.error("Speech blocked by browser. Please try again.");
-      }
-    };
-
-    // On some mobile devices, we need to ensure voices are loaded
-    const voices = window.speechSynthesis.getVoices();
-    if (voices.length > 0) {
-      const voice = voices.find(v => v.lang.startsWith(speechLang.split('-')[0]));
-      if (voice) {
-        utterance.voice = voice;
-      }
-    }
-
-    window.speechSynthesis.speak(utterance);
-    
-    // iOS Safari sometimes needs a little nudge
-    if (window.speechSynthesis.paused) {
-      window.speechSynthesis.resume();
     }
   };
+
+  useEffect(() => {
+    return () => {
+      TextToSpeech.stop();
+    };
+  }, []);
 
   const handleEmergencyClick = () => {
     setIsEmergencyDialogOpen(true);
