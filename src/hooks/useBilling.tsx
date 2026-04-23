@@ -1,6 +1,8 @@
 "use client";
 
 import React, { createContext, useContext, useState, useEffect } from 'react';
+import { isPremiumUser, purchasePremium, restorePurchases } from '@/lib/billing';
+import { toast } from 'sonner';
 
 interface BillingContextType {
   isPremium: boolean;
@@ -12,31 +14,53 @@ interface BillingContextType {
 const BillingContext = createContext<BillingContextType | undefined>(undefined);
 
 export const BillingProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  const [isPremium, setIsPremium] = useState(false);
-  const [isLoading, setIsLoading] = useState(true);
+  const [isPremium, setIsPremium] = useState<boolean>(false);
+  const [isLoading, setIsLoading] = useState<boolean>(true);
 
   useEffect(() => {
-    const checkStatus = () => {
-      const saved = localStorage.getItem('is_premium');
-      setIsPremium(saved === 'true');
+    const checkStatus = async () => {
+      const status = await isPremiumUser();
+      setIsPremium(status);
       setIsLoading(false);
     };
+
     checkStatus();
+
+    const handleStatusChange = (e: any) => {
+      setIsPremium(e.detail);
+    };
+
+    window.addEventListener('premium-status-changed', handleStatusChange);
+    return () => window.removeEventListener('premium-status-changed', handleStatusChange);
   }, []);
 
-  const purchasePremium = async () => {
-    setIsPremium(true);
-    localStorage.setItem('is_premium', 'true');
-    window.dispatchEvent(new Event('storage-update'));
+  const handlePurchase = async () => {
+    try {
+      await purchasePremium();
+    } catch (error) {
+      toast.error("Purchase failed. Please try again.");
+      console.error(error);
+    }
   };
 
-  const restorePurchases = async () => {
-    const saved = localStorage.getItem('is_premium');
-    setIsPremium(saved === 'true');
+  const handleRestore = async () => {
+    try {
+      await restorePurchases();
+      toast.success("Checking for previous purchases...");
+    } catch (error) {
+      toast.error("Restore failed.");
+    }
   };
 
   return (
-    <BillingContext.Provider value={{ isPremium, isLoading, purchasePremium, restorePurchases }}>
+    <BillingContext.Provider 
+      value={{ 
+        isPremium, 
+        isLoading, 
+        purchasePremium: handlePurchase, 
+        restorePurchases: handleRestore 
+      }}
+    >
       {children}
     </BillingContext.Provider>
   );
