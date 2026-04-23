@@ -25,7 +25,7 @@ const CardMenu: React.FC<CardMenuProps> = ({ isOpen, onClose, onOpenDisclaimer, 
 
   const handleReportIssue = () => {
     const subject = encodeURIComponent("Simple Allergy Alert Issue Report");
-    window.location.href = `mailto:happymunkeestudio@dpbcreative.com?subject=${subject}`;
+    window.location.href = `mailto:info@simpleallergyalert.com?subject=${subject}`;
     onClose();
   };
 
