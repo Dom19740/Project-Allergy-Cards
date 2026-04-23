@@ -11,7 +11,7 @@ import {
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Preferences } from '@capacitor/preferences';
-import { toast } from "react-hot-toast";
+import { toast } from "sonner";
 
 interface PromoCodeDialogProps {
   isOpen: boolean;
@@ -54,25 +54,37 @@ const PromoCodeDialog: React.FC<PromoCodeDialogProps> = ({ isOpen, onClose, onSu
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="sm:max-w-[425px] rounded-2xl">
-        <DialogHeader>
-          <DialogTitle>Enter Promo Code</DialogTitle>
-          <p className="text-sm text-muted-foreground">
+      <DialogContent 
+        className="w-[90%] max-w-[400px] rounded-2xl border-gray-200 dark:border-gray-700 shadow-2xl p-6 fixed left-1/2 -translate-x-1/2 top-[calc(2rem+env(safe-area-inset-top))] translate-y-0 animate-in fade-in slide-in-from-top-8 duration-300"
+      >
+        <DialogHeader className="mb-4">
+          <DialogTitle className="text-xl font-bold">Enter Promo Code</DialogTitle>
+          <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">
             If you have a special access code, enter it below.
           </p>
         </DialogHeader>
-        <div className="py-4">
+        
+        <div className="py-6">
           <Input
             placeholder="Enter code"
             value={code}
             onChange={(e) => setCode(e.target.value)}
-            className="uppercase font-bold tracking-widest text-center h-12"
+            className="uppercase font-bold tracking-widest text-center h-14 text-lg rounded-xl border-gray-200 focus:ring-red-500 focus:border-gray-200"
+            autoFocus
           />
         </div>
-        <DialogFooter>
+        
+        <DialogFooter className="flex flex-col gap-2 sm:flex-row sm:justify-end mt-2">
+          <Button 
+            variant="outline" 
+            onClick={onClose}
+            className="w-full sm:w-auto h-12 rounded-xl border-gray-200 text-gray-600 hover:bg-gray-50"
+          >
+            Cancel
+          </Button>
           <Button 
             onClick={handleRedeem}
-            className="w-full bg-zinc-900 hover:bg-zinc-800 text-white rounded-xl h-12"
+            className="w-full sm:w-auto bg-zinc-900 hover:bg-zinc-800 text-white rounded-xl h-12 font-bold"
           >
             Redeem Code
           </Button>
