@@ -3,7 +3,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { storage, STORAGE_KEYS } from '@/lib/storage';
-import { SelectedAllergens, CustomMessages, CardData, TranslatedContent } from '@/lib/types';
+import { SelectedAllergens, CustomMessages, CardData, TranslatedContent, Allergen } from '@/lib/types';
 import { ALLERGEN_OPTIONS } from '@/lib/allergens';
 import { useTranslation } from '@/hooks/useTranslation';
 import { toast } from 'sonner';
@@ -20,15 +20,18 @@ const Index = () => {
   const [isSharing, setIsSharing] = useState(false);
   const [isDownloading, setIsDownloading] = useState(false);
   
-  const { translatedContent, isLoading } = useTranslation(languageCode, selectedAllergens, customMessages);
+  const { translatedContent } = useTranslation(languageCode, selectedAllergens, customMessages);
   const cardRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    const savedAllergens = storage.get(STORAGE_KEYS.SELECTED_ALLERGENS);
-    if (savedAllergens) setSelectedAllergens(savedAllergens);
+    const loadData = async () => {
+      const savedAllergens = await storage.get(STORAGE_KEYS.SELECTED_ALLERGENS);
+      if (savedAllergens) setSelectedAllergens(savedAllergens as SelectedAllergens);
 
-    const savedLang = storage.get(STORAGE_KEYS.LANGUAGE);
-    if (savedLang) setLanguageCode(savedLang);
+      const savedLang = await storage.get(STORAGE_KEYS.SELECTED_LANGUAGE);
+      if (savedLang) setLanguageCode(savedLang as string);
+    };
+    loadData();
   }, []);
 
   const handleDownload = async () => {
@@ -56,18 +59,23 @@ const Index = () => {
     }
   };
 
-  // Prepare data for CardActions
+  // Map ALLERGEN_OPTIONS to include 'icon' property if it uses 'image'
+  const mappedAllergens: Allergen[] = ALLERGEN_OPTIONS.map(a => ({
+    ...a,
+    icon: a.image || ''
+  }));
+
   const currentCardData: CardData = {
     id: 'current',
     name: 'My Card',
-    allergens: ALLERGEN_OPTIONS.filter(a => selectedAllergens[a.id]),
+    allergens: mappedAllergens.filter(a => selectedAllergens[a.id]),
     createdAt: Date.now()
   };
 
   const currentTranslatedData: TranslatedContent = translatedContent || {
     title: "ALLERGY ALERT",
     alerts: ["I have a severe food allergy."],
-    allergens: ALLERGEN_OPTIONS.filter(a => selectedAllergens[a.id]).map(a => a.name)
+    allergens: mappedAllergens.filter(a => selectedAllergens[a.id]).map(a => a.name)
   };
 
   return (

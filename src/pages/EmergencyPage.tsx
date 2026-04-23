@@ -1,237 +1,117 @@
 "use client";
 
-import React, { useEffect, useState, useRef } from 'react';
-import { useParams, useNavigate, useSearchParams } from 'react-router-dom';
-import { AlertTriangle, Loader2, Phone } from 'lucide-react';
-import { translateText } from '@/lib/translator';
-import { getEmergencyNumber } from '@/lib/emergencyNumbers';
-import { shareCard, downloadCard } from '@/lib/card-utils';
-import EmergencyActions from '@/components/EmergencyActions';
-import SaveCardDialog from '@/components/SaveCardDialog';
-import CardMenu from '@/components/CardMenu';
-import DisclaimerDialog from '@/components/DisclaimerDialog';
-import { toast } from 'sonner';
+import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { storage, STORAGE_KEYS } from '@/lib/storage';
-import { SelectedAllergens, CustomMessages, TranslatedContent } from '@/lib/types';
-import { TextToSpeech } from '@capacitor-community/text-to-speech';
+import { SavedCard, TranslatedContent } from '@/lib/types';
+import { useTranslation } from '@/hooks/useTranslation';
+import FixedHeader from '@/components/FixedHeader';
+import AllergyCard from '@/components/AllergyCard';
+import { Button } from '@/components/ui/button';
+import { Phone, AlertTriangle, ChevronLeft } from 'lucide-react';
 
 const EmergencyPage = () => {
-  const { langCode } = useParams<{ langCode: string }>();
-  const [searchParams] = useSearchParams();
   const navigate = useNavigate();
-  const cardRef = useRef<HTMLDivElement>(null);
-  
-  const [isTranslating, setIsTranslating] = useState(true);
-  const [isSharing, setIsSharing] = useState(false);
-  const [isDownloading, setIsDownloading] = useState(false);
-  const [isSpeaking, setIsSpeaking] = useState(false);
-  const [isSaveDialogOpen, setIsSaveDialogOpen] = useState(false);
-  const [isMenuOpen, setIsMenuOpen] = useState(false);
-  const [isDisclaimerOpen, setIsDisclaimerOpen] = useState(false);
-  
-  const [selectedAllergens, setSelectedAllergens] = useState<SelectedAllergens | null>(null);
-  const [customMessages, setCustomMessages] = useState<CustomMessages | null>(null);
-  const [fullTranslatedContent, setFullTranslatedContent] = useState<TranslatedContent | null>(null);
-
-  // Use the number from URL if available, otherwise fallback to default for language
-  const emergencyNumber = searchParams.get('num') || getEmergencyNumber(langCode);
-  
-  const [translatedText, setTranslatedText] = useState({
-    attention: "ATTENTION",
-    emergency: "I am having a severe allergic reaction.",
-    needHelp: "I need medical help immediately.",
-    callServices: "Please call emergency services.",
-    dialText: "CALL"
-  });
+  const [emergencyCard, setEmergencyCard] = useState<SavedCard | null>(null);
+  const [languageCode, setLanguageCode] = useState('en');
 
   useEffect(() => {
-    const loadDataAndTranslate = async () => {
-      if (langCode) {
-        await storage.set(STORAGE_KEYS.LAST_EMERGENCY_LANG, langCode);
-      }
-
-      const allergens = await storage.get<SelectedAllergens>(STORAGE_KEYS.SELECTED_ALLERGENS);
-      const messages = await storage.get<CustomMessages>(STORAGE_KEYS.CUSTOM_MESSAGES);
-      setSelectedAllergens(allergens);
-      setCustomMessages(messages);
-
-      const sessionTranslations = await storage.get<any>(STORAGE_KEYS.SESSION_TRANSLATIONS);
-      if (sessionTranslations && sessionTranslations.languageCode === langCode) {
-        const content = sessionTranslations.content.emergency;
-        setTranslatedText({
-          attention: content.attention,
-          emergency: content.emergency,
-          needHelp: content.needHelp,
-          callServices: content.callServices,
-          dialText: content.dial112?.replace(/\d+/g, '').trim() || "CALL"
-        });
-        setFullTranslatedContent(sessionTranslations.content);
-        setIsTranslating(false);
-        return;
-      }
-
-      if (!langCode || langCode === 'en') {
-        setIsTranslating(false);
-        return;
-      }
-
-      try {
-        const [attention, emergency, needHelp, callServices, dialText] = await Promise.all([
-          translateText("ATTENTION", langCode),
-          translateText("I am having a severe allergic reaction.", langCode),
-          translateText("I need medical help immediately.", langCode),
-          translateText("Please call emergency services.", langCode),
-          translateText("CALL", langCode)
-        ]);
-
-        setTranslatedText({ attention, emergency, needHelp, callServices, dialText });
-      } catch (error) {
-        console.error('Translation failed:', error);
-      } finally {
-        setIsTranslating(false);
+    const loadEmergencyCard = async () => {
+      const card = await storage.get(STORAGE_KEYS.SAVED_EMERGENCY_CARD);
+      if (card) {
+        setEmergencyCard(card as SavedCard);
+        setLanguageCode((card as SavedCard).languageCode);
       }
     };
-
-    loadDataAndTranslate();
-  }, [langCode]);
-
-  const handleShare = async () => {
-    if (!cardRef.current) return;
-    setIsSharing(true);
-    const shortCode = (langCode || 'EN').split('-')[0].toUpperCase();
-    const success = await shareCard(cardRef.current, `Emergency Alert (${shortCode})`, `Emergency Alert (${shortCode})`);
-    if (!success) toast.error("Failed to share emergency message.");
-    setIsSharing(false);
-  };
-
-  const handleDownload = async () => {
-    if (!cardRef.current) return;
-    setIsDownloading(true);
-    const success = await downloadCard(cardRef.current, `emergency-message-${langCode || 'en'}.png`);
-    if (success) toast.success("Emergency message saved!");
-    else toast.error("Failed to save emergency message.");
-    setIsDownloading(false);
-  };
-
-  const handleReadAloud = async () => {
-    if (isSpeaking) {
-      await TextToSpeech.stop();
-      setIsSpeaking(false);
-      return;
-    }
-
-    const textToRead = [
-      translatedText.attention,
-      translatedText.emergency,
-      translatedText.needHelp,
-      translatedText.callServices
-    ].join(". ");
-
-    try {
-      setIsSpeaking(true);
-      await TextToSpeech.speak({
-        text: textToRead,
-        lang: langCode || 'en',
-        rate: 0.9,
-        pitch: 1.0,
-        volume: 1.0,
-        category: 'ambient',
-      });
-    } catch (error) {
-      console.error('TTS Error:', error);
-      toast.error("Speech failed. Please check your device volume and settings.");
-    } finally {
-      setIsSpeaking(false);
-    }
-  };
-
-  const handleSave = () => {
-    if (!selectedAllergens || !customMessages) {
-      toast.error("Missing allergen data to save card.");
-      return;
-    }
-    setIsSaveDialogOpen(true);
-  };
-
-  useEffect(() => {
-    return () => {
-      TextToSpeech.stop();
-    };
+    loadEmergencyCard();
   }, []);
 
-  if (isTranslating) {
-    return (
-      <div className="flex flex-col items-center justify-center min-h-screen bg-white">
-        <Loader2 className="h-12 w-12 animate-spin text-red-600 mb-4" />
-        <p className="text-xl font-medium text-gray-600">Preparing emergency message...</p>
-      </div>
-    );
-  }
+  const { translatedContent } = useTranslation(
+    languageCode, 
+    emergencyCard?.selectedAllergens || {}, 
+    emergencyCard?.customMessages || {}
+  );
+
+  const defaultTranslations: TranslatedContent = {
+    title: "EMERGENCY ALERT",
+    alerts: ["I am having a severe allergic reaction."],
+    allergens: [],
+    ui: {
+      allergyAlert: "Allergy Alert",
+      iAmAllergicTo: "I am allergic to:",
+      pleaseBeCareful: "Please be careful.",
+      thankYou: "Thank you.",
+      theyMakeMeSick: "They make me sick."
+    },
+    emergency: {
+      title: "Emergency",
+      subtitle: "Medical Assistance Needed",
+      callEmergency: "Call Emergency Services",
+      medicalInfo: "Medical Information",
+      dial112: "112",
+      attention: "ATTENTION",
+      emergency: "EMERGENCY",
+      needHelp: "I NEED HELP",
+      callServices: "CALL SERVICES",
+      dialText: "DIAL"
+    }
+  };
+
+  const fullTranslatedContent = translatedContent || defaultTranslations;
 
   return (
-    <div className="flex flex-col w-full h-screen bg-white overflow-hidden">
-      <div ref={cardRef} className="flex-1 w-full flex flex-col items-center justify-start text-center overflow-hidden p-4 sm:p-6 md:p-8 pt-[calc(1rem+env(safe-area-inset-top))] bg-white border-none">
-        <div className="h-6 sm:h-10 md:h-14" />
-        <div className="bg-red-600 p-4 sm:p-6 rounded-full shadow-lg mb-6 sm:mb-10">
-          <AlertTriangle className="h-10 w-10 sm:h-16 sm:w-16 text-white" />
-        </div>
-        <div className="w-full max-w-2xl space-y-6 sm:space-y-10">
-          <div className="border-b-4 border-red-600 pb-2 sm:pb-4">
-            <h1 className="text-3xl sm:text-6xl font-black tracking-tighter uppercase text-red-600">{translatedText.attention}</h1>
-          </div>
-          <div className="space-y-4 sm:space-y-8">
-            <p className="text-2xl sm:text-4xl font-bold text-gray-900 leading-tight">{translatedText.emergency}</p>
-            <p className="text-2xl sm:text-4xl font-bold text-gray-900 leading-tight">{translatedText.needHelp}</p>
-            <p className="text-2xl sm:text-4xl font-bold text-red-700 leading-tight">{translatedText.callServices}</p>
-          </div>
-        </div>
-        <div className="mt-auto w-full max-w-md pt-6">
-          <a href={`tel:${emergencyNumber}`} className="flex flex-col sm:flex-row items-center justify-center gap-2 sm:gap-4 w-full py-4 sm:py-6 px-6 bg-red-600 hover:bg-red-700 text-white rounded-2xl text-2xl sm:text-3xl font-black shadow-xl transition-transform active:scale-95 text-center">
-            <Phone className="h-8 w-8 sm:h-10 sm:w-10 fill-current shrink-0" />
-            <span className="leading-tight break-words">{translatedText.dialText} {emergencyNumber}</span>
-          </a>
-        </div>
-      </div>
+    <div className="flex flex-col min-h-screen bg-red-50 dark:bg-red-950/20">
+      <FixedHeader />
       
-      <EmergencyActions 
-        onBack={() => navigate(-1)} 
-        onShare={handleShare} 
-        onDownload={handleDownload} 
-        onToggleMenu={() => setIsMenuOpen(true)}
-        onReadAloud={handleReadAloud}
-        onSave={handleSave} 
-        isSharing={isSharing} 
-        isDownloading={isDownloading} 
-        isSpeaking={isSpeaking}
-      />
+      <main className="flex-grow container mx-auto px-4 pt-24 pb-8">
+        <Button 
+          variant="ghost" 
+          onClick={() => navigate(-1)}
+          className="mb-6"
+        >
+          <ChevronLeft className="mr-2 h-4 w-4" />
+          Back
+        </Button>
 
-      <CardMenu 
-        isOpen={isMenuOpen} 
-        onClose={() => setIsMenuOpen(false)} 
-        onOpenDisclaimer={() => setIsDisclaimerOpen(true)}
-        isEmergency={true}
-      />
+        <div className="space-y-8">
+          <div className="text-center space-y-2">
+            <div className="inline-flex items-center justify-center p-3 bg-red-100 dark:bg-red-900/30 rounded-full mb-2">
+              <AlertTriangle className="h-8 w-8 text-red-600" />
+            </div>
+            <h1 className="text-3xl font-black text-red-600 uppercase tracking-tight">
+              {fullTranslatedContent.emergency?.title || "EMERGENCY"}
+            </h1>
+            <p className="text-gray-600 dark:text-gray-400 font-bold">
+              {fullTranslatedContent.emergency?.subtitle || "Medical Assistance Needed"}
+            </p>
+          </div>
 
-      <DisclaimerDialog 
-        isOpen={isDisclaimerOpen} 
-        onClose={() => setIsDisclaimerOpen(false)} 
-      />
+          <AllergyCard 
+            data={emergencyCard ? {
+              id: emergencyCard.id,
+              name: emergencyCard.name,
+              allergens: [], // This would need mapping if we had the full allergen list here
+              createdAt: emergencyCard.createdAt
+            } : undefined}
+            translatedData={fullTranslatedContent}
+            languageCode={languageCode}
+          />
 
-      {selectedAllergens && customMessages && (
-        <SaveCardDialog
-          isOpen={isSaveDialogOpen}
-          onClose={() => setIsSaveDialogOpen(false)}
-          languageCode={langCode || 'en'}
-          selectedAllergens={selectedAllergens}
-          customMessages={customMessages}
-          isEmergency={true}
-          translatedContent={fullTranslatedContent || {
-            ui: { allergyAlert: "Allergy Alert", iAmAllergicTo: "I am allergic to:", pleaseBeCareful: "Please be careful.", thankYou: "Thank you.", theyMakeMeSick: "They make me sick." },
-            allergens: {},
-            emergency: { ...translatedText, dial112: `${translatedText.dialText} ${emergencyNumber}` }
-          }}
-        />
-      )}
+          <div className="space-y-4">
+            <Button 
+              className="w-full py-8 text-2xl font-black bg-red-600 hover:bg-red-700 text-white rounded-3xl shadow-xl animate-pulse flex items-center justify-center gap-4"
+              onClick={() => window.open('tel:112')}
+            >
+              <Phone className="h-8 w-8 fill-current" />
+              {fullTranslatedContent.emergency?.callEmergency || "CALL 112"}
+            </Button>
+            
+            <p className="text-center text-sm text-gray-500 font-medium uppercase tracking-widest">
+              Emergency services will be notified of your location
+            </p>
+          </div>
+        </div>
+      </main>
     </div>
   );
 };
