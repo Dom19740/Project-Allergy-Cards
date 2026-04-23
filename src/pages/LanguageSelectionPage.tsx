@@ -20,12 +20,17 @@ const LanguageSelectionPage = () => {
   const { isPremium } = useBilling();
   const [selectedLanguageCode, setSelectedLanguageCode] = useState<string>("es-ES");
   const [supportedLanguages, setSupportedLanguages] = useState<SupportedLanguage[]>([]);
+  const [isLoadingLangs, setIsLoadingLangs] = useState(true);
 
   useEffect(() => {
     const loadLang = async () => {
-      const savedLang = await storage.get<string>(STORAGE_KEYS.SELECTED_LANGUAGE);
-      if (savedLang) {
-        setSelectedLanguageCode(savedLang);
+      try {
+        const savedLang = await storage.get<string>(STORAGE_KEYS.SELECTED_LANGUAGE);
+        if (savedLang) {
+          setSelectedLanguageCode(savedLang);
+        }
+      } catch (e) {
+        console.error("Failed to load saved language", e);
       }
     };
     loadLang();
@@ -34,32 +39,34 @@ const LanguageSelectionPage = () => {
   useEffect(() => {
     let mounted = true;
     (async () => {
-      const langs = await getAllGoogleLanguages();
-      if (!mounted) return;
-      
-      const sortedLangs = [...langs].sort((a, b) => {
-        const aFree = FREE_LANGUAGES.includes(a.code);
-        const bFree = FREE_LANGUAGES.includes(b.code);
+      try {
+        const langs = await getAllGoogleLanguages();
+        if (!mounted) return;
         
-        // 1. Prioritize free languages at the top
-        if (aFree && !bFree) return -1;
-        if (!aFree && bFree) return 1;
+        const sortedLangs = [...langs].sort((a, b) => {
+          const aFree = FREE_LANGUAGES.includes(a.code);
+          const bFree = FREE_LANGUAGES.includes(b.code);
+          
+          if (aFree && !bFree) return -1;
+          if (!aFree && bFree) return 1;
+          
+          if (a.code === 'en') return -1;
+          if (b.code === 'en') return 1;
+          
+          return a.name.localeCompare(b.name);
+        });
         
-        // 2. Within the same category (both free or both premium)
-        // Always put English ('en') at the very top of its category
-        if (a.code === 'en') return -1;
-        if (b.code === 'en') return 1;
-        
-        // 3. Otherwise sort alphabetically by name
-        return a.name.localeCompare(b.name);
-      });
-      
-      setSupportedLanguages(sortedLangs);
+        setSupportedLanguages(sortedLangs);
+      } catch (e) {
+        console.error("Failed to load languages", e);
+      } finally {
+        if (mounted) setIsLoadingLangs(false);
+      }
     })();
     return () => { mounted = false; };
   }, []);
 
-  const handleLanguageChange = async (code: string) => {
+  const handleLanguageChange = (code: string) => {
     const isFree = FREE_LANGUAGES.includes(code);
     
     if (!isPremium && !isFree) {
@@ -73,7 +80,7 @@ const LanguageSelectionPage = () => {
     }
 
     setSelectedLanguageCode(code);
-    await storage.set(STORAGE_KEYS.SELECTED_LANGUAGE, code);
+    storage.set(STORAGE_KEYS.SELECTED_LANGUAGE, code);
   };
 
   const handleContinue = () => {
@@ -105,36 +112,42 @@ const LanguageSelectionPage = () => {
 
           <div className="w-full flex justify-center pt-8 pb-4">
             <div className="w-full max-w-xs sm:max-w-sm md:max-w-md lg:max-w-lg">
-              <Select value={selectedLanguageCode} onValueChange={handleLanguageChange} disabled={!isOnline}>
-                <SelectTrigger
-                  className="w-full py-4 text-lg md:text-xl h-auto bg-white text-gray-900 hover:bg-gray-50 border border-red-600 dark:border-red-500"
-                >
-                  <div className="flex items-center">
-                    {selectedLanguage ? (
-                      <span>{selectedLanguage.name}</span>
-                    ) : (
-                      <SelectValue placeholder="Select Target Language" />
-                    )}
-                  </div>
-                </SelectTrigger>
-                <SelectContent className="bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-50 max-h-[50vh]">
-                  {supportedLanguages.map((lang) => {
-                    const isLocked = !isPremium && !FREE_LANGUAGES.includes(lang.code);
-                    return (
-                      <SelectItem
-                        key={lang.code}
-                        value={lang.code}
-                        className="py-3 text-lg md:text-xl cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-700"
-                      >
-                        <div className="flex items-center justify-between w-full gap-4">
-                          <span>{lang.name}</span>
-                          {isLocked && <Lock className="h-4 w-4 text-amber-500" />}
-                        </div>
-                      </SelectItem>
-                    );
-                  })}
-                </SelectContent>
-              </Select>
+              {isLoadingLangs ? (
+                <div className="w-full py-4 flex items-center justify-center bg-white border border-gray-200 rounded-md">
+                  <span className="text-gray-400">Loading languages...</span>
+                </div>
+              ) : (
+                <Select value={selectedLanguageCode} onValueChange={handleLanguageChange} disabled={!isOnline}>
+                  <SelectTrigger
+                    className="w-full py-4 text-lg md:text-xl h-auto bg-white text-gray-900 hover:bg-gray-50 border border-red-600 dark:border-red-500"
+                  >
+                    <div className="flex items-center">
+                      {selectedLanguage ? (
+                        <span>{selectedLanguage.name}</span>
+                      ) : (
+                        <SelectValue placeholder="Select Target Language" />
+                      )}
+                    </div>
+                  </SelectTrigger>
+                  <SelectContent className="bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-50 max-h-[50vh]">
+                    {supportedLanguages.map((lang) => {
+                      const isLocked = !isPremium && !FREE_LANGUAGES.includes(lang.code);
+                      return (
+                        <SelectItem
+                          key={lang.code}
+                          value={lang.code}
+                          className="py-3 text-lg md:text-xl cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-700"
+                        >
+                          <div className="flex items-center justify-between w-full gap-4">
+                            <span>{lang.name}</span>
+                            {isLocked && <Lock className="h-4 w-4 text-amber-500" />}
+                          </div>
+                        </SelectItem>
+                      );
+                    })}
+                  </SelectContent>
+                </Select>
+              )}
               
               {!isPremium && (
                 <button 
