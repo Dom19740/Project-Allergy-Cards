@@ -90,9 +90,12 @@ const Home = () => {
 
         {/* Footer Action Area */}
         <div className="flex-shrink-0 w-full flex flex-col justify-center items-center py-2 gap-3 mt-auto">
-          <div className="w-full px-4">
-            <PremiumUnlock />
-          </div>
+          {/* Only show Premium status if already premium, otherwise it's hidden from Home */}
+          {isPremium && (
+            <div className="w-full px-4">
+              <PremiumUnlock />
+            </div>
+          )}
           
           <Button 
             onClick={handleGetStarted}
