@@ -152,7 +152,7 @@ const LanguageSelectionPage = () => {
               {!isPremium && (
                 <button 
                   onClick={() => navigate('/premium-onboarding')}
-                  className="mt-4 w-full flex items-center justify-center gap-2 text-amber-600 font-bold text-sm hover:underline"
+                  className="mt-6 w-full flex items-center justify-center gap-2 text-amber-600 font-bold text-sm hover:underline"
                 >
                   <Crown className="h-4 w-4" />
                   Unlock 100+ more languages

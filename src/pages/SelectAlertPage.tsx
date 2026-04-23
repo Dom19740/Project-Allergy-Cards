@@ -53,49 +53,51 @@ const SelectAlertPage = () => {
             description="Personalise the warning messages that will appear on the card."
           />
 
-          <div className="w-full space-y-6 text-left pt-8 pb-4">
-            <div className="space-y-2">
-              <div className="flex items-center justify-between ml-2">
-                <Label
-                  htmlFor="allergic-to"
-                  className="text-sm font-medium text-gray-500 dark:text-gray-400"
-                >
-                  Primary Warning
-                </Label>
+          <div className="w-full text-left pt-8 pb-4">
+            <div className="space-y-6">
+              <div className="space-y-2">
+                <div className="flex items-center justify-between ml-2">
+                  <Label
+                    htmlFor="allergic-to"
+                    className="text-sm font-medium text-gray-500 dark:text-gray-400"
+                  >
+                    Primary Warning
+                  </Label>
+                </div>
+                <textarea
+                  id="allergic-to"
+                  value={iAmAllergicTo}
+                  onChange={(e) => setIAmAllergicTo(e.target.value)}
+                  disabled={!isPremium}
+                  placeholder="e.g. Please, I can not eat:"
+                  className="w-[calc(100%-20px)] mx-[10px] px-4 py-3 text-base sm:text-lg bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-700 rounded-lg shadow-sm text-gray-800 dark:text-gray-200 min-h-[80px] resize-y disabled:opacity-70"
+                />
               </div>
-              <textarea
-                id="allergic-to"
-                value={iAmAllergicTo}
-                onChange={(e) => setIAmAllergicTo(e.target.value)}
-                disabled={!isPremium}
-                placeholder="e.g. Please, I can not eat:"
-                className="w-[calc(100%-20px)] mx-[10px] px-4 py-3 text-base sm:text-lg bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-700 rounded-lg shadow-sm text-gray-800 dark:text-gray-200 min-h-[80px] resize-y disabled:opacity-70"
-              />
-            </div>
 
-            <div className="space-y-2">
-              <div className="flex items-center justify-between ml-2">
-                <Label
-                  htmlFor="make-me-sick"
-                  className="text-sm font-medium text-gray-500 dark:text-gray-400"
-                >
-                  Secondary Warning
-                </Label>
+              <div className="space-y-2">
+                <div className="flex items-center justify-between ml-2">
+                  <Label
+                    htmlFor="make-me-sick"
+                    className="text-sm font-medium text-gray-500 dark:text-gray-400"
+                  >
+                    Secondary Warning
+                  </Label>
+                </div>
+                <textarea
+                  id="make-me-sick"
+                  value={theyMakeMeSick}
+                  onChange={(e) => setTheyMakeMeSick(e.target.value)}
+                  disabled={!isPremium}
+                  placeholder="e.g. It will make me seriously ill..."
+                  className="w-[calc(100%-20px)] mx-[10px] px-4 py-3 text-base sm:text-lg bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-700 rounded-lg shadow-sm text-gray-800 dark:text-gray-200 min-h-[80px] resize-y disabled:opacity-70"
+                />
               </div>
-              <textarea
-                id="make-me-sick"
-                value={theyMakeMeSick}
-                onChange={(e) => setTheyMakeMeSick(e.target.value)}
-                disabled={!isPremium}
-                placeholder="e.g. It will make me seriously ill..."
-                className="w-[calc(100%-20px)] mx-[10px] px-4 py-3 text-base sm:text-lg bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-700 rounded-lg shadow-sm text-gray-800 dark:text-gray-200 min-h-[80px] resize-y disabled:opacity-70"
-              />
             </div>
             
             {!isPremium && (
               <button 
                 onClick={() => navigate('/premium-onboarding')}
-                className="mt-4 w-full flex items-center justify-center gap-2 text-amber-600 font-bold text-sm hover:underline"
+                className="mt-6 w-full flex items-center justify-center gap-2 text-amber-600 font-bold text-sm hover:underline"
               >
                 <Crown className="h-4 w-4" />
                 Unlock Custom Alerts
