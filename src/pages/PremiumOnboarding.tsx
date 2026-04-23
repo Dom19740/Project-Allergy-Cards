@@ -3,7 +3,7 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
-import { Crown, Check, ChevronRight, Globe, ShieldAlert, MessageSquare, Save, Smartphone } from 'lucide-react';
+import { Crown, Check, ChevronRight, Languages, ShieldAlert, MessageSquare, Save, Smartphone } from 'lucide-react';
 import { useBilling } from '@/hooks/useBilling';
 import FixedHeader from '@/components/FixedHeader';
 
@@ -13,7 +13,7 @@ const PremiumOnboarding = () => {
 
   const benefits = [
     {
-      icon: Globe,
+      icon: Languages,
       title: "100+ Languages",
     },
     {
