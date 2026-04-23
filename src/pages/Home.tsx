@@ -46,7 +46,6 @@ const Home = () => {
 
   const handleDevReset = async () => {
     await storage.remove('isPremium');
-    // Dispatch event to update useBilling hook state
     window.dispatchEvent(new CustomEvent('premium-status-changed', { detail: false }));
     toast.success("Premium status reset (Dev)");
   };
@@ -54,7 +53,7 @@ const Home = () => {
   return (
     <div className="flex flex-col h-[100dvh] bg-gray-100 dark:bg-gray-900 overflow-hidden">
       <FixedHeader />
-      <div className="flex flex-col flex-1 w-full max-w-2xl mx-auto px-4 pt-[calc(80px+env(safe-area-inset-top))] pb-[env(safe-area-inset-bottom)] min-h-0">
+      <div className="flex flex-col flex-1 w-full max-w-2xl mx-auto px-4 pt-[env(safe-area-inset-top)] pb-[env(safe-area-inset-bottom)] min-h-0">
         <div className="flex-1 flex flex-col items-center justify-center text-center min-h-0 py-2">
           {/* Logo Area */}
           <div className={cn(
@@ -104,7 +103,6 @@ const Home = () => {
             Get Started
           </Button>
           
-          {/* Dev Reset Button - Remove before production */}
           <button 
             onClick={handleDevReset}
             className="text-[10px] text-gray-400 hover:text-red-400 transition-colors"

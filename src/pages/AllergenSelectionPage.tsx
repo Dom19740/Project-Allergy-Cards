@@ -107,7 +107,7 @@ const AllergenSelectionPage = () => {
     <div className="flex flex-col min-h-screen bg-gray-100 dark:bg-gray-900">
       <FixedHeader />
       
-      <div className="flex flex-col flex-grow w-full max-w-2xl mx-auto px-4 pt-[calc(80px+env(safe-area-inset-top)+10px)]">
+      <div className="flex flex-col flex-grow w-full max-w-2xl mx-auto px-4 pt-[calc(env(safe-area-inset-top)+10px)]">
         <div className="flex-grow pt-2">
           <StepHeader 
             title="Select Allergens"
