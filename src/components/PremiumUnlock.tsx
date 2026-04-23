@@ -12,13 +12,13 @@ const PremiumUnlock = () => {
 
   if (isPremium) {
     return (
-      <div className="w-full max-w-md mx-auto p-4 bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800 rounded-2xl flex items-center gap-3">
-        <div className="bg-green-100 dark:bg-green-900/40 p-2 rounded-full">
-          <CheckCircle2 className="h-5 w-5 text-green-600 dark:text-green-400" />
+      <div className="w-full max-w-md mx-auto p-3 bg-amber-50/50 dark:bg-amber-900/10 border border-amber-100 dark:border-amber-900/30 rounded-xl flex items-center justify-center gap-3">
+        <div className="bg-amber-100 dark:bg-amber-900/40 p-1.5 rounded-full">
+          <Crown className="h-4 w-4 text-amber-600 dark:text-amber-400" />
         </div>
-        <div>
-          <p className="text-sm font-bold text-green-800 dark:text-green-200">Premium Unlocked</p>
-          <p className="text-xs text-green-600 dark:text-green-400">Thank you for supporting us!</p>
+        <div className="text-center">
+          <p className="text-xs font-bold text-amber-900 dark:text-amber-100">Premium Unlocked</p>
+          <p className="text-[10px] text-amber-700 dark:text-amber-400">Thank you for supporting us!</p>
         </div>
       </div>
     );

@@ -84,16 +84,16 @@ const Home = () => {
                   <SavedCardsList />
                 </div>
               )}
-              
-              <div className="px-4">
-                <PremiumUnlock />
-              </div>
             </div>
           </div>
         </div>
 
         {/* Footer Action Area */}
-        <div className="flex-shrink-0 w-full flex flex-col justify-center items-center py-2 gap-2 mt-auto">
+        <div className="flex-shrink-0 w-full flex flex-col justify-center items-center py-2 gap-3 mt-auto">
+          <div className="w-full px-4">
+            <PremiumUnlock />
+          </div>
+          
           <Button 
             onClick={handleGetStarted}
             className="py-3 text-xl md:text-2xl h-auto transition-all duration-200 ease-in-out hover:scale-105 bg-red-600 text-white hover:bg-red-700 w-[280px] shadow-lg"
