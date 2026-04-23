@@ -1,15 +1,17 @@
 "use client";
 
-import React from 'react';
+import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Crown, Check, ChevronRight, Languages, ShieldAlert, MessageSquare, Save, Smartphone } from 'lucide-react';
 import { useBilling } from '@/hooks/useBilling';
 import FixedHeader from '@/components/FixedHeader';
+import PromoCodeDialog from '@/components/PromoCodeDialog';
 
 const PremiumOnboarding = () => {
   const navigate = useNavigate();
   const { purchasePremium, isPremium, price } = useBilling();
+  const [isPromoOpen, setIsPromoOpen] = useState(false);
 
   const benefits = [
     {
@@ -78,13 +80,22 @@ const PremiumOnboarding = () => {
 
         <div className="w-full flex flex-col gap-3 mt-8">
           {!isPremium && (
-            <Button 
-              onClick={purchasePremium}
-              className="w-full h-14 text-lg font-bold bg-amber-500 hover:bg-amber-600 text-white rounded-xl shadow-lg shadow-amber-500/20 transition-all active:scale-[0.98] flex flex-col items-center justify-center"
-            >
-              <span>Unlock Everything</span>
-              <span className="text-[10px] font-medium opacity-80 uppercase tracking-wider">One-time payment of {price}</span>
-            </Button>
+            <>
+              <Button 
+                onClick={purchasePremium}
+                className="w-full h-14 text-lg font-bold bg-amber-500 hover:bg-amber-600 text-white rounded-xl shadow-lg shadow-amber-500/20 transition-all active:scale-[0.98] flex flex-col items-center justify-center"
+              >
+                <span>Unlock Everything</span>
+                <span className="text-[10px] font-medium opacity-80 uppercase tracking-wider">One-time payment of {price}</span>
+              </Button>
+              
+              <button 
+                onClick={() => setIsPromoOpen(true)}
+                className="text-[11px] font-bold text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 uppercase tracking-widest transition-colors py-1"
+              >
+                Redeem Promo Code
+              </button>
+            </>
           )}
           
           <Button 
@@ -97,6 +108,14 @@ const PremiumOnboarding = () => {
           </Button>
         </div>
       </div>
+
+      <PromoCodeDialog 
+        isOpen={isPromoOpen} 
+        onClose={() => setIsPromoOpen(false)}
+        onSuccess={() => {
+          // Success logic is handled inside the dialog
+        }}
+      />
     </div>
   );
 };
