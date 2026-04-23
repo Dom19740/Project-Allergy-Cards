@@ -77,10 +77,13 @@ const PremiumOnboarding = () => {
           {!isPremium && (
             <Button 
               onClick={purchasePremium}
-              className="w-full py-7 text-xl font-bold bg-amber-600 hover:bg-amber-700 text-white rounded-2xl shadow-lg transition-transform active:scale-95 flex items-center justify-center gap-2"
+              className="w-full py-7 text-xl font-bold bg-amber-600 hover:bg-amber-700 text-white rounded-2xl shadow-lg transition-transform active:scale-95 flex flex-col items-center justify-center"
             >
-              <Crown className="h-6 w-6" />
-              Unlock Everything
+              <div className="flex items-center gap-2">
+                <Crown className="h-6 w-6" />
+                <span>Unlock Everything</span>
+              </div>
+              <span className="text-xs font-normal opacity-90 mt-1">One-time payment of $4.99</span>
             </Button>
           )}
           
