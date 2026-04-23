@@ -54,16 +54,6 @@ const CardActions: React.FC<CardActionsProps> = ({
         </Button>
 
         <Button
-          onClick={onReadAloud}
-          variant="ghost"
-          size="icon"
-          className={`${isSpeaking ? 'text-red-600 bg-red-50' : 'text-purple-600 hover:bg-purple-50'} rounded-full h-10 w-10 transition-colors`}
-          title={isSpeaking ? "Stop Reading" : "Read Aloud"}
-        >
-          {isSpeaking ? <Square className="h-5 w-5 fill-current" /> : <Volume2 className="h-5 w-5" />}
-        </Button>
-        
-        <Button
           onClick={onShare}
           disabled={isSharing}
           variant="ghost"
@@ -83,6 +73,16 @@ const CardActions: React.FC<CardActionsProps> = ({
           title="Download Card"
         >
           {isDownloading ? <Loader2 className="h-5 w-5 animate-spin" /> : <Download className="h-5 w-5" />}
+        </Button>
+
+        <Button
+          onClick={onReadAloud}
+          variant="ghost"
+          size="icon"
+          className={`${isSpeaking ? 'text-red-600 bg-red-50' : 'text-purple-600 hover:bg-purple-50'} rounded-full h-10 w-10 transition-colors`}
+          title={isSpeaking ? "Stop Reading" : "Read Aloud"}
+        >
+          {isSpeaking ? <Square className="h-5 w-5 fill-current" /> : <Volume2 className="h-5 w-5" />}
         </Button>
 
         <Button
