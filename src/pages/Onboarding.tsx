@@ -3,7 +3,7 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import useEmblaCarousel from 'embla-carousel-react';
-import { ChevronLeft, ChevronRight, ShieldAlert, Languages, Share2, AlertTriangle, Info, LayoutGrid } from 'lucide-react';
+import { ChevronLeft, ChevronRight, ShieldAlert, Languages, Share2, AlertTriangle, Info, Smartphone } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import FixedHeader from '@/components/FixedHeader';
 import OnboardingStep from '@/components/OnboardingStep';
