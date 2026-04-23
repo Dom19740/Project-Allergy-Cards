@@ -1,19 +1,10 @@
 "use client";
 
-import React, { createContext, useContext, useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { isPremiumUser, purchasePremium, restorePurchases } from '@/lib/billing';
 import { toast } from 'sonner';
 
-interface BillingContextType {
-  isPremium: boolean;
-  isLoading: boolean;
-  purchasePremium: () => Promise<void>;
-  restorePurchases: () => Promise<void>;
-}
-
-const BillingContext = createContext<BillingContextType | undefined>(undefined);
-
-export const BillingProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+export const useBilling = () => {
   const [isPremium, setIsPremium] = useState<boolean>(false);
   const [isLoading, setIsLoading] = useState<boolean>(true);
 
@@ -52,24 +43,10 @@ export const BillingProvider: React.FC<{ children: React.ReactNode }> = ({ child
     }
   };
 
-  return (
-    <BillingContext.Provider 
-      value={{ 
-        isPremium, 
-        isLoading, 
-        purchasePremium: handlePurchase, 
-        restorePurchases: handleRestore 
-      }}
-    >
-      {children}
-    </BillingContext.Provider>
-  );
-};
-
-export const useBilling = () => {
-  const context = useContext(BillingContext);
-  if (context === undefined) {
-    throw new Error('useBilling must be used within a BillingProvider');
-  }
-  return context;
+  return {
+    isPremium,
+    isLoading,
+    purchasePremium: handlePurchase,
+    restorePurchases: handleRestore
+  };
 };

@@ -1,95 +1,142 @@
 "use client";
 
-import React, { useState } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
+import useEmblaCarousel from 'embla-carousel-react';
+import { ChevronLeft, ChevronRight, ShieldAlert, Languages, Share2, AlertTriangle, Info, LayoutGrid } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { storage, STORAGE_KEYS } from '@/lib/storage';
-import { ChevronRight, ChevronLeft, ShieldAlert, Languages, AlertTriangle } from 'lucide-react';
+import FixedHeader from '@/components/FixedHeader';
 import OnboardingStep from '@/components/OnboardingStep';
+import { storage, STORAGE_KEYS } from '@/lib/storage';
 
-const slides = [
+const ONBOARDING_STEPS = [
   {
-    title: "Welcome to Allergy Alert",
-    description: "Your essential travel companion for managing dietary restrictions safely across the globe.",
-    icon: ShieldAlert,
-    image: "/logo_main.png"
+    title: "Safety First",
+    description: "This app provides translated allergy alerts for convenience. While we aim for accuracy, translations and emergency numbers may not always be correct. Always verify important information locally when possible. If in doubt, do not eat.",
+    icon: Info,
   },
   {
-    title: "Multi-Language Support",
-    description: "Translate your allergies into dozens of languages instantly to ensure you're understood anywhere.",
+    title: "Select Your Allergens",
+    description: "Choose from our standard list or add your own custom allergens. Customise your allergy alert warnings.",
+    icon: ShieldAlert,
+  },
+  {
+    title: "Choose a Language",
+    description: "Select from over 100 languages to translate your allergy alert instantly.",
     icon: Languages,
-    image: "/logo_main.png"
+  },
+  {
+    title: "Share & Save",
+    description: "Download your card as an image, share it with others, or save up to 3 cards in the app for quick access later.",
+    icon: Share2,
   },
   {
     title: "Emergency Ready",
-    description: "Quick access to emergency medical cards when you need them most.",
+    description: "In urgent situations, use the Emergency Card to quickly communicate your need for medical attention.",
     icon: AlertTriangle,
-    image: "/logo_main.png"
+  },
+  {
+    title: "Add a Widget",
+    description: "Add our widget to your home screen for instant access to your saved cards and one-tap emergency alerts, even when offline.",
+    icon: LayoutGrid,
   }
 ];
 
 const Onboarding = () => {
-  const [currentSlide, setCurrentSlide] = useState(0);
   const navigate = useNavigate();
+  const [currentStep, setCurrentStep] = useState(0);
+  
+  const [emblaRef, emblaApi] = useEmblaCarousel({ 
+    loop: false,
+    dragFree: false,
+    containScroll: 'trimSnaps'
+  });
 
-  const handleNext = async () => {
-    if (currentSlide < slides.length - 1) {
-      setCurrentSlide(currentSlide + 1);
+  const onSelect = useCallback(() => {
+    if (!emblaApi) return;
+    setCurrentStep(emblaApi.selectedScrollSnap());
+  }, [emblaApi]);
+
+  useEffect(() => {
+    if (!emblaApi) return;
+    onSelect();
+    emblaApi.on('select', onSelect);
+    emblaApi.on('reInit', onSelect);
+  }, [emblaApi, onSelect]);
+
+  const finishOnboarding = async () => {
+    await storage.set(STORAGE_KEYS.HAS_SEEN_ONBOARDING, 'true');
+    navigate('/select-allergens');
+  };
+
+  const handleNext = () => {
+    if (currentStep < ONBOARDING_STEPS.length - 1) {
+      emblaApi?.scrollNext();
     } else {
-      await storage.set(STORAGE_KEYS.HAS_SEEN_ONBOARDING, true);
-      navigate('/premium-onboarding');
+      finishOnboarding();
     }
   };
 
   const handleBack = () => {
-    if (currentSlide > 0) {
-      setCurrentSlide(currentSlide - 1);
+    if (currentStep > 0) {
+      emblaApi?.scrollPrev();
+    } else {
+      finishOnboarding();
     }
   };
 
-  const currentStep = slides[currentSlide];
-
   return (
-    <div className="flex flex-col h-[100dvh] bg-white dark:bg-gray-900 overflow-hidden">
-      <div className="flex-1 flex flex-col items-center justify-center px-6">
-        <OnboardingStep 
-          title={currentStep.title}
-          description={currentStep.description}
-          icon={currentStep.icon}
-          image={currentStep.image}
-        />
-      </div>
-
-      <div className="p-8 flex flex-col gap-4 bg-white dark:bg-gray-900 z-10">
-        <div className="flex justify-center gap-2 mb-4">
-          {slides.map((_, i) => (
-            <div 
-              key={i} 
-              className={`h-2 rounded-full transition-all duration-300 ${
-                i === currentSlide ? "w-8 bg-red-600" : "w-2 bg-gray-300 dark:bg-gray-700"
-              }`}
-            />
-          ))}
+    <div className="flex flex-col h-screen bg-gray-100 dark:bg-gray-900 overflow-hidden">
+      <FixedHeader />
+      
+      <div className="flex flex-col flex-grow w-full max-w-2xl mx-auto px-4 pt-[calc(80px+env(safe-area-inset-top)+10px)] overflow-hidden">
+        {/* Carousel Viewport */}
+        <div className="flex-grow overflow-hidden pt-8 cursor-grab active:cursor-grabbing" ref={emblaRef}>
+          <div className="flex h-full">
+            {ONBOARDING_STEPS.map((step, index) => (
+              <div key={index} className="flex-[0_0_100%] min-w-0 px-4">
+                <OnboardingStep 
+                  title={step.title}
+                  description={step.description}
+                  icon={step.icon}
+                />
+              </div>
+            ))}
+          </div>
         </div>
 
-        <div className="flex gap-4">
-          {currentSlide > 0 && (
-            <Button 
-              variant="ghost" 
+        <div className="w-full flex flex-col items-center mt-auto mb-[calc(50px+env(safe-area-inset-bottom))] space-y-8 shrink-0">
+          <div className="flex space-x-2">
+            {ONBOARDING_STEPS.map((_, index) => (
+              <div 
+                key={index}
+                className={`h-2.5 w-2.5 rounded-full transition-all duration-300 ${
+                  index === currentStep 
+                    ? "bg-red-600 w-6" 
+                    : "bg-gray-300 dark:bg-gray-700"
+                }`}
+              />
+            ))}
+          </div>
+
+          <div className="w-full flex justify-between items-center gap-4">
+            <Button
+              variant="ghost"
               onClick={handleBack}
-              className="flex-1 py-6 rounded-2xl text-gray-500"
+              className="flex items-center text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-100"
             >
-              <ChevronLeft className="mr-2 h-5 w-5" />
-              Back
+              <ChevronLeft className="w-5 h-5 mr-1" />
+              {currentStep === 0 ? "Skip" : "Back"}
             </Button>
-          )}
-          <Button 
-            onClick={handleNext}
-            className="flex-1 py-6 rounded-2xl bg-red-600 hover:bg-red-700 text-white shadow-lg transition-transform active:scale-95"
-          >
-            {currentSlide === slides.length - 1 ? "Continue" : "Next"}
-            <ChevronRight className="ml-2 h-5 w-5" />
-          </Button>
+
+            <Button
+              onClick={handleNext}
+              className="py-3 px-8 text-lg h-auto bg-red-600 text-white hover:bg-red-700 rounded-xl shadow-lg transition-transform active:scale-95 flex items-center"
+            >
+              {currentStep === ONBOARDING_STEPS.length - 1 ? "Get Started" : "Next"}
+              {currentStep < ONBOARDING_STEPS.length - 1 && <ChevronRight className="w-5 h-5 ml-1" />}
+            </Button>
+          </div>
         </div>
       </div>
     </div>
