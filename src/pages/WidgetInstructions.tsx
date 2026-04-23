@@ -2,7 +2,7 @@
 
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Smartphone, ChevronLeft, Plus, Share, Layout } from 'lucide-react';
+import { Smartphone, Plus, Share, Layout } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import StepHeader from '@/components/StepHeader';
 import FixedHeader from '@/components/FixedHeader';

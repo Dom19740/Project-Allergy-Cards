@@ -1,15 +1,13 @@
 "use client";
 
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { 
-  Plus, 
   Languages, 
   Smartphone, 
   Share2, 
   ChevronRight, 
   ChevronLeft,
-  CheckCircle2,
   AlertCircle
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
