@@ -173,7 +173,7 @@ const AllergenSelectionPage = () => {
             <div className="flex space-x-2">
               <Input
                 type="text"
-                placeholder={isPremium ? "Add custom allergen..." : "Premium: Add custom allergens"}
+                placeholder="Add custom allergens"
                 value={customAllergenInput}
                 onChange={(e) => setCustomAllergenInput(e.target.value)}
                 disabled={!isPremium}
