@@ -3,7 +3,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { storage, STORAGE_KEYS } from '@/lib/storage';
-import { SelectedAllergens, CustomMessages, CardData, TranslatedContent } from '@/lib/types';
+import { SelectedAllergens, CustomMessages, CardData, TranslatedContent, Allergen } from '@/lib/types';
 import { ALLERGEN_OPTIONS } from '@/lib/allergens';
 import { useTranslation } from '@/hooks/useTranslation';
 import { toast } from 'sonner';
@@ -25,10 +25,10 @@ const Index = () => {
 
   useEffect(() => {
     const savedAllergens = storage.get(STORAGE_KEYS.SELECTED_ALLERGENS);
-    if (savedAllergens) setSelectedAllergens(savedAllergens);
+    if (savedAllergens) setSelectedAllergens(savedAllergens as SelectedAllergens);
 
     const savedLang = storage.get(STORAGE_KEYS.LANGUAGE);
-    if (savedLang) setLanguageCode(savedLang);
+    if (savedLang) setLanguageCode(savedLang as string);
   }, []);
 
   const handleDownload = async () => {
@@ -56,18 +56,27 @@ const Index = () => {
     }
   };
 
-  // Prepare data for CardActions
+  // Map ALLERGEN_OPTIONS to match Allergen interface (image -> icon)
+  const activeAllergens: Allergen[] = ALLERGEN_OPTIONS
+    .filter(a => selectedAllergens[a.id])
+    .map(a => ({
+      id: a.id,
+      name: a.name,
+      icon: a.image || '', // Map image to icon
+      image: a.image
+    }));
+
   const currentCardData: CardData = {
     id: 'current',
     name: 'My Card',
-    allergens: ALLERGEN_OPTIONS.filter(a => selectedAllergens[a.id]),
+    allergens: activeAllergens,
     createdAt: Date.now()
   };
 
   const currentTranslatedData: TranslatedContent = translatedContent || {
     title: "ALLERGY ALERT",
     alerts: ["I have a severe food allergy."],
-    allergens: ALLERGEN_OPTIONS.filter(a => selectedAllergens[a.id]).map(a => a.name)
+    allergens: activeAllergens.map(a => a.name)
   };
 
   return (
