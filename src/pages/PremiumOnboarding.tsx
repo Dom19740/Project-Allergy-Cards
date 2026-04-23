@@ -44,14 +44,13 @@ const PremiumOnboarding = () => {
       
       <div className="flex flex-col flex-grow w-full max-w-2xl mx-auto px-6 pt-[calc(80px+env(safe-area-inset-top)+20px)] pb-8">
         <div className="flex-grow flex flex-col items-center text-center space-y-6">
-          <div className="space-y-4">
-            <div className="flex items-center justify-center gap-3">
-              <div className="bg-amber-100 dark:bg-amber-900/30 p-2 rounded-full">
-                <Crown className="h-8 w-8 text-amber-600" />
-              </div>
-              <h2 className="text-3xl font-bold text-gray-900 dark:text-white">Unlock Premium</h2>
-            </div>
-            <p className="text-gray-600 dark:text-gray-400 max-w-md mx-auto">
+          <div className="bg-amber-100 dark:bg-amber-900/30 p-4 rounded-full">
+            <Crown className="h-12 w-12 text-amber-600" />
+          </div>
+          
+          <div className="space-y-2">
+            <h2 className="text-2xl font-bold text-gray-900 dark:text-white">Unlock Premium</h2>
+            <p className="text-gray-600 dark:text-gray-400">
               Unlock the full power of Simple Allergy Alert and travel with total peace of mind.
             </p>
           </div>

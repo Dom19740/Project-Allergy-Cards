@@ -1,103 +1,210 @@
 "use client";
 
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { storage, STORAGE_KEYS } from '@/lib/storage';
-import { SelectedAllergens, CustomMessages, CardData, TranslatedContent } from '@/lib/types';
-import { ALLERGEN_OPTIONS } from '@/lib/allergens';
-import { useTranslation } from '@/hooks/useTranslation';
 import { toast } from 'sonner';
+import { ShieldAlert, Plus, Info, Languages, MessageSquare, Loader2 } from 'lucide-react';
+import { Button } from '@/components/ui/button';
+import { storage, STORAGE_KEYS } from '@/lib/storage';
+import { SelectedAllergens, CustomMessages } from '@/lib/types';
+import { ALLERGEN_OPTIONS } from '@/lib/allergens';
+import { shareCard, downloadCard } from '@/lib/card-utils';
+import { useBilling } from '@/hooks/useBilling';
+import { useNetworkStatus } from '@/hooks/useNetworkStatus';
+import { TextToSpeech } from '@capacitor-community/text-to-speech';
 import FixedHeader from '@/components/FixedHeader';
-import AllergyCard from '@/components/AllergyCard';
 import CardActions from '@/components/CardActions';
-import { downloadCard, shareCard } from '@/lib/card-utils';
+import CardMenu from '@/components/CardMenu';
+import DisclaimerDialog from '@/components/DisclaimerDialog';
+import SavedCardsList from '@/components/SavedCardsList';
+import EmergencyNumberDialog from '@/components/EmergencyNumberDialog';
 
 const Index = () => {
   const navigate = useNavigate();
-  const [selectedAllergens, setSelectedAllergens] = useState<SelectedAllergens>({});
-  const [customMessages, setCustomMessages] = useState<CustomMessages>({});
-  const [languageCode, setLanguageCode] = useState('en');
+  const cardRef = useRef<HTMLDivElement>(null);
+  const { isPremium } = useBilling();
+  const isOnline = useNetworkStatus();
+  
+  const [selectedAllergens, setSelectedAllergens] = useState<SelectedAllergens | null>(null);
+  const [customMessages, setCustomMessages] = useState<CustomMessages | null>(null);
+  const [languageCode, setLanguageCode] = useState<string>("en");
   const [isSharing, setIsSharing] = useState(false);
   const [isDownloading, setIsDownloading] = useState(false);
-  
-  const { translatedContent, isLoading } = useTranslation(languageCode, selectedAllergens, customMessages);
-  const cardRef = useRef<HTMLDivElement>(null);
+  const [isSpeaking, setIsSpeaking] = useState(false);
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const [isDisclaimerOpen, setIsDisclaimerOpen] = useState(false);
+  const [isEmergencyDialogOpen, setIsEmergencyDialogOpen] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
-    const savedAllergens = storage.get(STORAGE_KEYS.SELECTED_ALLERGENS);
-    if (savedAllergens) setSelectedAllergens(savedAllergens);
-
-    const savedLang = storage.get(STORAGE_KEYS.LANGUAGE);
-    if (savedLang) setLanguageCode(savedLang);
+    const loadData = async () => {
+      const [allergens, messages, lang] = await Promise.all([
+        storage.get<SelectedAllergens>(STORAGE_KEYS.SELECTED_ALLERGENS),
+        storage.get<CustomMessages>(STORAGE_KEYS.CUSTOM_MESSAGES),
+        storage.get<string>(STORAGE_KEYS.SELECTED_LANGUAGE)
+      ]);
+      
+      setSelectedAllergens(allergens);
+      setCustomMessages(messages);
+      if (lang) setLanguageCode(lang);
+      setIsLoading(false);
+    };
+    loadData();
   }, []);
 
-  const handleDownload = async () => {
-    if (!cardRef.current) return;
-    setIsDownloading(true);
-    try {
-      await downloadCard(cardRef.current, `allergy-card-${languageCode}.png`);
-      toast.success("Card downloaded successfully!");
-    } catch (error) {
-      toast.error("Failed to download card.");
-    } finally {
-      setIsDownloading(false);
-    }
-  };
-
   const handleShare = async () => {
-    if (!cardRef.current) return;
-    setIsSharing(true);
-    try {
-      await shareCard(cardRef.current, `allergy-card-${languageCode}.png`);
-    } catch (error) {
-      toast.error("Failed to share card.");
-    } finally {
+    if (cardRef.current) {
+      setIsSharing(true);
+      const success = await shareCard(cardRef.current, "My Allergy Alert Card", "Check out my allergy alert card.");
+      if (!success) toast.error("Failed to share card.");
       setIsSharing(false);
     }
   };
 
-  // Prepare data for CardActions
-  const currentCardData: CardData = {
-    id: 'current',
-    name: 'My Card',
-    allergens: ALLERGEN_OPTIONS.filter(a => selectedAllergens[a.id]),
-    createdAt: Date.now()
+  const handleDownload = async () => {
+    if (cardRef.current) {
+      setIsDownloading(true);
+      const success = await downloadCard(cardRef.current, "allergy-card.png");
+      if (success) toast.success("Card saved to gallery!");
+      else toast.error("Failed to save card.");
+      setIsDownloading(false);
+    }
   };
 
-  const currentTranslatedData: TranslatedContent = translatedContent || {
-    title: "ALLERGY ALERT",
-    alerts: ["I have a severe food allergy."],
-    allergens: ALLERGEN_OPTIONS.filter(a => selectedAllergens[a.id]).map(a => a.name)
+  const handleReadAloud = async () => {
+    if (isSpeaking) {
+      await TextToSpeech.stop();
+      setIsSpeaking(false);
+      return;
+    }
+
+    if (!selectedAllergens) return;
+
+    const allergenNames = selectedAllergens.ids.map(id => 
+      ALLERGEN_OPTIONS.find(opt => opt.id === id)?.name || id
+    );
+
+    const textToRead = [
+      "Allergy Alert",
+      customMessages?.iAmAllergicTo || "I am allergic to",
+      ...allergenNames,
+      customMessages?.theyMakeMeSick || "They make me very sick",
+      "Thank you"
+    ].join(". ");
+
+    try {
+      setIsSpeaking(true);
+      await TextToSpeech.speak({
+        text: textToRead,
+        lang: 'en-US',
+        rate: 0.9,
+      });
+    } catch (error) {
+      console.error('TTS Error:', error);
+    } finally {
+      setIsSpeaking(false);
+    }
   };
+
+  const handleEmergencyClick = () => {
+    setIsEmergencyDialogOpen(true);
+  };
+
+  const handleEmergencyConfirm = (number: string) => {
+    setIsEmergencyDialogOpen(false);
+    navigate(`/emergency/${languageCode}?num=${encodeURIComponent(number)}`);
+  };
+
+  if (isLoading) {
+    return (
+      <div className="min-h-screen bg-white flex items-center justify-center">
+        <Loader2 className="h-8 w-8 animate-spin text-red-600" />
+      </div>
+    );
+  }
+
+  const hasCard = selectedAllergens && selectedAllergens.ids.length > 0;
 
   return (
-    <div className="flex flex-col min-h-screen bg-gray-50 dark:bg-gray-900">
+    <div className="min-h-screen bg-white pb-32">
       <FixedHeader />
       
-      <main className="flex-grow container mx-auto px-4 pt-24 pb-32">
-        <div ref={cardRef}>
-          <AllergyCard 
-            data={currentCardData}
-            translatedData={currentTranslatedData}
-            languageCode={languageCode}
-          />
-        </div>
+      <main className="container mx-auto px-4 pt-24">
+        {!hasCard ? (
+          <div className="flex flex-col items-center justify-center space-y-8 py-12 text-center">
+            <div className="bg-red-50 p-6 rounded-full">
+              <ShieldAlert className="h-16 w-16 text-red-600" />
+            </div>
+            <div className="space-y-4 max-w-md">
+              <h2 className="text-3xl font-bold text-gray-900">No Allergy Card Yet</h2>
+              <p className="text-gray-600 text-lg">
+                Create your first allergy alert card to stay safe while traveling or dining out.
+              </p>
+            </div>
+            <Button 
+              onClick={() => navigate('/select-allergens')}
+              className="bg-red-600 hover:bg-red-700 text-white px-8 py-6 text-xl rounded-2xl shadow-lg transition-all active:scale-95"
+            >
+              <Plus className="mr-2 h-6 w-6" />
+              Create New Card
+            </Button>
+          </div>
+        ) : (
+          <div className="space-y-8">
+            <div className="flex items-center justify-between">
+              <h2 className="text-2xl font-bold text-gray-900">Your Allergy Card</h2>
+              <Button 
+                variant="outline" 
+                onClick={() => navigate('/select-allergens')}
+                className="border-red-200 text-red-600 hover:bg-red-50"
+              >
+                Edit Card
+              </Button>
+            </div>
+            
+            <div className="flex justify-center">
+              <div className="w-full max-w-md transform transition-all hover:scale-[1.02]">
+                <SavedCardsList />
+              </div>
+            </div>
+          </div>
+        )}
+      </main>
 
-        <div className="fixed bottom-0 left-0 right-0 z-40 bg-white/80 dark:bg-gray-900/80 backdrop-blur-md border-t border-gray-200 dark:border-gray-800">
+      {hasCard && (
+        <div className="fixed bottom-0 left-0 right-0 z-40">
           <CardActions 
             onShare={handleShare}
             onDownload={handleDownload}
             onPrint={() => window.print()}
             onSave={() => toast.success("Card is already saved!")}
-            onEmergency={() => navigate('/emergency')}
-            cardData={currentCardData}
-            translatedData={currentTranslatedData}
-            languageCode={languageCode}
+            onToggleMenu={() => setIsMenuOpen(!isMenuOpen)}
+            onEmergency={handleEmergencyClick}
+            onReadAloud={handleReadAloud}
             isSharing={isSharing}
             isDownloading={isDownloading}
+            isSpeaking={isSpeaking}
           />
         </div>
-      </main>
+      )}
+
+      <CardMenu 
+        isOpen={isMenuOpen} 
+        onClose={() => setIsMenuOpen(false)} 
+        onOpenDisclaimer={() => setIsDisclaimerOpen(true)} 
+      />
+      
+      <DisclaimerDialog 
+        isOpen={isDisclaimerOpen} 
+        onClose={() => setIsDisclaimerOpen(false)} 
+      />
+
+      <EmergencyNumberDialog 
+        isOpen={isEmergencyDialogOpen} 
+        onClose={() => setIsEmergencyDialogOpen(false)} 
+        onConfirm={handleEmergencyConfirm}
+        langCode={languageCode}
+      />
     </div>
   );
 };

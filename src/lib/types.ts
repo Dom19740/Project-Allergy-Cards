@@ -1,26 +1,44 @@
 "use client";
 
+export type LanguageCode = string;
+
 export interface Allergen {
   id: string;
   name: string;
-  icon: string;
+  image: string;
 }
-
-export interface CardData {
-  id: string;
-  name: string;
-  allergens: Allergen[];
-  createdAt: number;
-}
-
-export type LanguageCode = string;
 
 export interface SelectedAllergens {
-  [key: string]: boolean;
+  standard: string[];
+  custom: {
+    [key: string]: {
+      [lang: string]: string;
+    };
+  };
+  ids: string[];
 }
 
 export interface CustomMessages {
-  [key: string]: string;
+  iAmAllergicTo: string;
+  theyMakeMeSick: string;
+}
+
+export interface TranslatedContent {
+  ui: {
+    allergyAlert: string;
+    iAmAllergicTo: string;
+    pleaseBeCareful: string;
+    thankYou: string;
+    theyMakeMeSick: string;
+  };
+  allergens: { [key: string]: string };
+  emergency: {
+    attention: string;
+    emergency: string;
+    needHelp: string;
+    callServices: string;
+    dial112: string;
+  };
 }
 
 export interface SavedCard {
@@ -29,25 +47,6 @@ export interface SavedCard {
   languageCode: string;
   selectedAllergens: SelectedAllergens;
   customMessages: CustomMessages;
+  translatedContent: TranslatedContent;
   createdAt: number;
-}
-
-export interface TranslatedContent {
-  title: string;
-  alerts: string[];
-  allergens: string[];
-  // Added to support EmergencyPage structure
-  ui?: {
-    allergyAlert: string;
-    iAmAllergicTo: string;
-    pleaseBeCareful: string;
-    thankYou: string;
-    theyMakeMeSick: string;
-  };
-  emergency?: {
-    title: string;
-    subtitle: string;
-    callEmergency: string;
-    medicalInfo: string;
-  };
 }

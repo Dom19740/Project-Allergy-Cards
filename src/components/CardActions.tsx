@@ -1,108 +1,101 @@
 "use client";
 
 import React from 'react';
-import { Share2, Download, Printer, Save, Menu, AlertTriangle } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import ReadAloudButton from './ReadAloudButton';
-import { CardData, TranslatedContent } from '@/lib/types';
+import { Share2, Download, Save, Loader2, Menu, AlertTriangle, Volume2, Square } from 'lucide-react';
 
 interface CardActionsProps {
   onShare: () => void;
   onDownload: () => void;
-  cardData: CardData;
-  translatedData: TranslatedContent;
-  languageCode: string;
-  // Added to fix TS errors in Index.tsx
-  onPrint?: () => void;
-  onSave?: () => void;
-  onToggleMenu?: () => void;
-  onEmergency?: () => void;
-  onReadAloud?: () => void;
-  isSharing?: boolean;
-  isDownloading?: boolean;
-  isSpeaking?: boolean;
+  onPrint: () => void;
+  onSave: () => void;
+  onToggleMenu: () => void;
+  onEmergency: () => void;
+  onReadAloud: () => void;
+  isSharing: boolean;
+  isDownloading: boolean;
+  isSpeaking: boolean;
 }
 
-const CardActions = ({ 
-  onShare, 
-  onDownload, 
-  cardData, 
-  translatedData, 
-  languageCode,
+const CardActions: React.FC<CardActionsProps> = ({
+  onShare,
+  onDownload,
   onPrint,
   onSave,
   onToggleMenu,
   onEmergency,
+  onReadAloud,
   isSharing,
-  isDownloading
-}: CardActionsProps) => {
-  const textToRead = [
-    translatedData.title,
-    ...translatedData.alerts,
-    ...translatedData.allergens
-  ].join(". ");
-
+  isDownloading,
+  isSpeaking
+}) => {
   return (
-    <div className="flex flex-wrap items-center justify-center gap-4 mt-6 pb-8">
-      <ReadAloudButton text={textToRead} languageCode={languageCode} />
-      
-      <Button
-        variant="outline"
-        size="icon"
-        onClick={onDownload}
-        disabled={isDownloading}
-        className="rounded-full w-12 h-12 bg-white dark:bg-gray-800 shadow-md"
-        title="Download Image"
-      >
-        <Download className="h-6 w-6" />
-      </Button>
-
-      <Button
-        variant="outline"
-        size="icon"
-        onClick={onShare}
-        disabled={isSharing}
-        className="rounded-full w-12 h-12 bg-white dark:bg-gray-800 shadow-md"
-        title="Share Card"
-      >
-        <Share2 className="h-6 w-6" />
-      </Button>
-
-      {onPrint && (
+    <div className="w-full pt-2 pb-[calc(8px+env(safe-area-inset-bottom))] flex justify-center bg-white border-t border-gray-100 z-30">
+      <div className="flex items-center space-x-3 bg-white p-2 rounded-full shadow-md border border-gray-200">
+        
         <Button
-          variant="outline"
+          onClick={onToggleMenu}
+          variant="ghost"
           size="icon"
-          onClick={onPrint}
-          className="rounded-full w-12 h-12 bg-white dark:bg-gray-800 shadow-md"
-          title="Print Card"
+          className="text-gray-500 hover:bg-gray-100 rounded-full h-10 w-10"
+          title="Menu"
         >
-          <Printer className="h-6 w-6" />
+          <Menu className="h-5 w-5" />
         </Button>
-      )}
 
-      {onSave && (
         <Button
-          variant="outline"
-          size="icon"
           onClick={onSave}
-          className="rounded-full w-12 h-12 bg-white dark:bg-gray-800 shadow-md"
+          variant="ghost"
+          size="icon"
+          className="text-black hover:bg-gray-100 rounded-full h-10 w-10"
           title="Save Card"
         >
-          <Save className="h-6 w-6" />
+          <Save className="h-5 w-5" />
         </Button>
-      )}
 
-      {onEmergency && (
         <Button
-          variant="destructive"
+          onClick={onShare}
+          disabled={isSharing}
+          variant="ghost"
           size="icon"
+          className="text-green-600 hover:bg-green-50 rounded-full h-10 w-10"
+          title="Share Card"
+        >
+          {isSharing ? <Loader2 className="h-5 w-5 animate-spin" /> : <Share2 className="h-5 w-5" />}
+        </Button>
+        
+        <Button
+          onClick={onDownload}
+          disabled={isDownloading}
+          variant="ghost"
+          size="icon"
+          className="text-blue-600 hover:bg-blue-50 rounded-full h-10 w-10"
+          title="Download Card"
+        >
+          {isDownloading ? <Loader2 className="h-5 w-5 animate-spin" /> : <Download className="h-5 w-5" />}
+        </Button>
+
+        <Button
+          onClick={onReadAloud}
+          variant="ghost"
+          size="icon"
+          className={`${isSpeaking ? 'text-red-600 bg-red-50' : 'text-purple-600 hover:bg-purple-50'} rounded-full h-10 w-10 transition-colors`}
+          title={isSpeaking ? "Stop Reading" : "Read Aloud"}
+        >
+          {isSpeaking ? <Square className="h-5 w-5 fill-current" /> : <Volume2 className="h-5 w-5" />}
+        </Button>
+
+        <Button
           onClick={onEmergency}
-          className="rounded-full w-12 h-12 shadow-md"
+          variant="ghost"
+          size="icon"
+          className="text-orange-600 hover:bg-orange-50 rounded-full h-10 w-10"
           title="Emergency"
         >
-          <AlertTriangle className="h-6 w-6" />
+          <AlertTriangle className="h-5 w-5" />
         </Button>
-      )}
+
+      </div>
     </div>
   );
 };
