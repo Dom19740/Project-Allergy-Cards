@@ -23,7 +23,9 @@ const PromoCodeDialog: React.FC<PromoCodeDialogProps> = ({ isOpen, onClose, onSu
   const [code, setCode] = useState("");
 
   const handleRedeem = async () => {
-    if (code.trim().toUpperCase() === 'SAAFREE') {
+    const normalizedCode = code.trim().toUpperCase();
+    
+    if (normalizedCode === 'SAAFREE') {
       localStorage.setItem('isPremium', 'true');
       await Preferences.set({ key: 'isPremium', value: 'true' });
       
@@ -33,7 +35,17 @@ const PromoCodeDialog: React.FC<PromoCodeDialogProps> = ({ isOpen, onClose, onSu
       
       onSuccess();
       onClose();
-      // Force a reload to update all states across the app
+      window.location.reload();
+    } else if (normalizedCode === 'RESET') {
+      localStorage.setItem('isPremium', 'false');
+      await Preferences.set({ key: 'isPremium', value: 'false' });
+      
+      toast.success("Premium Revoked", {
+        icon: '🔄',
+      });
+      
+      onSuccess();
+      onClose();
       window.location.reload();
     } else {
       toast.error("Invalid promo code");
