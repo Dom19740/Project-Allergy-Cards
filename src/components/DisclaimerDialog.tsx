@@ -1,6 +1,7 @@
 "use client";
 
 import React from 'react';
+import { useNavigate } from 'react-router-dom';
 import {
   Dialog,
   DialogContent,
@@ -17,15 +18,26 @@ interface DisclaimerDialogProps {
 }
 
 const DisclaimerDialog: React.FC<DisclaimerDialogProps> = ({ isOpen, onClose }) => {
+  const navigate = useNavigate();
+
+  const handleHiddenClick = () => {
+    onClose();
+    navigate('/promo');
+  };
+
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
       <DialogContent 
         className="w-[90%] sm:max-w-[425px] rounded-2xl fixed left-1/2 -translate-x-1/2 top-[calc(1.5rem+env(safe-area-inset-top))] translate-y-0 animate-in fade-in slide-in-from-top-8 duration-300"
       >
         <DialogHeader className="flex flex-col items-center text-center">
-          <div className="bg-red-50 dark:bg-red-900/20 p-3 rounded-full mb-2">
+          <button 
+            onClick={handleHiddenClick}
+            className="bg-red-50 dark:bg-red-900/20 p-3 rounded-full mb-2 hover:scale-110 transition-transform active:scale-95"
+            aria-label="Promo entry"
+          >
             <Info className="h-6 w-6 text-red-600" />
-          </div>
+          </button>
           <DialogTitle className="text-xl font-bold">Safety Disclaimer</DialogTitle>
         </DialogHeader>
         <div className="py-4 text-center space-y-4">
