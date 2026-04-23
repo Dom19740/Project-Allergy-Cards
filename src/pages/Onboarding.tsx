@@ -38,7 +38,7 @@ const ONBOARDING_STEPS = [
   {
     title: "Add a Widget",
     description: "Add our widget to your home screen for instant access to your saved cards and one-tap emergency alerts, even when offline.",
-    icon: LayoutGrid,
+    icon: Smartphone,
   }
 ];
 
