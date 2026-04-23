@@ -13,7 +13,7 @@ interface BillingContextType {
 
 const BillingContext = createContext<BillingContextType | undefined>(undefined);
 
-export const BillingProvider = ({ children }: { children: ReactNode }) => {
+export const BillingProvider = ({ children }: { children: ReactNode }): React.ReactElement => {
   const [isPremium, setIsPremium] = useState<boolean>(false);
   const [isLoading, setIsLoading] = useState<boolean>(true);
 

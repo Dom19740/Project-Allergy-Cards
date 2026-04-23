@@ -66,7 +66,7 @@ const Onboarding = () => {
 
   const finishOnboarding = async () => {
     await storage.set(STORAGE_KEYS.HAS_SEEN_ONBOARDING, 'true');
-    navigate('/select-allergens');
+    navigate('/premium-onboarding');
   };
 
   const handleNext = () => {
@@ -81,6 +81,7 @@ const Onboarding = () => {
     if (currentStep > 0) {
       emblaApi?.scrollPrev();
     } else {
+      // If they skip from the first page, we still mark onboarding as seen
       finishOnboarding();
     }
   };
@@ -133,7 +134,7 @@ const Onboarding = () => {
               onClick={handleNext}
               className="py-3 px-8 text-lg h-auto bg-red-600 text-white hover:bg-red-700 rounded-xl shadow-lg transition-transform active:scale-95 flex items-center"
             >
-              {currentStep === ONBOARDING_STEPS.length - 1 ? "Get Started" : "Next"}
+              {currentStep === ONBOARDING_STEPS.length - 1 ? "Next" : "Next"}
               {currentStep < ONBOARDING_STEPS.length - 1 && <ChevronRight className="w-5 h-5 ml-1" />}
             </Button>
           </div>

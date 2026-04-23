@@ -9,6 +9,7 @@ import { Loader2 } from "lucide-react";
 import { storage, STORAGE_KEYS } from "./lib/storage";
 import { useDeepLinks } from "./hooks/useDeepLinks";
 import { initBilling } from "./lib/billing";
+import { BillingProvider } from "./hooks/useBilling";
 
 // Lazy load pages
 const Home = lazy(() => import("./pages/Home"));
@@ -20,6 +21,7 @@ const SelectAlertPage = lazy(() => import("./pages/SelectAlertPage"));
 const EmergencyPage = lazy(() => import("./pages/EmergencyPage"));
 const PageTemplate = lazy(() => import("./pages/PageTemplate"));
 const Onboarding = lazy(() => import("./pages/Onboarding"));
+const PremiumOnboarding = lazy(() => import("./pages/PremiumOnboarding"));
 
 const queryClient = new QueryClient();
 
@@ -68,6 +70,7 @@ const AppContent = () => {
       <Routes>
         <Route path="/" element={<Home />} />
         <Route path="/onboarding" element={<Onboarding />} />
+        <Route path="/premium-onboarding" element={<PremiumOnboarding />} />
         <Route path="/select-allergens" element={<AllergenSelectionPage />} />
         <Route path="/select-alert" element={<SelectAlertPage />} />
         <Route path="/select-language" element={<LanguageSelectionPage />} />
@@ -82,13 +85,15 @@ const AppContent = () => {
 
 const App = () => (
   <QueryClientProvider client={queryClient}>
-    <TooltipProvider>
-      <Toaster />
-      <Sonner duration={2000} />
-      <BrowserRouter>
-        <AppContent />
-      </BrowserRouter>
-    </TooltipProvider>
+    <BillingProvider>
+      <TooltipProvider>
+        <Toaster />
+        <Sonner duration={2000} />
+        <BrowserRouter>
+          <AppContent />
+        </BrowserRouter>
+      </TooltipProvider>
+    </BillingProvider>
   </QueryClientProvider>
 );
 
