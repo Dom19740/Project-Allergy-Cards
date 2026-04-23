@@ -80,7 +80,7 @@ const PremiumOnboarding = () => {
           {!isPremium && (
             <Button 
               onClick={purchasePremium}
-              className="w-full h-14 text-lg font-bold bg-red-600 hover:bg-red-700 text-white rounded-xl shadow-lg shadow-red-600/10 transition-all active:scale-[0.98] flex flex-col items-center justify-center"
+              className="w-full h-14 text-lg font-bold bg-amber-500 hover:bg-amber-600 text-white rounded-xl shadow-lg shadow-amber-500/20 transition-all active:scale-[0.98] flex flex-col items-center justify-center"
             >
               <span>Unlock Everything</span>
               <span className="text-[10px] font-medium opacity-80 uppercase tracking-wider">One-time payment of {price}</span>
