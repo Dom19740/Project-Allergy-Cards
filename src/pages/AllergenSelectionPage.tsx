@@ -131,7 +131,7 @@ const AllergenSelectionPage = () => {
                   <div className="w-10 h-10 rounded-lg flex items-center justify-center p-1.5 shrink-0 bg-white">
                     <img src={allergen.image} alt={allergen.name} className="w-full h-full object-contain" />
                   </div>
-                  <span className="text-[11px] font-bold leading-tight">{allergen.name}</span>
+                  <span className="text-[12px] font-bold leading-tight">{allergen.name}</span>
                 </div>
               );
             })}
@@ -161,7 +161,7 @@ const AllergenSelectionPage = () => {
                   <div className="w-10 h-10 rounded-lg flex items-center justify-center shrink-0 bg-white">
                     <Tag className={cn("w-5 h-5", isSelected ? "text-red-600" : "text-gray-500")} />
                   </div>
-                  <span className="text-[11px] font-bold leading-tight truncate w-full px-1">{allergen}</span>
+                  <span className="text-[12px] font-bold leading-tight truncate w-full px-1">{allergen}</span>
                 </div>
               );
             })}
