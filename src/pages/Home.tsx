@@ -9,6 +9,7 @@ import { storage, STORAGE_KEYS } from '@/lib/storage';
 import { SavedCard } from '@/lib/types';
 import { cn } from '@/lib/utils';
 import { useBilling } from '@/hooks/useBilling';
+import { toast } from 'sonner';
 
 const Home = () => {
   const navigate = useNavigate();
@@ -41,6 +42,13 @@ const Home = () => {
     } else {
       navigate('/onboarding');
     }
+  };
+
+  const handleDevReset = async () => {
+    await storage.remove('isPremium');
+    // Dispatch event to update useBilling hook state
+    window.dispatchEvent(new CustomEvent('premium-status-changed', { detail: false }));
+    toast.success("Premium status reset (Dev)");
   };
 
   return (
@@ -95,6 +103,15 @@ const Home = () => {
           >
             Get Started
           </Button>
+          
+          {/* Dev Reset Button - Remove before production */}
+          <button 
+            onClick={handleDevReset}
+            className="text-[10px] text-gray-400 hover:text-red-400 transition-colors"
+          >
+            Dev: Reset Premium
+          </button>
+
           <p className="text-[10px] text-gray-500 dark:text-gray-400 mb-0.5">
             © 2026 <a href="https://dpbcreative.com/" target="_blank" rel="noopener noreferrer" className="underline hover:text-gray-700 dark:hover:text-gray-200">dpb creative</a>. All rights reserved
           </p>
