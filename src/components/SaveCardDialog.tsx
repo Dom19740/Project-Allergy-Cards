@@ -13,6 +13,7 @@ import { storage, STORAGE_KEYS } from '@/lib/storage';
 import { Check, Crown } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useBilling } from '@/hooks/useBilling';
+import { PREMIUM_LIMITS } from '@/lib/premium-config';
 
 interface SaveCardDialogProps {
   isOpen: boolean;
@@ -101,9 +102,9 @@ const SaveCardDialog: React.FC<SaveCardDialogProps> = ({
         updatedCards = savedCards.map(card => card.id === selectedCardId ? newCard : card);
         toast.success(`Card "${cardName}" updated successfully!`);
       } else {
-        // Check limit for premium users (3 cards)
-        if (savedCards.length >= 3) {
-          toast.error("You can save up to 3 cards. Please overwrite an existing card.");
+        // Check limit for premium users
+        if (savedCards.length >= PREMIUM_LIMITS.MAX_SAVED_CARDS) {
+          toast.error(`You can save up to ${PREMIUM_LIMITS.MAX_SAVED_CARDS} cards. Please overwrite an existing card.`);
           return;
         }
         updatedCards = [...savedCards, newCard];
