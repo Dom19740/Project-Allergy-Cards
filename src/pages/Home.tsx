@@ -58,7 +58,15 @@ const Home = () => {
             </h1>
             
             <p className="text-base md:text-lg text-gray-600 dark:text-gray-400 mb-6 max-w-xl leading-relaxed">
-              Create personalized allergy alert cards in over 100 languages.
+              Create personalized allergy alert cards in over 100 languages to communicate your dietary restrictions easily and safely.
+
+Save a translated emergency card alert card to communicate your need for medical attention.
+            </p>
+
+              <p className="text-base md:text-lg text-gray-600 dark:text-gray-400 mb-6 max-w-xl leading-relaxed">
+
+
+            Save a translated emergency card alert card to communicate your need for medical attention.
             </p>
 
             <img 
