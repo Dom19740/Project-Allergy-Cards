@@ -51,11 +51,11 @@ const Home = () => {
           {/* Logo Area */}
           <div
             className={cn(
-              "w-full flex items-center justify-center min-h-0 p-1 transition-all duration-500 ease-in-out",
+              "w-full flex-1 flex items-center justify-center min-h-0 p-1 transition-all duration-500 ease-in-out",
               hasCards && isPremium ? "flex-[0.3]" : "flex-[0.4]"
             )}
           >
-            <div className="flex flex-col items-center">
+            <div className="flex-1 flex flex-col items-center justify-center">
               <h1 className="text-2xl md:text-4xl font-black text-gray-900 mb-3 tracking-tight">
                 Travel Safely. <span className="text-brand-red">Eat with Confidence.</span>
               </h1>

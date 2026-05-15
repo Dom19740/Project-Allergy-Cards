@@ -109,7 +109,7 @@ const SavedCardsList = () => {
       <div className="w-full overflow-hidden cursor-grab active:cursor-grabbing" ref={emblaRef}>
         <div className="flex">
           {allCards.map((card) => (
-            <div key={card.id} className="flex-[0_0_100%] min-w-0 flex justify-center px-4">
+            <div key={card.id} className="flex-1 min-w-0 flex justify-center px-4">
               <Card 
                 onClick={() => handleLoad(card)} 
                 className={cn(
