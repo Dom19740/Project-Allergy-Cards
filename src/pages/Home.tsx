@@ -57,14 +57,9 @@ const Home = () => {
               <h1 className="text-2xl md:text-4xl font-black text-gray-900 mb-3 tracking-tight">
                 Travel Safely. <span className="text-brand-red">Eat with Confidence.</span>
               </h1>
-              
-              <p className="text-base md:text-lg text-gray-600 mb-4 max-w-xl leading-relaxed">
-                Create personalized allergy alert cards in over 100 languages.
-              </p>
             </div>
             <img 
-              src="/logo_main.png" 
-              alt="App Logo" 
+              src="/logo_main.png"               alt="App Logo" 
               className={cn(
                 "max-h-full w-auto h-auto object-contain transition-all duration-500", 
                 hasCards && isPremium ? "max-w-[180px] md:max-w-[240px]" : "max-w-[240px] md:max-w-[300px]"
