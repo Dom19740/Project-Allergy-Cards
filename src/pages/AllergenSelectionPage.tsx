@@ -1,44 +1,29 @@
-// wait, I need to write the full file content correctly below.
-}
-export default AllergenSelectionPage;
-
-I'll add now the full file content correctly below!
-
-I know:
-
-<dyad-write path<dyad-problem-report summary="2 problems">
-<problem file="src/pages/AllergenSelectionPage.tsx" line="2" column="1" code="1128">Declaration or statement expected.</problem>
-<problem file="src/pages/AllergenSelectionPage.tsx" line="3" column="16" code="2304">Cannot find name 'AllergenSelectionPage'.</problem>
-</dyad-problem-report><think>
-</think>I need to fix the file structure. The issue is that the file has broken syntax and the component isn't properly defined.
-
-<dyad-write path="src/pages/AllergenSelectionPage.tsx" description="Fix TypeScript errors by properly defining the AllergenSelectionPage component">
 "use client";
 
-import React, { useState, useEffect, useRef } from "react";
-import { useNavigate } from "react-router-dom";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { toast } from "sonner";
-import { X, ChevronLeft, ChevronRight, Utensils, Crown, Plus } from "lucide-react";
-import { ALLERGEN_OPTION } from "@/lib/allergens";
-import FixedHeader from "@/components/FixedHeader";
-import StepHeader from "@/components/StepHeader";
-import { storage, STORAGE_KEYS } from "@/lib/storage";
-import { cn } from "@/lib/utils";
-import { useBilling } from "@/hooks/useBilling";
+import React, { useState, useEffect, useRef } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { toast } from 'sonner';
+import { X, ChevronLeft, ChevronRight, Utensils, Crown } from 'lucide-react';
+import { ALLERGEN_OPTIONS } from '@/lib/allergens';
+import FixedHeader from '@/components/FixedHeader';
+import StepHeader from '@/components/StepHeader';
+import { storage, STORAGE_KEYS } from '@/lib/storage';
+import { cn } from '@/lib/utils';
+import { useBilling } from '@/hooks/useBilling';
 
 const AllergenSelectionPage = () => {
   const navigate = useNavigate();
   const { isPremium } = useBilling();
   const [selectedAllergens, setSelectedAllergens] = useState<string[]>([]);
-  const [customAllerginInput, setCustomAllerginInput] = useState("");
+  const [customAllergenInput, setCustomAllergenInput] = useState<string>('');
   const [customList, setCustomList] = useState<string[]>([]);
   const bottomRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     const loadData = async () => {
-      const storedData = await storage.get<any>(STORAGE_KEYS.SELECTED_SELECTED_ALLERGEN);
+      const storedData = await storage.get<any>(STORAGE_KEYS.SELECTED_ALLERGENS);
       if (storedData) {
         let ids: string[] = [];
         if (Array.isArray(storedData)) {
@@ -46,12 +31,16 @@ const AllergenSelectionPage = () => {
         } else if (storedData.ids) {
           ids = storedData.ids;
         } else if (storedData.standard) {
-          ids = [...(storedData.standard || []), ...(storedData.custom || []), ...(storedData.ids || [])];
+          ids = [...(storedData.standard || []), ...(storedData.custom || [])];
         }
         setSelectedAllergens(ids);
         
         if (storedData.persistentCustomList) {
           setCustomList(storedData.persistentCustomList);
+        } else {
+          const standardIds = ALLERGEN_OPTIONS.map(opt => opt.id);
+          const custom = ids.filter(id => !standardIds.includes(id));
+          setCustomList(custom);
         }
       }
     };
@@ -64,36 +53,62 @@ const AllergenSelectionPage = () => {
     );
   };
 
+  const scrollToBottom = () => {
+    bottomRef.current?.scrollIntoView({ behavior: 'smooth' });
+  };
+
   const handleAddCustomAllergen = () => {
-    if (!customAllerginInput.trim()) return;
-    
     if (!isPremium) {
-      toast.error("Custom allergens are a premium feature. Please upgrade to unlock!");
+      toast.error("Custom allergens are a premium feature.");
+      return;
+    }
+
+    const trimmedInput = customAllergenInput.trim();
+    if (!trimmedInput) {
+      toast.error("Custom allergen cannot be empty.");
+      return;
+    }
+    if (customList.includes(trimmedInput) || ALLERGEN_OPTIONS.some(opt => opt.name.toLowerCase() === trimmedInput.toLowerCase())) {
+      toast.warning("This allergen is already in the list.");
       return;
     }
     
-    if (!customList.includes(customAllerginInput.trim())) {
-      const newList = [...customList, customAllerginInput.trim()];
-      setCustomList(newList);
-      setCustomAllerginInput("");
-    }
+    setCustomList(prev => [...prev, trimmedInput]);
+    setSelectedAllergens(prev => [...prev, trimmedInput]);
+    setCustomAllergenInput('');
+    toast.success(`"${trimmedInput}" added.`);
+    
+    // Small timeout to allow the DOM to update before scrolling
+    setTimeout(scrollToBottom, 100);
   };
 
   const removeCustomAllergen = (e: React.MouseEvent, allergen: string) => {
     e.stopPropagation();
-    const newList = customList.filter(item => item !== allergen);
-    setCustomList(newList);
+    setCustomList(prev => prev.filter(item => item !== allergen));
+    setSelectedAllergens(prev => prev.filter(item => item !== allergen));
+    toast.info(`"${allergen}" removed.`);
   };
 
   const handleContinue = async () => {
     if (selectedAllergens.length === 0) {
-      toast.error("Please select at least one allergen");
+      toast.error("Please select at least one allergen.");
       return;
     }
     
-    await storage.set(STORAGE_KEYS.SELECTED_SELECTED_ALLERGEN, selectedAllergens);
-    await storage.set(STORAGE_KEYS.PERSISTENT_CUSTOM_ALLERGENS, customList);
-    navigate("/select-alert");
+    const standardIds = ALLERGEN_OPTIONS.map(opt => opt.id);
+    const standard = selectedAllergens.filter(id => standardIds.includes(id));
+    const custom = selectedAllergens.filter(id => !standardIds.includes(id));
+    
+    await storage.remove(STORAGE_KEYS.SESSION_TRANSLATIONS);
+    
+    await storage.set(STORAGE_KEYS.SELECTED_ALLERGENS, {
+      standard,
+      custom,
+      ids: selectedAllergens,
+      persistentCustomList: customList
+    });
+    
+    navigate('/select-alert');
   };
 
   return (
@@ -103,12 +118,12 @@ const AllergenSelectionPage = () => {
       <div className="flex flex-col flex-grow w-full max-w-2xl mx-auto px-4 pt-[calc(80px+env(safe-area-inset-top)+10px)]">
         <div className="flex-grow pt-2">
           <StepHeader 
-            title="Select Your Allergens"
-            description="Choose the allergens that affect you. We'll create cards for each one."
+            title="Select Allergens"
+            description="Tap the allergens you want to include on your card."
           />
-
+          
           <div className="grid grid-cols-3 gap-2 w-full pt-4">
-            {ALLERGEN_OPTION.map((allergen) => {
+            {ALLERGEN_OPTIONS.map((allergen) => {
               const isSelected = selectedAllergens.includes(allergen.id);
               return (
                 <div 
@@ -118,30 +133,46 @@ const AllergenSelectionPage = () => {
                     "flex flex-col items-center justify-center space-y-1 py-1 px-1 rounded-xl shadow-sm cursor-pointer transition-all duration-200 border-2 text-center",
                     isSelected 
                       ? "bg-red-600 border-red-600 text-white" 
-                      : "bg-white dark:bg-gray-800 border-gray-200 dark:border-gray-700"
+                      : "bg-white dark:bg-gray-800 border-transparent text-gray-700 dark:text-gray-300 hover:border-red-200 dark:hover:border-red-900/30"
                   )}
                 >
-                  <div className="w-9 h-9 rounded-lg flex items-center justify-center p-1.5 shrink-0 bg-white">
+                  <div className="w-10 h-10 rounded-lg flex items-center justify-center p-1.5 shrink-0 bg-white">
                     <img src={allergen.image} alt={allergen.name} className="w-full h-full object-contain" />
                   </div>
-                  <span className="text-[13px] font-bold leading-tight">{allergen.name}</span>
+                  <span className="text-[14px] font-bold leading-tight">{allergen.name}</span>
                 </div>
               );
             })}
 
-            {customList.map((allergen) => (
-              <div 
-                key={allergen} 
-                onClick={(e) => removeCustomAllergen(e, allergen)}
-                className="flex flex-col items-center justify-center space-y-1 py-1 px-1 rounded-xl shadow-sm cursor-pointer bg-white dark:bg-gray-800 border-2 border-gray-200 dark:border-gray-700"
-              >
-                <div className="w-9 h-9 rounded-lg flex items-center justify-center p-1.5 shrink-0 bg-white">
-                  <Utensils className="w-5 h-5" />
-                  <X className="w-5 h-5" />
+            {customList.map((allergen) => {
+              const isSelected = selectedAllergens.includes(allergen);
+              return (
+                <div 
+                  key={allergen} 
+                  onClick={() => toggleAllergen(allergen)}
+                  className={cn(
+                    "flex flex-col items-center justify-center space-y-1 py-1 px-1 rounded-xl shadow-sm cursor-pointer transition-all duration-200 border-2 relative group text-center",
+                    isSelected 
+                      ? "bg-red-600 border-red-600 text-white" 
+                      : "bg-white dark:bg-gray-800 border-transparent text-gray-700 dark:text-gray-300 hover:border-red-200 dark:hover:border-red-900/30"
+                  )}
+                >
+                  <button 
+                    onClick={(e) => removeCustomAllergen(e, allergen)}
+                    className={cn(
+                      "absolute top-1 right-1 p-0.5 rounded-full hover:bg-black/10 transition-colors",
+                      isSelected ? "text-white" : "text-gray-400"
+                    )}
+                  >
+                    <X className="w-3.5 h-3.5" />
+                  </button>
+                  <div className="w-10 h-10 rounded-lg flex items-center justify-center shrink-0 bg-white">
+                    <Utensils className={cn("w-5 h-5", isSelected ? "text-red-600" : "text-gray-500")} />
+                  </div>
+                  <span className="text-[14px] font-bold leading-tight truncate w-full px-1">{allergen}</span>
                 </div>
-                <span className="text-[13px] font-bold leading-tight">{allergen}</span>
-              </div>
-            ))}
+              );
+            })}
           </div>
 
           <div className="w-full pt-8 px-2">
@@ -149,24 +180,24 @@ const AllergenSelectionPage = () => {
               <Input
                 type="text"
                 placeholder="Add custom allergens"
-                value={customAllerginInput}
-                onChange={(e) => setCustomAllerginInput(e.target.value)}
+                value={customAllergenInput}
+                onChange={(e) => setCustomAllergenInput(e.target.value)}
                 disabled={!isPremium}
-                className="flex-1 h-12 rounded-xl border-gray-200 focus:ring-red-500 focus:border-gray-200"
+                className="flex-grow bg-white dark:bg-gray-800 border-gray-200 dark:border-gray-700 rounded-xl h-10 px-4 text-sm"
+                onKeyPress={(e) => e.key === 'Enter' && handleAddCustomAllergen()}
               />
-              <Button
-                onClick={handleAddCustomAllergen}
-                disabled={!isPremium || !customAllerginInput.trim()}
-                className="w-32 h-12 bg-red-600 hover:bg-red-700 text-white rounded-xl"
+              <Button 
+                onClick={handleAddCustomAllergen} 
+                disabled={!isPremium}
+                className="h-10 px-4 bg-blue-600 text-white hover:bg-blue-700 rounded-xl text-sm"
               >
-                <Plus className="w-5 h-5" />
+                {isPremium ? "Add" : <Crown className="h-4 w-4" />}
               </Button>
             </div>
-            
             {!isPremium && (
               <button 
                 onClick={() => navigate('/premium-onboarding')}
-                className="mt-2 w-full flex items-center justify-center gap-2 text-amber-600 font-bold text-sm hover:underline"
+                className="mt-6 w-full flex items-center justify-center gap-2 text-amber-600 font-bold text-sm hover:underline"
               >
                 <Crown className="h-4 w-4" />
                 Unlock custom allergens
@@ -174,8 +205,8 @@ const AllergenSelectionPage = () => {
             )}
           </div>
         </div>
-        
-        <div ref={bottomRef} className="w-full flex justify-between items-center mt-auto mb-[50px] gap-4 shrink-0">
+
+        <div ref={bottomRef} className="w-full flex justify-between items-center mt-auto mb-[50px] pt-8 gap-4 shrink-0">
           <Button
             variant="ghost"
             onClick={() => navigate(-1)}
