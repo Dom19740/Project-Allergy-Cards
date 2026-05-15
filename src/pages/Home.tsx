@@ -57,9 +57,14 @@ const Home = () => {
               Travel Safely. <span className="text-red-600">Eat with Confidence.</span>
             </h1>
             
-            <p className="text-base md:text-lg text-gray-600 dark:text-gray-400 mb-6 max-w-xl leading-relaxed">
-              Create personalized allergy alert cards in over 100 languages.
-            </p>
+            <div className="text-base md:text-lg text-gray-600 dark:text-gray-400 mb-6 max-w-xl leading-relaxed space-y-2">
+              <p>
+                Create personalized allergy alerts in over 100 languages to communicate your dietary restrictions easily and safely.
+              </p>
+              <p>
+                Save a translated emergency card alert card to communicate your need for medical attention.
+              </p>
+            </div>
 
             <img 
               src="/logo_main.png" 
