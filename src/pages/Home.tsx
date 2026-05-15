@@ -53,6 +53,15 @@ const Home = () => {
             "w-full flex items-center justify-center min-h-0 p-1 transition-all duration-500 ease-in-out", 
             hasCards && isPremium ? "flex-[0.3]" : "flex-[0.4]"
           )}>
+            <div className="flex flex-col items-center">
+              <h1 className="text-2xl md:text-4xl font-black text-gray-900 mb-3 tracking-tight">
+                Travel Safely. <span className="text-brand-red">Eat with Confidence.</span>
+              </h1>
+              
+              <p className="text-base md:text-lg text-gray-600 mb-4 max-w-xl leading-relaxed">
+                Create personalized allergy alert cards in over 100 languages.
+              </p>
+            </div>
             <img 
               src="/logo_main.png" 
               alt="App Logo" 
@@ -68,15 +77,6 @@ const Home = () => {
             "flex flex-col w-full py-1 min-h-0 transition-all duration-500", 
             hasCards && isPremium ? "flex-[0.7] justify-start" : "flex-[0.6] justify-center"
           )}>
-            <div className="space-y-6 mb-4">
-              <p className="text-gray-700 dark:text-gray-300 max-w-md mx-auto px-6 leading-tight text-base md:text-lg">
-                Create a personalized allergy alert in multiple languages to communicate your dietary restrictions easily and safely.
-              </p>
-              <p className="text-gray-700 dark:text-gray-300 max-w-md mx-auto px-6 leading-tight text-base md:text-lg">
-                Save a translated emergency card alert card to communicate your need for medical attention.
-              </p>
-            </div>
-            
             <div className="w-full space-y-4">
               {hasCards && isPremium && (
                 <div className="w-full animate-in fade-in slide-in-from-bottom-4 duration-700">
