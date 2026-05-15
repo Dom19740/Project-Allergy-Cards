@@ -6,7 +6,6 @@ import {
   DialogContent,
   DialogHeader,
   DialogTitle,
-  DialogFooter,
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -74,21 +73,21 @@ const PromoCodeDialog: React.FC<PromoCodeDialogProps> = ({ isOpen, onClose, onSu
           />
         </div>
         
-        <DialogFooter className="flex flex-col gap-2 sm:flex-row sm:justify-end mt-2">
+        <div className="w-full flex justify-between items-center mt-2 gap-4 shrink-0">
           <Button 
             variant="outline" 
             onClick={onClose}
-            className="w-full sm:w-auto h-12 rounded-xl border-gray-200 text-gray-600 hover:bg-gray-50"
+            className="w-full h-12 rounded-xl border-gray-200 text-gray-600 hover:bg-gray-50"
           >
             Cancel
           </Button>
           <Button 
             onClick={handleRedeem}
-            className="w-full sm:w-auto bg-zinc-900 hover:bg-zinc-800 text-white rounded-xl h-12 font-bold"
+            className="w-full bg-zinc-900 hover:bg-zinc-800 text-white rounded-xl h-12 font-bold"
           >
             Redeem Code
           </Button>
-        </DialogFooter>
+        </div>
       </DialogContent>
     </Dialog>
   );
