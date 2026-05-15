@@ -18,7 +18,7 @@ const LanguageSelectionPage = () => {
   const navigate = useNavigate();
   const isOnline = useNetworkStatus();
   const { isPremium } = useBilling();
-  const [selectedLanguageCode, setSelectedLanguageCode] = useState<string>("es-ES");
+  const [selectedLanguageCode, setSelectedLanguageCode] = useState<string>("en");
   const [supportedLanguages, setSupportedLanguages] = useState<SupportedLanguage[]>([]);
   const [isLoadingLangs, setIsLoadingLangs] = useState(true);
 
