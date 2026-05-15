@@ -56,14 +56,16 @@ const Home = () => {
               <span className="text-red-600">Eat with Confidence.</span>
             </h1>
             
-            <div className="text-base md:text-lg text-gray-600 dark:text-gray-400 max-w-xl mx-auto leading-relaxed space-y-3">
-              <p>
-                Create personalized allergy alerts in over 100 languages to communicate your dietary restrictions easily and safely.
-              </p>
-              <p className="font-medium text-gray-500 dark:text-gray-500">
-                Save a translated emergency card to communicate your need for medical attention.
-              </p>
-            </div>
+            {!(hasCards && isPremium) && (
+              <div className="text-base md:text-lg text-gray-600 dark:text-gray-400 max-w-xl mx-auto leading-relaxed space-y-3">
+                <p>
+                  Create personalized allergy alerts in over 100 languages to communicate your dietary restrictions easily and safely.
+                </p>
+                <p className="font-medium text-gray-500 dark:text-gray-500">
+                  Save a translated emergency card to communicate your need for medical attention.
+                </p>
+              </div>
+            )}
           </div>
 
           {/* Middle Section: Logo */}
