@@ -22,7 +22,7 @@ const OnboardingStep: React.FC<OnboardingStepProps> = ({ title, description, ima
             <img 
               src={image} 
               alt={title}
-              className="w-full h-full object-contain rounded-xl shadow-md"
+              className="w-full h-full object-contain rounded-3xl shadow-md"
             />
           </div>
         </div>
