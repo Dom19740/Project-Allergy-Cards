@@ -35,27 +35,39 @@ const LoadingFallback = () => (
 );
 
 const AppContent = () => {
-  console.log('AppContent rendering - Platform:', Capacitor.getPlatform());
+  console.log('--- APP STARTUP ---');
+  console.log('Platform:', Capacitor.getPlatform());
+  
   usePreloadImages();
   useDeepLinks();
 
   useEffect(() => {
+    // Heartbeat log to verify Logcat is working
+    const interval = setInterval(() => {
+      console.log('Heartbeat - App is alive:', new Date().toLocaleTimeString());
+    }, 3000);
+
     // Initialize billing system
     initBilling();
 
     // Initialize Firebase if on native platform
     if (Capacitor.isNativePlatform()) {
       const initFirebase = async () => {
+        console.log('Firebase: Starting initialization...');
         try {
           await FirebaseAnalytics.setEnabled({ enabled: true });
+          console.log('Firebase: Analytics enabled');
+          
           await FirebaseCrashlytics.setEnabled({ enabled: true });
+          console.log('Firebase: Crashlytics enabled');
+          
           await FirebaseAnalytics.logEvent({
             name: 'app_open_debug',
             params: { platform: 'android', debug_mode: 'true' }
           });
-          console.log('Firebase Analytics & Crashlytics initialized and test event logged');
+          console.log('Firebase: Test event logged successfully');
         } catch (error) {
-          console.error('Error initializing Firebase:', error);
+          console.error('Firebase: Initialization error:', error);
         }
       };
       initFirebase();
@@ -81,10 +93,12 @@ const AppContent = () => {
       }
 
       await storage.set(STORAGE_KEYS.HAS_MIGRATED, 'true');
-      console.log('Migration to Preferences completed');
+      console.log('Migration: LocalStorage to Preferences completed');
     };
 
     migrate();
+
+    return () => clearInterval(interval);
   }, []);
   
   return (
