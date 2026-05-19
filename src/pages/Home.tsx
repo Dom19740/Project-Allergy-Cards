@@ -9,6 +9,8 @@ import { storage, STORAGE_KEYS } from '@/lib/storage';
 import { SavedCard } from '@/lib/types';
 import { cn } from '@/lib/utils';
 import { useBilling } from '@/hooks/useBilling';
+import { FirebaseAnalytics } from '@capacitor-firebase/analytics';
+import { Capacitor } from '@capacitor/core';
 
 const Home = () => {
   const navigate = useNavigate();
@@ -35,6 +37,10 @@ const Home = () => {
   }, []);
 
   const handleGetStarted = async () => {
+    if (Capacitor.isNativePlatform()) {
+      FirebaseAnalytics.logEvent({ name: 'get_started_click' });
+    }
+
     const hasSeenOnboarding = await storage.get<any>(STORAGE_KEYS.HAS_SEEN_ONBOARDING);
     if (hasSeenOnboarding === 'true' || hasSeenOnboarding === true) {
       navigate('/select-allergens');

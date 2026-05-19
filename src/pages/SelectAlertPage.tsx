@@ -9,6 +9,8 @@ import FixedHeader from '@/components/FixedHeader';
 import StepHeader from '@/components/StepHeader';
 import { storage, STORAGE_KEYS } from '@/lib/storage';
 import { useBilling } from '@/hooks/useBilling';
+import { FirebaseAnalytics } from '@capacitor-firebase/analytics';
+import { Capacitor } from '@capacitor/core';
 
 const SelectAlertPage = () => {
   const navigate = useNavigate();
@@ -22,7 +24,6 @@ const SelectAlertPage = () => {
     const loadMessages = async () => {
       const savedAlert = await storage.get<any>(STORAGE_KEYS.CUSTOM_MESSAGES);
       if (savedAlert) {
-        // Explicitly check for undefined/null to allow empty strings to be loaded
         if (savedAlert.iAmAllergicTo !== undefined && savedAlert.iAmAllergicTo !== null) {
           setIAmAllergicTo(savedAlert.iAmAllergicTo);
         }
@@ -35,6 +36,16 @@ const SelectAlertPage = () => {
   }, []);
 
   const handleContinue = async () => {
+    if (Capacitor.isNativePlatform()) {
+      FirebaseAnalytics.logEvent({
+        name: 'custom_alerts_confirmed',
+        params: {
+          primary_text: iAmAllergicTo.substring(0, 100),
+          secondary_text: theyMakeMeSick.substring(0, 100)
+        }
+      });
+    }
+
     await storage.remove(STORAGE_KEYS.SESSION_TRANSLATIONS);
     
     await storage.set(

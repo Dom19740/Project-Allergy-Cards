@@ -18,6 +18,8 @@ import { storage, STORAGE_KEYS } from '@/lib/storage';
 import { useNetworkStatus } from '@/hooks/useNetworkStatus';
 import { useBilling } from '@/hooks/useBilling';
 import { TextToSpeech } from '@capacitor-community/text-to-speech';
+import { FirebaseAnalytics } from '@capacitor-firebase/analytics';
+import { Capacitor } from '@capacitor/core';
 
 interface AllergyCardProps {
   languageCode: LanguageCode;
@@ -215,6 +217,13 @@ const AllergyCard: React.FC<AllergyCardProps> = ({ languageCode, selectedAllerge
 
   const handleDownload = async () => {
     if (cardRef.current) {
+      if (Capacitor.isNativePlatform()) {
+        FirebaseAnalytics.logEvent({
+          name: 'download_card_click',
+          params: { language: languageCode }
+        });
+      }
+
       setIsDownloading(true);
       const success = await downloadCard(cardRef.current, `allergy-card-${languageCode}.png`);
       if (success) toast.success("Allergy card saved to your device!");
@@ -225,6 +234,13 @@ const AllergyCard: React.FC<AllergyCardProps> = ({ languageCode, selectedAllerge
 
   const handleShare = async () => {
     if (cardRef.current) {
+      if (Capacitor.isNativePlatform()) {
+        FirebaseAnalytics.logEvent({
+          name: 'share_card_click',
+          params: { language: languageCode }
+        });
+      }
+
       setIsSharing(true);
       const shortCode = languageCode.split('-')[0].toUpperCase();
       const shareText = `My Allergy Alert Card (${shortCode}) made with Simple Allergy Alert`;

@@ -13,6 +13,8 @@ import { useNetworkStatus } from "@/hooks/useNetworkStatus";
 import { useBilling } from "@/hooks/useBilling";
 import { FREE_LANGUAGES } from "@/lib/premium-config";
 import { toast } from "sonner";
+import { FirebaseAnalytics } from '@capacitor-firebase/analytics';
+import { Capacitor } from '@capacitor/core';
 
 const LanguageSelectionPage = () => {
   const navigate = useNavigate();
@@ -85,6 +87,12 @@ const LanguageSelectionPage = () => {
 
   const handleContinue = () => {
     if (selectedLanguageCode) {
+      if (Capacitor.isNativePlatform()) {
+        FirebaseAnalytics.logEvent({
+          name: 'language_confirmed',
+          params: { language_code: selectedLanguageCode }
+        });
+      }
       navigate(`/alert/${selectedLanguageCode}`);
     }
   };

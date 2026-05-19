@@ -14,6 +14,8 @@ import { Check, Crown } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useBilling } from '@/hooks/useBilling';
 import { PREMIUM_LIMITS } from '@/lib/premium-config';
+import { FirebaseAnalytics } from '@capacitor-firebase/analytics';
+import { Capacitor } from '@capacitor/core';
 
 interface SaveCardDialogProps {
   isOpen: boolean;
@@ -102,7 +104,6 @@ const SaveCardDialog: React.FC<SaveCardDialogProps> = ({
         updatedCards = savedCards.map(card => card.id === selectedCardId ? newCard : card);
         toast.success(`Card "${cardName}" updated successfully!`);
       } else {
-        // Check limit for premium users
         if (savedCards.length >= PREMIUM_LIMITS.MAX_SAVED_CARDS) {
           toast.error(`You can save up to ${PREMIUM_LIMITS.MAX_SAVED_CARDS} cards. Please overwrite an existing card.`);
           return;
@@ -114,6 +115,17 @@ const SaveCardDialog: React.FC<SaveCardDialogProps> = ({
       await storage.set(STORAGE_KEYS.SAVED_CARDS, updatedCards);
     }
     
+    if (Capacitor.isNativePlatform()) {
+      FirebaseAnalytics.logEvent({
+        name: 'save_card_success',
+        params: {
+          is_emergency: isEmergency,
+          language: languageCode,
+          card_name: cardName.trim()
+        }
+      });
+    }
+
     handleClose();
   };
 

@@ -12,6 +12,8 @@ import StepHeader from '@/components/StepHeader';
 import { storage, STORAGE_KEYS } from '@/lib/storage';
 import { cn } from '@/lib/utils';
 import { useBilling } from '@/hooks/useBilling';
+import { FirebaseAnalytics } from '@capacitor-firebase/analytics';
+import { Capacitor } from '@capacitor/core';
 
 const AllergenSelectionPage = () => {
   const navigate = useNavigate();
@@ -78,7 +80,13 @@ const AllergenSelectionPage = () => {
     setCustomAllergenInput('');
     toast.success(`"${trimmedInput}" added.`);
     
-    // Small timeout to allow the DOM to update before scrolling
+    if (Capacitor.isNativePlatform()) {
+      FirebaseAnalytics.logEvent({
+        name: 'custom_allergen_added',
+        params: { allergen_name: trimmedInput }
+      });
+    }
+
     setTimeout(scrollToBottom, 100);
   };
 
@@ -99,6 +107,17 @@ const AllergenSelectionPage = () => {
     const standard = selectedAllergens.filter(id => standardIds.includes(id));
     const custom = selectedAllergens.filter(id => !standardIds.includes(id));
     
+    if (Capacitor.isNativePlatform()) {
+      FirebaseAnalytics.logEvent({
+        name: 'allergens_confirmed',
+        params: {
+          standard_allergens: standard.join(','),
+          custom_count: custom.length,
+          total_count: selectedAllergens.length
+        }
+      });
+    }
+
     await storage.remove(STORAGE_KEYS.SESSION_TRANSLATIONS);
     
     await storage.set(STORAGE_KEYS.SELECTED_ALLERGENS, {
