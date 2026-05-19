@@ -26,7 +26,7 @@ const FullscreenImageOverlay: React.FC<FullscreenImageOverlayProps> = ({
     >
       <button 
         onClick={onClose}
-        className="absolute top-4 right-4 z-[110] p-2 bg-gray-100 rounded-full text-gray-600 hover:bg-gray-200 transition-colors"
+        className="absolute top-[calc(1rem+env(safe-area-inset-top))] right-4 z-[110] p-2 bg-gray-100 rounded-full text-gray-600 hover:bg-gray-200 transition-colors"
       >
         <X size={24} />
       </button>
