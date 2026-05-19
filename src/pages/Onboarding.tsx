@@ -1,13 +1,13 @@
 "use client";
 
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useCallback, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import useEmblaCarousel from 'embla-carousel-react';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import { storage, STORAGE_KEYS } from '@/lib/storage';
 import FixedHeader from '@/components/FixedHeader';
 import OnboardingStep from '@/components/OnboardingStep';
-import { storage, STORAGE_KEYS } from '@/lib/storage';
 
 const ONBOARDING_STEPS = [
   {
@@ -43,14 +43,9 @@ const ONBOARDING_STEPS = [
 ];
 
 const Onboarding = () => {
-  const navigate = useNavigate();
   const [currentStep, setCurrentStep] = useState(0);
-  
-  const [emblaRef, emblaApi] = useEmblaCarousel({ 
-    loop: false,
-    dragFree: false,
-    containScroll: 'trimSnaps'
-  });
+  const navigate = useNavigate();
+  const [emblaRef, emblaApi] = useEmblaCarousel({ loop: false });
 
   const onSelect = useCallback(() => {
     if (!emblaApi) return;
@@ -64,24 +59,18 @@ const Onboarding = () => {
     emblaApi.on('reInit', onSelect);
   }, [emblaApi, onSelect]);
 
-  const finishOnboarding = async () => {
-    await storage.set(STORAGE_KEYS.HAS_SEEN_ONBOARDING, 'true');
-    navigate('/premium-onboarding');
-  };
-
-  const handleNext = () => {
+  const handleNext = async () => {
     if (currentStep < ONBOARDING_STEPS.length - 1) {
       emblaApi?.scrollNext();
     } else {
-      finishOnboarding();
+      await storage.set(STORAGE_KEYS.HAS_SEEN_ONBOARDING, true);
+      navigate('/premium-onboarding');
     }
   };
 
   const handleBack = () => {
     if (currentStep > 0) {
       emblaApi?.scrollPrev();
-    } else {
-      finishOnboarding();
     }
   };
 
@@ -122,17 +111,17 @@ const Onboarding = () => {
             <Button
               variant="ghost"
               onClick={handleBack}
-              className="flex items-center text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-100"
+              className={currentStep === 0 ? "invisible" : "flex-1 py-6 rounded-2xl border-2"}
             >
-              <ChevronLeft className="w-5 h-5 mr-1" />
-              {currentStep === 0 ? "Skip" : "Back"}
+              <ChevronLeft className="mr-2 h-5 w-5" />
+              Back
             </Button>
 
             <Button
               onClick={handleNext}
               className="py-3 px-8 text-lg h-auto bg-red-600 text-white hover:bg-red-700 rounded-xl shadow-lg transition-transform active:scale-95 flex items-center"
             >
-              Next
+              {currentStep === ONBOARDING_STEPS.length - 1 ? 'Get Started' : 'Next'}
               <ChevronRight className="w-5 h-5 ml-1" />
             </Button>
           </div>

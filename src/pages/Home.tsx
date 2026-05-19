@@ -5,6 +5,7 @@ import { useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import FixedHeader from '@/components/FixedHeader';
 import SavedCardsList from '@/components/SavedCardsList';
+import PremiumUnlock from '@/components/PremiumUnlock';
 import { storage, STORAGE_KEYS } from '@/lib/storage';
 import { SavedCard } from '@/lib/types';
 import { cn } from '@/lib/utils';
@@ -95,6 +96,12 @@ const Home = () => {
         </div>
 
         <div className="flex-shrink-0 w-full flex flex-col justify-center items-center py-6 gap-4 mt-auto">
+          {isPremium && (
+            <div className="w-full px-4">
+              <PremiumUnlock />
+            </div>
+          )}
+          
           <Button 
             onClick={handleGetStarted}
             className="py-4 text-xl md:text-2xl h-auto transition-all duration-200 ease-in-out hover:scale-105 bg-red-600 text-white hover:bg-red-700 w-full max-w-[300px] shadow-xl rounded-2xl font-bold"

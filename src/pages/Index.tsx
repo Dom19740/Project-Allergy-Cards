@@ -31,7 +31,7 @@ const Index = () => {
       title: "Choose Languages",
       description: "Select the languages for your destination. We support over 100 languages.",
       icon: Languages,
-      action: () => navigate('/select-languages'),
+      action: () => navigate('/select-language'),
       buttonText: "Select Languages"
     },
     {
@@ -45,7 +45,7 @@ const Index = () => {
       title: "Share & Save",
       description: "Share your cards with travel companions or save them for offline use.",
       icon: Share2,
-      action: () => navigate('/my-cards'),
+      action: () => navigate('/'),
       buttonText: "View My Cards"
     }
   ];
