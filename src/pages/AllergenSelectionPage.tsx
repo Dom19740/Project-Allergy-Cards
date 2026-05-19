@@ -116,13 +116,13 @@ const AllergenSelectionPage = () => {
       <FixedHeader />
       
       <div className="flex flex-col flex-grow w-full max-w-2xl mx-auto px-4 pt-[calc(80px+env(safe-area-inset-top)+10px)]">
-        <div className="flex-grow pt-2">
+        <div className="flex-grow pt-1">
           <StepHeader 
             title="Select Allergens"
             description="Tap the allergens you want to include on your card."
           />
           
-          <div className="grid grid-cols-3 gap-2 w-full pt-4">
+          <div className="grid grid-cols-3 gap-1.5 w-full pt-2">
             {ALLERGEN_OPTIONS.map((allergen) => {
               const isSelected = selectedAllergens.includes(allergen.id);
               return (
@@ -130,16 +130,16 @@ const AllergenSelectionPage = () => {
                   key={allergen.id} 
                   onClick={() => toggleAllergen(allergen.id)}
                   className={cn(
-                    "flex flex-col items-center justify-center space-y-1 py-1 px-1 rounded-xl shadow-sm cursor-pointer transition-all duration-200 border-2 text-center",
+                    "flex flex-col items-center justify-center space-y-0.5 py-1 px-1 rounded-xl shadow-sm cursor-pointer transition-all duration-200 border-2 text-center",
                     isSelected 
                       ? "bg-red-600 border-red-600 text-white" 
                       : "bg-white dark:bg-gray-800 border-transparent text-gray-700 dark:text-gray-300 hover:border-red-200 dark:hover:border-red-900/30"
                   )}
                 >
-                  <div className="w-10 h-10 rounded-lg flex items-center justify-center p-1.5 shrink-0 bg-white">
+                  <div className="w-8 h-8 rounded-lg flex items-center justify-center p-1 shrink-0 bg-white">
                     <img src={allergen.image} alt={allergen.name} className="w-full h-full object-contain" />
                   </div>
-                  <span className="text-[14px] font-bold leading-tight">{allergen.name}</span>
+                  <span className="text-[12px] font-bold leading-tight">{allergen.name}</span>
                 </div>
               );
             })}
@@ -151,7 +151,7 @@ const AllergenSelectionPage = () => {
                   key={allergen} 
                   onClick={() => toggleAllergen(allergen)}
                   className={cn(
-                    "flex flex-col items-center justify-center space-y-1 py-1 px-1 rounded-xl shadow-sm cursor-pointer transition-all duration-200 border-2 relative group text-center",
+                    "flex flex-col items-center justify-center space-y-0.5 py-1 px-1 rounded-xl shadow-sm cursor-pointer transition-all duration-200 border-2 relative group text-center",
                     isSelected 
                       ? "bg-red-600 border-red-600 text-white" 
                       : "bg-white dark:bg-gray-800 border-transparent text-gray-700 dark:text-gray-300 hover:border-red-200 dark:hover:border-red-900/30"
@@ -160,22 +160,22 @@ const AllergenSelectionPage = () => {
                   <button 
                     onClick={(e) => removeCustomAllergen(e, allergen)}
                     className={cn(
-                      "absolute top-1 right-1 p-0.5 rounded-full hover:bg-black/10 transition-colors",
+                      "absolute top-0.5 right-0.5 p-0.5 rounded-full hover:bg-black/10 transition-colors",
                       isSelected ? "text-white" : "text-gray-400"
                     )}
                   >
-                    <X className="w-3.5 h-3.5" />
+                    <X className="w-3 h-3" />
                   </button>
-                  <div className="w-10 h-10 rounded-lg flex items-center justify-center shrink-0 bg-white">
-                    <Utensils className={cn("w-5 h-5", isSelected ? "text-red-600" : "text-gray-500")} />
+                  <div className="w-8 h-8 rounded-lg flex items-center justify-center shrink-0 bg-white">
+                    <Utensils className={cn("w-4 h-4", isSelected ? "text-red-600" : "text-gray-500")} />
                   </div>
-                  <span className="text-[14px] font-bold leading-tight truncate w-full px-1">{allergen}</span>
+                  <span className="text-[12px] font-bold leading-tight truncate w-full px-1">{allergen}</span>
                 </div>
               );
             })}
           </div>
 
-          <div className="w-full pt-8 px-2">
+          <div className="w-full pt-4 px-2">
             <div className="flex space-x-2">
               <Input
                 type="text"
@@ -183,13 +183,13 @@ const AllergenSelectionPage = () => {
                 value={customAllergenInput}
                 onChange={(e) => setCustomAllergenInput(e.target.value)}
                 disabled={!isPremium}
-                className="flex-grow bg-white dark:bg-gray-800 border-gray-200 dark:border-gray-700 rounded-xl h-10 px-4 text-sm"
+                className="flex-grow bg-white dark:bg-gray-800 border-gray-200 dark:border-gray-700 rounded-xl h-9 px-3 text-sm"
                 onKeyPress={(e) => e.key === 'Enter' && handleAddCustomAllergen()}
               />
               <Button 
                 onClick={handleAddCustomAllergen} 
                 disabled={!isPremium}
-                className="h-10 px-4 bg-blue-600 text-white hover:bg-blue-700 rounded-xl text-sm"
+                className="h-9 px-3 bg-blue-600 text-white hover:bg-blue-700 rounded-xl text-sm"
               >
                 {isPremium ? "Add" : <Crown className="h-4 w-4" />}
               </Button>
@@ -197,16 +197,16 @@ const AllergenSelectionPage = () => {
             {!isPremium && (
               <button 
                 onClick={() => navigate('/premium-onboarding')}
-                className="mt-6 w-full flex items-center justify-center gap-2 text-amber-600 font-bold text-sm hover:underline"
+                className="mt-3 w-full flex items-center justify-center gap-2 text-amber-600 font-bold text-xs hover:underline"
               >
-                <Crown className="h-4 w-4" />
+                <Crown className="h-3.5 w-3.5" />
                 Unlock custom allergens
               </button>
             )}
           </div>
         </div>
 
-        <div ref={bottomRef} className="w-full flex justify-between items-center mt-auto mb-[50px] pt-8 gap-4 shrink-0">
+        <div ref={bottomRef} className="w-full flex justify-between items-center mt-auto mb-[40px] pt-4 gap-4 shrink-0">
           <Button
             variant="ghost"
             onClick={() => navigate(-1)}
@@ -218,7 +218,7 @@ const AllergenSelectionPage = () => {
           <Button
             onClick={handleContinue}
             disabled={selectedAllergens.length === 0}
-            className="py-3 px-8 text-lg h-auto bg-red-600 text-white hover:bg-red-700 rounded-xl shadow-lg transition-transform active:scale-95 flex items-center"
+            className="py-2.5 px-6 text-base h-auto bg-red-600 text-white hover:bg-red-700 rounded-xl shadow-lg transition-transform active:scale-95 flex items-center"
           >
             Continue
             <ChevronRight className="w-5 h-5 ml-1" />
