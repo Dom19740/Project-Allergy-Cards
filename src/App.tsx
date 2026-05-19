@@ -35,6 +35,7 @@ const LoadingFallback = () => (
 );
 
 const AppContent = () => {
+  console.log('AppContent rendering - Platform:', Capacitor.getPlatform());
   usePreloadImages();
   useDeepLinks();
 
