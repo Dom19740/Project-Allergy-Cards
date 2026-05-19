@@ -10,6 +10,9 @@ import { storage, STORAGE_KEYS } from "./lib/storage";
 import { useDeepLinks } from "./hooks/useDeepLinks";
 import { initBilling } from "./lib/billing";
 import { BillingProvider } from "./hooks/useBilling";
+import { FirebaseCrashlytics } from '@capacitor-firebase/crashlytics';
+import { FirebaseAnalytics } from '@capacitor-firebase/analytics';
+import { Capacitor } from '@capacitor/core';
 
 // Lazy load pages
 const Home = lazy(() => import("./pages/Home"));
@@ -38,6 +41,20 @@ const AppContent = () => {
   useEffect(() => {
     // Initialize billing system
     initBilling();
+
+    // Initialize Firebase if on native platform
+    if (Capacitor.isNativePlatform()) {
+      const initFirebase = async () => {
+        try {
+          await FirebaseAnalytics.setEnabled({ enabled: true });
+          await FirebaseCrashlytics.setEnabled({ enabled: true });
+          console.log('Firebase Analytics & Crashlytics initialized');
+        } catch (error) {
+          console.error('Error initializing Firebase:', error);
+        }
+      };
+      initFirebase();
+    }
 
     const migrate = async () => {
       const hasMigrated = await storage.get(STORAGE_KEYS.HAS_MIGRATED);

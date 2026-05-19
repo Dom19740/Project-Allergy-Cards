@@ -9,6 +9,8 @@ import { storage, STORAGE_KEYS } from '@/lib/storage';
 import { SavedCard } from '@/lib/types';
 import { cn } from '@/lib/utils';
 import { useBilling } from '@/hooks/useBilling';
+import { FirebaseCrashlytics } from '@capacitor-firebase/crashlytics';
+import { Capacitor } from '@capacitor/core';
 
 const Home = () => {
   const navigate = useNavigate();
@@ -40,6 +42,18 @@ const Home = () => {
       navigate('/select-allergens');
     } else {
       navigate('/onboarding');
+    }
+  };
+
+  const triggerTestCrash = async () => {
+    if (Capacitor.isNativePlatform()) {
+      try {
+        await FirebaseCrashlytics.crash({ message: 'Test crash from React' });
+      } catch (error) {
+        console.error('Failed to trigger crash:', error);
+      }
+    } else {
+      alert('Crash only works on native platforms');
     }
   };
 
@@ -104,6 +118,14 @@ const Home = () => {
             <p className="text-[10px] text-gray-400 dark:text-gray-500 uppercase tracking-widest font-bold">
               © 2026 <a href="https://dpbcreative.com/" target="_blank" rel="noopener noreferrer" className="hover:text-red-600 transition-colors">dpb creative</a>
             </p>
+            {process.env.NODE_ENV === 'development' && (
+              <button
+                onClick={triggerTestCrash}
+                className="text-[8px] text-gray-300 dark:text-gray-700 hover:text-red-500 transition-colors mt-1"
+              >
+                Debug: Test Crash
+              </button>
+            )}
           </div>
         </div>
       </div>
