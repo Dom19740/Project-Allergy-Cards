@@ -9,6 +9,11 @@ interface OnboardingStepProps {
 }
 
 const OnboardingStep: React.FC<OnboardingStepProps> = ({ title, description, image }) => {
+  // Split the description to handle the specific warning text
+  const warningText = "If in doubt, do not eat.";
+  const parts = description.split(warningText);
+  const hasWarning = parts.length > 1;
+
   return (
     <div className="flex flex-col items-center text-center h-full max-h-full overflow-hidden">
       {image && (
@@ -21,9 +26,16 @@ const OnboardingStep: React.FC<OnboardingStepProps> = ({ title, description, ima
         </div>
       )}
       
-      <div className="shrink-0 px-4 pb-2">
-        <p className="text-gray-700 dark:text-gray-300 text-base md:text-lg leading-relaxed font-medium">
-          {description}
+      <div className="shrink-0 px-4 pb-4">
+        <p className="text-gray-700 dark:text-gray-300 text-base md:text-lg leading-relaxed">
+          {parts[0]}
+          {hasWarning && (
+            <>
+              <span className="block mt-2 text-red-600 font-bold">
+                {warningText}
+              </span>
+            </>
+          )}
         </p>
       </div>
     </div>
