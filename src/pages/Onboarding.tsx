@@ -14,31 +14,37 @@ const ONBOARDING_STEPS = [
     title: "Safety First",
     description: "This app provides translated allergy alerts for convenience. While we aim for accuracy, translations and emergency numbers may not always be correct. Always verify important information locally when possible. If in doubt, do not eat.",
     icon: Info,
+    image: "/images/screenshot_1.png"
   },
   {
     title: "Select Your Allergens",
     description: "Choose from our standard list or add your own custom allergens. Customise your allergy alert warnings.",
     icon: ShieldAlert,
+    image: "/images/screenshot_2.png"
   },
   {
     title: "Choose a Language",
     description: "Select from over 100 languages to translate your allergy alert instantly.",
     icon: Languages,
+    image: "/images/screenshot_3.png"
   },
   {
     title: "Share & Save",
     description: "Download your card as an image, share it with others, save up to 10 cards in the app for quick offline access later, or have the card text read out in translated audio.",
     icon: Share2,
+    image: "/images/screenshot_4.png"
   },
   {
     title: "Emergency Ready",
     description: "In urgent situations, use the Emergency Card to quickly communicate your need for medical attention.",
     icon: AlertTriangle,
+    image: "/images/screenshot_5.png"
   },
   {
     title: "Add a Widget",
     description: "Add our widget to your home screen for instant access to your saved cards and one-tap emergency alerts, even when offline.",
     icon: Smartphone,
+    image: "/images/screenshot_6.png"
   }
 ];
 
@@ -81,7 +87,6 @@ const Onboarding = () => {
     if (currentStep > 0) {
       emblaApi?.scrollPrev();
     } else {
-      // If they skip from the first page, we still mark onboarding as seen
       finishOnboarding();
     }
   };
@@ -91,22 +96,22 @@ const Onboarding = () => {
       <FixedHeader />
       
       <div className="flex flex-col flex-grow w-full max-w-2xl mx-auto px-4 pt-[calc(80px+env(safe-area-inset-top)+10px)] overflow-hidden">
-        {/* Carousel Viewport */}
-        <div className="flex-grow overflow-hidden pt-8 cursor-grab active:cursor-grabbing" ref={emblaRef}>
+        <div className="flex-grow overflow-hidden pt-4 cursor-grab active:cursor-grabbing" ref={emblaRef}>
           <div className="flex h-full">
             {ONBOARDING_STEPS.map((step, index) => (
-              <div key={index} className="flex-[0_0_100%] min-w-0 px-4">
+              <div key={index} className="flex-[0_0_100%] min-w-0 px-4 h-full">
                 <OnboardingStep 
                   title={step.title}
                   description={step.description}
                   icon={step.icon}
+                  image={step.image}
                 />
               </div>
             ))}
           </div>
         </div>
 
-        <div className="w-full flex flex-col items-center mt-auto mb-[calc(50px+env(safe-area-inset-bottom))] space-y-8 shrink-0">
+        <div className="w-full flex flex-col items-center mt-auto mb-[calc(20px+env(safe-area-inset-bottom))] space-y-6 shrink-0">
           <div className="flex space-x-2">
             {ONBOARDING_STEPS.map((_, index) => (
               <div 
@@ -120,7 +125,7 @@ const Onboarding = () => {
             ))}
           </div>
 
-          <div className="w-full flex justify-between items-center gap-4">
+          <div className="w-full flex justify-between items-center gap-4 pb-4">
             <Button
               variant="ghost"
               onClick={handleBack}

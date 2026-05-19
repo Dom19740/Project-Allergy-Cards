@@ -74,7 +74,7 @@ const Home = () => {
             hasCards && isPremium ? "flex-[0.4]" : "flex-[0.6]"
           )}>
             <img 
-              src="/logo_main.png" 
+              src="/images/logo_main.png" 
               alt="App Logo" 
               className={cn(
                 "max-h-full w-auto h-auto object-contain drop-shadow-xl", 
