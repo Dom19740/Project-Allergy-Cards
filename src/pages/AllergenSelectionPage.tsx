@@ -206,7 +206,7 @@ const AllergenSelectionPage = () => {
           </div>
         </div>
 
-        <div ref={bottomRef} className="w-full flex justify-between items-center mt-auto mb-[40px] pt-4 gap-4 shrink-0">
+        <div ref={bottomRef} className="w-full flex justify-between items-center mt-auto mb-[50px] pt-12 gap-4 shrink-0">
           <Button
             variant="ghost"
             onClick={() => navigate(-1)}
@@ -218,7 +218,7 @@ const AllergenSelectionPage = () => {
           <Button
             onClick={handleContinue}
             disabled={selectedAllergens.length === 0}
-            className="py-2.5 px-6 text-base h-auto bg-red-600 text-white hover:bg-red-700 rounded-xl shadow-lg transition-transform active:scale-95 flex items-center"
+            className="py-3 px-8 text-lg h-auto bg-red-600 text-white hover:bg-red-700 rounded-xl shadow-lg transition-transform active:scale-95 flex items-center"
           >
             Continue
             <ChevronRight className="w-5 h-5 ml-1" />
