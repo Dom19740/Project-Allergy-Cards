@@ -17,7 +17,7 @@ const ONBOARDING_STEPS = [
   },
   {
     title: "Select Your Allergens",
-    description: "Choose from our standard list or add your own custom allergens. Customise your allergy alert warnings.",
+    description: "Choose from our standard list or add your own custom allergens. Customise your allergy alert\u00A0warnings.",
     image: "/images/screenshot_2.png"
   },
   {
@@ -28,12 +28,12 @@ const ONBOARDING_STEPS = [
   {
     title: "Share & Save",
     description: "Download your card as an image, share it with others, save up to 10 cards in the app for quick offline access later, or have the card text read out in translated audio.",
-    image: "/images/screenshot_4_alternate.png"
+    image: "/images/screenshot_4.png"
   },
   {
     title: "Emergency Ready",
-    description: "In urgent situations, use the Emergency Card to quickly communicate your need for medical attention.",
-    image: "/images/screenshot_5_alternate.png"
+    description: "In urgent situations, use the Emergency Card to quickly communicate your need for medical\u00A0attention.",
+    image: "/images/screenshot_5.png"
   },
   {
     title: "Add a Widget",
