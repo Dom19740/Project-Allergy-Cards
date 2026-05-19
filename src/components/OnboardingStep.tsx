@@ -17,24 +17,24 @@ const OnboardingStep: React.FC<OnboardingStepProps> = ({ title, description, ima
   return (
     <div className="flex flex-col items-center text-center h-full max-h-full overflow-hidden">
       {image && (
-        <div className="flex-1 w-full min-h-0 flex items-center justify-center overflow-hidden mb-6">
-          <img 
-            src={image} 
-            alt={title}
-            className="max-w-full max-h-full object-contain rounded-xl shadow-md"
-          />
+        <div className="w-full flex-[0_0_70%] min-h-0 flex items-center justify-center overflow-hidden mb-6">
+          <div className="h-full aspect-[9/19] flex items-center justify-center">
+            <img 
+              src={image} 
+              alt={title}
+              className="w-full h-full object-contain rounded-xl shadow-md"
+            />
+          </div>
         </div>
       )}
       
-      <div className="shrink-0 px-4 pb-4">
+      <div className="flex-1 flex flex-col justify-start px-4 pb-4 overflow-hidden">
         <p className="text-gray-700 dark:text-gray-300 text-base md:text-lg leading-relaxed">
           {parts[0]}
           {hasWarning && (
-            <>
-              <span className="block mt-2 text-red-600 font-bold">
-                {warningText}
-              </span>
-            </>
+            <span className="block mt-2 text-red-600 font-bold">
+              {warningText}
+            </span>
           )}
         </p>
       </div>
