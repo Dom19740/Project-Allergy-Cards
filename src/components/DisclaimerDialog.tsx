@@ -1,6 +1,6 @@
 "use client";
 
-import React from 'react';
+import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import {
   Dialog,
@@ -10,7 +10,9 @@ import {
   DialogFooter,
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
-import { Info } from "lucide-react";
+import { Info, Bug } from "lucide-react";
+import { FirebaseCrashlytics } from '@capacitor-firebase/crashlytics';
+import { Capacitor } from '@capacitor/core';
 
 interface DisclaimerDialogProps {
   isOpen: boolean;
@@ -19,10 +21,24 @@ interface DisclaimerDialogProps {
 
 const DisclaimerDialog: React.FC<DisclaimerDialogProps> = ({ isOpen, onClose }) => {
   const navigate = useNavigate();
+  const [tapCount, setTapCount] = useState(0);
 
-  const handleSecretClick = () => {
-    onClose();
-    navigate('/premium-onboarding');
+  const handleIconClick = () => {
+    setTapCount(prev => prev + 1);
+    if (tapCount >= 5) {
+      // Secret navigation to premium if tapped many times
+      onClose();
+      navigate('/premium-onboarding');
+    }
+  };
+
+  const handleTestCrash = async () => {
+    if (Capacitor.isNativePlatform()) {
+      // This will crash the app immediately on a real device
+      await FirebaseCrashlytics.crash({ message: "Test Crash from Simple Allergy Alert" });
+    } else {
+      alert("Crash testing only works on a real Android/iOS device!");
+    }
   };
 
   return (
@@ -33,7 +49,7 @@ const DisclaimerDialog: React.FC<DisclaimerDialogProps> = ({ isOpen, onClose }) 
         <DialogHeader className="flex flex-col items-center text-center">
           <div 
             className="bg-red-50 dark:bg-red-900/20 p-3 rounded-full mb-2 cursor-default active:opacity-70 transition-opacity"
-            onClick={handleSecretClick}
+            onClick={handleIconClick}
           >
             <Info className="h-6 w-6 text-red-600" />
           </div>
@@ -49,6 +65,20 @@ const DisclaimerDialog: React.FC<DisclaimerDialogProps> = ({ isOpen, onClose }) 
               If in doubt, do not eat.
             </p>
           </div>
+
+          {/* Hidden Debug Section */}
+          {tapCount >= 3 && (
+            <div className="pt-4 border-t border-gray-100 mt-4 animate-in fade-in zoom-in duration-300">
+              <Button 
+                variant="outline" 
+                onClick={handleTestCrash}
+                className="w-full border-dashed border-red-300 text-red-400 text-xs flex items-center justify-center gap-2"
+              >
+                <Bug size={14} />
+                Force Test Crash (Native Only)
+              </Button>
+            </div>
+          )}
         </div>
         <DialogFooter>
           <Button 
