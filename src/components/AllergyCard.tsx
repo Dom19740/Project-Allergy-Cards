@@ -86,8 +86,8 @@ const AllergyCard: React.FC<AllergyCardProps> = ({ languageCode, selectedAllerge
     const savedAlert = await storage.get<CustomMessages>(STORAGE_KEYS.CUSTOM_MESSAGES);
     if (savedAlert) {
       setCustomMessages({
-        iAmAllergicTo: savedAlert.iAmAllergicTo || "I can not eat:",
-        theyMakeMeSick: savedAlert.theyMakeMeSick || "They make me very sick and I could die"
+        iAmAllergicTo: savedAlert.iAmAllergicTo !== undefined ? savedAlert.iAmAllergicTo : "I can not eat:",
+        theyMakeMeSick: savedAlert.theyMakeMeSick !== undefined ? savedAlert.theyMakeMeSick : "They make me very sick and I could die"
       });
     }
   };
@@ -152,11 +152,11 @@ const AllergyCard: React.FC<AllergyCardProps> = ({ languageCode, selectedAllerge
       try {
         const [alert, allergicTo, careful, thankYou, langName, theyMeSick, att, em, help, call, dial] = await Promise.all([
           translateText("ALLERGY ALERT!", languageCode),
-          translateText(customMessages.iAmAllergicTo, languageCode),
+          translateText(customMessages.iAmAllergicTo || " ", languageCode),
           translateText("Please be careful with my food.", languageCode),
           translateText("Thank you!", languageCode),
           translateText("English", languageCode),
-          translateText(customMessages.theyMakeMeSick, languageCode),
+          translateText(customMessages.theyMakeMeSick || " ", languageCode),
           translateText("ATTENTION", languageCode),
           translateText("I am having a severe allergic reaction.", languageCode),
           translateText("I need medical help immediately.", languageCode),
@@ -166,11 +166,11 @@ const AllergyCard: React.FC<AllergyCardProps> = ({ languageCode, selectedAllerge
 
         const uiText = {
           allergyAlert: alert,
-          iAmAllergicTo: allergicTo,
+          iAmAllergicTo: customMessages.iAmAllergicTo ? allergicTo : "",
           pleaseBeCareful: careful,
           thankYou: thankYou,
           languageName: langName,
-          theyMakeMeSick: theyMeSick
+          theyMakeMeSick: customMessages.theyMakeMeSick ? theyMeSick : ""
         };
         setTranslatedUIText(uiText);
 
@@ -253,7 +253,7 @@ const AllergyCard: React.FC<AllergyCardProps> = ({ languageCode, selectedAllerge
       ...translatedAllergenList,
       translatedUIText.theyMakeMeSick,
       translatedUIText.thankYou
-    ].join(". ");
+    ].filter(Boolean).join(". ");
 
     try {
       setIsSpeaking(true);
@@ -330,9 +330,13 @@ const AllergyCard: React.FC<AllergyCardProps> = ({ languageCode, selectedAllerge
         <h1 className="text-2xl sm:text-4xl md:text-5xl lg:text-6xl font-black leading-tight mb-4 sm:mb-8 md:mb-12 text-red-600 uppercase tracking-tighter whitespace-nowrap">
           {translatedUIText.allergyAlert}
         </h1>
-        <p className="text-2xl sm:text-3xl md:text-4xl font-normal text-gray-800 mb-4 sm:mb-8 md:mb-12">
-          {translatedUIText.iAmAllergicTo}
-        </p>
+        
+        {translatedUIText.iAmAllergicTo && (
+          <p className="text-2xl sm:text-3xl md:text-4xl font-normal text-gray-800 mb-4 sm:mb-8 md:mb-12">
+            {translatedUIText.iAmAllergicTo}
+          </p>
+        )}
+
         <div className="flex flex-wrap justify-center gap-1 sm:gap-2 mb-4 sm:mb-8 md:mb-12">
           {translatedAllergenList.map((allergen, index) => (
             <span key={index} className="bg-red-600 text-white px-3 py-1 sm:px-4 sm:py-2 rounded-full text-base sm:text-lg md:text-xl font-normal uppercase">
@@ -340,9 +344,13 @@ const AllergyCard: React.FC<AllergyCardProps> = ({ languageCode, selectedAllerge
             </span>
           ))}
         </div>
-        <p className="text-2xl sm:text-3xl md:text-4xl font-normal text-gray-800 mb-2 sm:mb-3 leading-tight max-w-2xl">
-          {translatedUIText.theyMakeMeSick}
-        </p>
+
+        {translatedUIText.theyMakeMeSick && (
+          <p className="text-2xl sm:text-3xl md:text-4xl font-normal text-gray-800 mb-2 sm:mb-3 leading-tight max-w-2xl">
+            {translatedUIText.theyMakeMeSick}
+          </p>
+        )}
+
         <p className="text-2xl sm:text-3xl md:text-4xl font-normal text-gray-600 italic mb-4 sm:mb-6">
           {translatedUIText.thankYou}
         </p>

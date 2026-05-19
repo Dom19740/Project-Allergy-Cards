@@ -22,9 +22,13 @@ const SelectAlertPage = () => {
     const loadMessages = async () => {
       const savedAlert = await storage.get<any>(STORAGE_KEYS.CUSTOM_MESSAGES);
       if (savedAlert) {
-        // We check for undefined/null but allow empty strings
-        if (savedAlert.iAmAllergicTo !== undefined) setIAmAllergicTo(savedAlert.iAmAllergicTo);
-        if (savedAlert.theyMakeMeSick !== undefined) setTheyMakeMeSick(savedAlert.theyMakeMeSick);
+        // Explicitly check for undefined/null to allow empty strings to be loaded
+        if (savedAlert.iAmAllergicTo !== undefined && savedAlert.iAmAllergicTo !== null) {
+          setIAmAllergicTo(savedAlert.iAmAllergicTo);
+        }
+        if (savedAlert.theyMakeMeSick !== undefined && savedAlert.theyMakeMeSick !== null) {
+          setTheyMakeMeSick(savedAlert.theyMakeMeSick);
+        }
       }
     };
     loadMessages();
