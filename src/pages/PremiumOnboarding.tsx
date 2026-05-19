@@ -110,14 +110,12 @@ const PremiumOnboarding = () => {
           )}
           
           <div className="flex flex-col items-center gap-2">
-            {!isPremium && (
-              <button 
-                onClick={() => setIsPromoOpen(true)}
-                className="text-[10px] font-bold text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 uppercase tracking-widest transition-colors py-0.5"
-              >
-                Redeem Promo Code
-              </button>
-            )}
+            <button 
+              onClick={() => setIsPromoOpen(true)}
+              className="text-[10px] font-bold text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 uppercase tracking-widest transition-colors py-0.5"
+            >
+              Redeem Promo Code
+            </button>
             
             <Button 
               onClick={handleContinue}
