@@ -26,15 +26,14 @@ const OnboardingStep: React.FC<OnboardingStepProps> = ({ title, description, ima
         </div>
       )}
       
-      <div className="shrink-0 px-4 pb-4">
+      {/* Fixed minimum height container to keep image position constant across steps */}
+      <div className="shrink-0 px-4 pb-4 min-h-[120px] flex flex-col justify-start">
         <p className="text-gray-700 dark:text-gray-300 text-base md:text-lg leading-relaxed">
           {parts[0]}
           {hasWarning && (
-            <>
-              <span className="block mt-2 text-red-600 font-bold">
-                {warningText}
-              </span>
-            </>
+            <span className="block mt-2 text-red-600 font-bold">
+              {warningText}
+            </span>
           )}
         </p>
       </div>
