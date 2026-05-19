@@ -117,12 +117,11 @@ const PremiumOnboarding = () => {
           </button>
           
           <Button 
-            variant="ghost"
             onClick={handleContinue}
-            className="w-full h-12 text-gray-400 hover:text-gray-600 dark:text-gray-500 font-medium text-sm"
+            className="w-full h-12 bg-red-600 hover:bg-red-700 text-white font-bold rounded-xl shadow-lg transition-all active:scale-[0.98] flex items-center justify-center"
           >
             {isPremium ? "Continue to App" : "Maybe Later"}
-            <ChevronRight className="ml-1 h-3 w-3" />
+            <ChevronRight className="ml-1 h-4 w-4" />
           </Button>
         </div>
       </div>
