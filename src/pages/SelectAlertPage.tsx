@@ -13,7 +13,7 @@ import { useBilling } from '@/hooks/useBilling';
 const SelectAlertPage = () => {
   const navigate = useNavigate();
   const { isPremium } = useBilling();
-  const [iAmAllergicTo, setIAmAllergicTo] = useState("Please, I can not eat:");
+  const [iAmAllergicTo, setIAmAllergicTo] = useState("I can not eat:");
   const [theyMakeMeSick, setTheyMakeMeSick] = useState(
     "It will make me seriously ill and I can die",
   );
@@ -22,8 +22,9 @@ const SelectAlertPage = () => {
     const loadMessages = async () => {
       const savedAlert = await storage.get<any>(STORAGE_KEYS.CUSTOM_MESSAGES);
       if (savedAlert) {
-        if (savedAlert.iAmAllergicTo) setIAmAllergicTo(savedAlert.iAmAllergicTo);
-        if (savedAlert.theyMakeMeSick) setTheyMakeMeSick(savedAlert.theyMakeMeSick);
+        // We check for undefined/null but allow empty strings
+        if (savedAlert.iAmAllergicTo !== undefined) setIAmAllergicTo(savedAlert.iAmAllergicTo);
+        if (savedAlert.theyMakeMeSick !== undefined) setTheyMakeMeSick(savedAlert.theyMakeMeSick);
       }
     };
     loadMessages();
@@ -69,7 +70,7 @@ const SelectAlertPage = () => {
                   value={iAmAllergicTo}
                   onChange={(e) => setIAmAllergicTo(e.target.value)}
                   disabled={!isPremium}
-                  placeholder="e.g. Please, I can not eat:"
+                  placeholder="e.g. I can not eat:"
                   className="w-[calc(100%-20px)] mx-[10px] px-4 py-3 text-base sm:text-lg bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-700 rounded-lg shadow-sm text-gray-800 dark:text-gray-200 min-h-[80px] resize-y disabled:opacity-70"
                 />
               </div>
