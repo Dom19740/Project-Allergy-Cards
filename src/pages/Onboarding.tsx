@@ -27,7 +27,7 @@ const ONBOARDING_STEPS = [
   },
   {
     title: "Share & Save",
-    description: "Download your card as an image, share it with others, save up to 10 cards in the app for quick offline access later, or have the card text read out in translated audio.",
+    description: "Save up to 10 cards in the app for quick offline access. Download your card as an image, share it with others, .",
     image: "/images/screenshot_4_alternate.png"
   },
   {
