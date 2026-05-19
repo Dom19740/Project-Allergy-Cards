@@ -16,6 +16,7 @@ const Home = () => {
   const navigate = useNavigate();
   const { isPremium } = useBilling();
   const [hasCards, setHasCards] = useState(false);
+  const isNative = Capacitor.isNativePlatform();
 
   const checkCards = async () => {
     const cards = await storage.get<SavedCard[]>(STORAGE_KEYS.SAVED_CARDS);
@@ -46,8 +47,9 @@ const Home = () => {
   };
 
   const triggerTestCrash = async () => {
-    if (Capacitor.isNativePlatform()) {
+    if (isNative) {
       try {
+        console.log('CRASH TEST: Triggering native crash now...');
         await FirebaseCrashlytics.crash({ message: 'Test crash from React' });
       } catch (error) {
         console.error('Failed to trigger crash:', error);
@@ -63,7 +65,6 @@ const Home = () => {
       <div className="flex flex-col flex-1 w-full max-w-2xl mx-auto px-6 pt-[calc(100px+env(safe-area-inset-top))] pb-[env(safe-area-inset-bottom)] min-h-0">
         <div className="flex-1 flex flex-col items-center justify-between text-center min-h-0 py-4">
           
-          {/* Top Section: Headline and Description */}
           <div className="w-full space-y-4 animate-in fade-in slide-in-from-top-4 duration-700">
             <h1 className="text-3xl md:text-4xl font-black text-gray-900 dark:text-white tracking-tight leading-tight">
               Travel Safely. <br />
@@ -82,7 +83,6 @@ const Home = () => {
             )}
           </div>
 
-          {/* Middle Section: Logo */}
           <div className={cn(
             "w-full flex items-center justify-center transition-all duration-700 ease-in-out my-6",
             hasCards && isPremium ? "flex-[0.4]" : "flex-[0.6]"
@@ -97,7 +97,6 @@ const Home = () => {
             />
           </div>
 
-          {/* Bottom Section: Saved Cards (if any) */}
           {hasCards && isPremium && (
             <div className="w-full flex-1 min-h-0 animate-in fade-in slide-in-from-bottom-4 duration-700">
               <SavedCardsList />
@@ -105,7 +104,6 @@ const Home = () => {
           )}
         </div>
 
-        {/* Footer Action Area */}
         <div className="flex-shrink-0 w-full flex flex-col justify-center items-center py-6 gap-4 mt-auto">
           <Button 
             onClick={handleGetStarted}
@@ -118,10 +116,10 @@ const Home = () => {
             <p className="text-[10px] text-gray-400 dark:text-gray-500 uppercase tracking-widest font-bold">
               © 2026 <a href="https://dpbcreative.com/" target="_blank" rel="noopener noreferrer" className="hover:text-red-600 transition-colors">dpb creative</a>
             </p>
-            {process.env.NODE_ENV === 'development' && (
+            {isNative && (
               <button
                 onClick={triggerTestCrash}
-                className="text-[8px] text-gray-300 dark:text-gray-700 hover:text-red-500 transition-colors mt-1"
+                className="text-[10px] text-gray-400 dark:text-gray-600 hover:text-red-500 transition-colors mt-2 font-bold underline"
               >
                 Debug: Test Crash
               </button>
