@@ -63,7 +63,7 @@ const PremiumOnboarding = () => {
     <div className="flex flex-col min-h-screen bg-gray-50 dark:bg-gray-900">
       <FixedHeader />
       
-      <div className="flex flex-col flex-grow w-full max-w-md mx-auto px-6 pt-[calc(80px+env(safe-area-inset-top)+10px)] pb-6">
+      <div className="flex flex-col flex-grow w-full max-w-md mx-auto px-6 pt-[calc(80px+env(safe-area-inset-top)+10px)]">
         <div className="flex-grow flex flex-col items-center text-center space-y-4">
           <div className="space-y-1">
             <div className="flex items-center justify-center gap-2">
@@ -99,7 +99,7 @@ const PremiumOnboarding = () => {
           </div>
         </div>
 
-        <div className="w-full flex flex-col gap-2 mt-4">
+        <div className="w-full flex flex-col gap-3 mt-auto mb-[50px]">
           {!isPremium && (
             <Button 
               onClick={purchasePremium}
@@ -109,20 +109,24 @@ const PremiumOnboarding = () => {
             </Button>
           )}
           
-          <button 
-            onClick={() => setIsPromoOpen(true)}
-            className="text-[10px] font-bold text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 uppercase tracking-widest transition-colors py-0.5"
-          >
-            Redeem Promo Code
-          </button>
-          
-          <Button 
-            onClick={handleContinue}
-            className="w-full h-11 bg-red-600 hover:bg-red-700 text-white font-bold rounded-xl shadow-lg transition-all active:scale-[0.98] flex items-center justify-center"
-          >
-            {isPremium ? "Continue to App" : "Maybe Later"}
-            <ChevronRight className="ml-1 h-4 w-4" />
-          </Button>
+          <div className="flex flex-col items-center gap-2">
+            {!isPremium && (
+              <button 
+                onClick={() => setIsPromoOpen(true)}
+                className="text-[10px] font-bold text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 uppercase tracking-widest transition-colors py-0.5"
+              >
+                Redeem Promo Code
+              </button>
+            )}
+            
+            <Button 
+              onClick={handleContinue}
+              className="w-full py-3 px-8 text-lg h-auto bg-red-600 hover:bg-red-700 text-white font-bold rounded-xl shadow-lg transition-all active:scale-[0.98] flex items-center justify-center"
+            >
+              {isPremium ? "Continue to App" : "Maybe Later"}
+              <ChevronRight className="ml-1 h-5 w-5" />
+            </Button>
+          </div>
         </div>
       </div>
 
