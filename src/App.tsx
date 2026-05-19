@@ -48,7 +48,11 @@ const AppContent = () => {
         try {
           await FirebaseAnalytics.setEnabled({ enabled: true });
           await FirebaseCrashlytics.setEnabled({ enabled: true });
-          console.log('Firebase Analytics & Crashlytics initialized');
+          await FirebaseAnalytics.logEvent({
+            name: 'app_open_debug',
+            params: { platform: 'android', debug_mode: 'true' }
+          });
+          console.log('Firebase Analytics & Crashlytics initialized and test event logged');
         } catch (error) {
           console.error('Error initializing Firebase:', error);
         }
