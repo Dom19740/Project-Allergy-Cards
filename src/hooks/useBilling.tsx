@@ -1,8 +1,9 @@
 "use client";
 
 import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
-import { isPremiumUser, purchasePremium, restorePurchases, PREMIUM_PRODUCT_ID } from '@/lib/billing';
+import { isPremiumUser, purchasePremium, restorePurchases, PREMIUM_PRODUCT_ID, LEMON_SQUEEZY_CHECKOUT_URL } from '@/lib/billing';
 import { toast } from 'sonner';
+import { Capacitor } from '@capacitor/core';
 
 interface BillingContextType {
   isPremium: boolean;
@@ -55,6 +56,11 @@ export const BillingProvider = ({ children }: { children: ReactNode }): React.Re
   }, []);
 
   const handlePurchase = async () => {
+    if (Capacitor.getPlatform() === 'web') {
+      window.location.href = LEMON_SQUEEZY_CHECKOUT_URL;
+      return;
+    }
+
     try {
       await purchasePremium();
     } catch (error) {
@@ -64,6 +70,11 @@ export const BillingProvider = ({ children }: { children: ReactNode }): React.Re
   };
 
   const handleRestore = async () => {
+    if (Capacitor.getPlatform() === 'web') {
+      // Handled via the email restore dialog in the UI
+      return;
+    }
+
     try {
       await restorePurchases();
       toast.success("Checking for previous purchases...");

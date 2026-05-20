@@ -25,6 +25,7 @@ const EmergencyPage = lazy(() => import("./pages/EmergencyPage"));
 const PageTemplate = lazy(() => import("./pages/PageTemplate"));
 const Onboarding = lazy(() => import("./pages/Onboarding"));
 const PremiumOnboarding = lazy(() => import("./pages/PremiumOnboarding"));
+const PremiumSuccess = lazy(() => import("./pages/PremiumSuccess"));
 
 const queryClient = new QueryClient();
 
@@ -92,6 +93,7 @@ const AppContent = () => {
         <Route path="/" element={<Home />} />
         <Route path="/onboarding" element={<Onboarding />} />
         <Route path="/premium-onboarding" element={<PremiumOnboarding />} />
+        <Route path="/premium-success" element={<PremiumSuccess />} />
         <Route path="/select-allergens" element={<AllergenSelectionPage />} />
         <Route path="/select-alert" element={<SelectAlertPage />} />
         <Route path="/select-language" element={<LanguageSelectionPage />} />

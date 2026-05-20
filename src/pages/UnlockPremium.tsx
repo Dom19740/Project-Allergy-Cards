@@ -1,14 +1,45 @@
 "use client";
 
-import React from 'react';
+import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
-import { Crown, CheckCircle2, ArrowLeft, RefreshCw, Globe, Shield, Zap } from 'lucide-react';
+import { Crown, CheckCircle2, ArrowLeft, RefreshCw, Globe, Shield, Zap, Loader2 } from 'lucide-react';
 import { useBilling } from '@/hooks/useBilling';
+import { Capacitor } from '@capacitor/core';
+import { Preferences } from '@capacitor/preferences';
+import { toast } from 'sonner';
 
 const UnlockPremium = () => {
   const navigate = useNavigate();
   const { isPremium, purchasePremium, restorePurchases } = useBilling();
+  const [isRestoreOpen, setIsRestoreOpen] = useState(false);
+  const [restoreEmail, setRestoreEmail] = useState('');
+  const [isRestoring, setIsRestoring] = useState(false);
+
+  const handleEmailRestore = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!restoreEmail) return;
+    
+    setIsRestoring(true);
+    try {
+      const response = await fetch(`/api/restore-by-email?email=${encodeURIComponent(restoreEmail)}`);
+      const data = await response.json();
+      
+      if (data.success) {
+        localStorage.setItem('isPremium', 'true');
+        await Preferences.set({ key: 'isPremium', value: 'true' });
+        window.dispatchEvent(new CustomEvent('premium-status-changed', { detail: true }));
+        toast.success("Premium restored successfully!");
+        setIsRestoreOpen(false);
+      } else {
+        toast.error("No active premium purchase found for this email.");
+      }
+    } catch (error) {
+      toast.error("Failed to restore purchase. Please try again.");
+    } finally {
+      setIsRestoring(false);
+    }
+  };
 
   const features = [
     {
@@ -86,7 +117,7 @@ const UnlockPremium = () => {
         </div>
 
         <div className="w-full max-w-xs mt-auto space-y-4">
-          <Button 
+          <Button
             onClick={purchasePremium}
             className="w-full bg-amber-600 hover:bg-amber-700 text-white rounded-2xl py-7 text-xl font-black shadow-xl shadow-amber-200 dark:shadow-none transition-transform active:scale-95 flex items-center justify-center gap-3"
           >
@@ -94,15 +125,65 @@ const UnlockPremium = () => {
             Unlock Now
           </Button>
           
-          <button 
-            onClick={restorePurchases}
-            className="w-full text-sm text-gray-500 dark:text-gray-400 hover:underline flex items-center justify-center gap-2 py-2"
-          >
-            <RefreshCw className="h-4 w-4" />
-            Restore Purchases
-          </button>
+          {Capacitor.getPlatform() === 'web' ? (
+            <button
+              onClick={() => setIsRestoreOpen(true)}
+              className="w-full text-sm text-gray-500 dark:text-gray-400 hover:underline flex items-center justify-center gap-2 py-2"
+            >
+              <RefreshCw className="h-4 w-4" />
+              Restore Web Purchase
+            </button>
+          ) : (
+            <button
+              onClick={restorePurchases}
+              className="w-full text-sm text-gray-500 dark:text-gray-400 hover:underline flex items-center justify-center gap-2 py-2"
+            >
+              <RefreshCw className="h-4 w-4" />
+              Restore Purchases
+            </button>
+          )}
         </div>
       </div>
+
+      {isRestoreOpen && (
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center p-4 z-50">
+          <div className="bg-white dark:bg-gray-800 rounded-2xl p-6 max-w-sm w-full space-y-4 shadow-xl">
+            <h3 className="text-lg font-bold text-gray-900 dark:text-white">Restore Purchase</h3>
+            <p className="text-xs text-gray-500 dark:text-gray-400">
+              Enter the email address you used during checkout to restore your premium status.
+            </p>
+            <form onSubmit={handleEmailRestore} className="space-y-3">
+              <input
+                type="email"
+                placeholder="your@email.com"
+                value={restoreEmail}
+                onChange={(e) => setRestoreEmail(e.target.value)}
+                className="w-full p-3 border border-gray-200 dark:border-gray-700 rounded-xl bg-transparent text-sm text-gray-900 dark:text-white"
+                required
+                disabled={isRestoring}
+              />
+              <div className="flex gap-2">
+                <Button
+                  type="button"
+                  variant="outline"
+                  onClick={() => setIsRestoreOpen(false)}
+                  className="flex-1"
+                  disabled={isRestoring}
+                >
+                  Cancel
+                </Button>
+                <Button
+                  type="submit"
+                  className="flex-1 bg-amber-500 hover:bg-amber-600 text-white"
+                  disabled={isRestoring}
+                >
+                  {isRestoring ? <Loader2 className="h-4 w-4 animate-spin mx-auto" /> : "Restore"}
+                </Button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
     </div>
   );
 };

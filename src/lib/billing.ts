@@ -1,12 +1,22 @@
 "use client";
 
+import { Capacitor } from '@capacitor/core';
+
 export const PREMIUM_PRODUCT_ID = 'premium_unlock';
 export const PRODUCT_ID = PREMIUM_PRODUCT_ID;
+
+// Replace this with your actual Lemon Squeezy checkout link
+export const LEMON_SQUEEZY_CHECKOUT_URL = 'https://simpleallergyalert.lemonsqueezy.com/buy/your-product-id';
 
 /**
  * Initializes the billing store and registers the premium product.
  */
 export const initBilling = () => {
+  if (Capacitor.getPlatform() !== 'android') {
+    // Skip Google Play initialization on Web/iOS
+    return;
+  }
+
   if (typeof window !== 'undefined' && (window as any).CdvPurchase) {
     const { store, ProductType, Platform } = (window as any).CdvPurchase;
     
@@ -66,7 +76,11 @@ export const restorePurchases = async () => {
  * Fetches the localized price for the premium product.
  */
 export function getPremiumPrice(): string {
-  const FALLBACK = 'Loading...';
+  const FALLBACK = '€3.99';
+
+  if (Capacitor.getPlatform() !== 'android') {
+    return FALLBACK;
+  }
 
   if (typeof window === 'undefined' || !(window as any).CdvPurchase) {
     return FALLBACK;

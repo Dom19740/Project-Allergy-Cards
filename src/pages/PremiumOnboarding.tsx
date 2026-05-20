@@ -3,17 +3,48 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
-import { Crown, Check, ChevronRight, Languages, ShieldAlert, MessageSquare, Save, Smartphone } from 'lucide-react';
+import { Crown, Check, ChevronRight, Languages, ShieldAlert, MessageSquare, Save, Smartphone, Loader2 } from 'lucide-react';
 import { useBilling } from '@/hooks/useBilling';
 import FixedHeader from '@/components/FixedHeader';
 import PromoCodeDialog from '@/components/PromoCodeDialog';
 import { getPremiumPrice } from '@/lib/billing';
+import { Capacitor } from '@capacitor/core';
+import { Preferences } from '@capacitor/preferences';
+import { toast } from 'sonner';
 
 const PremiumOnboarding = () => {
   const navigate = useNavigate();
   const { purchasePremium, isPremium } = useBilling();
   const [isPromoOpen, setIsPromoOpen] = useState(false);
   const [price, setPrice] = useState('Loading...');
+  const [isRestoreOpen, setIsRestoreOpen] = useState(false);
+  const [restoreEmail, setRestoreEmail] = useState('');
+  const [isRestoring, setIsRestoring] = useState(false);
+
+  const handleEmailRestore = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!restoreEmail) return;
+    
+    setIsRestoring(true);
+    try {
+      const response = await fetch(`/api/restore-by-email?email=${encodeURIComponent(restoreEmail)}`);
+      const data = await response.json();
+      
+      if (data.success) {
+        localStorage.setItem('isPremium', 'true');
+        await Preferences.set({ key: 'isPremium', value: 'true' });
+        window.dispatchEvent(new CustomEvent('premium-status-changed', { detail: true }));
+        toast.success("Premium restored successfully!");
+        setIsRestoreOpen(false);
+      } else {
+        toast.error("No active premium purchase found for this email.");
+      }
+    } catch (error) {
+      toast.error("Failed to restore purchase. Please try again.");
+    } finally {
+      setIsRestoring(false);
+    }
+  };
 
   useEffect(() => {
     // Poll until the store has loaded the product
@@ -110,14 +141,23 @@ const PremiumOnboarding = () => {
           )}
           
           <div className="flex flex-col items-center gap-2">
-            <button 
+            <button
               onClick={() => setIsPromoOpen(true)}
               className="text-[10px] font-bold text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 uppercase tracking-widest transition-colors py-0.5"
             >
               Redeem Promo Code
             </button>
+
+            {Capacitor.getPlatform() === 'web' && !isPremium && (
+              <button
+                onClick={() => setIsRestoreOpen(true)}
+                className="text-[10px] font-bold text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 uppercase tracking-widest transition-colors py-0.5"
+              >
+                Restore Web Purchase
+              </button>
+            )}
             
-            <Button 
+            <Button
               onClick={handleContinue}
               className="w-full py-3 px-8 text-lg h-auto bg-red-600 hover:bg-red-700 text-white font-bold rounded-xl shadow-lg transition-all active:scale-[0.98] flex items-center justify-center"
             >
@@ -128,13 +168,53 @@ const PremiumOnboarding = () => {
         </div>
       </div>
 
-      <PromoCodeDialog 
-        isOpen={isPromoOpen} 
+      <PromoCodeDialog
+        isOpen={isPromoOpen}
         onClose={() => setIsPromoOpen(false)}
         onSuccess={() => {
           // Success logic is handled inside the dialog
         }}
       />
+
+      {isRestoreOpen && (
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center p-4 z-50">
+          <div className="bg-white dark:bg-gray-800 rounded-2xl p-6 max-w-sm w-full space-y-4 shadow-xl">
+            <h3 className="text-lg font-bold text-gray-900 dark:text-white">Restore Purchase</h3>
+            <p className="text-xs text-gray-500 dark:text-gray-400">
+              Enter the email address you used during checkout to restore your premium status.
+            </p>
+            <form onSubmit={handleEmailRestore} className="space-y-3">
+              <input
+                type="email"
+                placeholder="your@email.com"
+                value={restoreEmail}
+                onChange={(e) => setRestoreEmail(e.target.value)}
+                className="w-full p-3 border border-gray-200 dark:border-gray-700 rounded-xl bg-transparent text-sm text-gray-900 dark:text-white"
+                required
+                disabled={isRestoring}
+              />
+              <div className="flex gap-2">
+                <Button
+                  type="button"
+                  variant="outline"
+                  onClick={() => setIsRestoreOpen(false)}
+                  className="flex-1"
+                  disabled={isRestoring}
+                >
+                  Cancel
+                </Button>
+                <Button
+                  type="submit"
+                  className="flex-1 bg-amber-500 hover:bg-amber-600 text-white"
+                  disabled={isRestoring}
+                >
+                  {isRestoring ? <Loader2 className="h-4 w-4 animate-spin mx-auto" /> : "Restore"}
+                </Button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
     </div>
   );
 };
