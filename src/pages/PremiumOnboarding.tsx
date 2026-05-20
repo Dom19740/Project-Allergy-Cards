@@ -3,7 +3,8 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
-import { Crown, Check, ChevronRight, Languages, ShieldAlert, MessageSquare, Save, Smartphone, Loader2 } from 'lucide-react';
+import { Input } from '@/components/ui/input';
+import { Crown, Check, ChevronRight, Languages, ShieldAlert, MessageSquare, Save, Smartphone, Loader2, Receipt } from 'lucide-react';
 import { useBilling } from '@/hooks/useBilling';
 import FixedHeader from '@/components/FixedHeader';
 import PromoCodeDialog from '@/components/PromoCodeDialog';
@@ -20,6 +21,10 @@ const PremiumOnboarding = () => {
   const [isRestoreOpen, setIsRestoreOpen] = useState(false);
   const [restoreEmail, setRestoreEmail] = useState('');
   const [isRestoring, setIsRestoring] = useState(false);
+  
+  // Manual Verification states
+  const [manualOrderId, setManualOrderId] = useState('');
+  const [isVerifyingManual, setIsVerifyingManual] = useState(false);
 
   const handleEmailRestore = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -43,6 +48,37 @@ const PremiumOnboarding = () => {
       toast.error("Failed to restore purchase. Please try again.");
     } finally {
       setIsRestoring(false);
+    }
+  };
+
+  const handleVerifyManualOrder = async () => {
+    const trimmedId = manualOrderId.trim();
+    if (!trimmedId) {
+      toast.error("Please enter a valid Order ID.");
+      return;
+    }
+
+    setIsVerifyingManual(true);
+    try {
+      const response = await fetch(`/api/verify-order?order_id=${trimmedId}`);
+      const data = await response.json();
+
+      if (data.success) {
+        localStorage.setItem('isPremium', 'true');
+        await Preferences.set({ key: 'isPremium', value: 'true' });
+        window.dispatchEvent(new CustomEvent('premium-status-changed', { detail: true }));
+        toast.success("Premium successfully verified and unlocked!", {
+          icon: '🎉',
+        });
+        setManualOrderId('');
+      } else {
+        toast.error(`Order is not paid. Status: ${data.status || 'unknown'}`);
+      }
+    } catch (error) {
+      console.error("Verification error:", error);
+      toast.error("Failed to verify Order ID. Please check the ID and try again.");
+    } finally {
+      setIsVerifyingManual(false);
     }
   };
 
@@ -140,6 +176,34 @@ const PremiumOnboarding = () => {
                 ? 'One-time payment of $3.99' 
                 : (price === 'Loading...' ? 'Loading Price...' : `One-time payment of ${price}`)}
             </Button>
+          )}
+
+          {/* Manual Order ID Verification bypass */}
+          {!isPremium && (
+            <div className="w-full p-3 bg-white dark:bg-gray-800 rounded-xl border border-dashed border-gray-200 dark:border-gray-700 text-left space-y-2 my-1">
+              <div className="flex items-center gap-1 text-gray-500">
+                <Receipt className="h-3.5 w-3.5" />
+                <span className="text-[10px] font-bold uppercase tracking-wider">Already Paid?</span>
+              </div>
+              <p className="text-[10px] text-gray-400">
+                If the redirect URL showed a 404 during your test checkout, copy your **Order ID** from the confirmation screen or email and verify it below:
+              </p>
+              <div className="flex gap-2">
+                <Input
+                  placeholder="Order ID (e.g. 4821035)"
+                  value={manualOrderId}
+                  onChange={(e) => setManualOrderId(e.target.value)}
+                  className="h-8 text-xs rounded-lg"
+                />
+                <Button 
+                  onClick={handleVerifyManualOrder}
+                  disabled={isVerifyingManual}
+                  className="h-8 px-3 bg-zinc-900 hover:bg-zinc-800 text-white rounded-lg text-xs font-bold shrink-0"
+                >
+                  {isVerifyingManual ? <Loader2 className="h-3 w-3 animate-spin" /> : "Verify"}
+                </Button>
+              </div>
+            </div>
           )}
           
           <div className="flex flex-col items-center gap-2">
