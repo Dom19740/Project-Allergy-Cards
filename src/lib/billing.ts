@@ -6,7 +6,7 @@ export const PREMIUM_PRODUCT_ID = 'premium_unlock';
 export const PRODUCT_ID = PREMIUM_PRODUCT_ID;
 
 // Replace this with your actual Lemon Squeezy checkout link
-export const LEMON_SQUEEZY_CHECKOUT_URL = 'https://simpleallergyalert.lemonsqueezy.com/buy/your-product-id';
+export const LEMON_SQUEEZY_CHECKOUT_URL = 'https://happymunkeestudio.lemonsqueezy.com/checkout/buy/e1fd4e62-2d89-42b2-aaf5-4e8148c81e33';
 
 /**
  * Initializes the billing store and registers the premium product.
