@@ -5,7 +5,7 @@ import path from "path";
 
 import { nitro } from "nitro/vite";
 
-export default defineConfig(() => ({
+export default defineConfig({
   server: {
     host: "::",
     port: 8080,
@@ -36,4 +36,4 @@ export default defineConfig(() => ({
       },
     },
   },
-}));
+});
