@@ -92,10 +92,16 @@ const Home = () => {
             layout
             className="w-full flex items-center justify-center flex-1 min-h-0 overflow-hidden"
           >
-            <img 
+            <motion.img 
+              layout
+              transition={{ 
+                type: "spring", 
+                stiffness: 260, 
+                damping: 25 
+              }}
               src="/images/logo_main.png" 
               alt="App Logo" 
-              className="max-h-full w-auto h-auto object-contain drop-shadow-xl max-w-[250px] md:max-w-[350px]" 
+              className="max-h-full w-auto h-auto object-contain drop-shadow-xl max-w-[250px] md:max-w-[350px] aspect-square" 
             />
           </motion.div>
 
