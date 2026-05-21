@@ -11,6 +11,8 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Preferences } from '@capacitor/preferences';
 import { toast } from "sonner";
+import { FirebaseAnalytics } from '@capacitor-firebase/analytics';
+import { Capacitor } from '@capacitor/core';
 
 interface PromoCodeDialogProps {
   isOpen: boolean;
@@ -25,6 +27,17 @@ const PromoCodeDialog: React.FC<PromoCodeDialogProps> = ({ isOpen, onClose, onSu
     const normalizedCode = code.trim().toUpperCase();
     
     if (normalizedCode === 'SAAFREE') {
+      // Log the successful redemption to Firebase Analytics
+      if (Capacitor.isNativePlatform()) {
+        FirebaseAnalytics.logEvent({
+          name: 'promo_code_redeemed',
+          params: { 
+            code: 'SAAFREE',
+            platform: Capacitor.getPlatform()
+          }
+        });
+      }
+
       localStorage.setItem('isPremium', 'true');
       await Preferences.set({ key: 'isPremium', value: 'true' });
       
@@ -47,6 +60,15 @@ const PromoCodeDialog: React.FC<PromoCodeDialogProps> = ({ isOpen, onClose, onSu
       onClose();
       window.location.reload();
     } else {
+      // Optional: Log failed attempts to see what people are trying
+      if (Capacitor.isNativePlatform()) {
+        FirebaseAnalytics.logEvent({
+          name: 'promo_code_failed',
+          params: { 
+            attempted_code: normalizedCode 
+          }
+        });
+      }
       toast.error("Invalid promo code");
     }
   };
