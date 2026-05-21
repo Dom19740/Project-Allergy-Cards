@@ -117,7 +117,7 @@ const Onboarding = () => {
               <Button
                 variant="ghost"
                 onClick={handleSkip}
-                className="flex-1 py-6 rounded-2xl border-2 font-semibold"
+                className="flex-1 py-4 rounded-2xl border-2 font-semibold h-auto"
               >
                 Skip
               </Button>
@@ -125,7 +125,7 @@ const Onboarding = () => {
               <Button
                 variant="ghost"
                 onClick={handleBack}
-                className="flex-1 py-6 rounded-2xl border-2 font-semibold"
+                className="flex-1 py-4 rounded-2xl border-2 font-semibold h-auto"
               >
                 <ChevronLeft className="mr-2 h-5 w-5" />
                 Back
@@ -134,7 +134,7 @@ const Onboarding = () => {
 
             <Button
               onClick={handleNext}
-              className="flex-1 py-6 text-lg h-auto bg-red-600 text-white hover:bg-red-700 rounded-2xl shadow-lg transition-transform active:scale-95 flex items-center justify-center font-bold"
+              className="flex-1 py-4 text-lg bg-red-600 text-white hover:bg-red-700 rounded-2xl shadow-lg transition-transform active:scale-95 flex items-center justify-center font-bold h-auto"
             >
               {currentStep === ONBOARDING_STEPS.length - 1 ? 'Get Started' : 'Continue'}
               <ChevronRight className="w-5 h-5 ml-1" />
