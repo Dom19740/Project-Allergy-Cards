@@ -173,7 +173,7 @@ const PremiumOnboarding = () => {
               className="w-full h-12 text-base font-bold bg-amber-500 hover:bg-amber-600 text-white rounded-xl shadow-lg shadow-amber-500/20 transition-all active:scale-[0.98]"
             >
               {Capacitor.getPlatform() === 'web' 
-                ? 'One-time payment of $3.99' 
+                ? 'One-time payment of $2.99' 
                 : (price === 'Loading...' ? 'Loading Price...' : `One-time payment of ${price}`)}
             </Button>
           )}
