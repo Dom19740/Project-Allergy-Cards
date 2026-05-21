@@ -118,7 +118,7 @@ const PremiumOnboarding = () => {
     },
     {
       icon: Smartphone,
-      title: "Home Screen Widget",
+      title: "Home Screen Widget (Android Only)",
     }
   ];
 
