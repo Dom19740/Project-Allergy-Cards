@@ -78,7 +78,7 @@ const Home = () => {
             <img 
               src="/images/logo_main.png" 
               alt="App Logo" 
-              className="max-h-[180px] md:max-h-[240px] w-auto h-auto object-contain drop-shadow-xl max-w-[220px] md:max-w-[280px]" 
+              className="max-h-[225px] md:max-h-[300px] w-auto h-auto object-contain drop-shadow-xl max-w-[275px] md:max-w-[350px]" 
             />
           </div>
 
