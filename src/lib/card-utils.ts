@@ -48,15 +48,38 @@ export const generateCardImage = async (element: HTMLElement): Promise<string | 
 /**
  * Handles downloading the card. 
  * On Web: Triggers a browser download using a Blob URL (highly compatible with Android Chrome).
- * On Native: Uses the Share API so users can "Save to Device".
+ * On Native: Saves the image directly to the device's Documents folder.
  */
 export const downloadCard = async (element: HTMLElement, fileName: string = 'allergy-card.png') => {
   const native = await isNative();
 
   if (native) {
-    // On mobile, the most reliable "download" is sharing the file 
-    // so the user can select "Save Image" from the system sheet.
-    return await shareCard(element, 'Save Card', 'Save this allergy card to your device');
+    try {
+      const dataUrl = await generateCardImage(element);
+      if (!dataUrl) return false;
+
+      const base64Data = dataUrl.split(',')[1];
+
+      // Check and request permissions for saving to public storage (Documents)
+      const permission = await Filesystem.checkPermissions();
+      if (permission.publicStorage !== 'granted') {
+        const request = await Filesystem.requestPermissions();
+        if (request.publicStorage !== 'granted') {
+          return false;
+        }
+      }
+
+      await Filesystem.writeFile({
+        path: fileName,
+        data: base64Data,
+        directory: Directory.Documents,
+        recursive: true
+      });
+      return true;
+    } catch (error) {
+      console.error('Native download error:', error);
+      return false;
+    }
   }
 
   const dataUrl = await generateCardImage(element);
