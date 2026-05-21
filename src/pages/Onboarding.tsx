@@ -74,6 +74,11 @@ const Onboarding = () => {
     }
   };
 
+  const handleSkip = async () => {
+    await storage.set(STORAGE_KEYS.HAS_SEEN_ONBOARDING, true);
+    navigate('/premium-onboarding');
+  };
+
   return (
     <div className="flex flex-col h-screen bg-gray-100 dark:bg-gray-900 overflow-hidden">
       <FixedHeader />
@@ -108,20 +113,30 @@ const Onboarding = () => {
           </div>
 
           <div className="w-full flex justify-between items-center gap-4 pb-4">
-            <Button
-              variant="ghost"
-              onClick={handleBack}
-              className={currentStep === 0 ? "invisible" : "flex-1 py-6 rounded-2xl border-2"}
-            >
-              <ChevronLeft className="mr-2 h-5 w-5" />
-              Back
-            </Button>
+            {currentStep === 0 ? (
+              <Button
+                variant="ghost"
+                onClick={handleSkip}
+                className="flex-1 py-6 rounded-2xl border-2 font-semibold"
+              >
+                Skip
+              </Button>
+            ) : (
+              <Button
+                variant="ghost"
+                onClick={handleBack}
+                className="flex-1 py-6 rounded-2xl border-2 font-semibold"
+              >
+                <ChevronLeft className="mr-2 h-5 w-5" />
+                Back
+              </Button>
+            )}
 
             <Button
               onClick={handleNext}
-              className="py-3 px-8 text-lg h-auto bg-red-600 text-white hover:bg-red-700 rounded-xl shadow-lg transition-transform active:scale-95 flex items-center"
+              className="flex-1 py-6 text-lg h-auto bg-red-600 text-white hover:bg-red-700 rounded-2xl shadow-lg transition-transform active:scale-95 flex items-center justify-center font-bold"
             >
-              {currentStep === ONBOARDING_STEPS.length - 1 ? 'Get Started' : 'Next'}
+              {currentStep === ONBOARDING_STEPS.length - 1 ? 'Get Started' : 'Continue'}
               <ChevronRight className="w-5 h-5 ml-1" />
             </Button>
           </div>
