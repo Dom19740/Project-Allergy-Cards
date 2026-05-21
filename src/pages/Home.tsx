@@ -55,14 +55,14 @@ const Home = () => {
   return (
     <div className="flex flex-col h-[100dvh] bg-gray-100 dark:bg-gray-900 overflow-hidden">
       <FixedHeader />
-      <div className="flex flex-col flex-1 w-full max-w-2xl mx-auto px-6 pt-[calc(100px+env(safe-area-inset-top))] pb-[env(safe-area-inset-bottom)] min-h-0">
+      <div className="flex flex-col flex-1 w-full max-w-2xl mx-auto px-6 pt-[calc(80px+env(safe-area-inset-top))] pb-[env(safe-area-inset-bottom)] min-h-0">
         <motion.div 
           layout
-          className="flex-1 flex flex-col items-center justify-center text-center min-h-0 py-4 gap-8 md:gap-12"
+          className="flex-1 flex flex-col items-center justify-center text-center min-h-0 py-2 gap-4 md:gap-8"
         >
           
-          <motion.div layout className="w-full space-y-4 mt-4">
-            <h1 className="text-3xl md:text-4xl font-black text-gray-900 dark:text-white tracking-tight leading-tight">
+          <motion.div layout className="w-full space-y-2 md:space-y-4 mt-2 flex-shrink-0">
+            <h1 className="text-2xl md:text-4xl font-black text-gray-900 dark:text-white tracking-tight leading-tight">
               Travel Safely. <br />
               <span className="text-red-600">Eat with Confidence.</span>
             </h1>
@@ -71,16 +71,16 @@ const Home = () => {
               {showDescription && (
                 <motion.div 
                   key="description"
-                  initial={{ opacity: 0, y: -20 }}
+                  initial={{ opacity: 0, y: -10 }}
                   animate={{ opacity: 1, y: 0 }}
-                  exit={{ opacity: 0, y: -20 }}
+                  exit={{ opacity: 0, y: -10 }}
                   transition={{ duration: 0.5 }}
-                  className="text-base md:text-lg text-gray-600 dark:text-gray-400 max-w-xl mx-auto leading-relaxed space-y-3"
+                  className="text-sm md:text-lg text-gray-600 dark:text-gray-400 max-w-xl mx-auto leading-relaxed space-y-1 md:space-y-3"
                 >
                   <p>
                     Create personalized allergy alerts in over 100 languages to communicate your dietary restrictions easily and safely.
                   </p>
-                  <p>
+                  <p className="hidden xs:block">
                     Save a translated emergency card to communicate your need for medical attention. 
                   </p>
                 </motion.div>
@@ -90,12 +90,12 @@ const Home = () => {
 
           <motion.div 
             layout
-            className="w-full flex items-center justify-center flex-shrink-0"
+            className="w-full flex items-center justify-center flex-1 min-h-0 overflow-hidden"
           >
             <img 
               src="/images/logo_main.png" 
               alt="App Logo" 
-              className="max-h-[225px] md:max-h-[300px] w-auto h-auto object-contain drop-shadow-xl max-w-[275px] md:max-w-[350px]" 
+              className="max-h-full w-auto h-auto object-contain drop-shadow-xl max-w-[250px] md:max-w-[350px]" 
             />
           </motion.div>
 
@@ -115,7 +115,7 @@ const Home = () => {
           </AnimatePresence>
         </motion.div>
 
-        <div className="flex-shrink-0 w-full flex flex-col justify-center items-center py-6 gap-4 mt-auto">
+        <div className="flex-shrink-0 w-full flex flex-col justify-center items-center py-4 gap-3 mt-auto">
           {isPremium && (
             <div className="w-full px-4">
               <PremiumUnlock />
@@ -124,7 +124,7 @@ const Home = () => {
           
           <Button 
             onClick={handleGetStarted}
-            className="py-4 text-xl md:text-2xl h-auto transition-all duration-200 ease-in-out hover:scale-105 bg-red-600 text-white hover:bg-red-700 w-full max-w-[300px] shadow-xl rounded-2xl font-bold"
+            className="py-3 md:py-4 text-lg md:text-2xl h-auto transition-all duration-200 ease-in-out hover:scale-105 bg-red-600 text-white hover:bg-red-700 w-full max-w-[300px] shadow-xl rounded-2xl font-bold"
           >
             Get Started
           </Button>
