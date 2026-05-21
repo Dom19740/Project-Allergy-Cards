@@ -1,6 +1,6 @@
 "use client";
 
-import { toPng } from 'html-to-image';
+import html2canvas from 'html2canvas';
 import { Share } from '@capacitor/share';
 import { Filesystem, Directory } from '@capacitor/filesystem';
 import { Device } from '@capacitor/device';
@@ -15,15 +15,22 @@ const isNative = async () => {
 
 export const generateCardImage = async (element: HTMLElement): Promise<string | null> => {
   try {
-    // Optimized settings for better quality and compatibility
-    return await toPng(element, { 
-      cacheBust: true, 
-      pixelRatio: 3,
+    // html2canvas is more reliable on Android WebViews for DOM capture
+    const canvas = await html2canvas(element, {
+      scale: 3, // High quality
       backgroundColor: '#ffffff',
-      style: {
-        transform: 'scale(1)',
+      useCORS: true,
+      logging: false,
+      allowTaint: true,
+      onclone: (clonedDoc) => {
+        // Ensure the cloned element is visible for capture
+        const el = clonedDoc.getElementById(element.id) || clonedDoc.querySelector('[ref]');
+        if (el instanceof HTMLElement) {
+          el.style.transform = 'none';
+        }
       }
     });
+    return canvas.toDataURL('image/png');
   } catch (error) {
     console.error('Error generating card image:', error);
     return null;
@@ -79,10 +86,11 @@ export const shareCard = async (element: HTMLElement, title: string = 'My Allerg
         directory: Directory.Cache,
       });
 
+      // On Android/iOS, local files must be shared via the 'files' array
       await Share.share({
         title: title,
         text: text,
-        url: savedFile.uri,
+        files: [savedFile.uri],
       });
       return true;
     } catch (error) {
