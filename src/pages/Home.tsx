@@ -8,10 +8,10 @@ import SavedCardsList from '@/components/SavedCardsList';
 import PremiumUnlock from '@/components/PremiumUnlock';
 import { storage, STORAGE_KEYS } from '@/lib/storage';
 import { SavedCard } from '@/lib/types';
-import { cn } from '@/lib/utils';
 import { useBilling } from '@/hooks/useBilling';
 import { FirebaseAnalytics } from '@capacitor-firebase/analytics';
-import { Capacitor } from '@capacitor/core';
+import { Capacitor } from '@capacitor-core';
+import { motion, AnimatePresence } from 'framer-motion';
 
 const Home = () => {
   const navigate = useNavigate();
@@ -50,44 +50,70 @@ const Home = () => {
     }
   };
 
+  const showDescription = !(hasCards && isPremium);
+
   return (
     <div className="flex flex-col h-[100dvh] bg-gray-100 dark:bg-gray-900 overflow-hidden">
       <FixedHeader />
       <div className="flex flex-col flex-1 w-full max-w-2xl mx-auto px-6 pt-[calc(100px+env(safe-area-inset-top))] pb-[env(safe-area-inset-bottom)] min-h-0">
-        <div className="flex-1 flex flex-col items-center justify-center text-center min-h-0 py-4 gap-8 md:gap-12">
+        <motion.div 
+          layout
+          className="flex-1 flex flex-col items-center justify-center text-center min-h-0 py-4 gap-8 md:gap-12"
+        >
           
-          <div className="w-full space-y-4 animate-in fade-in slide-in-from-top-4 duration-700 mt-4">
+          <motion.div layout className="w-full space-y-4 mt-4">
             <h1 className="text-3xl md:text-4xl font-black text-gray-900 dark:text-white tracking-tight leading-tight">
               Travel Safely. <br />
               <span className="text-red-600">Eat with Confidence.</span>
             </h1>
             
-            {!(hasCards && isPremium) && (
-              <div className="text-base md:text-lg text-gray-600 dark:text-gray-400 max-w-xl mx-auto leading-relaxed space-y-3">
-                <p>
-                  Create personalized allergy alerts in over 100 languages to communicate your dietary restrictions easily and safely.
-                </p>
-                <p>
-                  Save a translated emergency card to communicate your need for medical attention. 
-                </p>
-              </div>
-            )}
-          </div>
+            <AnimatePresence mode="wait">
+              {showDescription && (
+                <motion.div 
+                  key="description"
+                  initial={{ opacity: 0, y: -20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0, y: -20 }}
+                  transition={{ duration: 0.5 }}
+                  className="text-base md:text-lg text-gray-600 dark:text-gray-400 max-w-xl mx-auto leading-relaxed space-y-3"
+                >
+                  <p>
+                    Create personalized allergy alerts in over 100 languages to communicate your dietary restrictions easily and safely.
+                  </p>
+                  <p>
+                    Save a translated emergency card to communicate your need for medical attention. 
+                  </p>
+                </motion.div>
+              )}
+            </AnimatePresence>
+          </motion.div>
 
-          <div className="w-full flex items-center justify-center transition-all duration-700 ease-in-out flex-shrink-0">
+          <motion.div 
+            layout
+            className="w-full flex items-center justify-center flex-shrink-0"
+          >
             <img 
               src="/images/logo_main.png" 
               alt="App Logo" 
               className="max-h-[225px] md:max-h-[300px] w-auto h-auto object-contain drop-shadow-xl max-w-[275px] md:max-w-[350px]" 
             />
-          </div>
+          </motion.div>
 
-          {hasCards && isPremium && (
-            <div className="w-full flex-1 min-h-0 animate-in fade-in slide-in-from-bottom-4 duration-700 overflow-hidden">
-              <SavedCardsList />
-            </div>
-          )}
-        </div>
+          <AnimatePresence>
+            {hasCards && isPremium && (
+              <motion.div 
+                key="cards-list"
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: 20 }}
+                transition={{ duration: 0.5 }}
+                className="w-full flex-1 min-h-0 overflow-hidden"
+              >
+                <SavedCardsList />
+              </motion.div>
+            )}
+          </AnimatePresence>
+        </motion.div>
 
         <div className="flex-shrink-0 w-full flex flex-col justify-center items-center py-6 gap-4 mt-auto">
           {isPremium && (
