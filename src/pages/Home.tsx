@@ -10,7 +10,7 @@ import { storage, STORAGE_KEYS } from '@/lib/storage';
 import { SavedCard } from '@/lib/types';
 import { useBilling } from '@/hooks/useBilling';
 import { FirebaseAnalytics } from '@capacitor-firebase/analytics';
-import { Capacitor } from '@capacitor-core';
+import { Capacitor } from '@capacitor/core';
 import { motion, AnimatePresence } from 'framer-motion';
 
 const Home = () => {
