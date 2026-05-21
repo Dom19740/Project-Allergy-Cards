@@ -3,6 +3,7 @@ import path from 'path';
 
 const src = path.resolve('.output/public');
 const dest = path.resolve('dist');
+const templatePath = path.resolve('.output/server/_chunks/renderer-template.mjs');
 
 function copyRecursiveSync(src, dest) {
   const exists = fs.existsSync(src);
@@ -28,8 +29,32 @@ try {
     fs.rmSync(dest, { recursive: true, force: true });
   }
   
+  // Copy all public assets
   copyRecursiveSync(src, dest);
   console.log('Build assets successfully copied to dist!');
+  
+  // Extract index.html from Nitro's server-side renderer template
+  if (fs.existsSync(templatePath)) {
+    console.log('Extracting index.html from Nitro server template...');
+    const content = fs.readFileSync(templatePath, 'utf8');
+    const match = content.match(/new HTTPResponse\('([\s\S]*?)',\s*\{\s*headers:/);
+    
+    if (match && match[1]) {
+      let html = match[1]
+        .replace(/\\r/g, '\r')
+        .replace(/\\n/g, '\n')
+        .replace(/\\'/g, "'")
+        .replace(/\\"/g, '"')
+        .replace(/\\\//g, '/');
+      
+      fs.writeFileSync(path.join(dest, 'index.html'), html, 'utf8');
+      console.log('SUCCESS: Extracted and wrote index.html to dist!');
+    } else {
+      console.error('WARNING: Could not parse HTML from renderer template!');
+    }
+  } else {
+    console.error('WARNING: Nitro renderer template not found!');
+  }
   
   // Verify contents of dist
   if (fs.existsSync(dest)) {
