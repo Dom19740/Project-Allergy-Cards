@@ -88,9 +88,6 @@ const Home = () => {
                   <p>
                     Create personalized allergy alerts in over 100 languages to communicate your dietary restrictions easily and safely.
                   </p>
-                  <p className="hidden xs:block">
-                    Save a translated emergency card to communicate your need for medical attention. 
-                  </p>
                 </motion.div>
               )}
             </AnimatePresence>
