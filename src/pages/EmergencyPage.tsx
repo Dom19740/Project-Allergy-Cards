@@ -108,17 +108,7 @@ const EmergencyPage = () => {
     if (!cardRef.current) return;
     setIsDownloading(true);
     
-    const sanitizeFilenamePart = (str: string) => {
-      return str
-        .toLowerCase()
-        .replace(/[^a-z0-9]/g, '-')
-        .replace(/-+/g, '-')
-        .replace(/^-|-$/g, '');
-    };
-
-    const allergenIds = selectedAllergens?.ids || [];
-    const allergenPart = allergenIds.map(sanitizeFilenamePart).filter(Boolean).join('-');
-    const filename = `emergency-message-${allergenPart ? allergenPart + '-' : ''}${langCode || 'en'}.png`;
+    const filename = `emergency-message-${langCode || 'en'}.png`;
 
     const success = await downloadCard(cardRef.current, filename);
     if (success) toast.success("Emergency message saved!");
