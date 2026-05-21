@@ -2,12 +2,8 @@ import { defineConfig } from "nitro";
 
 export default defineConfig({
   serverDir: "./server",
-  // @ts-ignore
-  bundler: "rollup",
+  ssr: false,
   routeRules: {
     "/api/**": { cache: false }
-  },
-  prerender: {
-    routes: ["/"] // This forces Nitro to generate .output/public/index.html
   }
 });

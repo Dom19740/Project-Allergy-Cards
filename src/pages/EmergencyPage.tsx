@@ -105,13 +105,12 @@ const EmergencyPage = () => {
   };
 
   const handleDownload = async () => {
-    if (cardRef.current) {
-      setIsDownloading(true);
-      const success = await downloadCard(cardRef.current, `emergency-message-${langCode || 'en'}.png`);
-      if (success) toast.success("Emergency message saved!");
-      else toast.error("Failed to download emergency message.");
-      setIsDownloading(false);
-    }
+    if (!cardRef.current) return;
+    setIsDownloading(true);
+    const success = await downloadCard(cardRef.current, `emergency-message-${langCode || 'en'}.png`);
+    if (success) toast.success("Emergency message saved!");
+    else toast.error("Failed to save emergency message.");
+    setIsDownloading(false);
   };
 
   const handleReadAloud = async () => {
