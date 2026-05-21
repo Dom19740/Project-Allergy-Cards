@@ -27,15 +27,17 @@ const PromoCodeDialog: React.FC<PromoCodeDialogProps> = ({ isOpen, onClose, onSu
     const normalizedCode = code.trim().toUpperCase();
     
     if (normalizedCode === 'SAAFREE') {
-      // Log the successful redemption to Firebase Analytics
-      if (Capacitor.isNativePlatform()) {
-        FirebaseAnalytics.logEvent({
+      // Log the successful redemption to Firebase Analytics (works on Web and Native)
+      try {
+        await FirebaseAnalytics.logEvent({
           name: 'promo_code_redeemed',
           params: { 
             code: 'SAAFREE',
             platform: Capacitor.getPlatform()
           }
         });
+      } catch (e) {
+        console.error("Analytics log failed", e);
       }
 
       localStorage.setItem('isPremium', 'true');
@@ -60,14 +62,17 @@ const PromoCodeDialog: React.FC<PromoCodeDialogProps> = ({ isOpen, onClose, onSu
       onClose();
       window.location.reload();
     } else {
-      // Optional: Log failed attempts to see what people are trying
-      if (Capacitor.isNativePlatform()) {
-        FirebaseAnalytics.logEvent({
+      // Log failed attempts
+      try {
+        await FirebaseAnalytics.logEvent({
           name: 'promo_code_failed',
           params: { 
-            attempted_code: normalizedCode 
+            attempted_code: normalizedCode,
+            platform: Capacitor.getPlatform()
           }
         });
+      } catch (e) {
+        // ignore
       }
       toast.error("Invalid promo code");
     }

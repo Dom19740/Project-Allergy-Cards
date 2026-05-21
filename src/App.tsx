@@ -13,6 +13,7 @@ import { BillingProvider } from "./hooks/useBilling";
 import { FirebaseCrashlytics } from '@capacitor-firebase/crashlytics';
 import { FirebaseAnalytics } from '@capacitor-firebase/analytics';
 import { Capacitor } from '@capacitor/core';
+import "./lib/firebase-web"; // Initialize Firebase for Web
 
 // Lazy load pages
 const Home = lazy(() => import("./pages/Home"));
@@ -43,24 +44,27 @@ const AppContent = () => {
     // Initialize billing system
     initBilling();
 
-    // Initialize Firebase if on native platform
-    if (Capacitor.isNativePlatform()) {
-      const initFirebase = async () => {
-        try {
-          await FirebaseAnalytics.setEnabled({ enabled: true });
+    const initFirebase = async () => {
+      try {
+        // Enable analytics for all platforms (Web uses the JS SDK initialized above)
+        await FirebaseAnalytics.setEnabled({ enabled: true });
+        
+        // Crashlytics is native-only
+        if (Capacitor.isNativePlatform()) {
           await FirebaseCrashlytics.setEnabled({ enabled: true });
-          
-          // Log app open event
-          await FirebaseAnalytics.logEvent({
-            name: 'app_open',
-            params: { platform: Capacitor.getPlatform() }
-          });
-        } catch (error) {
-          console.error('Firebase initialization error:', error);
         }
-      };
-      initFirebase();
-    }
+        
+        // Log app open event for all platforms
+        await FirebaseAnalytics.logEvent({
+          name: 'app_open',
+          params: { platform: Capacitor.getPlatform() }
+        });
+      } catch (error) {
+        console.error('Firebase initialization error:', error);
+      }
+    };
+    
+    initFirebase();
 
     const migrate = async () => {
       const hasMigrated = await storage.get(STORAGE_KEYS.HAS_MIGRATED);
