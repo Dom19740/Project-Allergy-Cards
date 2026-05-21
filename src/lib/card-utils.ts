@@ -13,6 +13,21 @@ const isNative = async () => {
   return info.platform === 'android' || info.platform === 'ios';
 };
 
+/**
+ * Converts a data URL (base64) to a Blob object
+ */
+const dataUrlToBlob = (dataUrl: string): Blob => {
+  const arr = dataUrl.split(',');
+  const mime = arr[0].match(/:(.*?);/)?.[1] || 'image/png';
+  const bstr = atob(arr[1]);
+  let n = bstr.length;
+  const u8arr = new Uint8Array(n);
+  while (n--) {
+    u8arr[n] = bstr.charCodeAt(n);
+  }
+  return new Blob([u8arr], { type: mime });
+};
+
 export const generateCardImage = async (element: HTMLElement): Promise<string | null> => {
   try {
     // html2canvas is more reliable on Android WebViews for DOM capture
@@ -39,7 +54,7 @@ export const generateCardImage = async (element: HTMLElement): Promise<string | 
 
 /**
  * Handles downloading the card. 
- * On Web: Triggers a browser download.
+ * On Web: Triggers a browser download using a Blob URL (highly compatible with Android Chrome).
  * On Native: Uses the Share API so users can "Save to Device".
  */
 export const downloadCard = async (element: HTMLElement, fileName: string = 'allergy-card.png') => {
@@ -54,13 +69,24 @@ export const downloadCard = async (element: HTMLElement, fileName: string = 'all
   const dataUrl = await generateCardImage(element);
   if (!dataUrl) return false;
 
-  const link = document.createElement('a');
-  link.download = fileName;
-  link.href = dataUrl;
-  document.body.appendChild(link);
-  link.click();
-  document.body.removeChild(link);
-  return true;
+  try {
+    const blob = dataUrlToBlob(dataUrl);
+    const blobUrl = URL.createObjectURL(blob);
+
+    const link = document.createElement('a');
+    link.download = fileName;
+    link.href = blobUrl;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+
+    // Clean up the object URL after a short delay
+    setTimeout(() => URL.revokeObjectURL(blobUrl), 100);
+    return true;
+  } catch (error) {
+    console.error('Download error:', error);
+    return false;
+  }
 };
 
 /**
@@ -123,12 +149,22 @@ export const shareCard = async (element: HTMLElement, title: string = 'My Allerg
     
     // Fallback for web browsers that don't support sharing files: 
     // Just download the image instead.
-    const link = document.createElement('a');
-    link.download = 'allergy-card.png';
-    link.href = dataUrl;
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
-    return true;
+    try {
+      const blob = dataUrlToBlob(dataUrl);
+      const blobUrl = URL.createObjectURL(blob);
+
+      const link = document.createElement('a');
+      link.download = 'allergy-card.png';
+      link.href = blobUrl;
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+
+      setTimeout(() => URL.revokeObjectURL(blobUrl), 100);
+      return true;
+    } catch (error) {
+      console.error('Download fallback error:', error);
+      return false;
+    }
   }
 };
