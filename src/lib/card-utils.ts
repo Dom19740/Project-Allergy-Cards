@@ -1,16 +1,15 @@
 "use client";
 
-import html2canvas from 'html2canvas';
+import { toPng } from 'html-to-image';
 import { Share } from '@capacitor/share';
 import { Filesystem, Directory } from '@capacitor/filesystem';
-import { Device } from '@capacitor/device';
+import { Capacitor } from '@capacitor/core';
 
 /**
  * Checks if the app is running in a native mobile environment
  */
 const isNative = async () => {
-  const info = await Device.getInfo();
-  return info.platform === 'android' || info.platform === 'ios';
+  return Capacitor.isNativePlatform();
 };
 
 /**
@@ -30,22 +29,16 @@ const dataUrlToBlob = (dataUrl: string): Blob => {
 
 export const generateCardImage = async (element: HTMLElement): Promise<string | null> => {
   try {
-    // html2canvas is more reliable on Android WebViews for DOM capture
-    const canvas = await html2canvas(element, {
-      scale: 3, // High quality
+    // html-to-image is extremely fast and handles modern CSS (flex, grid, rounded corners) perfectly
+    return await toPng(element, {
+      quality: 0.95,
+      pixelRatio: 3, // High quality
       backgroundColor: '#ffffff',
-      useCORS: true,
-      logging: false,
-      allowTaint: true,
-      onclone: (clonedDoc) => {
-        // Ensure the cloned element is visible for capture
-        const el = clonedDoc.getElementById(element.id) || clonedDoc.querySelector('[ref]');
-        if (el instanceof HTMLElement) {
-          el.style.transform = 'none';
-        }
-      }
+      style: {
+        transform: 'none',
+      },
+      cacheBust: true,
     });
-    return canvas.toDataURL('image/png');
   } catch (error) {
     console.error('Error generating card image:', error);
     return null;
