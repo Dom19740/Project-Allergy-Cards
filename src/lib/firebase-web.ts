@@ -4,21 +4,15 @@ import { initializeApp, getApps, getApp } from "firebase/app";
 import { getAnalytics } from "firebase/analytics";
 import { Capacitor } from "@capacitor/core";
 
-/**
- * To get these values:
- * 1. Go to Firebase Console (https://console.firebase.google.com/)
- * 2. Click the Gear icon (Project Settings) > General
- * 3. Scroll down to "Your apps" and click the "</>" icon to add a Web App
- * 4. Copy the 'firebaseConfig' object and paste it here
- */
+// Your web app's Firebase configuration
 const firebaseConfig = {
-  apiKey: "REPLACE_WITH_YOUR_API_KEY",
-  authDomain: "REPLACE_WITH_YOUR_AUTH_DOMAIN",
-  projectId: "REPLACE_WITH_YOUR_PROJECT_ID",
-  storageBucket: "REPLACE_WITH_YOUR_STORAGE_BUCKET",
-  messagingSenderId: "REPLACE_WITH_YOUR_MESSAGING_SENDER_ID",
-  appId: "REPLACE_WITH_YOUR_APP_ID",
-  measurementId: "REPLACE_WITH_YOUR_MEASUREMENT_ID"
+  apiKey: "AIzaSyDZIOqkQ8f4XmW3e7unOJ6CVxlvs2qkkww",
+  authDomain: "simple-allergy-alert.firebaseapp.com",
+  projectId: "simple-allergy-alert",
+  storageBucket: "simple-allergy-alert.firebasestorage.app",
+  messagingSenderId: "878638647949",
+  appId: "1:878638647949:web:5de959895d621a5871b0c4",
+  measurementId: "G-6F57EBJDZ7"
 };
 
 let app;
