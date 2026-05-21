@@ -3,27 +3,19 @@
 import html2canvas from 'html2canvas';
 import { Share } from '@capacitor/share';
 import { Filesystem, Directory } from '@capacitor/filesystem';
-import { Device } from '@capacitor/device';
-
-/**
- * Checks if the app is running in a native mobile environment
- */
-const isNative = async () => {
-  const info = await Device.getInfo();
-  return info.platform === 'android' || info.platform === 'ios';
-};
+import { Capacitor } from '@capacitor/core';
 
 export const generateCardImage = async (element: HTMLElement): Promise<string | null> => {
   try {
-    // html2canvas is more reliable on Android WebViews for DOM capture
+    // html2canvas is the most reliable for Android WebViews
     const canvas = await html2canvas(element, {
-      scale: 3, // High quality
+      scale: 3, // High quality for printing/sharing
       backgroundColor: '#ffffff',
       useCORS: true,
       logging: false,
       allowTaint: true,
       onclone: (clonedDoc) => {
-        // Ensure the cloned element is visible for capture
+        // Ensure the cloned element is visible and correctly positioned for capture
         const el = clonedDoc.getElementById(element.id) || clonedDoc.querySelector('[ref]');
         if (el instanceof HTMLElement) {
           el.style.transform = 'none';
@@ -43,9 +35,7 @@ export const generateCardImage = async (element: HTMLElement): Promise<string | 
  * On Native: Uses the Share API so users can "Save to Device".
  */
 export const downloadCard = async (element: HTMLElement, fileName: string = 'allergy-card.png') => {
-  const native = await isNative();
-
-  if (native) {
+  if (Capacitor.isNativePlatform()) {
     // On mobile, the most reliable "download" is sharing the file 
     // so the user can select "Save Image" from the system sheet.
     return await shareCard(element, 'Save Card', 'Save this allergy card to your device');
@@ -54,13 +44,18 @@ export const downloadCard = async (element: HTMLElement, fileName: string = 'all
   const dataUrl = await generateCardImage(element);
   if (!dataUrl) return false;
 
-  const link = document.createElement('a');
-  link.download = fileName;
-  link.href = dataUrl;
-  document.body.appendChild(link);
-  link.click();
-  document.body.removeChild(link);
-  return true;
+  try {
+    const link = document.createElement('a');
+    link.download = fileName;
+    link.href = dataUrl;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    return true;
+  } catch (error) {
+    console.error('Web download failed:', error);
+    return false;
+  }
 };
 
 /**
@@ -72,9 +67,7 @@ export const shareCard = async (element: HTMLElement, title: string = 'My Allerg
   const dataUrl = await generateCardImage(element);
   if (!dataUrl) return false;
 
-  const native = await isNative();
-
-  if (native) {
+  if (Capacitor.isNativePlatform()) {
     try {
       const base64Data = dataUrl.split(',')[1];
       const fileName = `allergy_card_${Date.now()}.png`;
@@ -94,7 +87,7 @@ export const shareCard = async (element: HTMLElement, title: string = 'My Allerg
       });
       return true;
     } catch (error) {
-      // Don't show error if user just cancelled the share sheet
+      // Don't return false if user just cancelled the share sheet
       if ((error as any).code !== 'UA') { 
         console.error('Native share error:', error);
         return false;

@@ -227,7 +227,7 @@ const AllergyCard: React.FC<AllergyCardProps> = ({ languageCode, selectedAllerge
       setIsDownloading(true);
       const success = await downloadCard(cardRef.current, `allergy-card-${languageCode}.png`);
       if (success) toast.success("Allergy card saved to your device!");
-      else toast.error("Failed to save card.");
+      else toast.error("Failed to download card.");
       setIsDownloading(false);
     }
   };
