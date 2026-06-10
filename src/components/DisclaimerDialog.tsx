@@ -13,7 +13,7 @@ import { Button } from "@/components/ui/button";
 import { Info, Bug } from "lucide-react";
 import { FirebaseCrashlytics } from '@capacitor-firebase/crashlytics';
 import { Capacitor } from '@capacitor/core';
-import SafetyDisclaimer from "@/components/SafetyDisclaimer";
+import SafetyDisclaimer from '@/components/SafetyDisclaimer';
 
 interface DisclaimerDialogProps {
   isOpen: boolean;

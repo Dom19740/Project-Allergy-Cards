@@ -14,9 +14,6 @@ import { toast } from "sonner";
 import { FirebaseAnalytics } from '@capacitor-firebase/analytics';
 import { Capacitor } from '@capacitor/core';
 
-const PRODUCT_HUNT_CODE = 'PRODUCTHUNT';
-const PRODUCT_HUNT_EXPIRES_AT = new Date('2026-06-23T23:59:59.000Z');
-
 interface PromoCodeDialogProps {
   isOpen: boolean;
   onClose: () => void;
@@ -28,40 +25,13 @@ const PromoCodeDialog: React.FC<PromoCodeDialogProps> = ({ isOpen, onClose, onSu
 
   const handleRedeem = async () => {
     const normalizedCode = code.trim().toUpperCase();
-
-    if (normalizedCode === PRODUCT_HUNT_CODE) {
-      if (Date.now() > PRODUCT_HUNT_EXPIRES_AT.getTime()) {
-        toast.error("This promo code has expired.");
-        return;
-      }
-
+    
+    if (normalizedCode === 'SAAFREE') {
+      // Log the successful redemption to Firebase Analytics (works on Web and Native)
       try {
         await FirebaseAnalytics.logEvent({
           name: 'promo_code_redeemed',
-          params: {
-            code: PRODUCT_HUNT_CODE,
-            platform: Capacitor.getPlatform()
-          }
-        });
-      } catch (e) {
-        console.error("Analytics log failed", e);
-      }
-
-      localStorage.setItem('isPremium', 'true');
-      await Preferences.set({ key: 'isPremium', value: 'true' });
-
-      toast.success("Premium Unlocked!", {
-        icon: '🎉',
-      });
-
-      onSuccess();
-      onClose();
-      window.location.reload();
-    } else if (normalizedCode === 'SAAFREE') {
-      try {
-        await FirebaseAnalytics.logEvent({
-          name: 'promo_code_redeemed',
-          params: {
+          params: { 
             code: 'SAAFREE',
             platform: Capacitor.getPlatform()
           }
@@ -92,10 +62,11 @@ const PromoCodeDialog: React.FC<PromoCodeDialogProps> = ({ isOpen, onClose, onSu
       onClose();
       window.location.reload();
     } else {
+      // Log failed attempts
       try {
         await FirebaseAnalytics.logEvent({
           name: 'promo_code_failed',
-          params: {
+          params: { 
             attempted_code: normalizedCode,
             platform: Capacitor.getPlatform()
           }

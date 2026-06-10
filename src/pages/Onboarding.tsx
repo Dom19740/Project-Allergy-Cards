@@ -15,10 +15,9 @@ const ONBOARDING_STEPS = [
     description: "This app is not a medical device. Translations are machine-generated and may contain errors — do not rely on this app as your sole means of communicating a life-threatening allergy. Always carry your prescribed medication. Always speak directly with restaurant staff to confirm ingredients. By using this app you agree to our Terms & Conditions and Privacy Policy. If in doubt, do no eat.",
     image: "/images/screenshot_1.png"
   },
-
   {
     title: "Select Your Allergens",
-    description: "Choose from our standard list or add your own custom allergens. Customise your allergy alert\u00A0warnings.",
+    description: "Choose from our standard list or add your own custom allergens. Customise your allergy alert warnings.",
     image: "/images/screenshot_2.png"
   },
   {
@@ -28,12 +27,12 @@ const ONBOARDING_STEPS = [
   },
   {
     title: "Share & Save",
-    description: "Save up to 10 cards in the app for quick offline access. Download your card as an image, share it. Play the audio.",
+    description: "Save up to 10 cards in the app for quick offline access. Download your card as an image, share it with others.",
     image: "/images/screenshot_4_alternate.png"
   },
   {
     title: "Emergency Ready",
-    description: "In urgent situations, use the Emergency Card to quickly communicate your need for medical\u00A0attention. Quick dial button to local emergency services.",
+    description: "In urgent situations, use the Emergency Card to quickly communicate your need for medical attention. Quick dial button to local emergency services.",
     image: "/images/screenshot_5_alternate.png"
   },
   {

@@ -29,7 +29,6 @@ const StepHeader: React.FC<StepHeaderProps> = ({ title, description, icon: Icon 
           {hasDisclaimer ? <SafetyDisclaimer /> : <p className="break-words">{description}</p>}
         </div>
       </div>
-
     </div>
   );
 };
