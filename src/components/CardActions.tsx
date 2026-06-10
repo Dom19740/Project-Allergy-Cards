@@ -2,7 +2,7 @@
 
 import React from 'react';
 import { Button } from '@/components/ui/button';
-import { Share2, Download, Save, Loader2, Menu, AlertTriangle, Volume2, Square } from 'lucide-react';
+import { Share2, Download, Save, Loader2, Menu, Cross, Volume2, Square } from 'lucide-react';
 
 interface CardActionsProps {
   onShare: () => void;
@@ -92,7 +92,7 @@ const CardActions: React.FC<CardActionsProps> = ({
           className="text-orange-600 hover:bg-orange-50 rounded-full h-10 w-10"
           title="Emergency"
         >
-          <AlertTriangle className="h-5 w-5" />
+          <Cross className="h-5 w-5" />
         </Button>
 
       </div>
