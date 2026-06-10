@@ -3,7 +3,7 @@
 import React, { useState, useCallback, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import useEmblaCarousel from 'embla-carousel-react';
-import { ChevronLeft, ChevronRight } from 'lucide-react';
+import { ChevronRight } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { storage, STORAGE_KEYS } from '@/lib/storage';
 import FixedHeader from '@/components/FixedHeader';
@@ -74,7 +74,7 @@ const Onboarding = () => {
     }
   };
 
-  const handleSkip = async () => {
+  const handleUnderstand = async () => {
     await storage.set(STORAGE_KEYS.HAS_SEEN_ONBOARDING, true);
     navigate('/premium-onboarding');
   };
@@ -101,44 +101,45 @@ const Onboarding = () => {
         <div className="w-full flex flex-col items-center mt-auto mb-[calc(20px+env(safe-area-inset-bottom))] space-y-6 shrink-0">
           <div className="flex space-x-2">
             {ONBOARDING_STEPS.map((_, index) => (
-              <div 
+              <div
                 key={index}
                 className={`h-2.5 w-2.5 rounded-full transition-all duration-300 ${
-                  index === currentStep 
-                    ? "bg-red-600 w-6" 
+                  index === currentStep
+                    ? "bg-red-600 w-6"
                     : "bg-gray-300 dark:bg-gray-700"
                 }`}
               />
             ))}
           </div>
 
-          <div className="w-full flex justify-between items-center gap-4 pb-4">
-            {currentStep === 0 ? (
-              <Button
-                variant="ghost"
-                onClick={handleSkip}
-                className="flex-1 py-4 rounded-2xl border-2 font-semibold h-auto"
-              >
-                Skip
-              </Button>
-            ) : (
+          <div className="w-full flex items-center gap-4 pb-4">
+            {currentStep > 0 && (
               <Button
                 variant="ghost"
                 onClick={handleBack}
                 className="flex-1 py-4 rounded-2xl border-2 font-semibold h-auto"
               >
-                <ChevronLeft className="mr-2 h-5 w-5" />
+                <ChevronRight className="mr-2 h-5 w-5 rotate-180" />
                 Back
               </Button>
             )}
 
-            <Button
-              onClick={handleNext}
-              className="flex-1 py-4 text-lg bg-red-600 text-white hover:bg-red-700 rounded-2xl shadow-lg transition-transform active:scale-95 flex items-center justify-center font-bold h-auto"
-            >
-              {currentStep === ONBOARDING_STEPS.length - 1 ? 'Get Started' : 'Continue'}
-              <ChevronRight className="w-5 h-5 ml-1" />
-            </Button>
+            {currentStep === 0 ? (
+              <Button
+                onClick={handleUnderstand}
+                className="flex-1 py-4 text-lg bg-red-600 text-white hover:bg-red-700 rounded-2xl shadow-lg transition-transform active:scale-95 flex items-center justify-center font-bold h-auto"
+              >
+                I Understand
+              </Button>
+            ) : (
+              <Button
+                onClick={handleNext}
+                className="flex-1 py-4 text-lg bg-red-600 text-white hover:bg-red-700 rounded-2xl shadow-lg transition-transform active:scale-95 flex items-center justify-center font-bold h-auto"
+              >
+                {currentStep === ONBOARDING_STEPS.length - 1 ? 'Get Started' : 'Continue'}
+                <ChevronRight className="w-5 h-5 ml-1" />
+              </Button>
+            )}
           </div>
         </div>
       </div>
