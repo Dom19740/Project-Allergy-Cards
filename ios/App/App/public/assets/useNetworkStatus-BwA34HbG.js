@@ -1,1 +1,0 @@
-import{r as s,N as n}from"./vendor-CpBnEU8D.js";const u=()=>{const[a,e]=s.useState(!0);return s.useEffect(()=>{(async()=>{const t=await n.getStatus();e(t.connected)})();const r=n.addListener("networkStatusChange",t=>{e(t.connected)});return()=>{r.then(t=>t.remove())}},[]),a};export{u};
