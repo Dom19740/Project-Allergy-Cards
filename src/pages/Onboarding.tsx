@@ -12,9 +12,10 @@ import OnboardingStep from '@/components/OnboardingStep';
 const ONBOARDING_STEPS = [
   {
     title: "Safety First",
-    description: "This app provides translated allergy alerts for convenience. While we aim for accuracy, translations and emergency numbers may not always be correct. Always verify important information locally when possible. If in doubt, do not eat.",
+    description: "This app is not a medical device. Translations are machine-generated and may contain errors — do not rely on this app as your sole means of communicating a life-threatening allergy. Always carry your prescribed medication. Always speak directly with restaurant staff to confirm ingredients. By using this app you agree to our Terms & Conditions and Privacy Policy. If in doubt, do no eat.",
     image: "/images/screenshot_1.png"
   },
+
   {
     title: "Select Your Allergens",
     description: "Choose from our standard list or add your own custom allergens. Customise your allergy alert\u00A0warnings.",

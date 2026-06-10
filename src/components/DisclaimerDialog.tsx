@@ -13,6 +13,7 @@ import { Button } from "@/components/ui/button";
 import { Info, Bug } from "lucide-react";
 import { FirebaseCrashlytics } from '@capacitor-firebase/crashlytics';
 import { Capacitor } from '@capacitor/core';
+import SafetyDisclaimer from "@/components/SafetyDisclaimer";
 
 interface DisclaimerDialogProps {
   isOpen: boolean;
@@ -56,17 +57,10 @@ const DisclaimerDialog: React.FC<DisclaimerDialogProps> = ({ isOpen, onClose }) 
           <DialogTitle className="text-xl font-bold">Safety Disclaimer</DialogTitle>
         </DialogHeader>
         <div className="py-4 text-center space-y-4">
-          <p className="text-gray-700 dark:text-gray-300 leading-relaxed">
-            This app provides translated allergy alerts for convenience. While we aim for accuracy, translations and emergency numbers may not always be correct.
-          </p>
-          <div className="text-gray-700 dark:text-gray-300 leading-relaxed">
-            <p>Always verify important information locally when possible.</p>
-            <p className="mt-2 font-bold text-red-600 dark:text-red-500">
-              If in doubt, do not eat.
-            </p>
-          </div>
+          <SafetyDisclaimer />
 
           {/* Hidden Debug Section */}
+
           {tapCount >= 3 && (
             <div className="pt-4 border-t border-gray-100 mt-4 animate-in fade-in zoom-in duration-300">
               <Button 
