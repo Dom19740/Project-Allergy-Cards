@@ -76,7 +76,7 @@ const Onboarding = () => {
 
   const handleUnderstand = async () => {
     await storage.set(STORAGE_KEYS.HAS_SEEN_ONBOARDING, true);
-    navigate('/premium-onboarding');
+    emblaApi?.scrollNext();
   };
 
   return (
