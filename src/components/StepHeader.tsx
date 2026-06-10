@@ -2,7 +2,6 @@
 
 import React from 'react';
 import { LucideIcon } from 'lucide-react';
-import SafetyDisclaimer from '@/components/SafetyDisclaimer';
 
 interface StepHeaderProps {
   title: string;
@@ -11,7 +10,9 @@ interface StepHeaderProps {
 }
 
 const StepHeader: React.FC<StepHeaderProps> = ({ title, description, icon: Icon }) => {
-  const hasDisclaimer = title === "Safety First";
+  const warningText = "If in doubt, do not eat.";
+  const hasWarning = description.includes(warningText);
+  const mainText = hasWarning ? description.replace(warningText, "").trim() : description;
 
   return (
     <div className="w-full px-4 flex flex-col items-center text-center space-y-1">
@@ -26,7 +27,12 @@ const StepHeader: React.FC<StepHeaderProps> = ({ title, description, icon: Icon 
           {title}
         </h2>
         <div className="text-base sm:text-lg md:text-xl text-gray-600 dark:text-gray-400 max-w-md mx-auto leading-snug">
-          {hasDisclaimer ? <SafetyDisclaimer /> : <p className="break-words">{description}</p>}
+          <p className="break-words">{mainText}</p>
+          {hasWarning && (
+            <p className="mt-0.5 font-bold text-red-600 dark:text-red-500 break-words">
+              {warningText}
+            </p>
+          )}
         </div>
       </div>
     </div>

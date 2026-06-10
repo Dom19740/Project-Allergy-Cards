@@ -225,7 +225,19 @@ const AllergyCard: React.FC<AllergyCardProps> = ({ languageCode, selectedAllerge
       }
 
       setIsDownloading(true);
-      const success = await downloadCard(cardRef.current, `allergy-card-${languageCode}.png`);
+
+      const sanitizeFilenamePart = (str: string) => {
+        return str
+          .toLowerCase()
+          .replace(/[^a-z0-9]/g, '-')
+          .replace(/-+/g, '-')
+          .replace(/^-|-$/g, '');
+      };
+
+      const allergenPart = selectedAllergens.map(sanitizeFilenamePart).filter(Boolean).join('-');
+      const filename = `allergy-card-${allergenPart || 'allergens'}-${languageCode}.png`;
+
+      const success = await downloadCard(cardRef.current, filename);
       if (success) toast.success("Allergy card saved to your device!");
       else toast.error("Failed to save card.");
       setIsDownloading(false);

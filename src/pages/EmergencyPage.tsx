@@ -107,7 +107,10 @@ const EmergencyPage = () => {
   const handleDownload = async () => {
     if (!cardRef.current) return;
     setIsDownloading(true);
-    const success = await downloadCard(cardRef.current, `emergency-message-${langCode || 'en'}.png`);
+    
+    const filename = `emergency-message-${langCode || 'en'}.png`;
+
+    const success = await downloadCard(cardRef.current, filename);
     if (success) toast.success("Emergency message saved!");
     else toast.error("Failed to save emergency message.");
     setIsDownloading(false);
