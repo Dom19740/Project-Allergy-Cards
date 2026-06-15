@@ -131,7 +131,7 @@ const Home = () => {
 
           <div className="flex flex-col items-center gap-1">
             <p className="text-[10px] text-gray-400 dark:text-gray-500 uppercase tracking-widest font-bold">
-              © 2026 <a href="https://dpbcreative.com/" target="_blank" rel="noopener noreferrer" className="hover:text-red-600 transition-colors">dpb creative</a>
+              © 2026 <a href="https://simpleallergyalert.com/" target="_blank" rel="noopener noreferrer" className="hover:text-red-600 transition-colors">Simple Allergy Alert</a>
             </p>
           </div>
         </div>
