@@ -12,7 +12,7 @@ import OnboardingStep from '@/components/OnboardingStep';
 const ONBOARDING_STEPS = [
   {
     title: "Safety First",
-    description: "This app is not a medical device. Translations are machine-generated and may contain errors — do not rely on this app as your sole means of communicating a life-threatening allergy. Always carry your prescribed medication. Always speak directly with restaurant staff to confirm ingredients. By using this app you agree to our Terms & Conditions and Privacy Policy. If in doubt, do no eat.",
+    description: "This app is not a medical device. Translations are machine-generated and may contain errors. Do not rely on this app as your sole means of communicating a life-threatening allergy. Always carry your prescribed medication. Always speak directly with restaurant staff to confirm ingredients. By using this app you agree to our Terms & Conditions and Privacy Policy. If in doubt, do no eat.",
     image: "/images/screenshot_1.png"
   },
   {
