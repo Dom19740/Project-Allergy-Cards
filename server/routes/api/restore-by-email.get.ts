@@ -1,6 +1,5 @@
-import { defineHandler } from "nitro";
+import { defineHandler, useRuntimeConfig } from "nitro";
 import { createError, getQuery, setResponseHeader } from "nitro/h3";
-import { useRuntimeConfig } from "#imports";
 
 const restoreRateLimit = new Map<string, { count: number; resetAt: number }>();
 
