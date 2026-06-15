@@ -1,5 +1,4 @@
 import { defineHandler } from "nitro";
-import { useRuntimeConfig } from "#imports";
 import { createError, getQuery, setResponseHeader } from "nitro/h3";
 
 const restoreRateLimit = new Map<string, { count: number; resetAt: number }>();
@@ -33,7 +32,8 @@ export default defineHandler(async (event) => {
 
   enforceRateLimit(restoreToken);
 
-  const apiKey = useRuntimeConfig().lemonSqueezyApiKey;
+  const apiKey = process.env.NITRO_LEMONSQUEEZY_API_KEY;
+
   if (!apiKey) {
     throw createError({
       statusCode: 500,
