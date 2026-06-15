@@ -41,7 +41,7 @@ const PromoCodeDialog: React.FC<PromoCodeDialogProps> = ({ isOpen, onClose, onSu
       }
 
       await Preferences.set({ key: 'isPremium', value: 'true' });
-      localStorage.setItem('isPremium', 'true');
+      sessionStorage.setItem('isPremium', 'true');
       window.dispatchEvent(new CustomEvent('premium-status-changed', { detail: true }));
       
       toast.success("Premium Unlocked!", {
@@ -53,7 +53,7 @@ const PromoCodeDialog: React.FC<PromoCodeDialogProps> = ({ isOpen, onClose, onSu
       window.location.reload();
     } else if (normalizedCode === 'RESET') {
       await Preferences.set({ key: 'isPremium', value: 'false' });
-      localStorage.setItem('isPremium', 'false');
+      sessionStorage.setItem('isPremium', 'false');
       window.dispatchEvent(new CustomEvent('premium-status-changed', { detail: false }));
       
       toast.success("Premium Revoked", {

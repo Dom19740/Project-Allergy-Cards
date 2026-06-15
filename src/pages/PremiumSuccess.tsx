@@ -18,13 +18,12 @@ const PremiumSuccess = () => {
 
     const verifyOrder = async () => {
       try {
-        const response = await fetch(`/api/verify-order?order_id=${orderId}`);
+        const response = await fetch(`/api/verify-order?order_id=${orderId}&session_token=${encodeURIComponent(orderId)}`);
         const data = await response.json();
 
         if (data.success) {
-          // Unlock Premium locally
           await Preferences.set({ key: 'isPremium', value: 'true' });
-          localStorage.setItem('isPremium', 'true');
+          sessionStorage.setItem('isPremium', 'true');
           window.dispatchEvent(new CustomEvent('premium-status-changed', { detail: true }));
           setStatus('success');
         } else {

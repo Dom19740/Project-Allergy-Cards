@@ -6,15 +6,38 @@
  * Requires: process.env.GOOGLE_TRANSLATE_API_KEY
  */
 
+const buckets = new Map<string, { count: number; resetAt: number }>();
+
+const rateLimit = (key: string) => {
+  const now = Date.now();
+  const bucket = buckets.get(key);
+  if (!bucket || bucket.resetAt < now) {
+    buckets.set(key, { count: 1, resetAt: now + 60_000 });
+    return;
+  }
+
+  if (bucket.count >= 20) {
+    throw new Error("RATE_LIMIT");
+  }
+
+  bucket.count += 1;
+};
+
 export default async function handler(req: any, res: any) {
   const apiKey = process.env.GOOGLE_TRANSLATE_API_KEY;
 
-  // Parse URL for query params safely
   let url: URL | null = null;
   try {
     url = new URL(req.url, `http://${req.headers?.host || "localhost"}`);
   } catch {
     // ignore
+  }
+
+  const clientKey = req.headers?.["x-forwarded-for"] || req.socket?.remoteAddress || "unknown";
+  try {
+    rateLimit(String(clientKey));
+  } catch {
+    return res.status(429).json({ error: "Too many requests." });
   }
 
   // Handle GET: list supported languages with English names
@@ -48,9 +71,10 @@ export default async function handler(req: any, res: any) {
       }));
       return res.status(200).json({ languages });
     } catch (error) {
-      console.error("Languages API error:", error);
+      console.error("Languages API error");
       return res.status(500).json({ error: "Internal Server Error" });
     }
+
   }
 
   // Only POST translation below
@@ -103,7 +127,10 @@ export default async function handler(req: any, res: any) {
 
     return res.status(200).json({ translatedText });
   } catch (error) {
-    console.error("Translation API error:", error);
+    if ((error as Error).message === 'RATE_LIMIT') {
+      return res.status(429).json({ error: "Too many requests." });
+    }
+    console.error("Translation API error");
     return res.status(500).json({ error: "Internal Server Error" });
   }
 }

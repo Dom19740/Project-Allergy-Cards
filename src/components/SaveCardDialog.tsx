@@ -94,7 +94,7 @@ const SaveCardDialog: React.FC<SaveCardDialogProps> = ({
     };
 
     if (isEmergency) {
-      await storage.set(STORAGE_KEYS.SAVED_EMERGENCY_CARD, newCard);
+      await storage.setEphemeral(STORAGE_KEYS.SAVED_EMERGENCY_CARD, newCard);
       toast.success("Emergency card saved successfully!");
     } else {
       const savedCards = await storage.get<SavedCard[]>(STORAGE_KEYS.SAVED_CARDS) || [];

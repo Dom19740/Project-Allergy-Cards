@@ -23,6 +23,11 @@ export const useDeepLinks = () => {
           const card = savedCards.find(c => c.id === cardId);
 
           if (card) {
+            const confirmOpen = window.confirm(`Open saved card "${card.name}"?`);
+            if (!confirmOpen) {
+              return;
+            }
+
             await Promise.all([
               storage.set(STORAGE_KEYS.SELECTED_ALLERGENS, card.selectedAllergens),
               storage.set(STORAGE_KEYS.CUSTOM_MESSAGES, card.customMessages),
@@ -36,14 +41,19 @@ export const useDeepLinks = () => {
               });
             }
             
-            navigate(`/alert/${card.languageCode}`, { 
+            navigate(`/alert/${card.languageCode}`, {
               replace: true,
               state: { refresh: Date.now() }
             });
           }
         } else if (host === 'emergency') {
-          const emergencyCard = await storage.get<SavedCard>(STORAGE_KEYS.SAVED_EMERGENCY_CARD);
+          const emergencyCard = await storage.getEphemeral<SavedCard>(STORAGE_KEYS.SAVED_EMERGENCY_CARD);
           if (emergencyCard) {
+            const confirmOpen = window.confirm(`Open emergency card "${emergencyCard.name}"?`);
+            if (!confirmOpen) {
+              return;
+            }
+
             await Promise.all([
               storage.set(STORAGE_KEYS.SELECTED_ALLERGENS, emergencyCard.selectedAllergens),
               storage.set(STORAGE_KEYS.CUSTOM_MESSAGES, emergencyCard.customMessages),
@@ -57,7 +67,7 @@ export const useDeepLinks = () => {
               });
             }
 
-            navigate(`/emergency/${emergencyCard.languageCode}`, { 
+            navigate(`/emergency/${emergencyCard.languageCode}`, {
               replace: true,
               state: { refresh: Date.now() }
             });

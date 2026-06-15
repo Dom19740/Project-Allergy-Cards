@@ -10,10 +10,10 @@ export const LEMON_SQUEEZY_CHECKOUT_URL = 'https://happymunkeestudio.lemonsqueez
 const PREMIUM_CACHE_KEY = 'isPremium';
 
 const setPremiumCache = (value: boolean) => {
-  localStorage.setItem(PREMIUM_CACHE_KEY, value ? 'true' : 'false');
+  sessionStorage.setItem(PREMIUM_CACHE_KEY, value ? 'true' : 'false');
 };
 
-const readPremiumCache = () => localStorage.getItem(PREMIUM_CACHE_KEY) === 'true';
+const readPremiumCache = () => sessionStorage.getItem(PREMIUM_CACHE_KEY) === 'true';
 
 /**
  * Initializes the billing store and registers the premium product.

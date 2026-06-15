@@ -27,12 +27,12 @@ const PremiumOnboarding = () => {
     
     setIsRestoring(true);
     try {
-      const response = await fetch(`/api/restore-by-email?email=${encodeURIComponent(restoreEmail)}`);
+      const response = await fetch(`/api/restore-by-email?restore_token=${encodeURIComponent(restoreEmail)}`);
       const data = await response.json();
       
       if (data.success) {
         await Preferences.set({ key: 'isPremium', value: 'true' });
-        localStorage.setItem('isPremium', 'true');
+        sessionStorage.setItem('isPremium', 'true');
         window.dispatchEvent(new CustomEvent('premium-status-changed', { detail: true }));
         toast.success("Premium restored successfully!");
         setIsRestoreOpen(false);
