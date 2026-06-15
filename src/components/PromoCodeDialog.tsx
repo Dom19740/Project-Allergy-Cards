@@ -9,10 +9,9 @@ import {
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Preferences } from '@capacitor/preferences';
 import { toast } from "sonner";
-import { FirebaseAnalytics } from '@capacitor-firebase/analytics';
 import { Capacitor } from '@capacitor/core';
+import { syncPremiumCache } from '@/lib/billing';
 
 interface PromoCodeDialogProps {
   isOpen: boolean;
@@ -25,57 +24,46 @@ const PromoCodeDialog: React.FC<PromoCodeDialogProps> = ({ isOpen, onClose, onSu
 
   const handleRedeem = async () => {
     const normalizedCode = code.trim().toUpperCase();
-    
-    if (normalizedCode === 'SAAFREE') {
-      // Log the successful redemption to Firebase Analytics (works on Web and Native)
-      try {
-        await FirebaseAnalytics.logEvent({
-          name: 'promo_code_redeemed',
-          params: { 
-            code: 'SAAFREE',
-            platform: Capacitor.getPlatform()
-          }
-        });
-      } catch (e) {
-        console.error("Analytics log failed", e);
+
+    try {
+      const response = await fetch('/api/redeem-promo', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ code: normalizedCode }),
+      });
+
+      if (!response.ok) {
+        throw new Error('Invalid promo code');
       }
 
-      await Preferences.set({ key: 'isPremium', value: 'true' });
-      sessionStorage.setItem('isPremium', 'true');
-      window.dispatchEvent(new CustomEvent('premium-status-changed', { detail: true }));
-      
+      const data = await response.json();
+      if (!data?.success) {
+        throw new Error('Invalid promo code');
+      }
+
+      try {
+        await import('@capacitor-firebase/analytics').then(({ FirebaseAnalytics }) =>
+          FirebaseAnalytics.logEvent({
+            name: 'promo_code_redeemed',
+            params: {
+              code: 'server_redeemed',
+              platform: Capacitor.getPlatform(),
+            },
+          })
+        );
+      } catch {
+      }
+
+      syncPremiumCache(true);
       toast.success("Premium Unlocked!", {
         icon: '🎉',
       });
-      
-      onSuccess();
-      onClose();
-      window.location.reload();
-    } else if (normalizedCode === 'RESET') {
-      await Preferences.set({ key: 'isPremium', value: 'false' });
-      sessionStorage.setItem('isPremium', 'false');
-      window.dispatchEvent(new CustomEvent('premium-status-changed', { detail: false }));
-      
-      toast.success("Premium Revoked", {
-        icon: '🔄',
-      });
 
       onSuccess();
       onClose();
-      window.location.reload();
-    } else {
-      // Log failed attempts
-      try {
-        await FirebaseAnalytics.logEvent({
-          name: 'promo_code_failed',
-          params: { 
-            attempted_code: normalizedCode,
-            platform: Capacitor.getPlatform()
-          }
-        });
-      } catch (e) {
-        // ignore
-      }
+    } catch {
       toast.error("Invalid promo code");
     }
   };

@@ -40,7 +40,7 @@ export const useDeepLinks = () => {
                 content: card.translatedContent
               });
             }
-            
+
             navigate(`/alert/${card.languageCode}`, {
               replace: true,
               state: { refresh: Date.now() }

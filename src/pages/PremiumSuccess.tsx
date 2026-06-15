@@ -1,33 +1,31 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
-import { Preferences } from '@capacitor/preferences';
 import { CheckCircle, Loader2, XCircle } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import { syncPremiumCache } from '@/lib/billing';
 
 const PremiumSuccess = () => {
   const [searchParams] = useSearchParams();
   const navigate = useNavigate();
   const [status, setStatus] = useState<'loading' | 'success' | 'error'>('loading');
   const orderId = searchParams.get('order_id');
+  const sessionToken = searchParams.get('session_token');
 
   useEffect(() => {
-    if (!orderId) {
+    if (!orderId || !sessionToken) {
       setStatus('error');
       return;
     }
 
     const verifyOrder = async () => {
       try {
-        const response = await fetch(`/api/verify-order?order_id=${orderId}&session_token=${encodeURIComponent(orderId)}`);
+        const response = await fetch(`/api/verify-order?order_id=${encodeURIComponent(orderId)}&session_token=${encodeURIComponent(sessionToken)}`);
         const data = await response.json();
 
         if (data.success) {
-          await Preferences.set({ key: 'isPremium', value: 'true' });
-          sessionStorage.setItem('isPremium', 'true');
-          window.dispatchEvent(new CustomEvent('premium-status-changed', { detail: true }));
+          syncPremiumCache(true);
           setStatus('success');
         } else {
-
           setStatus('error');
         }
       } catch (error) {
@@ -37,7 +35,7 @@ const PremiumSuccess = () => {
     };
 
     verifyOrder();
-  }, [orderId]);
+  }, [orderId, sessionToken]);
 
   return (
     <div className="flex flex-col items-center justify-center min-h-screen bg-background p-6 text-center">
