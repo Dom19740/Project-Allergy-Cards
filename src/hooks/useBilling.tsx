@@ -1,7 +1,7 @@
 "use client";
 
 import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
-import { isPremiumUser, purchasePremium, restorePurchases, PREMIUM_PRODUCT_ID, LEMON_SQUEEZY_CHECKOUT_URL } from '@/lib/billing';
+import { isPremiumUser, purchasePremium, restorePurchases, PREMIUM_PRODUCT_ID, LEMON_SQUEEZY_CHECKOUT_URL, refreshPremiumStatus } from '@/lib/billing';
 import { toast } from 'sonner';
 import { Capacitor } from '@capacitor/core';
 
@@ -47,8 +47,14 @@ export const BillingProvider = ({ children }: { children: ReactNode }): React.Re
       updatePrice(); // Initial check
     }
 
-    const handleStatusChange = (e: any) => {
-      setIsPremium(e.detail);
+    const handleStatusChange = async (e: any) => {
+      if (typeof e.detail === 'boolean') {
+        setIsPremium(e.detail);
+        return;
+      }
+
+      const status = await refreshPremiumStatus();
+      setIsPremium(status);
     };
 
     window.addEventListener('premium-status-changed', handleStatusChange);

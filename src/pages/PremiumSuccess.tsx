@@ -23,11 +23,12 @@ const PremiumSuccess = () => {
 
         if (data.success) {
           // Unlock Premium locally
-          localStorage.setItem('isPremium', 'true');
           await Preferences.set({ key: 'isPremium', value: 'true' });
+          localStorage.setItem('isPremium', 'true');
           window.dispatchEvent(new CustomEvent('premium-status-changed', { detail: true }));
           setStatus('success');
         } else {
+
           setStatus('error');
         }
       } catch (error) {

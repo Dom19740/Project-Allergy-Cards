@@ -7,6 +7,13 @@ export const PRODUCT_ID = PREMIUM_PRODUCT_ID;
 
 // Replace this with your actual Lemon Squeezy checkout link
 export const LEMON_SQUEEZY_CHECKOUT_URL = 'https://happymunkeestudio.lemonsqueezy.com/checkout/buy/e1fd4e62-2d89-42b2-aaf5-4e8148c81e33';
+const PREMIUM_CACHE_KEY = 'isPremium';
+
+const setPremiumCache = (value: boolean) => {
+  localStorage.setItem(PREMIUM_CACHE_KEY, value ? 'true' : 'false');
+};
+
+const readPremiumCache = () => localStorage.getItem(PREMIUM_CACHE_KEY) === 'true';
 
 /**
  * Initializes the billing store and registers the premium product.
@@ -32,7 +39,7 @@ export const initBilling = () => {
 
     store.when().verified((receipt: any) => {
       receipt.finish();
-      localStorage.setItem('isPremium', 'true');
+      setPremiumCache(true);
       window.dispatchEvent(new CustomEvent('premium-status-changed', { detail: true }));
     });
 
@@ -40,16 +47,24 @@ export const initBilling = () => {
   }
 };
 
-export const isPremiumUser = async (): Promise<boolean> => {
-  if (localStorage.getItem('isPremium') === 'true') return true;
-  
-  if (typeof window === 'undefined' || !(window as any).CdvPurchase) {
+export const refreshPremiumStatus = async (): Promise<boolean> => {
+  if (typeof window === 'undefined') {
     return false;
+  }
+
+  if (!(window as any).CdvPurchase) {
+    return readPremiumCache();
   }
 
   const { store } = (window as any).CdvPurchase;
   const product = store.get(PREMIUM_PRODUCT_ID);
-  return product?.owned || false;
+  const isOwned = product?.owned || false;
+  setPremiumCache(isOwned);
+  return isOwned;
+};
+
+export const isPremiumUser = async (): Promise<boolean> => {
+  return refreshPremiumStatus();
 };
 
 export const purchasePremium = async () => {

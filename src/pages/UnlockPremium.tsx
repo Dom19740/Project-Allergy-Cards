@@ -26,12 +26,13 @@ const UnlockPremium = () => {
       const data = await response.json();
       
       if (data.success) {
-        localStorage.setItem('isPremium', 'true');
         await Preferences.set({ key: 'isPremium', value: 'true' });
+        localStorage.setItem('isPremium', 'true');
         window.dispatchEvent(new CustomEvent('premium-status-changed', { detail: true }));
         toast.success("Premium restored successfully!");
         setIsRestoreOpen(false);
       } else {
+
         toast.error("No active premium purchase found for this email.");
       }
     } catch (error) {
