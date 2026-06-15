@@ -1,24 +1,22 @@
 import { defineHandler } from "nitro";
-import { createError, getCookie, getQuery } from "nitro/h3";
-
-const PURCHASE_VERIFICATION_COOKIE = "purchase_verification_token";
+import { createError, getQuery } from "nitro/h3";
 
 export default defineHandler(async (event) => {
-  const token = getCookie(event, PURCHASE_VERIFICATION_COOKIE);
-  if (!token) {
-    throw createError({
-      statusCode: 401,
-      statusMessage: "Unauthorized",
-    });
-  }
-
   const query = getQuery(event);
   const orderId = query.order_id;
+  const verificationToken = query.verification_token;
 
   if (!orderId) {
     throw createError({
       statusCode: 400,
       statusMessage: "Missing order_id parameter",
+    });
+  }
+
+  if (!verificationToken || typeof verificationToken !== "string") {
+    throw createError({
+      statusCode: 401,
+      statusMessage: "Unauthorized",
     });
   }
 
@@ -34,9 +32,9 @@ export default defineHandler(async (event) => {
   try {
     const response = await fetch(`https://api.lemonsqueezy.com/v1/orders/${orderId}`, {
       headers: {
-        "Accept": "application/vnd.api+json",
+        Accept: "application/vnd.api+json",
         "Content-Type": "application/vnd.api+json",
-        "Authorization": `Bearer ${apiKey}`,
+        Authorization: `Bearer ${apiKey}`,
       },
     });
 
@@ -49,8 +47,9 @@ export default defineHandler(async (event) => {
 
     const data = await response.json();
     const status = data.data?.attributes?.status;
+    const orderVerificationToken = data.data?.attributes?.first_order_item?.variant_id?.toString?.();
 
-    if (status === "paid") {
+    if (status === "paid" && orderVerificationToken === verificationToken) {
       return { success: true };
     }
 

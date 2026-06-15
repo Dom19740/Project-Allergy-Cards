@@ -1,24 +1,22 @@
 import { defineHandler } from "nitro";
-import { createError, getCookie, getQuery } from "nitro/h3";
-
-const PURCHASE_VERIFICATION_COOKIE = "purchase_verification_token";
+import { createError, getQuery } from "nitro/h3";
 
 export default defineHandler(async (event) => {
-  const token = getCookie(event, PURCHASE_VERIFICATION_COOKIE);
-  if (!token) {
-    throw createError({
-      statusCode: 401,
-      statusMessage: "Unauthorized",
-    });
-  }
-
   const query = getQuery(event);
   const email = query.email;
+  const verificationToken = query.verification_token;
 
-  if (!email) {
+  if (!email || typeof email !== "string") {
     throw createError({
       statusCode: 400,
       statusMessage: "Missing email parameter",
+    });
+  }
+
+  if (!verificationToken || typeof verificationToken !== "string") {
+    throw createError({
+      statusCode: 401,
+      statusMessage: "Unauthorized",
     });
   }
 
@@ -32,11 +30,11 @@ export default defineHandler(async (event) => {
   }
 
   try {
-    const response = await fetch(`https://api.lemonsqueezy.com/v1/orders?filter[user_email]=${encodeURIComponent(String(email))}`, {
+    const response = await fetch(`https://api.lemonsqueezy.com/v1/orders?filter[user_email]=${encodeURIComponent(email)}`, {
       headers: {
-        "Accept": "application/vnd.api+json",
+        Accept: "application/vnd.api+json",
         "Content-Type": "application/vnd.api+json",
-        "Authorization": `Bearer ${apiKey}`,
+        Authorization: `Bearer ${apiKey}`,
       },
     });
 
@@ -49,9 +47,12 @@ export default defineHandler(async (event) => {
 
     const data = await response.json();
     const orders = data.data || [];
-    const hasPaidOrder = orders.some((order: any) => order.attributes?.status === "paid");
+    const matchingOrder = orders.find((order: any) => {
+      const orderToken = order.attributes?.first_order_item?.variant_id?.toString?.();
+      return order.attributes?.status === "paid" && orderToken === verificationToken;
+    });
 
-    if (hasPaidOrder) {
+    if (matchingOrder) {
       return { success: true };
     }
 
