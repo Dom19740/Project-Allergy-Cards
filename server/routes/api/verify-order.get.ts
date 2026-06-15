@@ -1,4 +1,5 @@
-import { defineHandler, useRuntimeConfig } from "nitro";
+import { defineHandler } from "nitro";
+import { useRuntimeConfig } from "#imports";
 import { createError, getQuery, setResponseHeader } from "nitro/h3";
 
 const verifyRateLimit = new Map<string, { count: number; resetAt: number }>();
