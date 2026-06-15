@@ -1,7 +1,17 @@
 import { defineHandler } from "nitro";
-import { getQuery, createError } from "nitro/h3";
+import { createError, getCookie, getQuery } from "nitro/h3";
+
+const PURCHASE_VERIFICATION_COOKIE = "purchase_verification_token";
 
 export default defineHandler(async (event) => {
+  const token = getCookie(event, PURCHASE_VERIFICATION_COOKIE);
+  if (!token) {
+    throw createError({
+      statusCode: 401,
+      statusMessage: "Unauthorized",
+    });
+  }
+
   const query = getQuery(event);
   const email = query.email;
 
@@ -22,7 +32,6 @@ export default defineHandler(async (event) => {
   }
 
   try {
-    // Query Lemon Squeezy orders filtered by email
     const response = await fetch(`https://api.lemonsqueezy.com/v1/orders?filter[user_email]=${encodeURIComponent(String(email))}`, {
       headers: {
         "Accept": "application/vnd.api+json",
@@ -32,30 +41,33 @@ export default defineHandler(async (event) => {
     });
 
     if (!response.ok) {
-      const errorText = await response.text();
-      console.error("Lemon Squeezy API error response:", errorText);
       throw createError({
         statusCode: 400,
-        statusMessage: "Failed to query orders from Lemon Squeezy",
+        statusMessage: "Unable to verify purchase",
       });
     }
 
     const data = await response.json();
     const orders = data.data || [];
-
-    // Check if there is any paid order
     const hasPaidOrder = orders.some((order: any) => order.attributes?.status === "paid");
 
     if (hasPaidOrder) {
       return { success: true };
-    } else {
-      return { success: false, message: "No paid orders found for this email" };
     }
+
+    throw createError({
+      statusCode: 403,
+      statusMessage: "Purchase not verified",
+    });
   } catch (error: any) {
+    if (error?.statusCode) {
+      throw error;
+    }
+
     console.error("Error restoring purchase by email:", error);
     throw createError({
       statusCode: 500,
-      statusMessage: error.message || "Internal Server Error",
+      statusMessage: "Internal Server Error",
     });
   }
 });

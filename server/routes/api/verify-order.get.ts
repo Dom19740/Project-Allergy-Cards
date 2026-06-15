@@ -1,7 +1,17 @@
 import { defineHandler } from "nitro";
-import { getQuery, createError } from "nitro/h3";
+import { createError, getCookie, getQuery } from "nitro/h3";
+
+const PURCHASE_VERIFICATION_COOKIE = "purchase_verification_token";
 
 export default defineHandler(async (event) => {
+  const token = getCookie(event, PURCHASE_VERIFICATION_COOKIE);
+  if (!token) {
+    throw createError({
+      statusCode: 401,
+      statusMessage: "Unauthorized",
+    });
+  }
+
   const query = getQuery(event);
   const orderId = query.order_id;
 
@@ -31,11 +41,9 @@ export default defineHandler(async (event) => {
     });
 
     if (!response.ok) {
-      const errorText = await response.text();
-      console.error("Lemon Squeezy API error response:", errorText);
       throw createError({
         statusCode: 400,
-        statusMessage: "Failed to fetch order from Lemon Squeezy",
+        statusMessage: "Unable to verify purchase",
       });
     }
 
@@ -44,14 +52,21 @@ export default defineHandler(async (event) => {
 
     if (status === "paid") {
       return { success: true };
-    } else {
-      return { success: false, status };
     }
+
+    throw createError({
+      statusCode: 403,
+      statusMessage: "Purchase not verified",
+    });
   } catch (error: any) {
+    if (error?.statusCode) {
+      throw error;
+    }
+
     console.error("Error verifying order:", error);
     throw createError({
       statusCode: 500,
-      statusMessage: error.message || "Internal Server Error",
+      statusMessage: "Internal Server Error",
     });
   }
 });
