@@ -20,10 +20,13 @@ const OnboardingStep: React.FC<OnboardingStepProps> = ({ title, description, ima
           <div className="bg-red-50 dark:bg-red-900/20 p-3 rounded-full mb-4 cursor-default active:opacity-70 transition-opacity">
             <Info className="h-6 w-6 text-red-600" />
           </div>
-          <div className="w-full max-w-md overflow-y-auto px-4">
-            <h2 className="text-xl font-bold mb-4">Safety Disclaimer</h2>
-            <SafetyDisclaimer />
+          <div className="w-full max-w-md px-4">
+            <h2 className="text-lg font-bold mb-3">Safety Disclaimer</h2>
+            <div className="text-sm md:text-base leading-snug">
+              <SafetyDisclaimer />
+            </div>
           </div>
+
         </div>
       ) : image ? (
         <div className="flex-1 w-full min-h-0 flex items-center justify-center overflow-hidden mb-6">
