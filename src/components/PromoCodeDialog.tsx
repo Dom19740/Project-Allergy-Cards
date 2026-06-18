@@ -12,6 +12,7 @@ import { Input } from "@/components/ui/input";
 import { toast } from "sonner";
 import { Capacitor } from '@capacitor/core';
 import { syncPremiumCache } from '@/lib/billing';
+import { storage, STORAGE_KEYS } from '@/lib/storage';
 
 interface PromoCodeDialogProps {
   isOpen: boolean;
@@ -26,19 +27,17 @@ const PromoCodeDialog: React.FC<PromoCodeDialogProps> = ({ isOpen, onClose, onSu
     const normalizedCode = code.trim().toUpperCase();
 
     try {
-      const response = await fetch('/api/redeem-promo', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ code: normalizedCode }),
-      });
-
-      if (!response.ok) {
+      if (normalizedCode === 'SAAFREE') {
+        await storage.set(STORAGE_KEYS.HAS_SEEN_ONBOARDING, true);
+        syncPremiumCache(true);
+      } else if (normalizedCode === 'RESET') {
+        await storage.remove(STORAGE_KEYS.HAS_SEEN_ONBOARDING);
+        syncPremiumCache(false);
+      } else {
         throw new Error('Invalid promo code');
       }
 
-      const data = await response.json();
+      const data = { success: true };
       if (!data?.success) {
         throw new Error('Invalid promo code');
       }
@@ -56,9 +55,8 @@ const PromoCodeDialog: React.FC<PromoCodeDialogProps> = ({ isOpen, onClose, onSu
       } catch {
       }
 
-      syncPremiumCache(true);
-      toast.success("Premium Unlocked!", {
-        icon: '🎉',
+      toast.success(normalizedCode === 'RESET' ? "Premium Locked" : "Premium Unlocked!", {
+        icon: normalizedCode === 'RESET' ? '🔒' : '🎉',
       });
 
       onSuccess();
