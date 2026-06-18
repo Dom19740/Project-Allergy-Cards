@@ -11,13 +11,13 @@ import OnboardingStep from '@/components/OnboardingStep';
 
 const ONBOARDING_STEPS = [
   {
-    title: "Intro",
-    description: "Create personalized allergy alerts in over 100 languages to communicate your dietary restrictions easily and safely.",
+    title: "Safety First",
+    description: "This app is not a medical device. It provides translated allergy alerts for convenience. Translations are machine-generated and may contain errors. Do not rely on this app as your sole means of communicating a life-threatening allergy. Always carry your prescribed medication. By using this app you agree to our Terms & Conditions and Privacy Policy. If in doubt, do no eat.",
     image: "/images/screenshot_1.png"
   },
   {
-    title: "Safety First",
-    description: "This app is not a medical device. It provides translated allergy alerts for convenience. Translations are machine-generated and may contain errors. Do not rely on this app as your sole means of communicating a life-threatening allergy. Always carry your prescribed medication. By using this app you agree to our Terms & Conditions and Privacy Policy. If in doubt, do no eat.",
+    title: "Intro",
+    description: "Create personalized allergy alerts in over 100 languages to communicate your dietary restrictions easily and safely.",
     image: "/images/screenshot_1.png"
   },
   {
