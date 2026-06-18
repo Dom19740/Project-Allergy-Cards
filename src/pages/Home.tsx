@@ -60,36 +60,36 @@ const Home = () => {
           className="flex-1 flex flex-col items-center justify-center text-center min-h-0 py-4 gap-8 md:gap-12"
         >
           
-          <motion.div layout className="w-full space-y-4 mt-4">
+          <motion.div layout className="w-full space-y-4 mt-4 flex-shrink-0">
             <h1 className="text-3xl md:text-4xl font-black text-gray-900 dark:text-white tracking-tight leading-tight">
               Travel Safely. <br />
               <span className="text-red-600">Eat with Confidence.</span>
             </h1>
-            
+
             {showDescription && <div className="h-4" />}
 
           </motion.div>
 
-          <motion.div 
+          <motion.div
             layout
-            className="w-full flex items-center justify-center flex-shrink-0"
+            className="w-full flex items-center justify-center flex-1 min-h-0 max-h-[225px] md:max-h-[300px] overflow-hidden"
           >
-            <img 
-              src="/images/logo_main.png" 
-              alt="App Logo" 
-              className="max-h-[225px] md:max-h-[300px] w-auto h-auto object-contain drop-shadow-xl max-w-[275px] md:max-w-[350px]" 
+            <img
+              src="/images/logo_main.png"
+              alt="App Logo"
+              className="max-h-full w-auto object-contain drop-shadow-xl max-w-[275px] md:max-w-[350px]"
             />
           </motion.div>
 
           <AnimatePresence>
             {hasCards && isPremium && (
-              <motion.div 
+              <motion.div
                 key="cards-list"
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 exit={{ opacity: 0, y: 20 }}
                 transition={{ duration: 0.5 }}
-                className="w-full flex-1 min-h-0 overflow-hidden"
+                className="w-full flex-shrink-0"
               >
                 <SavedCardsList />
               </motion.div>
