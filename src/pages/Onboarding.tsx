@@ -132,9 +132,8 @@ const Onboarding = () => {
             {currentStep === 0 ? (
               <Button
                 onClick={handleUnderstand}
-                className="w-auto px-6 py-4 text-lg bg-red-600 text-white hover:bg-red-700 rounded-2xl shadow-lg transition-transform active:scale-95 flex items-center justify-center font-bold h-auto"
+                className="flex-1 py-4 text-lg bg-red-600 text-white hover:bg-red-700 rounded-2xl shadow-lg transition-transform active:scale-95 flex items-center justify-center font-bold h-auto"
               >
-
                 I Understand
               </Button>
             ) : (
