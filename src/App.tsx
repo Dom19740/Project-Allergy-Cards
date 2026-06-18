@@ -35,9 +35,11 @@ class ErrorBoundary extends Component<{ children: ReactNode }, { error: Error | 
   static getDerivedStateFromError(error: Error) { return { error }; }
   render() {
     if (this.state.error) {
+      const err = this.state.error as Error;
       return (
         <div className="flex h-screen w-full flex-col items-center justify-center gap-4 p-6 text-center">
           <p className="text-lg font-semibold text-gray-800 dark:text-gray-200">Something went wrong.</p>
+          <p className="text-sm text-red-600 font-mono break-all max-w-md">{err.message}</p>
           <button
             className="text-sm text-red-600 underline"
             onClick={() => window.location.href = '/'}
