@@ -117,7 +117,7 @@ const Onboarding = () => {
             ))}
           </div>
 
-          <div className="w-full flex items-center gap-4 pb-4">
+          <div className="w-full flex items-center justify-center gap-4 pb-4">
             {currentStep > 0 && (
               <Button
                 variant="ghost"
@@ -134,13 +134,12 @@ const Onboarding = () => {
                 onClick={handleUnderstand}
                 className="py-4 text-xl md:text-2xl h-auto transition-all duration-200 ease-in-out hover:scale-105 bg-red-600 text-white hover:bg-red-700 w-full max-w-[300px] shadow-xl rounded-2xl font-bold"
               >
-
                 I Understand
               </Button>
             ) : (
               <Button
                 onClick={handleNext}
-                className="flex-1 py-4 text-lg bg-red-600 text-white hover:bg-red-700 rounded-2xl shadow-lg transition-transform active:scale-95 flex items-center justify-center font-bold h-auto"
+                className="py-4 text-xl md:text-2xl h-auto transition-all duration-200 ease-in-out hover:scale-105 bg-red-600 text-white hover:bg-red-700 w-full max-w-[300px] shadow-xl rounded-2xl font-bold"
               >
                 {currentStep === ONBOARDING_STEPS.length - 1 ? 'Get Started' : 'Continue'}
                 <ChevronRight className="w-5 h-5 ml-1" />
@@ -148,6 +147,7 @@ const Onboarding = () => {
             )}
           </div>
         </div>
+
       </div>
     </div>
   );
