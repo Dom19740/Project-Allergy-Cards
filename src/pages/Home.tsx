@@ -70,14 +70,14 @@ const Home = () => {
 
           </motion.div>
 
-          <motion.div
+          <motion.div 
             layout
             className="w-full flex items-center justify-center flex-shrink-0"
           >
-            <img
-              src="/images/logo_main.png"
-              alt="App Logo"
-              className={`w-auto h-auto object-contain drop-shadow-xl ${hasCards && isPremium ? 'max-h-[160px] md:max-h-[210px] max-w-[200px] md:max-w-[260px]' : 'max-h-[225px] md:max-h-[300px] max-w-[275px] md:max-w-[350px]'}`}
+            <img 
+              src="/images/logo_main.png" 
+              alt="App Logo" 
+              className="max-h-[225px] md:max-h-[300px] w-auto h-auto object-contain drop-shadow-xl max-w-[275px] md:max-w-[350px]" 
             />
           </motion.div>
 
