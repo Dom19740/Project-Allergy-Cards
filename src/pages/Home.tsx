@@ -67,25 +67,8 @@ const Home = () => {
               <span className="text-red-600">Eat with Confidence.</span>
             </h1>
             
-            <AnimatePresence mode="wait">
-              {showDescription && (
-                <motion.div 
-                  key="description"
-                  initial={{ opacity: 0, y: -20 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  exit={{ opacity: 0, y: -20 }}
-                  transition={{ duration: 0.5 }}
-                  className="text-base md:text-lg text-gray-600 dark:text-gray-400 max-w-xl mx-auto leading-relaxed space-y-3"
-                >
-                  <p>
-                    Create personalized allergy alerts in over 100 languages to communicate your dietary restrictions easily and safely.
-                  </p>
-                  <p>
-                    Save a translated emergency card to communicate your need for medical attention. 
-                  </p>
-                </motion.div>
-              )}
-            </AnimatePresence>
+            {showDescription && <div className="h-4" />}
+
           </motion.div>
 
           <motion.div 
