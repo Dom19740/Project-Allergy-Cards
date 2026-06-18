@@ -144,7 +144,8 @@ const EmergencyNumberDialog: React.FC<EmergencyNumberDialogProps> = ({
           <Button 
             onClick={handleConfirm}
             disabled={isCustom ? !customNumber : !selectedNumber}
-            className="flex-1 h-11 bg-red-600 hover:bg-red-700 text-white rounded-xl shadow-sm transition-all active:scale-95 font-medium gap-2"
+            variant="primary"
+            className="flex-1 h-11 rounded-xl shadow-sm transition-all active:scale-95 font-medium gap-2"
           >
             <Phone className="h-4 w-4" />
             Confirm

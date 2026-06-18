@@ -133,7 +133,8 @@ const SelectAlertPage = () => {
           </Button>
           <Button
             onClick={handleContinue}
-            className="py-3 px-8 text-lg h-auto bg-red-600 text-white hover:bg-red-700 rounded-xl shadow-lg transition-transform active:scale-95 flex items-center"
+            variant="primary"
+            className="py-3 px-8 text-lg h-auto rounded-xl shadow-lg transition-transform active:scale-95 flex items-center"
           >
             Continue
             <ChevronRight className="w-5 h-5 ml-1" />

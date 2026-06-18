@@ -19,7 +19,8 @@ const CardPreview = () => {
         <div className="flex flex-col gap-4 w-full max-w-xs">
           <Button 
             onClick={() => navigate('/')}
-            className="w-full bg-red-600 hover:bg-red-700 text-white"
+            variant="primary"
+            className="w-full"
           >
             Save Card
           </Button>

@@ -56,7 +56,8 @@ const WidgetInstructions = () => {
           <div className="pt-4">
             <Button 
               onClick={() => navigate(-1)}
-              className="w-full h-14 text-lg font-bold bg-red-600 hover:bg-red-700 text-white rounded-xl shadow-lg shadow-red-600/10 transition-all active:scale-[0.98]"
+              variant="primary"
+              className="w-full h-14 text-lg font-bold rounded-xl shadow-lg shadow-red-700/10 transition-all active:scale-[0.98]"
             >
               Got it
             </Button>

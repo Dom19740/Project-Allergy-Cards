@@ -18,7 +18,8 @@ const SelectAllergens = () => {
         </p>
         <Button 
           onClick={() => navigate('/select-languages')}
-          className="w-full max-w-xs bg-red-600 hover:bg-red-700 text-white"
+          variant="primary"
+          className="w-full max-w-xs"
         >
           Next: Select Languages
         </Button>

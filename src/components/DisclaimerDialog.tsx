@@ -63,7 +63,8 @@ const DisclaimerDialog: React.FC<DisclaimerDialogProps> = ({ isOpen, onClose }) 
         <DialogFooter>
           <Button 
             onClick={onClose}
-            className="w-full bg-red-600 hover:bg-red-700 text-white rounded-xl py-6 text-lg"
+            variant="primary"
+            className="w-full rounded-xl py-6 text-lg"
           >
             I Understand
           </Button>

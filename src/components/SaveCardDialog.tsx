@@ -255,7 +255,8 @@ const SaveCardDialog: React.FC<SaveCardDialogProps> = ({
           <Button 
             onClick={handleSave} 
             disabled={!isPremium}
-            className="flex-1 h-11 bg-red-600 hover:bg-red-700 text-white rounded-xl shadow-sm transition-all active:scale-95 font-medium disabled:opacity-50"
+            variant="primary"
+            className="flex-1 h-11 rounded-xl shadow-sm transition-all active:scale-95 font-medium disabled:opacity-50"
           >
             {selectedCardId ? 'Update' : 'Save'}
           </Button>

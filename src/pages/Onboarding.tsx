@@ -3,7 +3,7 @@
 import React, { useState, useCallback, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import useEmblaCarousel from 'embla-carousel-react';
-import { ChevronRight } from 'lucide-react';
+import { ChevronLeft, ChevronRight } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { storage, STORAGE_KEYS } from '@/lib/storage';
 import FixedHeader from '@/components/FixedHeader';
@@ -117,29 +117,33 @@ const Onboarding = () => {
             ))}
           </div>
 
-          <div className="w-full flex items-center justify-center gap-4 pb-4">
-            {currentStep > 0 && (
+          <div className="w-full flex items-center justify-between gap-4 pb-4">
+            {currentStep > 0 ? (
               <Button
                 variant="ghost"
                 onClick={handleBack}
-                className="flex-1 py-4 rounded-2xl border-2 font-semibold h-auto"
+                className="flex items-center text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-100"
               >
-                <ChevronRight className="mr-2 h-5 w-5 rotate-180" />
+                <ChevronLeft className="w-5 h-5 mr-1" />
                 Back
               </Button>
+            ) : (
+              <div />
             )}
 
             {currentStep === 0 ? (
               <Button
+                variant="primary"
                 onClick={handleUnderstand}
-                className="py-3 px-8 text-lg h-auto bg-red-600 text-white hover:bg-red-700 rounded-xl shadow-lg transition-transform active:scale-95 flex items-center"
+                className="py-3 px-8 text-lg h-auto min-w-[200px] rounded-xl shadow-lg transition-transform active:scale-95"
               >
                 I Understand
               </Button>
             ) : (
               <Button
+                variant="primary"
                 onClick={handleNext}
-                className="py-3 px-8 text-lg h-auto bg-red-600 text-white hover:bg-red-700 rounded-xl shadow-lg transition-transform active:scale-95 flex items-center"
+                className="py-3 px-8 text-lg h-auto min-w-[200px] rounded-xl shadow-lg transition-transform active:scale-95 flex items-center"
               >
                 {currentStep === ONBOARDING_STEPS.length - 1 ? 'Get Started' : 'Continue'}
                 <ChevronRight className="w-5 h-5 ml-1" />

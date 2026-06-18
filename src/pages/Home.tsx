@@ -97,7 +97,8 @@ const Home = () => {
         <div className="flex-shrink-0 w-full flex flex-col justify-center items-center py-6 gap-4 mt-auto">
           <Button
             onClick={handleGetStarted}
-            className="py-3 px-8 text-lg h-auto bg-red-600 text-white hover:bg-red-700 rounded-xl shadow-lg transition-transform active:scale-95 flex items-center"
+            variant="primary"
+            className="py-3 px-8 text-lg h-auto rounded-xl shadow-lg transition-transform active:scale-95 flex items-center"
           >
             Get Started
           </Button>

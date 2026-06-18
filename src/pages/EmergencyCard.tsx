@@ -18,7 +18,8 @@ const EmergencyCard = () => {
         </p>
         <Button 
           onClick={() => navigate('/')}
-          className="w-full max-w-xs bg-red-600 hover:bg-red-700 text-white"
+          variant="primary"
+          className="w-full max-w-xs"
         >
           Save Emergency Card
         </Button>
