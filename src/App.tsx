@@ -1,4 +1,4 @@
-import { Suspense, lazy, useEffect } from "react";
+import { Suspense, lazy, useEffect, Component, ReactNode } from "react";
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -26,9 +26,30 @@ const EmergencyPage = lazy(() => import("./pages/EmergencyPage"));
 const PageTemplate = lazy(() => import("./pages/PageTemplate"));
 const Onboarding = lazy(() => import("./pages/Onboarding"));
 const PremiumOnboarding = lazy(() => import("./pages/PremiumOnboarding"));
-const PremiumSuccess = lazy(() => import("./pages/PremiumSuccess"));
+import PremiumSuccess from "./pages/PremiumSuccess";
 
 const queryClient = new QueryClient();
+
+class ErrorBoundary extends Component<{ children: ReactNode }, { error: Error | null }> {
+  state = { error: null };
+  static getDerivedStateFromError(error: Error) { return { error }; }
+  render() {
+    if (this.state.error) {
+      return (
+        <div className="flex h-screen w-full flex-col items-center justify-center gap-4 p-6 text-center">
+          <p className="text-lg font-semibold text-gray-800 dark:text-gray-200">Something went wrong.</p>
+          <button
+            className="text-sm text-red-600 underline"
+            onClick={() => window.location.href = '/'}
+          >
+            Go to Home
+          </button>
+        </div>
+      );
+    }
+    return this.props.children;
+  }
+}
 
 const LoadingFallback = () => (
   <div className="flex h-screen w-full items-center justify-center bg-gray-100 dark:bg-gray-900">
@@ -92,6 +113,7 @@ const AppContent = () => {
   }, []);
   
   return (
+    <ErrorBoundary>
     <Suspense fallback={<LoadingFallback />}>
       <Routes>
         <Route path="/" element={<Home />} />
@@ -107,6 +129,7 @@ const AppContent = () => {
         <Route path="*" element={<NotFound />} />
       </Routes>
     </Suspense>
+    </ErrorBoundary>
   );
 };
 
