@@ -41,7 +41,7 @@ export default defineHandler(async (event) => {
     });
   }
 
-  const response = await fetch(`https://api.lemonsqueezy.com/v1/orders?filter[custom_fields][restore_token]=${encodeURIComponent(restoreToken)}`, {
+  const response = await fetch(`https://api.lemonsqueezy.com/v1/orders?filter[user_email]=${encodeURIComponent(restoreToken)}`, {
     headers: {
       Accept: "application/vnd.api+json",
       "Content-Type": "application/vnd.api+json",

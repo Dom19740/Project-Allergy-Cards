@@ -34,7 +34,7 @@ const PremiumSuccess = () => {
     };
 
     verifyOrder();
-  }, [orderId, sessionToken]);
+  }, [orderId]);
 
   return (
     <div className="flex flex-col items-center justify-center min-h-screen bg-background p-6 text-center">
