@@ -5,7 +5,7 @@ import { Capacitor } from '@capacitor/core';
 export const PREMIUM_PRODUCT_ID = 'premium_unlock';
 export const PRODUCT_ID = PREMIUM_PRODUCT_ID;
 
-export const LEMON_SQUEEZY_CHECKOUT_URL = '/api/create-checkout';
+export const LEMON_SQUEEZY_CHECKOUT_URL = 'https://happymunkeestudio.lemonsqueezy.com/checkout/buy/91c95564-fa69-44ce-afcf-6422dfea4ed5';
 const PREMIUM_CACHE_KEY = 'isPremium';
 
 const setPremiumCache = (value: boolean) => {
