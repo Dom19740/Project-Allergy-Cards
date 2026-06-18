@@ -55,12 +55,9 @@ const Home = () => {
     <div className="flex flex-col h-[100dvh] bg-gray-100 dark:bg-gray-900 overflow-hidden">
       <FixedHeader />
       <div className="flex flex-col flex-1 w-full max-w-2xl mx-auto px-6 pt-[calc(100px+env(safe-area-inset-top))] pb-[env(safe-area-inset-bottom)] min-h-0">
-        <motion.div 
-          layout
-          className="flex-1 flex flex-col items-center justify-center text-center min-h-0 py-4 gap-8 md:gap-12"
-        >
-          
-          <motion.div layout className="w-full space-y-4 mt-4 flex-shrink-0">
+        <div className="flex-1 flex flex-col items-center justify-center text-center min-h-0 py-4 gap-8 md:gap-12">
+
+          <div className="w-full space-y-4 mt-4 flex-shrink-0">
             <h1 className="text-3xl md:text-4xl font-black text-gray-900 dark:text-white tracking-tight leading-tight">
               Travel Safely. <br />
               <span className="text-red-600">Eat with Confidence.</span>
@@ -68,7 +65,7 @@ const Home = () => {
 
             {showDescription && <div className="h-4" />}
 
-          </motion.div>
+          </div>
 
           <motion.div
             layout
@@ -95,7 +92,7 @@ const Home = () => {
               </motion.div>
             )}
           </AnimatePresence>
-        </motion.div>
+        </div>
 
         <div className="flex-shrink-0 w-full flex flex-col justify-center items-center py-6 gap-4 mt-auto">
           <Button
