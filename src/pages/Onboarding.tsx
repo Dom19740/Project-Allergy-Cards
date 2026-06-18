@@ -132,14 +132,14 @@ const Onboarding = () => {
             {currentStep === 0 ? (
               <Button
                 onClick={handleUnderstand}
-                className="py-4 text-xl md:text-2xl h-auto transition-all duration-200 ease-in-out hover:scale-105 bg-red-600 text-white hover:bg-red-700 w-full max-w-[300px] shadow-xl rounded-2xl font-bold"
+                className="py-3 px-8 text-lg h-auto bg-red-600 text-white hover:bg-red-700 rounded-xl shadow-lg transition-transform active:scale-95 flex items-center"
               >
                 I Understand
               </Button>
             ) : (
               <Button
                 onClick={handleNext}
-                className="py-4 text-xl md:text-2xl h-auto transition-all duration-200 ease-in-out hover:scale-105 bg-red-600 text-white hover:bg-red-700 w-full max-w-[300px] shadow-xl rounded-2xl font-bold"
+                className="py-3 px-8 text-lg h-auto bg-red-600 text-white hover:bg-red-700 rounded-xl shadow-lg transition-transform active:scale-95 flex items-center"
               >
                 {currentStep === ONBOARDING_STEPS.length - 1 ? 'Get Started' : 'Continue'}
                 <ChevronRight className="w-5 h-5 ml-1" />
