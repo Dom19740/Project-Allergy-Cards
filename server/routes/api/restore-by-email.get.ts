@@ -32,7 +32,7 @@ export default defineHandler(async (event) => {
 
   enforceRateLimit(restoreToken);
 
-  const apiKey = process.env.NITRO_LEMONSQUEEZY_API_KEY;
+  const apiKey = process.env.LEMON_SQUEEZY_API_KEY;
 
   if (!apiKey) {
     throw createError({

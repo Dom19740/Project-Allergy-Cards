@@ -22,7 +22,6 @@ export default defineHandler(async (event) => {
   setResponseHeader(event, "Cache-Control", "no-store");
   const query = getQuery(event);
   const orderId = query.order_id;
-  const sessionToken = query.session_token;
 
   if (!orderId || typeof orderId !== "string") {
     throw createError({
@@ -31,16 +30,9 @@ export default defineHandler(async (event) => {
     });
   }
 
-  if (!sessionToken || typeof sessionToken !== "string") {
-    throw createError({
-      statusCode: 401,
-      statusMessage: "Unauthorized",
-    });
-  }
+  enforceRateLimit(orderId);
 
-  enforceRateLimit(`${orderId}:${sessionToken}`);
-
-  const apiKey = process.env.NITRO_LEMONSQUEEZY_API_KEY;
+  const apiKey = process.env.LEMON_SQUEEZY_API_KEY;
 
   if (!apiKey) {
     throw createError({
@@ -66,9 +58,8 @@ export default defineHandler(async (event) => {
 
   const data = await response.json();
   const status = data.data?.attributes?.status;
-  const orderSessionToken = data.data?.attributes?.custom_data?.session_token;
 
-  if (status === "paid" && orderSessionToken === sessionToken) {
+  if (status === "paid") {
     return { success: true };
   }
 

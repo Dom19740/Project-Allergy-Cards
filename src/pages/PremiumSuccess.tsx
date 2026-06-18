@@ -9,17 +9,16 @@ const PremiumSuccess = () => {
   const navigate = useNavigate();
   const [status, setStatus] = useState<'loading' | 'success' | 'error'>('loading');
   const orderId = searchParams.get('order_id');
-  const sessionToken = searchParams.get('session_token');
 
   useEffect(() => {
-    if (!orderId || !sessionToken) {
+    if (!orderId) {
       setStatus('error');
       return;
     }
 
     const verifyOrder = async () => {
       try {
-        const response = await fetch(`/api/verify-order?order_id=${encodeURIComponent(orderId)}&session_token=${encodeURIComponent(sessionToken)}`);
+        const response = await fetch(`/api/verify-order?order_id=${encodeURIComponent(orderId)}`);
         const data = await response.json();
 
         if (data.success) {
