@@ -55,10 +55,8 @@ const LANGUAGES = [
   { code: 'haw',    name: 'Hawaiian' },
   { code: 'iw',     name: 'Hebrew' },
   { code: 'hi',     name: 'Hindi' },
-  { code: 'hmn',    name: 'Hmong' },
   { code: 'hu',     name: 'Hungarian' },
   { code: 'is',     name: 'Icelandic' },
-  { code: 'ig',     name: 'Igbo' },
   { code: 'id',     name: 'Indonesian' },
   { code: 'ga',     name: 'Irish' },
   { code: 'it',     name: 'Italian' },
@@ -98,7 +96,6 @@ const LANGUAGES = [
   { code: 'gd',     name: 'Scots Gaelic' },
   { code: 'sr',     name: 'Serbian' },
   { code: 'st',     name: 'Sesotho' },
-  { code: 'sn',     name: 'Shona' },
   { code: 'sd',     name: 'Sindhi' },
   { code: 'si',     name: 'Sinhala' },
   { code: 'sk',     name: 'Slovak' },
@@ -117,7 +114,6 @@ const LANGUAGES = [
   { code: 'uz',     name: 'Uzbek' },
   { code: 'vi',     name: 'Vietnamese' },
   { code: 'cy',     name: 'Welsh' },
-  { code: 'xh',     name: 'Xhosa' },
   { code: 'yi',     name: 'Yiddish' },
   { code: 'yo',     name: 'Yoruba' },
   { code: 'zu',     name: 'Zulu' },
@@ -170,10 +166,6 @@ const MANUAL_OVERRIDES = {
   'haw': {
     'tree nuts':  "hua kumulā'au",
     'celery':     'kālere',
-  },
-  'ig': {
-    'eggs':       'àkwà',
-    'tree nuts':  'ọkpa osisi',
   },
   'kn': {
     'crustaceans': 'ಕಠಿಣಚರ್ಮಿ ಪ್ರಾಣಿಗಳು',
@@ -234,9 +226,6 @@ const MANUAL_OVERRIDES = {
     'gluten':     'kleykovina',
     'soy':        'soya',
     'sesame':     'kunjut',
-  },
-  'xh': {
-    'gluten':     'i-gluten',
   },
 };
 
