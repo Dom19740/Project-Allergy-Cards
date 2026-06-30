@@ -317,7 +317,11 @@ async function main() {
       const value = entries[key];
       if (!value) continue;
       const tag = overrides[key] ? ' // verified' : '';
-      lines.push(`    '${escapeTs(key)}': '${escapeTs(value)}',${tag}`);
+      // Lowercased for storage consistency — translateText() re-capitalizes the
+      // first letter on display. toLowerCase() is a no-op on scripts without case
+      // (CJK, Arabic, Thai, Devanagari, etc.), so this only affects Latin/Cyrillic/
+      // Greek/Armenian-script entries.
+      lines.push(`    '${escapeTs(key)}': '${escapeTs(value.toLowerCase())}',${tag}`);
     }
     lines.push(`  },`);
   }
