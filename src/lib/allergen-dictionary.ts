@@ -56,7 +56,7 @@ export const ALLERGEN_DICTIONARY: Record<string, Record<string, string>> = {
   },
   // Arabic
   'ar': {
-    'milk': 'لبن',
+    'milk': 'حليب',
     'eggs': 'بيض',
     'peanuts': 'الفول السوداني',
     'tree nuts': 'جوز الشجرة',
@@ -558,7 +558,7 @@ export const ALLERGEN_DICTIONARY: Record<string, Record<string, string>> = {
     'fish': 'ψάρι',
     'crustaceans': 'καρκινοειδή',
     'sesame': 'σουσάμι',
-    'molluscs': 'μαλάκια',
+    'molluscs': 'μύδια, αχιβάδες',
     'mustard': 'μουστάρδα',
     'sulphites': 'θειώδη',
     'celery': 'σέλινο',
