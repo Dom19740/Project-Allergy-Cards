@@ -100,13 +100,11 @@ export const getAllGoogleLanguages = async (): Promise<SupportedLanguage[]> => {
     { code: 'el', name: 'Greek' },
     { code: 'gu', name: 'Gujarati' },
     { code: 'ht', name: 'Haitian Creole' },
-    { code: 'ha', name: 'Hausa' },
     { code: 'iw', name: 'Hebrew' },
     { code: 'hi', name: 'Hindi' },
     { code: 'hu', name: 'Hungarian' },
     { code: 'is', name: 'Icelandic' },
     { code: 'id', name: 'Indonesian' },
-    { code: 'ga', name: 'Irish' },
     { code: 'it', name: 'Italian' },
     { code: 'ja', name: 'Japanese' },
     { code: 'jw', name: 'Javanese' },
@@ -141,7 +139,6 @@ export const getAllGoogleLanguages = async (): Promise<SupportedLanguage[]> => {
     { code: 'ro', name: 'Romanian' },
     { code: 'ru', name: 'Russian' },
     { code: 'sm', name: 'Samoan' },
-    { code: 'gd', name: 'Scots Gaelic' },
     { code: 'sr', name: 'Serbian' },
     { code: 'sd', name: 'Sindhi' },
     { code: 'si', name: 'Sinhala' },
@@ -160,9 +157,7 @@ export const getAllGoogleLanguages = async (): Promise<SupportedLanguage[]> => {
     { code: 'ur', name: 'Urdu' },
     { code: 'uz', name: 'Uzbek' },
     { code: 'vi', name: 'Vietnamese' },
-    { code: 'cy', name: 'Welsh' },
-    { code: 'yi', name: 'Yiddish' },
-    { code: 'yo', name: 'Yoruba' }
+    { code: 'yi', name: 'Yiddish' }
   ];
   
   return languages;

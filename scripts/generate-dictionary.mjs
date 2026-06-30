@@ -51,13 +51,11 @@ const LANGUAGES = [
   { code: 'el',     name: 'Greek' },
   { code: 'gu',     name: 'Gujarati' },
   { code: 'ht',     name: 'Haitian Creole' },
-  { code: 'ha',     name: 'Hausa' },
   { code: 'iw',     name: 'Hebrew' },
   { code: 'hi',     name: 'Hindi' },
   { code: 'hu',     name: 'Hungarian' },
   { code: 'is',     name: 'Icelandic' },
   { code: 'id',     name: 'Indonesian' },
-  { code: 'ga',     name: 'Irish' },
   { code: 'it',     name: 'Italian' },
   { code: 'ja',     name: 'Japanese' },
   { code: 'jw',     name: 'Javanese' },
@@ -92,7 +90,6 @@ const LANGUAGES = [
   { code: 'ro',     name: 'Romanian' },
   { code: 'ru',     name: 'Russian' },
   { code: 'sm',     name: 'Samoan' },
-  { code: 'gd',     name: 'Scots Gaelic' },
   { code: 'sr',     name: 'Serbian' },
   { code: 'sd',     name: 'Sindhi' },
   { code: 'si',     name: 'Sinhala' },
@@ -111,9 +108,7 @@ const LANGUAGES = [
   { code: 'ur',     name: 'Urdu' },
   { code: 'uz',     name: 'Uzbek' },
   { code: 'vi',     name: 'Vietnamese' },
-  { code: 'cy',     name: 'Welsh' },
   { code: 'yi',     name: 'Yiddish' },
-  { code: 'yo',     name: 'Yoruba' },
 ];
 
 // Verified manual corrections — these override whatever Google Translate returns.
@@ -197,10 +192,6 @@ const MANUAL_OVERRIDES = {
   'pa': {
     'soy':        'ਸੋਇਆਬੀਨ',
     'celery':     'ਸੈਲਰੀ',
-  },
-  'gd': {
-    'soy':        'pònair soighe',
-    'celery':     'soilire',
   },
   'sd': {
     'eggs':       'آنا',

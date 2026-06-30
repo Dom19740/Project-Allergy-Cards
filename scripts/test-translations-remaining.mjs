@@ -38,10 +38,8 @@ const LANGUAGES = [
   { code: 'ka',    name: 'Georgian' },
   { code: 'gu',    name: 'Gujarati' },
   { code: 'ht',    name: 'Haitian Creole' },
-  { code: 'ha',    name: 'Hausa' },
   { code: 'hu',    name: 'Hungarian' },
   { code: 'is',    name: 'Icelandic' },
-  { code: 'ga',    name: 'Irish' },
   { code: 'jw',    name: 'Javanese' },
   { code: 'kn',    name: 'Kannada' },
   { code: 'kk',    name: 'Kazakh' },
@@ -67,7 +65,6 @@ const LANGUAGES = [
   { code: 'pt-PT', name: 'Portuguese (European)' },
   { code: 'pa',    name: 'Punjabi' },
   { code: 'sm',    name: 'Samoan' },
-  { code: 'gd',    name: 'Scots Gaelic' },
   { code: 'sr',    name: 'Serbian' },
   { code: 'sd',    name: 'Sindhi' },
   { code: 'si',    name: 'Sinhala' },
@@ -81,9 +78,7 @@ const LANGUAGES = [
   { code: 'te',    name: 'Telugu' },
   { code: 'ur',    name: 'Urdu' },
   { code: 'uz',    name: 'Uzbek' },
-  { code: 'cy',    name: 'Welsh' },
   { code: 'yi',    name: 'Yiddish' },
-  { code: 'yo',    name: 'Yoruba' },
 ];
 
 const ALLERGENS = [
