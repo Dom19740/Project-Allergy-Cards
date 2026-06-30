@@ -173,7 +173,7 @@ export const ALLERGEN_DICTIONARY: Record<string, Record<string, string>> = {
     'celery': 'celer',
     'lupin': 'lupin',
   },
-  // Bulgarian
+  // Bulgarian - 
   'bg': {
     'milk': 'мляко',
     'eggs': 'яйца',
@@ -195,7 +195,7 @@ export const ALLERGEN_DICTIONARY: Record<string, Record<string, string>> = {
     'milk': 'llet',
     'eggs': 'ous',
     'peanuts': 'cacauets',
-    'tree nuts': 'fruits secs d\'arbre',
+    'tree nuts': 'fruits secs',
     'gluten': 'gluten',
     'soy': 'soja',
     'fish': 'peix',
@@ -205,7 +205,7 @@ export const ALLERGEN_DICTIONARY: Record<string, Record<string, string>> = {
     'mustard': 'mostassa',
     'sulphites': 'sulfits',
     'celery': 'api',
-    'lupin': 'tramús',
+    'lupin': 'llobí',
   },
   // Cebuano
   'ceb': {
@@ -416,7 +416,7 @@ export const ALLERGEN_DICTIONARY: Record<string, Record<string, string>> = {
     'milk': 'leche',
     'eggs': 'huevos',
     'peanuts': 'maníes',
-    'tree nuts': 'frutos secos de árbol',
+    'tree nuts': 'frutos secos',
     'gluten': 'gluten',
     'soy': 'soja',
     'fish': 'pescado',
@@ -535,7 +535,7 @@ export const ALLERGEN_DICTIONARY: Record<string, Record<string, string>> = {
     'milk': 'milch',
     'eggs': 'eier',
     'peanuts': 'erdnüsse',
-    'tree nuts': 'baumnüsse',
+    'tree nuts': 'schalenfrüchte ',
     'gluten': 'gluten',
     'soy': 'soja',
     'fish': 'fisch',
@@ -785,20 +785,20 @@ export const ALLERGEN_DICTIONARY: Record<string, Record<string, string>> = {
     'celery': 'សេលីរី',
     'lupin': 'លូភីន',
   },
-  // Korean
+// Korean
   'ko': {
     'milk': '우유',
-    'eggs': '계란',
+    'eggs': '달걀',
     'peanuts': '땅콩',
     'tree nuts': '견과류',
     'gluten': '글루텐',
-    'soy': '대두',
-    'fish': '물고기',
+    'soy': '콩',
+    'fish': '생선',
     'crustaceans': '갑각류',
     'sesame': '참깨',
-    'molluscs': '연체동물',
+    'molluscs': '조개류',
     'mustard': '겨자',
-    'sulphites': '아황산염',
+    'sulphites': '아황산류',
     'celery': '셀러리',
     'lupin': '루핀',
   },

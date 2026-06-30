@@ -43,6 +43,7 @@ const AllergyCard: React.FC<AllergyCardProps> = ({ languageCode, selectedAllerge
   const [customAllergenTranslations, setCustomAllergenTranslations] = useState<{ [key: string]: { [lang: string]: string } }>({});
   const [translatedAllergens, setTranslatedAllergens] = useState<{ [key: string]: string }>(initialTranslations?.allergens || {});
   const [isTranslating, setIsTranslating] = useState(!initialTranslations);
+  const [showOriginal, setShowOriginal] = useState(false);
   
   const [fullSelectedData, setFullSelectedData] = useState<SelectedAllergens | null>(null);
   const [customMessages, setCustomMessages] = useState<CustomMessages>({
@@ -96,11 +97,15 @@ const AllergyCard: React.FC<AllergyCardProps> = ({ languageCode, selectedAllerge
 
   useEffect(() => {
     loadData();
-    
+
     const handleUpdate = () => loadData();
     window.addEventListener('storage-update', handleUpdate);
     return () => window.removeEventListener('storage-update', handleUpdate);
   }, [languageCode, selectedAllergens]);
+
+  useEffect(() => {
+    setShowOriginal(false);
+  }, [languageCode]);
 
   useEffect(() => {
     const translateAllContent = async () => {
@@ -304,9 +309,25 @@ const AllergyCard: React.FC<AllergyCardProps> = ({ languageCode, selectedAllerge
     navigate(`/emergency/${languageCode}?num=${encodeURIComponent(number)}`);
   };
 
-  const translatedAllergenList = selectedAllergens.map(allergen => 
+  const translatedAllergenList = selectedAllergens.map(allergen =>
     translatedAllergens[allergen] || allergen
   );
+
+  const englishAllergenList = selectedAllergens.map(allergenId => {
+    const predefinedAllergen = ALLERGEN_OPTIONS.find(opt => opt.id === allergenId);
+    if (predefinedAllergen) return predefinedAllergen.name;
+    return customAllergenTranslations[allergenId]?.['en'] || allergenId;
+  });
+
+  const englishUIText = {
+    allergyAlert: "ALLERGY ALERT!",
+    iAmAllergicTo: customMessages.iAmAllergicTo,
+    thankYou: "Thank you!",
+    theyMakeMeSick: customMessages.theyMakeMeSick
+  };
+
+  const displayUIText = showOriginal ? englishUIText : translatedUIText;
+  const displayAllergenList = showOriginal ? englishAllergenList : translatedAllergenList;
 
   const allergensWithImages = selectedAllergens
     .map(id => ALLERGEN_OPTIONS.find(option => option.id === id))
@@ -344,31 +365,31 @@ const AllergyCard: React.FC<AllergyCardProps> = ({ languageCode, selectedAllerge
       >
         <div className="h-6 sm:h-10 md:h-14" />
         <h1 className="text-2xl sm:text-4xl md:text-5xl lg:text-6xl font-black leading-tight mb-4 sm:mb-8 md:mb-12 text-red-600 uppercase tracking-tighter whitespace-nowrap">
-          {translatedUIText.allergyAlert}
+          {displayUIText.allergyAlert}
         </h1>
-        
-        {translatedUIText.iAmAllergicTo && (
+
+        {displayUIText.iAmAllergicTo && (
           <p className="text-2xl sm:text-3xl md:text-4xl font-normal text-gray-800 mb-4 sm:mb-8 md:mb-12">
-            {translatedUIText.iAmAllergicTo}
+            {displayUIText.iAmAllergicTo}
           </p>
         )}
 
         <div className="flex flex-wrap justify-center gap-1 sm:gap-2 mb-4 sm:mb-8 md:mb-12">
-          {translatedAllergenList.map((allergen, index) => (
+          {displayAllergenList.map((allergen, index) => (
             <span key={index} className="bg-red-600 text-white px-3 py-1 sm:px-4 sm:py-2 rounded-full text-base sm:text-lg md:text-xl font-normal uppercase">
               {allergen}
             </span>
           ))}
         </div>
 
-        {translatedUIText.theyMakeMeSick && (
+        {displayUIText.theyMakeMeSick && (
           <p className="text-2xl sm:text-3xl md:text-4xl font-normal text-gray-800 mb-2 sm:mb-3 leading-tight max-w-2xl">
-            {translatedUIText.theyMakeMeSick}
+            {displayUIText.theyMakeMeSick}
           </p>
         )}
 
         <p className="text-2xl sm:text-3xl md:text-4xl font-normal text-gray-600 italic mb-4 sm:mb-6">
-          {translatedUIText.thankYou}
+          {displayUIText.thankYou}
         </p>
         
         <div 
@@ -394,9 +415,15 @@ const AllergyCard: React.FC<AllergyCardProps> = ({ languageCode, selectedAllerge
         </div>
 
         <div className="mt-auto pt-2">
-          <p className="text-[20px] sm:text-2xl text-gray-400 font-light mb-0">
-            Translated to {getLanguageName(languageCode)}
-          </p>
+          <button
+            type="button"
+            onClick={() => setShowOriginal(prev => !prev)}
+            className="inline-flex items-center bg-white hover:bg-gray-50 active:bg-gray-100 transition-colors rounded-full px-4 py-1.5 border border-gray-200 shadow-md text-gray-600 text-[14px] sm:text-base font-light mb-0"
+          >
+            {showOriginal
+              ? `English · See ${getLanguageName(languageCode)}`
+              : `${getLanguageName(languageCode)} · See Original`}
+          </button>
           {!isPremium && (
             <p className="text-[13px] sm:text-base text-gray-400 font-light">
               created with Simple Allergy Alert © 2026 dpbcreative
