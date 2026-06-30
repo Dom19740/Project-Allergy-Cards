@@ -60,7 +60,7 @@ export const ALLERGEN_DICTIONARY: Record<string, Record<string, string>> = {
     'eggs': 'بيض',
     'peanuts': 'الفول السوداني',
     'tree nuts': 'جوز الشجرة',
-    'gluten': 'الغولتين',
+    'gluten': 'الغلوتين',
     'soy': 'الصويا',
     'fish': 'الأسماك',
     'crustaceans': 'القشريات',
@@ -615,23 +615,6 @@ export const ALLERGEN_DICTIONARY: Record<string, Record<string, string>> = {
     'celery': 'seleri',
     'lupin': 'lupine',
   },
-  // Hawaiian
-  'haw': {
-    'milk': 'waiu',
-    'eggs': 'huamoa',
-    'peanuts': 'peanuts',
-    'tree nuts': 'hua kumulā\'au', // verified
-    'gluten': 'gluten',
-    'soy': 'soya',
-    'fish': 'iʻa',
-    'crustaceans': 'ʻo crustaceans',
-    'sesame': 'sesame',
-    'molluscs': 'molluscs',
-    'mustard': 'makeke',
-    'sulphites': 'sulphites',
-    'celery': 'kālere', // verified
-    'lupin': 'lupine',
-  },
   // Hebrew
   'iw': {
     'milk': 'חָלָב',
@@ -896,12 +879,12 @@ export const ALLERGEN_DICTIONARY: Record<string, Record<string, string>> = {
     'gluten': 'ກລູເຕນ',
     'soy': 'ຖົ່ວເຫຼືອງ',
     'fish': 'ປາ',
-    'crustaceans': 'crustaceans',
+    'crustaceans': 'ສັດທະເລມີເປືອກແຂງ',
     'sesame': 'ໝາກງາ',
     'molluscs': 'ສັດທີ່ມີເປືອກ', // verified
     'mustard': 'ມັດສະຕາດ', // verified
     'sulphites': 'ຊັນໄຟດ໌', // verified
-    'celery': 'celery',
+    'celery': 'ຜັກຕັ້ງໂອ',
     'lupin': 'ລູປິນ',
   },
   // Latin
@@ -1346,23 +1329,6 @@ export const ALLERGEN_DICTIONARY: Record<string, Record<string, string>> = {
     'celery': 'целер',
     'lupin': 'лупин',
   },
-  // Sesotho
-  'st': {
-    'milk': 'lebese',
-    'eggs': 'mahe',
-    'peanuts': 'matokomane',
-    'tree nuts': 'linate tsa sefate',
-    'gluten': 'gluten',
-    'soy': 'soya',
-    'fish': 'litlhapi',
-    'crustaceans': 'li-crustaceans',
-    'sesame': 'sesame',
-    'molluscs': 'li-molluscs',
-    'mustard': 'mosetareta',
-    'sulphites': 'li-sulphite',
-    'celery': 'seleri',
-    'lupin': 'lupine',
-  },
   // Sindhi
   'sd': {
     'milk': 'کير',
@@ -1474,12 +1440,12 @@ export const ALLERGEN_DICTIONARY: Record<string, Record<string, string>> = {
     'gluten': 'gluten',
     'soy': 'soya',
     'fish': 'samaki',
-    'crustaceans': 'crustaceans',
+    'crustaceans': 'kaa na kamba',
     'sesame': 'ufuta',
     'molluscs': 'moluska',
     'mustard': 'haradali',
     'sulphites': 'sulphites',
-    'celery': 'celery',
+    'celery': 'seleri',
     'lupin': 'lupine',
   },
   // Swedish
@@ -1556,9 +1522,9 @@ export const ALLERGEN_DICTIONARY: Record<string, Record<string, string>> = {
     'eggs': 'ไข่',
     'peanuts': 'ถั่วลิสง',
     'tree nuts': 'ถั่วต้นไม้',
-    'gluten': 'ตัง',
+    'gluten': 'กลูเตน',
     'soy': 'ถั่วเหลือง',
-    'fish': 'กลูเตน',
+    'fish': 'ปลา',
     'crustaceans': 'กุ้ง กุ้งทะเล ปู', // verified
     'sesame': 'งา',
     'molluscs': 'มอลลัสก์', // verified
@@ -1702,23 +1668,6 @@ export const ALLERGEN_DICTIONARY: Record<string, Record<string, string>> = {
     'sulphites': 'awọn sulfites',
     'celery': 'seleri',
     'lupin': 'lupin',
-  },
-  // Zulu
-  'zu': {
-    'milk': 'ubisi',
-    'eggs': 'amaqanda',
-    'peanuts': 'amantongomane',
-    'tree nuts': 'amantongomane esihlahla',
-    'gluten': 'i-gluten',
-    'soy': 'isoya',
-    'fish': 'inhlanzi',
-    'crustaceans': 'ama-crustaceans',
-    'sesame': 'isesame',
-    'molluscs': 'ama-molluscs',
-    'mustard': 'isinaphi',
-    'sulphites': 'ama-sulphite',
-    'celery': 'isilimo esidliwayo esinamagatsha anamanzi',
-    'lupin': 'i-lupine',
   },
 };
 

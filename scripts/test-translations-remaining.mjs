@@ -39,7 +39,6 @@ const LANGUAGES = [
   { code: 'gu',    name: 'Gujarati' },
   { code: 'ht',    name: 'Haitian Creole' },
   { code: 'ha',    name: 'Hausa' },
-  { code: 'haw',   name: 'Hawaiian' },
   { code: 'hu',    name: 'Hungarian' },
   { code: 'is',    name: 'Icelandic' },
   { code: 'ga',    name: 'Irish' },
@@ -70,7 +69,6 @@ const LANGUAGES = [
   { code: 'sm',    name: 'Samoan' },
   { code: 'gd',    name: 'Scots Gaelic' },
   { code: 'sr',    name: 'Serbian' },
-  { code: 'st',    name: 'Sesotho' },
   { code: 'sd',    name: 'Sindhi' },
   { code: 'si',    name: 'Sinhala' },
   { code: 'sk',    name: 'Slovak' },
@@ -86,7 +84,6 @@ const LANGUAGES = [
   { code: 'cy',    name: 'Welsh' },
   { code: 'yi',    name: 'Yiddish' },
   { code: 'yo',    name: 'Yoruba' },
-  { code: 'zu',    name: 'Zulu' },
 ];
 
 const ALLERGENS = [

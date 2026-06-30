@@ -52,7 +52,6 @@ const LANGUAGES = [
   { code: 'gu',     name: 'Gujarati' },
   { code: 'ht',     name: 'Haitian Creole' },
   { code: 'ha',     name: 'Hausa' },
-  { code: 'haw',    name: 'Hawaiian' },
   { code: 'iw',     name: 'Hebrew' },
   { code: 'hi',     name: 'Hindi' },
   { code: 'hu',     name: 'Hungarian' },
@@ -95,7 +94,6 @@ const LANGUAGES = [
   { code: 'sm',     name: 'Samoan' },
   { code: 'gd',     name: 'Scots Gaelic' },
   { code: 'sr',     name: 'Serbian' },
-  { code: 'st',     name: 'Sesotho' },
   { code: 'sd',     name: 'Sindhi' },
   { code: 'si',     name: 'Sinhala' },
   { code: 'sk',     name: 'Slovak' },
@@ -116,7 +114,6 @@ const LANGUAGES = [
   { code: 'cy',     name: 'Welsh' },
   { code: 'yi',     name: 'Yiddish' },
   { code: 'yo',     name: 'Yoruba' },
-  { code: 'zu',     name: 'Zulu' },
 ];
 
 // Verified manual corrections — these override whatever Google Translate returns.
@@ -162,10 +159,6 @@ const MANUAL_OVERRIDES = {
   },
   'ht': {
     'molluscs':   'molusks',
-  },
-  'haw': {
-    'tree nuts':  "hua kumulā'au",
-    'celery':     'kālere',
   },
   'kn': {
     'crustaceans': 'ಕಠಿಣಚರ್ಮಿ ಪ್ರಾಣಿಗಳು',
