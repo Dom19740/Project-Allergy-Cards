@@ -60,7 +60,7 @@ export const UI_TEXT_DICTIONARY: Record<string, Record<string, string>> = {
     'i need medical help immediately.': 'أحتاج إلى مساعدة طبية على الفور.',
     'please call emergency services.': 'يرجى الاتصال بخدمات الطوارئ.',
     'dial 112': 'اطلب 112',
-    'call': 'اتصل',
+    'call': 'اتصال',
   },
   // Armenian
   'hy': {
@@ -451,7 +451,7 @@ export const UI_TEXT_DICTIONARY: Record<string, Record<string, string>> = {
     'i am having a severe allergic reaction.': 'ich habe eine schwere allergische reaktion.',
     'i need medical help immediately.': 'ich brauche sofort medizinische hilfe.',
     'please call emergency services.': 'bitte rufen sie den notdienst an.',
-    'dial 112': 'wählen 112',
+    'dial 112': 'wähle 112',
     'call': 'anrufen',
   },
   // Greek
@@ -515,7 +515,7 @@ export const UI_TEXT_DICTIONARY: Record<string, Record<string, string>> = {
     'allergy alert!': 'एलर्जी चेतावनी!',
     'please be careful with my food.': 'कृपया मेरे भोजन में सावधानी बरतें।',
     'thank you!': 'धन्यवाद!',
-    'i can not eat:': 'मैं नहीं खा सकता/सकती::',
+    'i can not eat:': 'मैं यह नहीं खा सकता:',
     'they make me very sick and i could die': 'वे मुझे बहुत बीमार कर देते हैं और मैं मर सकता हूँ',
     'attention': 'ध्यान',
     'i am having a severe allergic reaction.': 'मुझे गंभीर एलर्जिक प्रतिक्रिया हो रही है।',
