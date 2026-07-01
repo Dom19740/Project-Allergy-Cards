@@ -11,7 +11,7 @@ const enforceRateLimit = (key: string) => {
     return;
   }
 
-  if (bucket.count >= 20) {
+  if (bucket.count >= 40) {
     throw createError({ statusCode: 429, statusMessage: "Too Many Requests" });
   }
 
