@@ -19,7 +19,7 @@ const Home = () => {
 
   const checkCards = async () => {
     const cards = await storage.get<SavedCard[]>(STORAGE_KEYS.SAVED_CARDS);
-    const emergencyCard = await storage.get<SavedCard>(STORAGE_KEYS.SAVED_EMERGENCY_CARD);
+    const emergencyCard = await storage.getEphemeral<SavedCard>(STORAGE_KEYS.SAVED_EMERGENCY_CARD);
     setHasCards(!!((cards && cards.length > 0) || emergencyCard));
   };
 

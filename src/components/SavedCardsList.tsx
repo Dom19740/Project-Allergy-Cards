@@ -10,6 +10,7 @@ import { SavedCard } from '@/lib/types';
 import { toast } from 'sonner';
 import { storage, STORAGE_KEYS } from '@/lib/storage';
 import { cn } from '@/lib/utils';
+import { computeContentSignature } from '@/lib/customMessages';
 
 const SavedCardsList = () => {
   const navigate = useNavigate();
@@ -50,7 +51,7 @@ const SavedCardsList = () => {
   const handleDelete = async (e: React.MouseEvent, card: SavedCard) => {
     e.stopPropagation();
     if (card.id === 'emergency-slot') {
-      await storage.remove(STORAGE_KEYS.SAVED_EMERGENCY_CARD);
+      await storage.removeEphemeral(STORAGE_KEYS.SAVED_EMERGENCY_CARD);
       toast.success("Emergency card deleted.");
     } else {
       const standardCards = await storage.get<SavedCard[]>(STORAGE_KEYS.SAVED_CARDS) || [];
@@ -73,10 +74,11 @@ const SavedCardsList = () => {
     if (card.translatedContent) {
       await storage.set(STORAGE_KEYS.SESSION_TRANSLATIONS, {
         languageCode: card.languageCode,
+        signature: computeContentSignature(card.customMessages, card.selectedAllergens.ids),
         content: card.translatedContent
       });
     }
-    
+
     if (card.id === 'emergency-slot') {
       navigate(`/emergency/${card.languageCode}`);
     } else {

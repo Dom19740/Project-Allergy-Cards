@@ -4,21 +4,20 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Label } from '@/components/ui/label';
-import { ChevronLeft, ChevronRight, Crown } from 'lucide-react';
+import { ChevronLeft, ChevronRight, Crown, RotateCcw } from 'lucide-react';
 import FixedHeader from '@/components/FixedHeader';
 import StepHeader from '@/components/StepHeader';
 import { storage, STORAGE_KEYS } from '@/lib/storage';
 import { useBilling } from '@/hooks/useBilling';
 import { FirebaseAnalytics } from '@capacitor-firebase/analytics';
 import { Capacitor } from '@capacitor/core';
+import { DEFAULT_CUSTOM_MESSAGES } from '@/lib/customMessages';
 
 const SelectAlertPage = () => {
   const navigate = useNavigate();
   const { isPremium } = useBilling();
-  const [iAmAllergicTo, setIAmAllergicTo] = useState("I can not eat:");
-  const [theyMakeMeSick, setTheyMakeMeSick] = useState(
-    "It will make me seriously ill and I can die",
-  );
+  const [iAmAllergicTo, setIAmAllergicTo] = useState(DEFAULT_CUSTOM_MESSAGES.iAmAllergicTo);
+  const [theyMakeMeSick, setTheyMakeMeSick] = useState(DEFAULT_CUSTOM_MESSAGES.theyMakeMeSick);
 
   useEffect(() => {
     const loadMessages = async () => {
@@ -79,6 +78,15 @@ const SelectAlertPage = () => {
                   >
                     Primary Warning
                   </Label>
+                  <button
+                    type="button"
+                    onClick={() => setIAmAllergicTo(DEFAULT_CUSTOM_MESSAGES.iAmAllergicTo)}
+                    disabled={!isPremium || iAmAllergicTo === DEFAULT_CUSTOM_MESSAGES.iAmAllergicTo}
+                    className="flex items-center gap-1 text-xs font-medium text-gray-400 hover:text-red-600 disabled:opacity-40 disabled:hover:text-gray-400 transition-colors"
+                  >
+                    <RotateCcw className="h-3 w-3" />
+                    Reset
+                  </button>
                 </div>
                 <textarea
                   id="allergic-to"
@@ -98,6 +106,15 @@ const SelectAlertPage = () => {
                   >
                     Secondary Warning
                   </Label>
+                  <button
+                    type="button"
+                    onClick={() => setTheyMakeMeSick(DEFAULT_CUSTOM_MESSAGES.theyMakeMeSick)}
+                    disabled={!isPremium || theyMakeMeSick === DEFAULT_CUSTOM_MESSAGES.theyMakeMeSick}
+                    className="flex items-center gap-1 text-xs font-medium text-gray-400 hover:text-red-600 disabled:opacity-40 disabled:hover:text-gray-400 transition-colors"
+                  >
+                    <RotateCcw className="h-3 w-3" />
+                    Reset
+                  </button>
                 </div>
                 <textarea
                   id="make-me-sick"

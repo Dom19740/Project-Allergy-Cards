@@ -1,9 +1,9 @@
 "use client";
 
-import React, { useEffect, useState, useRef } from 'react';
+import React, { useEffect, useState, useRef, useCallback } from 'react';
 import { useParams, useNavigate, useSearchParams } from 'react-router-dom';
 import { AlertTriangle, Loader2, Phone } from 'lucide-react';
-import { translateText } from '@/lib/translator';
+import { translateText, TranslationError } from '@/lib/translator';
 import { getEmergencyNumber } from '@/lib/emergencyNumbers';
 import { shareCard, downloadCard } from '@/lib/card-utils';
 import EmergencyActions from '@/components/EmergencyActions';
@@ -22,6 +22,7 @@ const EmergencyPage = () => {
   const cardRef = useRef<HTMLDivElement>(null);
   
   const [isTranslating, setIsTranslating] = useState(true);
+  const [translationError, setTranslationError] = useState<string | null>(null);
   const [isSharing, setIsSharing] = useState(false);
   const [isDownloading, setIsDownloading] = useState(false);
   const [isSpeaking, setIsSpeaking] = useState(false);
@@ -44,8 +45,7 @@ const EmergencyPage = () => {
     dialText: "CALL"
   });
 
-  useEffect(() => {
-    const loadDataAndTranslate = async () => {
+  const loadDataAndTranslate = useCallback(async () => {
       if (langCode) {
         await storage.set(STORAGE_KEYS.LAST_EMERGENCY_LANG, langCode);
       }
@@ -75,6 +75,7 @@ const EmergencyPage = () => {
         return;
       }
 
+      setTranslationError(null);
       try {
         const [attention, emergency, needHelp, callServices, dialText] = await Promise.all([
           translateText("ATTENTION", langCode),
@@ -86,14 +87,20 @@ const EmergencyPage = () => {
 
         setTranslatedText({ attention, emergency, needHelp, callServices, dialText });
       } catch (error) {
-        console.error('Translation failed:', error);
+        if (error instanceof TranslationError) {
+          console.error('Translation failed:', error.message);
+          setTranslationError(error.message);
+        } else {
+          console.error('Translation failed:', error);
+        }
       } finally {
         setIsTranslating(false);
       }
-    };
-
-    loadDataAndTranslate();
   }, [langCode]);
+
+  useEffect(() => {
+    loadDataAndTranslate();
+  }, [loadDataAndTranslate]);
 
   const handleShare = async () => {
     if (!cardRef.current) return;
@@ -158,6 +165,26 @@ const EmergencyPage = () => {
       TextToSpeech.stop();
     };
   }, []);
+
+  if (translationError) {
+    return (
+      <div className="flex flex-col items-center justify-center min-h-screen bg-white p-6 text-center">
+        <div className="flex flex-col items-center space-y-4 max-w-md">
+          <AlertTriangle className="h-10 w-10 text-red-600" />
+          <p className="text-xl font-semibold text-gray-800">Translation failed</p>
+          <p className="text-sm text-gray-600">
+            We couldn't translate this emergency message into this language. Showing an untranslated message could put you at risk, so we're not displaying it until translation succeeds.
+          </p>
+          <button
+            className="px-6 py-3 bg-red-600 hover:bg-red-500 text-white rounded-lg font-semibold transition-colors"
+            onClick={() => { setIsTranslating(true); loadDataAndTranslate(); }}
+          >
+            Try Again
+          </button>
+        </div>
+      </div>
+    );
+  }
 
   if (isTranslating) {
     return (

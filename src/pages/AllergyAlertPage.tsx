@@ -3,9 +3,10 @@
 import React, { useEffect, useState } from 'react';
 import { useParams, useLocation } from 'react-router-dom';
 import AllergyCard from '../components/AllergyCard';
-import { LanguageCode, TranslatedContent } from '@/lib/types';
+import { CustomMessages, LanguageCode, TranslatedContent } from '@/lib/types';
 import NotFound from './NotFound';
 import { storage, STORAGE_KEYS } from '@/lib/storage';
+import { resolveCustomMessages, computeContentSignature } from '@/lib/customMessages';
 
 const AllergyAlertPage = () => {
   const { langCode } = useParams<{ langCode: string }>();
@@ -40,9 +41,19 @@ const AllergyAlertPage = () => {
       }
       setSelectedAllergens(allergens);
 
-      // Load translations for offline support
+      // Load translations for offline support - only trust the cache if it
+      // matches the current custom messages and allergen selection, since a
+      // cached translation from before an edit is no longer valid.
+      const savedMessages = await storage.get<Partial<CustomMessages>>(STORAGE_KEYS.CUSTOM_MESSAGES);
+      const customMessages = resolveCustomMessages(savedMessages);
+      const contentSignature = computeContentSignature(customMessages, allergens);
+
       const sessionTranslations = await storage.get<any>(STORAGE_KEYS.SESSION_TRANSLATIONS);
-      if (sessionTranslations && sessionTranslations.languageCode === langCode) {
+      if (
+        sessionTranslations &&
+        sessionTranslations.languageCode === langCode &&
+        sessionTranslations.signature === contentSignature
+      ) {
         setInitialTranslations(sessionTranslations.content);
       } else {
         setInitialTranslations(null);

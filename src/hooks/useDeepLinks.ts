@@ -5,6 +5,7 @@ import { useNavigate } from 'react-router-dom';
 import { App, URLOpenListenerEvent } from '@capacitor/app';
 import { storage, STORAGE_KEYS } from '@/lib/storage';
 import { SavedCard } from '@/lib/types';
+import { computeContentSignature } from '@/lib/customMessages';
 
 export const useDeepLinks = () => {
   const navigate = useNavigate();
@@ -37,6 +38,7 @@ export const useDeepLinks = () => {
             if (card.translatedContent) {
               await storage.set(STORAGE_KEYS.SESSION_TRANSLATIONS, {
                 languageCode: card.languageCode,
+                signature: computeContentSignature(card.customMessages, card.selectedAllergens.ids),
                 content: card.translatedContent
               });
             }
@@ -63,6 +65,7 @@ export const useDeepLinks = () => {
             if (emergencyCard.translatedContent) {
               await storage.set(STORAGE_KEYS.SESSION_TRANSLATIONS, {
                 languageCode: emergencyCard.languageCode,
+                signature: computeContentSignature(emergencyCard.customMessages, emergencyCard.selectedAllergens.ids),
                 content: emergencyCard.translatedContent
               });
             }

@@ -1,12 +1,12 @@
 "use client";
 
-import React, { useRef, useState, useEffect } from 'react';
+import React, { useRef, useState, useEffect, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'sonner';
-import { Loader2, Utensils } from 'lucide-react';
+import { Loader2, Utensils, AlertTriangle } from 'lucide-react';
 import { LanguageCode, SelectedAllergens, CustomMessages, TranslatedContent } from '@/lib/types';
 import { ALLERGEN_OPTIONS } from '@/lib/allergens';
-import { translateText } from '@/lib/translator';
+import { translateText, TranslationError } from '@/lib/translator';
 import { shareCard, downloadCard } from '@/lib/card-utils';
 import SaveCardDialog from './SaveCardDialog';
 import CardActions from './CardActions';
@@ -16,6 +16,7 @@ import EmergencyNumberDialog from './EmergencyNumberDialog';
 import FullscreenImageOverlay from './FullscreenImageOverlay';
 import AllergenDetailOverlay from './AllergenDetailOverlay';
 import { storage, STORAGE_KEYS } from '@/lib/storage';
+import { resolveCustomMessages, computeContentSignature, DEFAULT_CUSTOM_MESSAGES } from '@/lib/customMessages';
 import { useNetworkStatus } from '@/hooks/useNetworkStatus';
 import { useBilling } from '@/hooks/useBilling';
 import { TextToSpeech } from '@capacitor-community/text-to-speech';
@@ -46,20 +47,18 @@ const AllergyCard: React.FC<AllergyCardProps> = ({ languageCode, selectedAllerge
   const [customAllergenTranslations, setCustomAllergenTranslations] = useState<{ [key: string]: { [lang: string]: string } }>({});
   const [translatedAllergens, setTranslatedAllergens] = useState<{ [key: string]: string }>(initialTranslations?.allergens || {});
   const [isTranslating, setIsTranslating] = useState(!initialTranslations);
+  const [translationError, setTranslationError] = useState<string | null>(null);
+  const [customTranslationWarning, setCustomTranslationWarning] = useState<string | null>(null);
   const [showOriginal, setShowOriginal] = useState(false);
-  
+
   const [fullSelectedData, setFullSelectedData] = useState<SelectedAllergens | null>(null);
-  const [customMessages, setCustomMessages] = useState<CustomMessages>({
-    iAmAllergicTo: "I can not eat:",
-    theyMakeMeSick: "They make me very sick and I could die"
-  });
+  const [customMessages, setCustomMessages] = useState<CustomMessages>(DEFAULT_CUSTOM_MESSAGES);
   const [translatedUIText, setTranslatedUIText] = useState(initialTranslations?.ui || {
     allergyAlert: "ALLERGY ALERT!",
-    iAmAllergicTo: "I can not eat:",
+    iAmAllergicTo: DEFAULT_CUSTOM_MESSAGES.iAmAllergicTo,
     pleaseBeCareful: "Please be careful with my food.",
     thankYou: "Thank you!",
-    languageName: "English",
-    theyMakeMeSick: "They make me very sick and I could die"
+    theyMakeMeSick: DEFAULT_CUSTOM_MESSAGES.theyMakeMeSick
   });
   const [emergencyTranslations, setEmergencyTranslations] = useState(initialTranslations?.emergency || {
     attention: "ATTENTION",
@@ -89,13 +88,8 @@ const AllergyCard: React.FC<AllergyCardProps> = ({ languageCode, selectedAllerge
       setCustomAllergenTranslations(custom);
     }
 
-    const savedAlert = await storage.get<CustomMessages>(STORAGE_KEYS.CUSTOM_MESSAGES);
-    if (savedAlert) {
-      setCustomMessages({
-        iAmAllergicTo: savedAlert.iAmAllergicTo !== undefined ? savedAlert.iAmAllergicTo : "I can not eat:",
-        theyMakeMeSick: savedAlert.theyMakeMeSick !== undefined ? savedAlert.theyMakeMeSick : "They make me very sick and I could die"
-      });
-    }
+    const savedAlert = await storage.get<Partial<CustomMessages>>(STORAGE_KEYS.CUSTOM_MESSAGES);
+    setCustomMessages(resolveCustomMessages(savedAlert));
   };
 
   useEffect(() => {
@@ -110,8 +104,7 @@ const AllergyCard: React.FC<AllergyCardProps> = ({ languageCode, selectedAllerge
     setShowOriginal(false);
   }, [languageCode]);
 
-  useEffect(() => {
-    const translateAllContent = async () => {
+  const translateAllContent = useCallback(async () => {
       if (initialTranslations) {
         setTranslatedUIText(initialTranslations.ui);
         setTranslatedAllergens(initialTranslations.allergens);
@@ -120,8 +113,13 @@ const AllergyCard: React.FC<AllergyCardProps> = ({ languageCode, selectedAllerge
         return;
       }
 
+      const contentSignature = computeContentSignature(customMessages, selectedAllergens);
       const sessionTranslations = await storage.get<any>(STORAGE_KEYS.SESSION_TRANSLATIONS);
-      if (sessionTranslations && sessionTranslations.languageCode === languageCode) {
+      if (
+        sessionTranslations &&
+        sessionTranslations.languageCode === languageCode &&
+        sessionTranslations.signature === contentSignature
+      ) {
         setTranslatedUIText(sessionTranslations.content.ui);
         setTranslatedAllergens(sessionTranslations.content.allergens);
         setEmergencyTranslations(sessionTranslations.content.emergency);
@@ -140,7 +138,6 @@ const AllergyCard: React.FC<AllergyCardProps> = ({ languageCode, selectedAllerge
           iAmAllergicTo: customMessages.iAmAllergicTo,
           pleaseBeCareful: "Please be careful with my food.",
           thankYou: "Thank you!",
-          languageName: "English",
           theyMakeMeSick: customMessages.theyMakeMeSick
         });
 
@@ -159,14 +156,46 @@ const AllergyCard: React.FC<AllergyCardProps> = ({ languageCode, selectedAllerge
       }
 
       setIsTranslating(true);
+      setTranslationError(null);
+      setCustomTranslationWarning(null);
+
+      // Custom allergen names and custom alert text are free-typed by the
+      // user, so they usually aren't covered by the local dictionaries and
+      // need a live translation. If that fails we don't block the whole
+      // card on it: a custom allergen name has no substitute, so we keep
+      // the original English text for just that item; a custom alert
+      // message does have a substitute (our default wording, which is
+      // always dictionary-covered), so we translate that instead.
+      const failedCustomKinds = new Set<'allergen' | 'alert'>();
+      const translateAllergenOrFallback = async (text: string): Promise<string> => {
+        try {
+          return await translateText(text, languageCode);
+        } catch (error) {
+          if (error instanceof TranslationError) {
+            failedCustomKinds.add('allergen');
+            return text;
+          }
+          throw error;
+        }
+      };
+      const translateAlertField = async (customText: string, defaultText: string): Promise<string> => {
+        try {
+          return await translateText(customText, languageCode);
+        } catch (error) {
+          if (!(error instanceof TranslationError)) throw error;
+          failedCustomKinds.add('alert');
+          return translateText(defaultText, languageCode);
+        }
+      };
+
       try {
-        const [alert, allergicTo, careful, thankYou, langName, theyMeSick, att, em, help, call, dial] = await Promise.all([
+        // Standard, fixed phrases - these are always expected to be covered
+        // by the local dictionaries, so a failure here blocks the card:
+        // there's no sensible fallback for the core safety instructions.
+        const [alert, careful, thankYou, att, em, help, call, dial] = await Promise.all([
           translateText("ALLERGY ALERT!", languageCode),
-          translateText(customMessages.iAmAllergicTo || " ", languageCode),
           translateText("Please be careful with my food.", languageCode),
           translateText("Thank you!", languageCode),
-          translateText("English", languageCode),
-          translateText(customMessages.theyMakeMeSick || " ", languageCode),
           translateText("ATTENTION", languageCode),
           translateText("I am having a severe allergic reaction.", languageCode),
           translateText("I need medical help immediately.", languageCode),
@@ -174,12 +203,20 @@ const AllergyCard: React.FC<AllergyCardProps> = ({ languageCode, selectedAllerge
           translateText("DIAL 112", languageCode)
         ]);
 
+        const [allergicTo, theyMeSick] = await Promise.all([
+          customMessages.iAmAllergicTo
+            ? translateAlertField(customMessages.iAmAllergicTo, DEFAULT_CUSTOM_MESSAGES.iAmAllergicTo)
+            : Promise.resolve(""),
+          customMessages.theyMakeMeSick
+            ? translateAlertField(customMessages.theyMakeMeSick, DEFAULT_CUSTOM_MESSAGES.theyMakeMeSick)
+            : Promise.resolve("")
+        ]);
+
         const uiText = {
           allergyAlert: alert,
           iAmAllergicTo: customMessages.iAmAllergicTo ? allergicTo : "",
           pleaseBeCareful: careful,
           thankYou: thankYou,
-          languageName: langName,
           theyMakeMeSick: customMessages.theyMakeMeSick ? theyMeSick : ""
         };
         setTranslatedUIText(uiText);
@@ -198,30 +235,45 @@ const AllergyCard: React.FC<AllergyCardProps> = ({ languageCode, selectedAllerge
           const predefinedAllergen = ALLERGEN_OPTIONS.find(opt => opt.id === allergenId);
           if (predefinedAllergen) {
             allergenTranslations[allergenId] = await translateText(predefinedAllergen.name, languageCode);
+          } else if (customAllergenTranslations[allergenId]?.[languageCode]) {
+            allergenTranslations[allergenId] = customAllergenTranslations[allergenId][languageCode];
           } else {
-            if (customAllergenTranslations[allergenId]?.[languageCode]) {
-              allergenTranslations[allergenId] = customAllergenTranslations[allergenId][languageCode];
-            } else {
-              allergenTranslations[allergenId] = await translateText(allergenId, languageCode);
-            }
+            allergenTranslations[allergenId] = await translateAllergenOrFallback(allergenId);
           }
         }
         setTranslatedAllergens(allergenTranslations);
 
-        await storage.set(STORAGE_KEYS.SESSION_TRANSLATIONS, {
-          languageCode,
-          content: { ui: uiText, allergens: allergenTranslations, emergency: emergencyText }
-        });
-        
+        if (failedCustomKinds.size > 0) {
+          const reasons: string[] = [];
+          if (failedCustomKinds.has('allergen')) {
+            reasons.push("Your custom allergen names couldn't be translated because you're offline, so they'll be left in English.");
+          }
+          if (failedCustomKinds.has('alert')) {
+            reasons.push("Your custom alert text couldn't be translated because you're offline, so we've used our default alert message (translated) instead.");
+          }
+          setCustomTranslationWarning(reasons.join(' '));
+        } else {
+          await storage.set(STORAGE_KEYS.SESSION_TRANSLATIONS, {
+            languageCode,
+            signature: contentSignature,
+            content: { ui: uiText, allergens: allergenTranslations, emergency: emergencyText }
+          });
+        }
       } catch (error) {
-        console.error('Translation failed:', error);
+        if (error instanceof TranslationError) {
+          console.error('Translation failed:', error.message);
+          setTranslationError(error.message);
+        } else {
+          console.error('Translation failed:', error);
+        }
       } finally {
         setIsTranslating(false);
       }
-    };
-
-    translateAllContent();
   }, [languageCode, selectedAllergens, customMessages, customAllergenTranslations, initialTranslations, isOnline]);
+
+  useEffect(() => {
+    translateAllContent();
+  }, [translateAllContent]);
 
   const waitForNextPaint = () =>
     new Promise<void>(resolve => requestAnimationFrame(() => requestAnimationFrame(() => resolve())));
@@ -351,6 +403,55 @@ const AllergyCard: React.FC<AllergyCardProps> = ({ languageCode, selectedAllerge
   else if (allergensWithImages.length <= 4) imageGridClasses = "grid-cols-2 grid-rows-2";
   else if (allergensWithImages.length <= 6) imageGridClasses = "grid-cols-3 grid-rows-2";
   else imageGridClasses = "grid-cols-3 grid-rows-3";
+
+  if (translationError) {
+    return (
+      <div className="flex flex-col items-center justify-center min-h-screen bg-white p-6 text-center">
+        <div className="flex flex-col items-center space-y-4 max-w-md">
+          <AlertTriangle className="h-10 w-10 text-red-600" />
+          <p className="text-lg sm:text-xl font-semibold text-gray-800">Translation failed</p>
+          <p className="text-sm text-gray-600">
+            We couldn't translate your card into this language. Showing an untranslated card could put you at risk, so we're not displaying it until translation succeeds.
+          </p>
+          <button
+            className="px-6 py-3 bg-red-600 hover:bg-red-500 text-white rounded-lg font-semibold transition-colors"
+            onClick={() => translateAllContent()}
+          >
+            Try Again
+          </button>
+        </div>
+      </div>
+    );
+  }
+
+  if (customTranslationWarning) {
+    return (
+      <div className="flex flex-col items-center justify-center min-h-screen bg-white p-6 text-center">
+        <div className="flex flex-col items-center space-y-4 max-w-md">
+          <AlertTriangle className="h-10 w-10 text-amber-500" />
+          <p className="text-lg sm:text-xl font-semibold text-gray-800">Some text couldn't be translated</p>
+          <p className="text-sm text-gray-600">{customTranslationWarning}</p>
+          <p className="text-sm text-gray-600">
+            The rest of your card was translated normally. You can continue with the card as described above, or try again once you're back online.
+          </p>
+          <div className="flex flex-col sm:flex-row gap-3 w-full pt-2">
+            <button
+              className="flex-1 px-6 py-3 bg-gray-200 hover:bg-gray-300 text-gray-800 rounded-lg font-semibold transition-colors"
+              onClick={() => translateAllContent()}
+            >
+              Try Again
+            </button>
+            <button
+              className="flex-1 px-6 py-3 bg-red-600 hover:bg-red-500 text-white rounded-lg font-semibold transition-colors"
+              onClick={() => setCustomTranslationWarning(null)}
+            >
+              Continue
+            </button>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   if (isTranslating) {
     return (
