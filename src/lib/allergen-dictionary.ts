@@ -1242,7 +1242,7 @@ export const ALLERGEN_DICTIONARY: Record<string, Record<string, string>> = {
     'mustard': 'горчица',
     'sulphites': 'сульфиты',
     'celery': 'сельдерей',
-    'lupin': 'люпин',
+    'lupin': 'люпиновые бобы',
   },
   // Samoan
   'sm': {

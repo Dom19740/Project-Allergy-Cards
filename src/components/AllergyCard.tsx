@@ -14,6 +14,7 @@ import CardMenu from './CardMenu';
 import DisclaimerDialog from './DisclaimerDialog';
 import EmergencyNumberDialog from './EmergencyNumberDialog';
 import FullscreenImageOverlay from './FullscreenImageOverlay';
+import AllergenDetailOverlay from './AllergenDetailOverlay';
 import { storage, STORAGE_KEYS } from '@/lib/storage';
 import { useNetworkStatus } from '@/hooks/useNetworkStatus';
 import { useBilling } from '@/hooks/useBilling';
@@ -40,6 +41,8 @@ const AllergyCard: React.FC<AllergyCardProps> = ({ languageCode, selectedAllerge
   const [isDisclaimerOpen, setIsDisclaimerOpen] = useState(false);
   const [isEmergencyDialogOpen, setIsEmergencyDialogOpen] = useState(false);
   const [isImageFullscreen, setIsImageFullscreen] = useState(false);
+  const [selectedPillIndex, setSelectedPillIndex] = useState<number | null>(null);
+  const [isCapturing, setIsCapturing] = useState(false);
   const [customAllergenTranslations, setCustomAllergenTranslations] = useState<{ [key: string]: { [lang: string]: string } }>({});
   const [translatedAllergens, setTranslatedAllergens] = useState<{ [key: string]: string }>(initialTranslations?.allergens || {});
   const [isTranslating, setIsTranslating] = useState(!initialTranslations);
@@ -220,6 +223,9 @@ const AllergyCard: React.FC<AllergyCardProps> = ({ languageCode, selectedAllerge
     translateAllContent();
   }, [languageCode, selectedAllergens, customMessages, customAllergenTranslations, initialTranslations, isOnline]);
 
+  const waitForNextPaint = () =>
+    new Promise<void>(resolve => requestAnimationFrame(() => requestAnimationFrame(() => resolve())));
+
   const handleDownload = async () => {
     if (cardRef.current) {
       if (Capacitor.isNativePlatform()) {
@@ -230,7 +236,10 @@ const AllergyCard: React.FC<AllergyCardProps> = ({ languageCode, selectedAllerge
       }
 
       setIsDownloading(true);
+      setIsCapturing(true);
+      await waitForNextPaint();
       const success = await downloadCard(cardRef.current, `allergy-card-${languageCode}.png`);
+      setIsCapturing(false);
       if (success) toast.success("Allergy card saved to your device!");
       else toast.error("Failed to save card.");
       setIsDownloading(false);
@@ -247,9 +256,12 @@ const AllergyCard: React.FC<AllergyCardProps> = ({ languageCode, selectedAllerge
       }
 
       setIsSharing(true);
+      setIsCapturing(true);
+      await waitForNextPaint();
       const shortCode = languageCode.split('-')[0].toUpperCase();
       const shareText = `My Allergy Alert Card (${shortCode}) made with Simple Allergy Alert`;
       const success = await shareCard(cardRef.current, shareText, shareText);
+      setIsCapturing(false);
       if (!success) toast.error("Failed to share card.");
       setIsSharing(false);
     }
@@ -376,7 +388,11 @@ const AllergyCard: React.FC<AllergyCardProps> = ({ languageCode, selectedAllerge
 
         <div className="flex flex-wrap justify-center gap-1 sm:gap-2 mb-4 sm:mb-8 md:mb-12">
           {displayAllergenList.map((allergen, index) => (
-            <span key={index} className="bg-red-600 text-white px-3 py-1 sm:px-4 sm:py-2 rounded-full text-base sm:text-lg md:text-xl font-normal uppercase">
+            <span
+              key={index}
+              onClick={() => setSelectedPillIndex(index)}
+              className="bg-red-600 text-white px-3 py-1 sm:px-4 sm:py-2 rounded-full text-base sm:text-lg md:text-xl font-normal uppercase cursor-pointer transition-transform duration-150 hover:scale-105"
+            >
               {allergen}
             </span>
           ))}
@@ -420,9 +436,11 @@ const AllergyCard: React.FC<AllergyCardProps> = ({ languageCode, selectedAllerge
             onClick={() => setShowOriginal(prev => !prev)}
             className="inline-flex items-center bg-white hover:bg-gray-50 active:bg-gray-100 transition-colors rounded-full px-4 py-1.5 border border-gray-200 shadow-md text-gray-600 text-[14px] sm:text-base font-light mb-0"
           >
-            {showOriginal
-              ? `English · See ${getLanguageName(languageCode)}`
-              : `${getLanguageName(languageCode)} · See Original`}
+            {isCapturing
+              ? (showOriginal ? 'English' : getLanguageName(languageCode))
+              : showOriginal
+                ? `English · See ${getLanguageName(languageCode)}`
+                : `${getLanguageName(languageCode)} · See Original`}
           </button>
           {!isPremium && (
             <p className="text-[13px] sm:text-base text-gray-400 font-light">
@@ -451,11 +469,18 @@ const AllergyCard: React.FC<AllergyCardProps> = ({ languageCode, selectedAllerge
         onConfirm={handleEmergencyConfirm}
         langCode={languageCode}
       />
-      <FullscreenImageOverlay 
-        isOpen={isImageFullscreen} 
-        onClose={() => setIsImageFullscreen(false)} 
+      <FullscreenImageOverlay
+        isOpen={isImageFullscreen}
+        onClose={() => setIsImageFullscreen(false)}
         allergensWithImages={allergensWithImages}
         imageGridClasses={imageGridClasses}
+      />
+      <AllergenDetailOverlay
+        isOpen={selectedPillIndex !== null}
+        onClose={() => setSelectedPillIndex(null)}
+        translatedName={selectedPillIndex !== null ? translatedAllergenList[selectedPillIndex] : ''}
+        englishName={selectedPillIndex !== null ? englishAllergenList[selectedPillIndex] : ''}
+        image={selectedPillIndex !== null ? ALLERGEN_OPTIONS.find(opt => opt.id === selectedAllergens[selectedPillIndex])?.image : undefined}
       />
       {fullSelectedData && (
         <SaveCardDialog

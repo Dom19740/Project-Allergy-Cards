@@ -382,7 +382,7 @@ export const UI_TEXT_DICTIONARY: Record<string, Record<string, string>> = {
     'i need medical help immediately.': 'tarvitsen välittömästi lääkärin apua.',
     'please call emergency services.': 'soita hätäkeskukseen.',
     'dial 112': 'soita 112',
-    'call': 'soittaa',
+    'call': 'soita',
   },
   // French
   'fr': {
