@@ -27,7 +27,11 @@ const PremiumOnboarding = () => {
     
     setIsRestoring(true);
     try {
-      const response = await fetch(`/api/restore-by-email?restore_token=${encodeURIComponent(restoreEmail)}`);
+      const response = await fetch('/api/restore-by-email', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ restoreToken: restoreEmail }),
+      });
       const data = await response.json();
       
       if (data.success) {

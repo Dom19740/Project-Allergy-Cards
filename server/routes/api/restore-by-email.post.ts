@@ -1,5 +1,5 @@
 import { defineHandler } from "nitro";
-import { createError, getQuery, getRequestIP, setResponseHeader } from "nitro/h3";
+import { createError, getRequestIP, readBody, setResponseHeader } from "nitro/h3";
 import { enforceOrigin } from "../../utils/cors";
 
 const ipRateLimit = new Map<string, { count: number; resetAt: number }>();
@@ -23,8 +23,12 @@ const enforceRateLimit = (map: Map<string, { count: number; resetAt: number }>, 
 export default defineHandler(async (event) => {
   setResponseHeader(event, "Cache-Control", "no-store");
   enforceOrigin(event);
-  const query = getQuery(event);
-  const restoreToken = query.restore_token;
+
+  // Posted rather than a GET query param, since an email address is PII
+  // that shouldn't end up in browser history, CDN/access logs, or Referer
+  // headers the way a query string would.
+  const body = await readBody(event);
+  const restoreToken = body?.restoreToken;
 
   if (!restoreToken || typeof restoreToken !== "string") {
     throw createError({
