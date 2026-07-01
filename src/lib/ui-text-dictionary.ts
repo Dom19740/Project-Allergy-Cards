@@ -60,7 +60,7 @@ export const UI_TEXT_DICTIONARY: Record<string, Record<string, string>> = {
     'i need medical help immediately.': 'أحتاج إلى مساعدة طبية على الفور.',
     'please call emergency services.': 'يرجى الاتصال بخدمات الطوارئ.',
     'dial 112': 'اطلب 112',
-    'call': 'يتصل',
+    'call': 'اتصل',
   },
   // Armenian
   'hy': {
@@ -367,7 +367,7 @@ export const UI_TEXT_DICTIONARY: Record<string, Record<string, string>> = {
     'i am having a severe allergic reaction.': 'nagkakaroon ako ng matinding allergic reaction.',
     'i need medical help immediately.': 'kailangan ko agad ng tulong medikal.',
     'please call emergency services.': 'mangyaring tumawag sa mga serbisyong pang-emergency.',
-    'dial 112': 'dial 112',
+    'dial 112': 'i-dial ang 112',
     'call': 'tawag',
   },
   // Finnish
@@ -461,12 +461,12 @@ export const UI_TEXT_DICTIONARY: Record<string, Record<string, string>> = {
     'thank you!': 'σας ευχαριστώ!',
     'i can not eat:': 'δεν μπορώ να φάω:',
     'they make me very sick and i could die': 'με αρρωσταίνουν πολύ και θα μπορούσα να πεθάνω',
-    'attention': 'προσοχη',
+    'attention': 'προσοχή',
     'i am having a severe allergic reaction.': 'έχω μια σοβαρή αλλεργική αντίδραση.',
     'i need medical help immediately.': 'χρειάζομαι ιατρική βοήθεια αμέσως.',
     'please call emergency services.': 'καλέστε τις υπηρεσίες έκτακτης ανάγκης.',
     'dial 112': 'καλέστε το 112',
-    'call': 'κληση',
+    'call': 'κλήση',
   },
   // Gujarati
   'gu': {
@@ -515,7 +515,7 @@ export const UI_TEXT_DICTIONARY: Record<string, Record<string, string>> = {
     'allergy alert!': 'एलर्जी चेतावनी!',
     'please be careful with my food.': 'कृपया मेरे भोजन में सावधानी बरतें।',
     'thank you!': 'धन्यवाद!',
-    'i can not eat:': 'मैं नहीं खा सकते हैं:',
+    'i can not eat:': 'मैं नहीं खा सकता/सकती::',
     'they make me very sick and i could die': 'वे मुझे बहुत बीमार कर देते हैं और मैं मर सकता हूँ',
     'attention': 'ध्यान',
     'i am having a severe allergic reaction.': 'मुझे गंभीर एलर्जिक प्रतिक्रिया हो रही है।',
@@ -586,13 +586,13 @@ export const UI_TEXT_DICTIONARY: Record<string, Record<string, string>> = {
     'please be careful with my food.': '私の食べ物には気をつけてください。',
     'thank you!': 'ありがとう！',
     'i can not eat:': '食べられないもの：',
-    'they make me very sick and i could die': 'とても気分が悪くなり、死ぬかもしれません',
+    'they make me very sick and i could die': '重篤な症状を引き起こし、命に関わる危険があります',
     'attention': '注意',
     'i am having a severe allergic reaction.': '重度のアレルギー反応が出ています。',
     'i need medical help immediately.': 'すぐに医師の助けが必要です。',
     'please call emergency services.': '緊急サービスに電話してください。',
     'dial 112': '112 にダイヤルしてください',
-    'call': '電話',
+    'call': '発信',
   },
   // Javanese
   'jw': {
@@ -633,7 +633,7 @@ export const UI_TEXT_DICTIONARY: Record<string, Record<string, string>> = {
     'i am having a severe allergic reaction.': 'менде қатты аллергиялық реакция бар.',
     'i need medical help immediately.': 'маған дереу медициналық көмек керек.',
     'please call emergency services.': 'жедел қызметтерге хабарласыңыз.',
-    'dial 112': '112 тереңіз',
+    'dial 112': '112 теріңіз',
     'call': 'қоңырау',
   },
   // Khmer (Cambodian)
@@ -655,7 +655,7 @@ export const UI_TEXT_DICTIONARY: Record<string, Record<string, string>> = {
     'allergy alert!': '알레르기 경고!',
     'please be careful with my food.': '내 음식을 조심하세요.',
     'thank you!': '감사합니다!',
-    'i can not eat:': '나는 먹을 수 없다:',
+    'i can not eat:': '저는 먹을 수 없어요:',
     'they make me very sick and i could die': '그것들은 나를 심하게 아프게 하고 죽을 수도 있어요',
     'attention': '주목',
     'i am having a severe allergic reaction.': '심한 알레르기 반응을 보이고 있습니다.',
@@ -750,7 +750,7 @@ export const UI_TEXT_DICTIONARY: Record<string, Record<string, string>> = {
   },
   // Luxembourgish
   'lb': {
-    'allergy alert!': 'allergie alert!',
+    'allergy alert!': 'Allergie-Warnung!',
     'please be careful with my food.': 'sief virsiichteg mat mengem iessen.',
     'thank you!': 'merci!',
     'i can not eat:': 'ech kann net iessen:',
@@ -787,12 +787,12 @@ export const UI_TEXT_DICTIONARY: Record<string, Record<string, string>> = {
     'i am having a severe allergic reaction.': 'manana fihetsika alergika mahery aho.',
     'i need medical help immediately.': 'mila fanampiana ara-pitsaboana avy hatrany aho.',
     'please call emergency services.': 'antsoy ny sampana vonjy maika.',
-    'dial 112': 'dial 112',
+    'dial 112': 'antsoy 112',
     'call': 'antso',
   },
   // Malay
   'ms': {
-    'allergy alert!': 'alergi alert!',
+    'allergy alert!': 'amaran alergi!',
     'please be careful with my food.': 'sila berhati-hati dengan makanan saya.',
     'thank you!': 'terima kasih!',
     'i can not eat:': 'saya tidak boleh makan:',
@@ -1004,7 +1004,7 @@ export const UI_TEXT_DICTIONARY: Record<string, Record<string, string>> = {
   'ro': {
     'allergy alert!': 'alertă de alergie!',
     'please be careful with my food.': 'vă rog să aveți grijă cu mâncarea mea.',
-    'thank you!': 'multumesc!',
+    'thank you!': 'mulțumesc!',
     'i can not eat:': 'nu pot manca:',
     'they make me very sick and i could die': 'mă îmbolnăvesc foarte tare și aș putea muri',
     'attention': 'atenţie',
@@ -1020,7 +1020,7 @@ export const UI_TEXT_DICTIONARY: Record<string, Record<string, string>> = {
     'please be careful with my food.': 'пожалуйста, будьте осторожны с моей едой.',
     'thank you!': 'спасибо!',
     'i can not eat:': 'я не могу есть:',
-    'they make me very sick and i could die': 'меня от них очень тошнит, и я могу умереть',
+    'they make me very sick and i could die': 'они вызывают у меня тяжелейшую реакцию, я могу умереть',
     'attention': 'внимание',
     'i am having a severe allergic reaction.': 'у меня сильная аллергическая реакция.',
     'i need medical help immediately.': 'мне срочно нужна медицинская помощь.',
@@ -1058,7 +1058,7 @@ export const UI_TEXT_DICTIONARY: Record<string, Record<string, string>> = {
   },
   // Sindhi
   'sd': {
-    'allergy alert!': 'الرجي الرٽ!',
+    'allergy alert!': 'الرجي کان خبردار!',
     'please be careful with my food.': 'مهرباني ڪري منهنجي کاڌي سان محتاط رهو.',
     'thank you!': 'تنهنجي مهرباني!',
     'i can not eat:': 'مان کائي نٿو سگهان:',
@@ -1088,14 +1088,14 @@ export const UI_TEXT_DICTIONARY: Record<string, Record<string, string>> = {
   'sk': {
     'allergy alert!': 'upozornenie na alergie!',
     'please be careful with my food.': 'prosím, buďte opatrní s mojím jedlom.',
-    'thank you!': 'dakujem!',
+    'thank you!': 'ďakujem!',
     'i can not eat:': 'nemôžem jesť:',
     'they make me very sick and i could die': 'je mi z nich veľmi zle a mohol by som zomrieť',
     'attention': 'pozor',
     'i am having a severe allergic reaction.': 'mám silnú alergickú reakciu.',
     'i need medical help immediately.': 'okamžite potrebujem lekársku pomoc.',
     'please call emergency services.': 'zavolajte na pohotovostnú službu.',
-    'dial 112': 'volite 112',
+    'dial 112': 'volajte 112',
     'call': 'zavolať',
   },
   // Slovenian
@@ -1226,16 +1226,16 @@ export const UI_TEXT_DICTIONARY: Record<string, Record<string, string>> = {
   },
   // Turkish
   'tr': {
-    'allergy alert!': 'alerji̇ uyarisi!',
+    'allergy alert!': 'alerji uyarısı!',
     'please be careful with my food.': 'lütfen yemeğime dikkat edin.',
     'thank you!': 'teşekkür ederim!',
     'i can not eat:': 'yemek yiyemiyorum:',
     'they make me very sick and i could die': 'beni çok hasta ediyorlar ve ölebilirim',
-    'attention': 'di̇kkat',
+    'attention': 'dikkat',
     'i am having a severe allergic reaction.': 'şiddetli bir alerjik reaksiyon yaşıyorum.',
     'i need medical help immediately.': 'derhal tıbbi yardıma ihtiyacım var.',
     'please call emergency services.': 'lütfen acil servisleri arayın.',
-    'dial 112': '112\'yi arayin',
+    'dial 112': "112'yi arayın",
     'call': 'ara',
   },
   // Ukrainian
@@ -1254,7 +1254,7 @@ export const UI_TEXT_DICTIONARY: Record<string, Record<string, string>> = {
   },
   // Urdu
   'ur': {
-    'allergy alert!': 'الرجی الرٹ!',
+    'allergy alert!': 'الرجی سے خبردار!',
     'please be careful with my food.': 'برائے مہربانی میرے کھانے میں احتیاط برتیں۔',
     'thank you!': 'شکریہ!',
     'i can not eat:': 'میں نہیں کھا سکتا:',
@@ -1277,7 +1277,7 @@ export const UI_TEXT_DICTIONARY: Record<string, Record<string, string>> = {
     'i am having a severe allergic reaction.': 'menda kuchli allergik reaktsiya bor.',
     'i need medical help immediately.': 'menga zudlik bilan tibbiy yordam kerak.',
     'please call emergency services.': 'iltimos, tez yordam xizmatiga qo\'ng\'iroq qiling.',
-    'dial 112': '112 teng',
+    'dial 112': '112 raqamini tering',
     'call': 'qo\'ng\'iroq qiling',
   },
   // Vietnamese
@@ -1286,7 +1286,7 @@ export const UI_TEXT_DICTIONARY: Record<string, Record<string, string>> = {
     'please be careful with my food.': 'xin hãy cẩn thận với thức ăn của tôi.',
     'thank you!': 'cảm ơn!',
     'i can not eat:': 'tôi không thể ăn:',
-    'they make me very sick and i could die': 'chúng làm tôi bệnh nặng và tôi có thể chết',
+    'they make me very sick and i could die': 'tôi sẽ bị ngộ độc rất nặng và có thể tử vong',
     'attention': 'chú ý',
     'i am having a severe allergic reaction.': 'tôi đang bị phản ứng dị ứng nghiêm trọng.',
     'i need medical help immediately.': 'tôi cần trợ giúp y tế ngay lập tức.',
@@ -1296,7 +1296,7 @@ export const UI_TEXT_DICTIONARY: Record<string, Record<string, string>> = {
   },
   // Yiddish
   'yi': {
-    'allergy alert!': 'allergy alert!',
+    'allergy alert!': 'אַלערגיע וואָרענונג!',
     'please be careful with my food.': 'ביטע זייט אָפּגעהיט מיט מיין עסן.',
     'thank you!': 'דאַנקען דיר!',
     'i can not eat:': 'איך קען נישט עסן:',
