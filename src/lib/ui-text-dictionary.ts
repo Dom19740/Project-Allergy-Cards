@@ -666,16 +666,16 @@ export const UI_TEXT_DICTIONARY: Record<string, Record<string, string>> = {
   },
   // Kurdish (Kurmanji)
   'ku': {
-    'allergy alert!': 'alergy alert!',
+    'allergy alert!': 'hişyariya alerjiyê!',
     'please be careful with my food.': 'ji kerema xwe hay ji xwarina min hebe.',
-    'thank you!': 'sipas ji were!',
+    'thank you!': 'spas!',
     'i can not eat:': 'ez nikarim bixwim:',
     'they make me very sick and i could die': 'ew min pir nexweş dikin û ez dikarim bimirim',
     'attention': 'baldarî',
     'i am having a severe allergic reaction.': 'ez rastî reaksiyonek alerjîk a giran dibim.',
     'i need medical help immediately.': 'pêdiviya min bi alîkariya bijîşkî heye.',
     'please call emergency services.': 'ji kerema xwe telefonê xizmetên acîl bikin.',
-    'dial 112': 'dial 112',
+    'dial 112': '112 lê bide',
     'call': 'bang',
   },
   // Kyrgyz
@@ -689,7 +689,7 @@ export const UI_TEXT_DICTIONARY: Record<string, Record<string, string>> = {
     'i am having a severe allergic reaction.': 'менде катуу аллергиялык реакция бар.',
     'i need medical help immediately.': 'мага тез арада медициналык жардам керек.',
     'please call emergency services.': 'тез жардам кызматына чалыңыз.',
-    'dial 112': 'ter 112',
+    'dial 112': '112ге чалыңыз',
     'call': 'чал',
   },
   // Lao
@@ -708,7 +708,7 @@ export const UI_TEXT_DICTIONARY: Record<string, Record<string, string>> = {
   },
   // Latin
   'la': {
-    'allergy alert!': 'allergy alert!',
+    'allergy alert!': 'monitio allergiae!',
     'please be careful with my food.': 'cave, quaeso, cum cibo meo.',
     'thank you!': 'gratias tibi ago!',
     'i can not eat:': 'non possum comedere;',
@@ -716,8 +716,8 @@ export const UI_TEXT_DICTIONARY: Record<string, Record<string, string>> = {
     'attention': 'animadversio',
     'i am having a severe allergic reaction.': 'allergic reactionem gravem habeo.',
     'i need medical help immediately.': 'medico auxilio statim opus est.',
-    'please call emergency services.': 'vivamus facilisis officia velit.',
-    'dial 112': 'dial 112',
+    'please call emergency services.': 'quaeso officia subitanea voca.',
+    'dial 112': 'numerum 112 voca',
     'call': 'voca',
   },
   // Latvian
@@ -759,12 +759,12 @@ export const UI_TEXT_DICTIONARY: Record<string, Record<string, string>> = {
     'i am having a severe allergic reaction.': 'ech hunn eng schwéier allergesch reaktioun.',
     'i need medical help immediately.': 'ech brauch direkt medizinesch hëllef.',
     'please call emergency services.': 'rufft w.e.g. d\'noutdéngschter un.',
-    'dial 112': 'dir 112',
+    'dial 112': 'rufft 112 un',
     'call': 'uruff',
   },
   // Macedonian
   'mk': {
-    'allergy alert!': 'алергија за алергија!',
+    'allergy alert!': 'предупредување за алергија!',
     'please be careful with my food.': 'ве молам, бидете внимателни со мојата храна.',
     'thank you!': 'ви благодариме!',
     'i can not eat:': 'не можам да јадам:',
@@ -773,20 +773,20 @@ export const UI_TEXT_DICTIONARY: Record<string, Record<string, string>> = {
     'i am having a severe allergic reaction.': 'имам тешка алергиска реакција.',
     'i need medical help immediately.': 'итно ми треба лекарска помош.',
     'please call emergency services.': 'ве молиме јавете се на итната служба.',
-    'dial 112': 'брирајте 112',
+    'dial 112': 'бирајте 112',
     'call': 'повик',
   },
   // Malagasy
   'mg': {
-    'allergy alert!': 'alerje!',
+    'allergy alert!': 'fampitandremana alergia!',
     'please be careful with my food.': 'mba tandremo ny sakafoko.',
     'thank you!': 'misaotra anao!',
     'i can not eat:': 'tsy afaka mihinana aho:',
     'they make me very sick and i could die': 'marary mafy aho ary mety ho faty',
-    'attention': 'tsara',
-    'i am having a severe allergic reaction.': 'marary mafy aho.',
+    'attention': 'fitandremana',
+    'i am having a severe allergic reaction.': 'manana fihetsika alergika mahery aho.',
     'i need medical help immediately.': 'mila fanampiana ara-pitsaboana avy hatrany aho.',
-    'please call emergency services.': 'miantso sampana vonjy maika.',
+    'please call emergency services.': 'antsoy ny sampana vonjy maika.',
     'dial 112': 'dial 112',
     'call': 'antso',
   },
@@ -834,13 +834,13 @@ export const UI_TEXT_DICTIONARY: Record<string, Record<string, string>> = {
   },
   // Maori
   'mi': {
-    'allergy alert!': 'whakaaro matara!',
+    'allergy alert!': 'whakatūpato mate pāwera!',
     'please be careful with my food.': 'kia tupato ki aku kai.',
     'thank you!': 'mauruuru koe!',
     'i can not eat:': 'kaore e taea e au te kai:',
     'they make me very sick and i could die': 'ka tino mate ahau, ka mate ahau',
-    'attention': 'whakaaro',
-    'i am having a severe allergic reaction.': 'he mate mate mate mate ahau.',
+    'attention': 'kia tūpato',
+    'i am having a severe allergic reaction.': 'kei te pāngia ahau e tētahi mate pāwera tino kino.',
     'i need medical help immediately.': 'kei te hiahia awhina hauora ahau.',
     'please call emergency services.': 'tena waea atu ki nga ratonga ohorere.',
     'dial 112': 'waea 112',
@@ -871,7 +871,7 @@ export const UI_TEXT_DICTIONARY: Record<string, Record<string, string>> = {
     'i am having a severe allergic reaction.': 'би хүнд харшлын урвалтай байна.',
     'i need medical help immediately.': 'надад яаралтай эмнэлгийн тусламж хэрэгтэй байна.',
     'please call emergency services.': 'яаралтай тусламжийн үйлчилгээ рүү залгана уу.',
-    'dial 112': '112 дугаар дугаар',
+    'dial 112': '112 руу залга',
     'call': 'дуудлага',
   },
   // Myanmar (Burmese)
@@ -946,7 +946,7 @@ export const UI_TEXT_DICTIONARY: Record<string, Record<string, string>> = {
   },
   // Polish
   'pl': {
-    'allergy alert!': 'uwaga alergiczna!',
+    'allergy alert!': 'uwaga! alergia!',
     'please be careful with my food.': 'proszę uważać na moje jedzenie.',
     'thank you!': 'dziękuję!',
     'i can not eat:': 'nie mogę jeść:',
@@ -974,7 +974,7 @@ export const UI_TEXT_DICTIONARY: Record<string, Record<string, string>> = {
   },
   // Portuguese (European)
   'pt-PT': {
-    'allergy alert!': 'alerta alergia!',
+    'allergy alert!': 'alerta de alergia!',
     'please be careful with my food.': 'por favor, tenha cuidado com a minha comida.',
     'thank you!': 'obrigado!',
     'i can not eat:': 'não posso comer:',
@@ -984,7 +984,7 @@ export const UI_TEXT_DICTIONARY: Record<string, Record<string, string>> = {
     'i need medical help immediately.': 'preciso de ajuda médica imediatamente.',
     'please call emergency services.': 'ligue para os serviços de emergência.',
     'dial 112': 'disque 112',
-    'call': 'chamada',
+    'call': 'ligar',
   },
   // Punjabi
   'pa': {
@@ -1002,7 +1002,7 @@ export const UI_TEXT_DICTIONARY: Record<string, Record<string, string>> = {
   },
   // Romanian
   'ro': {
-    'allergy alert!': 'alertă alergie!',
+    'allergy alert!': 'alertă de alergie!',
     'please be careful with my food.': 'vă rog să aveți grijă cu mâncarea mea.',
     'thank you!': 'multumesc!',
     'i can not eat:': 'nu pot manca:',
@@ -1011,12 +1011,12 @@ export const UI_TEXT_DICTIONARY: Record<string, Record<string, string>> = {
     'i am having a severe allergic reaction.': 'am o reacție alergică severă.',
     'i need medical help immediately.': 'am nevoie de ajutor medical imediat.',
     'please call emergency services.': 'vă rugăm să sunați la serviciile de urgență.',
-    'dial 112': 'anumeați 112',
+    'dial 112': 'formați 112',
     'call': 'apel',
   },
   // Russian
   'ru': {
-    'allergy alert!': 'внимание аллергия!',
+    'allergy alert!': 'внимание! аллергия!',
     'please be careful with my food.': 'пожалуйста, будьте осторожны с моей едой.',
     'thank you!': 'спасибо!',
     'i can not eat:': 'я не могу есть:',
@@ -1026,25 +1026,25 @@ export const UI_TEXT_DICTIONARY: Record<string, Record<string, string>> = {
     'i need medical help immediately.': 'мне срочно нужна медицинская помощь.',
     'please call emergency services.': 'пожалуйста, позвоните в службу экстренной помощи.',
     'dial 112': 'наберите 112',
-    'call': 'вызов',
+    'call': 'позвонить',
   },
   // Samoan
   'sm': {
-    'allergy alert!': 'lala\'iga allergy!',
+    'allergy alert!': 'lapata\'iga o le allergy!',
     'please be careful with my food.': 'fa\'amolemole fa\'aeteete i a\'u mea\'ai.',
     'thank you!': 'fa\'afetai!',
     'i can not eat:': 'e le mafai ona ou \'ai:',
     'they make me very sick and i could die': 'latou te matuā maʻi lava ma e mafai ona ou oti',
-    'attention': 'faamatalaga',
-    'i am having a severe allergic reaction.': 'o lo\'o maua a\'u i se fa\'ama\'i tuga.',
+    'attention': 'lapata\'iga',
+    'i am having a severe allergic reaction.': 'o lo\'o ou maua i se tali allergy matuia.',
     'i need medical help immediately.': 'ou te manaʻomia vave fesoasoani faafomaʻi.',
     'please call emergency services.': 'fa\'amolemole vala\'au auaunaga fa\'afuase\'i.',
-    'dial 112': 'tali 112',
+    'dial 112': 'vala\'au 112',
     'call': 'valaau',
   },
   // Serbian
   'sr': {
-    'allergy alert!': 'алергија упозорење!',
+    'allergy alert!': 'упозорење на алергију!',
     'please be careful with my food.': 'молим те, буди пажљив са мојом храном.',
     'thank you!': 'хвала вам!',
     'i can not eat:': 'не могу да једем:',
@@ -1054,7 +1054,7 @@ export const UI_TEXT_DICTIONARY: Record<string, Record<string, string>> = {
     'i need medical help immediately.': 'треба ми хитна медицинска помоћ.',
     'please call emergency services.': 'молимо позовите хитну помоћ.',
     'dial 112': 'бирајте 112',
-    'call': 'цалл',
+    'call': 'позови',
   },
   // Sindhi
   'sd': {
