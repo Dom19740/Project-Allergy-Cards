@@ -52,17 +52,32 @@ export default defineHandler(async (event) => {
     throw createError({ statusCode: 400, statusMessage: "Unsupported targetLanguage." });
   }
 
-  const response = await fetch(`https://translation.googleapis.com/language/translate/v2?key=${apiKey}`, {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ q: text, source: "en", target: targetLanguage, format: "text" }),
-  });
+  // The outbound fetch/parse is wrapped so a raw network error (whose
+  // message can include this request's URL - and therefore the API key)
+  // never propagates as an unhandled exception that might get logged
+  // verbatim by the hosting platform.
+  let response: Response;
+  try {
+    response = await fetch(`https://translation.googleapis.com/language/translate/v2?key=${apiKey}`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ q: text, source: "en", target: targetLanguage, format: "text" }),
+    });
+  } catch {
+    throw createError({ statusCode: 502, statusMessage: "Upstream request failed" });
+  }
 
   if (!response.ok) {
     throw createError({ statusCode: response.status, statusMessage: "Failed to translate." });
   }
 
-  const data = await response.json();
+  let data: any;
+  try {
+    data = await response.json();
+  } catch {
+    throw createError({ statusCode: 502, statusMessage: "Upstream request failed" });
+  }
+
   const translatedText = data?.data?.translations?.[0]?.translatedText;
 
   if (!translatedText) {

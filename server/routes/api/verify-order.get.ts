@@ -49,13 +49,20 @@ export default defineHandler(async (event) => {
     });
   }
 
-  const response = await fetch(`https://api.lemonsqueezy.com/v1/orders/${encodeURIComponent(orderId)}`, {
-    headers: {
-      Accept: "application/vnd.api+json",
-      "Content-Type": "application/vnd.api+json",
-      Authorization: `Bearer ${apiKey}`,
-    },
-  });
+  // Wrapped so a raw network error never propagates as an unhandled
+  // exception that might get logged verbatim by the hosting platform.
+  let response: Response;
+  try {
+    response = await fetch(`https://api.lemonsqueezy.com/v1/orders/${encodeURIComponent(orderId)}`, {
+      headers: {
+        Accept: "application/vnd.api+json",
+        "Content-Type": "application/vnd.api+json",
+        Authorization: `Bearer ${apiKey}`,
+      },
+    });
+  } catch {
+    throw createError({ statusCode: 502, statusMessage: "Upstream request failed" });
+  }
 
   if (!response.ok) {
     throw createError({
@@ -64,7 +71,13 @@ export default defineHandler(async (event) => {
     });
   }
 
-  const data = await response.json();
+  let data: any;
+  try {
+    data = await response.json();
+  } catch {
+    throw createError({ statusCode: 502, statusMessage: "Upstream request failed" });
+  }
+
   const status = data.data?.attributes?.status;
 
   if (status === "paid") {
