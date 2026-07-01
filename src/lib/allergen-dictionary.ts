@@ -1408,7 +1408,7 @@ export const ALLERGEN_DICTIONARY: Record<string, Record<string, string>> = {
     'fish': 'fisk',
     'crustaceans': 'kräftdjur',
     'sesame': 'sesam',
-    'molluscs': 'blötdjur',
+    'molluscs': 'musslor',
     'mustard': 'senap',
     'sulphites': 'sulfiter',
     'celery': 'selleri',

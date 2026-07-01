@@ -2,32 +2,36 @@
 
 import { LanguageCode } from './types';
 import { ALLERGEN_DICTIONARY, REGIONAL_OVERRIDES } from './allergen-dictionary';
+import { UI_TEXT_DICTIONARY } from './ui-text-dictionary';
 
 export interface SupportedLanguage {
   code: LanguageCode;
   name: string;
 }
 
+// Preserve capitalization if the original text was capitalized
+const applyCapitalization = (text: string, translation: string): string => {
+  if (text[0] === text[0].toUpperCase() && text[0] !== text[0].toLowerCase()) {
+    return translation.charAt(0).toUpperCase() + translation.slice(1);
+  }
+  return translation;
+};
+
 /**
- * Translates text using a local dictionary first, then falls back to the Google Translate API.
+ * Translates text using local dictionaries first, then falls back to the Google Translate API.
  */
 export const translateText = async (text: string, targetLanguage: string): Promise<string> => {
   if (!text || !targetLanguage || targetLanguage === 'en') return text;
 
-  // 1. Check local dictionary first (case-insensitive)
-  const langDictionary = ALLERGEN_DICTIONARY[targetLanguage];
-  if (langDictionary) {
-    const normalizedText = text.toLowerCase().trim();
-    if (langDictionary[normalizedText]) {
-      // Preserve capitalization if the original text was capitalized
-      const translation = langDictionary[normalizedText];
-      if (text[0] === text[0].toUpperCase() && text[0] !== text[0].toLowerCase()) {
-        return translation.charAt(0).toUpperCase() + translation.slice(1);
-      }
-      return translation;
-    }
-  }
-  
+  const normalizedText = text.toLowerCase().trim();
+
+  // 1. Check local dictionaries first (case-insensitive)
+  const allergenEntry = ALLERGEN_DICTIONARY[targetLanguage]?.[normalizedText];
+  if (allergenEntry) return applyCapitalization(text, allergenEntry);
+
+  const uiTextEntry = UI_TEXT_DICTIONARY[targetLanguage]?.[normalizedText];
+  if (uiTextEntry) return applyCapitalization(text, uiTextEntry);
+
   try {
     const response = await fetch(
       `https://translate.googleapis.com/translate_a/single?client=gtx&sl=en&tl=${targetLanguage}&dt=t&q=${encodeURIComponent(text)}`
