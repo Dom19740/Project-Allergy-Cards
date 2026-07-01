@@ -1,17 +1,18 @@
 import { defineHandler } from "nitro";
-import { createError, getQuery, setResponseHeader } from "nitro/h3";
+import { createError, getQuery, getRequestIP, setResponseHeader } from "nitro/h3";
 
-const restoreRateLimit = new Map<string, { count: number; resetAt: number }>();
+const ipRateLimit = new Map<string, { count: number; resetAt: number }>();
+const restoreTokenRateLimit = new Map<string, { count: number; resetAt: number }>();
 
-const enforceRateLimit = (key: string) => {
+const enforceRateLimit = (map: Map<string, { count: number; resetAt: number }>, key: string, limit: number) => {
   const now = Date.now();
-  const entry = restoreRateLimit.get(key);
+  const entry = map.get(key);
   if (!entry || entry.resetAt < now) {
-    restoreRateLimit.set(key, { count: 1, resetAt: now + 60_000 });
+    map.set(key, { count: 1, resetAt: now + 60_000 });
     return;
   }
 
-  if (entry.count >= 10) {
+  if (entry.count >= limit) {
     throw createError({ statusCode: 429, statusMessage: "Too Many Requests" });
   }
 
@@ -30,7 +31,14 @@ export default defineHandler(async (event) => {
     });
   }
 
-  enforceRateLimit(restoreToken);
+  // Primary defense: throttle by requesting IP, so guessing a different
+  // email on every request doesn't grant a fresh rate-limit bucket.
+  const clientIp = getRequestIP(event, { xForwardedFor: true }) || "unknown";
+  enforceRateLimit(ipRateLimit, clientIp, 10);
+
+  // Secondary layer: also cap requests per email, so a single address
+  // can't be hammered from many different IPs.
+  enforceRateLimit(restoreTokenRateLimit, restoreToken, 10);
 
   const apiKey = process.env.LEMON_SQUEEZY_API_KEY;
 

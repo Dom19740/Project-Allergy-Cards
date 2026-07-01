@@ -1,17 +1,18 @@
 import { defineHandler } from "nitro";
-import { createError, getQuery, setResponseHeader } from "nitro/h3";
+import { createError, getQuery, getRequestIP, setResponseHeader } from "nitro/h3";
 
-const verifyRateLimit = new Map<string, { count: number; resetAt: number }>();
+const ipRateLimit = new Map<string, { count: number; resetAt: number }>();
+const orderIdRateLimit = new Map<string, { count: number; resetAt: number }>();
 
-const enforceRateLimit = (key: string) => {
+const enforceRateLimit = (map: Map<string, { count: number; resetAt: number }>, key: string, limit: number) => {
   const now = Date.now();
-  const entry = verifyRateLimit.get(key);
+  const entry = map.get(key);
   if (!entry || entry.resetAt < now) {
-    verifyRateLimit.set(key, { count: 1, resetAt: now + 60_000 });
+    map.set(key, { count: 1, resetAt: now + 60_000 });
     return;
   }
 
-  if (entry.count >= 10) {
+  if (entry.count >= limit) {
     throw createError({ statusCode: 429, statusMessage: "Too Many Requests" });
   }
 
@@ -30,7 +31,14 @@ export default defineHandler(async (event) => {
     });
   }
 
-  enforceRateLimit(orderId);
+  // Primary defense: throttle by requesting IP, so guessing a different
+  // order_id on every request doesn't grant a fresh rate-limit bucket.
+  const clientIp = getRequestIP(event, { xForwardedFor: true }) || "unknown";
+  enforceRateLimit(ipRateLimit, clientIp, 10);
+
+  // Secondary layer: also cap requests per order_id, so a single ID can't
+  // be hammered from many different IPs.
+  enforceRateLimit(orderIdRateLimit, orderId, 10);
 
   const apiKey = process.env.LEMON_SQUEEZY_API_KEY;
 
@@ -41,7 +49,7 @@ export default defineHandler(async (event) => {
     });
   }
 
-  const response = await fetch(`https://api.lemonsqueezy.com/v1/orders/${orderId}`, {
+  const response = await fetch(`https://api.lemonsqueezy.com/v1/orders/${encodeURIComponent(orderId)}`, {
     headers: {
       Accept: "application/vnd.api+json",
       "Content-Type": "application/vnd.api+json",
