@@ -1,5 +1,12 @@
 import { defineHandler } from "nitro";
 import { createError, getRequestIP, readBody, setResponseHeader } from "nitro/h3";
+import { SUPPORTED_LANGUAGE_CODES } from "../../../src/lib/supportedLanguages";
+
+// Generous ceiling for any phrase this app actually sends (fixed UI text,
+// allergen names, custom alert messages) - not a UX limit, just a cap on
+// how much a single request can cost against the paid, per-character-billed
+// Google Cloud Translation API.
+const MAX_TEXT_LENGTH = 500;
 
 const buckets = new Map<string, { count: number; resetAt: number }>();
 
@@ -35,6 +42,14 @@ export default defineHandler(async (event) => {
 
   if (!text || typeof text !== "string" || !targetLanguage || typeof targetLanguage !== "string") {
     throw createError({ statusCode: 400, statusMessage: "text and targetLanguage are required." });
+  }
+
+  if (text.length > MAX_TEXT_LENGTH) {
+    throw createError({ statusCode: 400, statusMessage: "text is too long." });
+  }
+
+  if (!SUPPORTED_LANGUAGE_CODES.has(targetLanguage)) {
+    throw createError({ statusCode: 400, statusMessage: "Unsupported targetLanguage." });
   }
 
   const response = await fetch(`https://translation.googleapis.com/language/translate/v2?key=${apiKey}`, {

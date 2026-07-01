@@ -10,5 +10,5 @@
       "#imports": ["./node_modules/nitro/dist/runtime/index.d.ts"]
     }
   },
-  "include": ["vite.config.ts", "nitro.config.ts", "server/**/*.ts"]
+  "include": ["vite.config.ts", "nitro.config.ts", "server/**/*.ts", "src/lib/supportedLanguages.ts"]
 }
