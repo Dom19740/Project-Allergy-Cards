@@ -1,5 +1,6 @@
 import { defineHandler } from "nitro";
 import { createError, getQuery, getRequestIP, setResponseHeader } from "nitro/h3";
+import { enforceOrigin } from "../../utils/cors";
 
 const ipRateLimit = new Map<string, { count: number; resetAt: number }>();
 const restoreTokenRateLimit = new Map<string, { count: number; resetAt: number }>();
@@ -21,6 +22,7 @@ const enforceRateLimit = (map: Map<string, { count: number; resetAt: number }>, 
 
 export default defineHandler(async (event) => {
   setResponseHeader(event, "Cache-Control", "no-store");
+  enforceOrigin(event);
   const query = getQuery(event);
   const restoreToken = query.restore_token;
 

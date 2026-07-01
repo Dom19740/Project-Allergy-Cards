@@ -134,11 +134,15 @@ const translateViaProxy = async (text: string, targetLanguage: string): Promise<
  *
  * The free translate_a/single "gtx" endpoint is the same undocumented client
  * the Google Translate website itself uses - it has no SLA and Google can
- * throttle or block it without notice. When it fails we retry once against
- * our own rate-limited /api/translate proxy (backed by the official Cloud
- * Translation API + GOOGLE_TRANSLATE_API_KEY, kept server-side only). If both
- * fail, we throw rather than silently showing untranslated/broken text on a
- * safety-critical allergy card.
+ * throttle or block it without notice. On web, where the app and its API are
+ * the same deployment, we retry once against our own rate-limited
+ * /api/translate proxy (backed by the official Cloud Translation API +
+ * GOOGLE_TRANSLATE_API_KEY, kept server-side only). The native Capacitor app
+ * has no backend of its own to fall back to - a relative /api/translate call
+ * there would resolve against the WebView's own origin, not a real server -
+ * so on native we skip straight to failing. Either way, if translation can't
+ * be completed we throw rather than silently showing untranslated/broken
+ * text on a safety-critical allergy card.
  */
 export const translateText = async (text: string, targetLanguage: string): Promise<string> => {
   if (!text || !targetLanguage || targetLanguage === 'en') return text;
@@ -158,6 +162,14 @@ export const translateText = async (text: string, targetLanguage: string): Promi
     return applyRegionalOverrides(translated, targetLanguage);
   } catch (freeError) {
     const freeErrorMessage = (freeError as Error).message;
+
+    if (Capacitor.isNativePlatform()) {
+      const message = `Translation unavailable for "${targetLanguage}": free endpoint (${freeErrorMessage})`;
+      logTranslationEvent('translation_failed', { target_language: targetLanguage });
+      recordTranslationException(message);
+      throw new TranslationError(message);
+    }
+
     logTranslationEvent('translation_fallback_triggered', {
       target_language: targetLanguage,
       reason: freeErrorMessage,

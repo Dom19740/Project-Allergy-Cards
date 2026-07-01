@@ -1,6 +1,7 @@
 import { defineHandler } from "nitro";
 import { createError, getRequestIP, readBody, setResponseHeader } from "nitro/h3";
 import { SUPPORTED_LANGUAGE_CODES } from "../../../src/lib/supportedLanguages";
+import { enforceOrigin } from "../../utils/cors";
 
 // Generous ceiling for any phrase this app actually sends (fixed UI text,
 // allergen names, custom alert messages) - not a UX limit, just a cap on
@@ -27,6 +28,7 @@ const enforceRateLimit = (key: string) => {
 
 export default defineHandler(async (event) => {
   setResponseHeader(event, "Cache-Control", "no-store");
+  enforceOrigin(event);
 
   const clientIp = getRequestIP(event, { xForwardedFor: true }) || "unknown";
   enforceRateLimit(clientIp);
