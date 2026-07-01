@@ -22,7 +22,7 @@ export const UI_TEXT_DICTIONARY: Record<string, Record<string, string>> = {
   },
   // Albanian
   'sq': {
-    'allergy alert!': 'Paralajmërim për alergji!',
+    'allergy alert!': 'paralajmërim për alergji!',
     'please be careful with my food.': 'ju lutemi kini kujdes me ushqimin tim.',
     'thank you!': 'faleminderit!',
     'i can not eat:': 'nuk mund të ha:',
@@ -67,7 +67,7 @@ export const UI_TEXT_DICTIONARY: Record<string, Record<string, string>> = {
     'allergy alert!': 'ալերգիայի զգուշացում!',
     'please be careful with my food.': 'խնդրում եմ զգույշ եղեք իմ սննդի հետ:',
     'thank you!': 'շնորհակալություն',
-    'i can not eat:': 'ես չեմ կարող ուտել.',
+    'i can not eat:': 'ես չեմ կարող ուտել:',
     'they make me very sick and i could die': 'նրանք ինձ շատ են հիվանդացնում, և ես կարող եմ մահանալ',
     'attention': 'ուշադրություն',
     'i am having a severe allergic reaction.': 'ես ծանր ալերգիկ ռեակցիա ունեմ։',
@@ -87,7 +87,7 @@ export const UI_TEXT_DICTIONARY: Record<string, Record<string, string>> = {
     'i am having a severe allergic reaction.': 'məndə ciddi allergik reaksiya var.',
     'i need medical help immediately.': 'mənə təcili tibbi yardım lazımdır.',
     'please call emergency services.': 'zəhmət olmasa təcili xidmətlərə zəng edin.',
-    'dial 112': '112 yöndəri̇n',
+    'dial 112': '112-yə zəng edin',
     'call': 'zəng',
   },
   // Basque
@@ -162,7 +162,7 @@ export const UI_TEXT_DICTIONARY: Record<string, Record<string, string>> = {
   },
   // Catalan
   'ca': {
-    'allergy alert!': "alerta d'al lèrgia!",
+    'allergy alert!': "alerta d'al·lèrgia!",
     'please be careful with my food.': 'si us plau, aneu amb compte amb el meu menjar.',
     'thank you!': 'gràcies!',
     'i can not eat:': 'no puc menjar:',
@@ -227,7 +227,7 @@ export const UI_TEXT_DICTIONARY: Record<string, Record<string, string>> = {
     'i am having a severe allergic reaction.': '我有嚴重嘅過敏反應。',
     'i need medical help immediately.': '我即刻需要醫療協助。',
     'please call emergency services.': '請打去緊急服務。',
-    'dial 112': '1打11212',
+    'dial 112': '打112',
     'call': '打電話',
   },
   // Corsican
@@ -1096,7 +1096,7 @@ export const UI_TEXT_DICTIONARY: Record<string, Record<string, string>> = {
     'i need medical help immediately.': 'okamžite potrebujem lekársku pomoc.',
     'please call emergency services.': 'zavolajte na pohotovostnú službu.',
     'dial 112': 'volite 112',
-    'call': 'zavolajte',
+    'call': 'zavolať',
   },
   // Slovenian
   'sl': {
@@ -1110,21 +1110,21 @@ export const UI_TEXT_DICTIONARY: Record<string, Record<string, string>> = {
     'i need medical help immediately.': 'takoj potrebujem zdravniško pomoč.',
     'please call emergency services.': 'pokličite nujno službo.',
     'dial 112': 'pokličite 112',
-    'call': 'pokličite',
+    'call': 'pokliči',
   },
   // Somali
   'so': {
-    'allergy alert!': 'ogaysiis xasaasiyad!',
+    'allergy alert!': 'digniin xasaasiyad!',
     'please be careful with my food.': 'fadlan ka taxaddar cuntadayda.',
     'thank you!': 'mahadsanid!',
     'i can not eat:': 'ma cuni karo:',
     'they make me very sick and i could die': 'aad bay ii xanuunsadeen waanan dhiman karaa',
-    'attention': 'fiiro gaar ah',
+    'attention': 'feejignaan',
     'i am having a severe allergic reaction.': 'waxaa igu dhacay xasaasiyad daran.',
     'i need medical help immediately.': 'waxaan u baahanahay gargaar caafimaad isla markiiba.',
     'please call emergency services.': 'fadlan wac adeegyada degdegga ah.',
     'dial 112': 'garaac 112',
-    'call': 'baaq',
+    'call': 'wac',
   },
   // Sundanese
   'su': {
@@ -1133,11 +1133,11 @@ export const UI_TEXT_DICTIONARY: Record<string, Record<string, string>> = {
     'thank you!': 'hatur nuhun!',
     'i can not eat:': 'abdi henteu tiasa tuang:',
     'they make me very sick and i could die': 'aranjeunna ngajantenkeun kuring gering pisan sareng kuring tiasa maot',
-    'attention': 'perhatosan',
+    'attention': 'awas',
     'i am having a severe allergic reaction.': 'kuring ngalaman réaksi alérgi parah.',
     'i need medical help immediately.': 'abdi peryogi bantosan médis langsung.',
     'please call emergency services.': 'mangga nelepon jasa darurat.',
-    'dial 112': 'dial 112',
+    'dial 112': 'telepon 112',
     'call': 'telepon',
   },
   // Swahili
@@ -1166,7 +1166,7 @@ export const UI_TEXT_DICTIONARY: Record<string, Record<string, string>> = {
     'i need medical help immediately.': 'jag behöver medicinsk hjälp omedelbart.',
     'please call emergency services.': 'ring räddningstjänsten.',
     'dial 112': 'ring 112',
-    'call': 'samtal',
+    'call': 'ring',
   },
   // Tajik
   'tg': {
@@ -1179,8 +1179,8 @@ export const UI_TEXT_DICTIONARY: Record<string, Record<string, string>> = {
     'i am having a severe allergic reaction.': 'ман реаксияи шадиди аллергӣ дорам.',
     'i need medical help immediately.': 'ба ман фавран ёрии тиббӣ лозим аст.',
     'please call emergency services.': 'лутфан ба хадамоти таъҷилӣ занг занед.',
-    'dial 112': 'раками 112',
-    'call': 'занг',
+    'dial 112': '112-ро занг занед',
+    'call': 'занг занед',
   },
   // Tamil
   'ta': {
@@ -1222,7 +1222,7 @@ export const UI_TEXT_DICTIONARY: Record<string, Record<string, string>> = {
     'i need medical help immediately.': 'ฉันต้องการความช่วยเหลือทางการแพทย์ทันที',
     'please call emergency services.': 'กรุณาโทรเรียกบริการฉุกเฉิน',
     'dial 112': 'กด 112',
-    'call': 'เรียก',
+    'call': 'โทร',
   },
   // Turkish
   'tr': {
@@ -1236,7 +1236,7 @@ export const UI_TEXT_DICTIONARY: Record<string, Record<string, string>> = {
     'i need medical help immediately.': 'derhal tıbbi yardıma ihtiyacım var.',
     'please call emergency services.': 'lütfen acil servisleri arayın.',
     'dial 112': '112\'yi arayin',
-    'call': 'arama',
+    'call': 'ara',
   },
   // Ukrainian
   'uk': {
@@ -1250,7 +1250,7 @@ export const UI_TEXT_DICTIONARY: Record<string, Record<string, string>> = {
     'i need medical help immediately.': 'мені негайно потрібна медична допомога.',
     'please call emergency services.': 'будь ласка, викликайте екстрену службу.',
     'dial 112': 'наберіть 112',
-    'call': 'дзвоніть',
+    'call': 'зателефонувати',
   },
   // Urdu
   'ur': {
@@ -1264,7 +1264,7 @@ export const UI_TEXT_DICTIONARY: Record<string, Record<string, string>> = {
     'i need medical help immediately.': 'مجھے فوری طور پر طبی مدد کی ضرورت ہے۔',
     'please call emergency services.': 'براہ کرم ہنگامی خدمات کو کال کریں۔',
     'dial 112': '112 ڈائل کریں۔',
-    'call': 'کال کریں۔',
+    'call': 'کال کریں',
   },
   // Uzbek
   'uz': {
@@ -1278,7 +1278,7 @@ export const UI_TEXT_DICTIONARY: Record<string, Record<string, string>> = {
     'i need medical help immediately.': 'menga zudlik bilan tibbiy yordam kerak.',
     'please call emergency services.': 'iltimos, tez yordam xizmatiga qo\'ng\'iroq qiling.',
     'dial 112': '112 teng',
-    'call': 'qo\'ng\'iroq',
+    'call': 'qo\'ng\'iroq qiling',
   },
   // Vietnamese
   'vi': {
