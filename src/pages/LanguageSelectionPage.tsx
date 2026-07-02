@@ -115,7 +115,7 @@ const LanguageSelectionPage = () => {
             <div className="mx-auto max-w-md mt-4 p-4 bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-800 rounded-xl flex items-center gap-3 text-amber-800 dark:text-amber-200 text-center">
               <WifiOff className="h-5 w-5 shrink-0" />
               <p className="text-sm font-medium">
-                Offline: Translations for new cards requires an internet connection
+                Offline: Custom allergens and alerts require an internet connection to translate, but you can still continue with the default options.
               </p>
             </div>
           )}
@@ -127,7 +127,7 @@ const LanguageSelectionPage = () => {
                   <span className="text-gray-400">Loading languages...</span>
                 </div>
               ) : (
-                <Select value={selectedLanguageCode} onValueChange={handleLanguageChange} disabled={!isOnline}>
+                <Select value={selectedLanguageCode} onValueChange={handleLanguageChange}>
                   <SelectTrigger
                     className="w-full py-4 text-lg md:text-xl h-auto bg-white text-gray-900 hover:bg-gray-50 border border-red-600 dark:border-red-500"
                   >
@@ -183,7 +183,7 @@ const LanguageSelectionPage = () => {
           </Button>
           <Button
             onClick={handleContinue}
-            disabled={!selectedLanguageCode || (!isOnline && selectedLanguageCode !== 'en')}
+            disabled={!selectedLanguageCode}
             variant="primary"
             className="py-3 px-8 text-lg h-auto rounded-xl shadow-lg transition-transform active:scale-95 flex items-center"
           >

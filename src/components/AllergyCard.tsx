@@ -128,11 +128,6 @@ const AllergyCard: React.FC<AllergyCardProps> = ({ languageCode, selectedAllerge
         return;
       }
 
-      if (!isOnline && languageCode !== 'en') {
-        setIsTranslating(false);
-        return;
-      }
-
       if (!languageCode || languageCode === 'en') {
         setTranslatedUIText({
           allergyAlert: "ALLERGY ALERT!",
