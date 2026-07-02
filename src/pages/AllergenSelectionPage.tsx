@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState, useEffect, useRef } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { toast } from 'sonner';
@@ -17,6 +17,8 @@ import { Capacitor } from '@capacitor/core';
 
 const AllergenSelectionPage = () => {
   const navigate = useNavigate();
+  const location = useLocation();
+  const returnTo = (location.state as { returnTo?: string } | null)?.returnTo;
   const { isPremium } = useBilling();
   const [selectedAllergens, setSelectedAllergens] = useState<string[]>([]);
   const [customAllergenInput, setCustomAllergenInput] = useState<string>('');
@@ -127,7 +129,7 @@ const AllergenSelectionPage = () => {
       persistentCustomList: customList
     });
     
-    navigate('/select-alert');
+    navigate(returnTo || '/select-alert');
   };
 
   return (

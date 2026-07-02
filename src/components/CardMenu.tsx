@@ -1,7 +1,7 @@
 "use client";
 
 import React from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 import { Home, HelpCircle, ShieldAlert, MessageSquare, Languages, X, Info, Mail } from 'lucide-react';
 
 interface CardMenuProps {
@@ -14,13 +14,21 @@ interface CardMenuProps {
 
 const CardMenu: React.FC<CardMenuProps> = ({ isOpen, onClose, onOpenDisclaimer, onOpenUnderstandCard, isEmergency = false }) => {
   const navigate = useNavigate();
+  const location = useLocation();
   if (!isOpen) return null;
 
-  const handleNavigation = (to: string) => {
+  // Lets the step page's Continue button jump straight back to this card
+  // instead of continuing through the rest of the wizard.
+  const editState = {
+    returnTo: location.pathname,
+    returnBase: isEmergency ? '/emergency' : '/alert',
+  };
+
+  const handleNavigation = (to: string, state?: typeof editState) => {
     onClose();
     // Small delay to allow the menu animation to start closing or just to be safe
     setTimeout(() => {
-      navigate(to);
+      navigate(to, state ? { state } : undefined);
     }, 10);
   };
 
@@ -33,10 +41,10 @@ const CardMenu: React.FC<CardMenuProps> = ({ isOpen, onClose, onOpenDisclaimer, 
   const menuItems = [
     { to: "/", label: "Saved Cards", icon: Home },
     ...(!isEmergency ? [
-      { to: "/select-allergens", label: "Edit Allergens", icon: ShieldAlert },
-      { to: "/select-alert", label: "Edit Alert", icon: MessageSquare },
+      { to: "/select-allergens", label: "Edit Allergens", icon: ShieldAlert, state: editState },
+      { to: "/select-alert", label: "Edit Alert", icon: MessageSquare, state: editState },
     ] : []),
-    { to: "/select-language", label: "Change Language", icon: Languages },
+    { to: "/select-language", label: "Change Language", icon: Languages, state: editState },
   ];
 
   const savedCardsItem = menuItems[0];
@@ -83,7 +91,7 @@ const CardMenu: React.FC<CardMenuProps> = ({ isOpen, onClose, onOpenDisclaimer, 
             {restOfMenuItems.map((item) => (
               <button
                 key={item.to}
-                onClick={() => handleNavigation(item.to)}
+                onClick={() => handleNavigation(item.to, item.state)}
                 className="w-full flex items-center space-x-3 px-4 py-3 text-sm font-medium text-gray-700 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-gray-700 rounded-xl transition-colors text-left"
               >
                 <item.icon className="h-4 w-4 text-red-500" />

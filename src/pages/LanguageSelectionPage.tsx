@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Button } from "@/components/ui/button";
 import { ChevronLeft, ChevronRight, WifiOff, Crown, Lock } from "lucide-react";
@@ -18,6 +18,8 @@ import { Capacitor } from '@capacitor/core';
 
 const LanguageSelectionPage = () => {
   const navigate = useNavigate();
+  const location = useLocation();
+  const returnBase = (location.state as { returnBase?: string } | null)?.returnBase;
   const isOnline = useNetworkStatus();
   const { isPremium } = useBilling();
   const [selectedLanguageCode, setSelectedLanguageCode] = useState<string>("es-ES");
@@ -93,7 +95,7 @@ const LanguageSelectionPage = () => {
           params: { language_code: selectedLanguageCode }
         });
       }
-      navigate(`/alert/${selectedLanguageCode}`);
+      navigate(`${returnBase || '/alert'}/${selectedLanguageCode}`);
     }
   };
 

@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Label } from '@/components/ui/label';
 import { ChevronLeft, ChevronRight, Crown, RotateCcw } from 'lucide-react';
@@ -15,6 +15,8 @@ import { DEFAULT_CUSTOM_MESSAGES } from '@/lib/customMessages';
 
 const SelectAlertPage = () => {
   const navigate = useNavigate();
+  const location = useLocation();
+  const returnTo = (location.state as { returnTo?: string } | null)?.returnTo;
   const { isPremium } = useBilling();
   const [iAmAllergicTo, setIAmAllergicTo] = useState(DEFAULT_CUSTOM_MESSAGES.iAmAllergicTo);
   const [theyMakeMeSick, setTheyMakeMeSick] = useState(DEFAULT_CUSTOM_MESSAGES.theyMakeMeSick);
@@ -54,7 +56,7 @@ const SelectAlertPage = () => {
         theyMakeMeSick,
       },
     );
-    navigate('/select-language');
+    navigate(returnTo || '/select-language');
   };
 
   return (
