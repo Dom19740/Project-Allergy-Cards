@@ -51,7 +51,7 @@ const PremiumSuccess = () => {
           <CheckCircle className="h-16 w-16 text-green-500 mx-auto" />
           <h1 className="text-3xl font-bold text-green-600 dark:text-green-400">Premium Unlocked!</h1>
           <p className="text-muted-foreground">
-            Thank you for upgrading! You now have lifetime access to all premium features, including 100+ languages, custom allergens, and widgets.
+            Thank you for upgrading! You now have lifetime access to all premium features.
           </p>
           <Button onClick={() => navigate('/')} className="w-full">
             Go to Home Screen

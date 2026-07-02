@@ -38,7 +38,7 @@ const CardActions: React.FC<CardActionsProps> = ({
 }) => {
   return (
     <div className="w-full pt-2 pb-[calc(8px+env(safe-area-inset-bottom))] flex justify-center bg-white border-t border-gray-100 z-30">
-      <div className="flex items-center space-x-3 bg-white p-2 rounded-full shadow-md border border-gray-200">
+      <div className="flex items-center space-x-1 bg-white p-2 rounded-full shadow-md border border-gray-200">
         
         <Button
           onClick={onToggleMenu}
@@ -96,7 +96,7 @@ const CardActions: React.FC<CardActionsProps> = ({
           onClick={onToggleOriginal}
           variant="ghost"
           size="icon"
-          className={`${showOriginal ? 'text-indigo-700' : 'text-indigo-600'} hover:bg-transparent rounded-full h-10 w-10 transition-colors`}
+          className={`${showOriginal ? 'text-indigo-700' : 'text-indigo-600'} hover:bg-indigo-50 rounded-full h-10 w-10 transition-colors`}
           title={showOriginal ? `English · See ${languageName}` : `${languageName} · See Original`}
         >
           <Languages className="h-5 w-5" />
@@ -106,7 +106,7 @@ const CardActions: React.FC<CardActionsProps> = ({
           onClick={onEmergency}
           variant="ghost"
           size="icon"
-          className="bg-white hover:bg-gray-50 rounded-full h-10 w-10 border-2 border-black"
+          className="bg-white hover:bg-red-50 rounded-full h-10 w-10 border-2 border-black transition-colors"
           title="Emergency"
         >
           <EmergencyCrossIcon className="h-5 w-5" />
