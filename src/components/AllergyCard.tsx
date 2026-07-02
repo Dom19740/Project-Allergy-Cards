@@ -69,6 +69,15 @@ const AllergyCard: React.FC<AllergyCardProps> = ({ languageCode, selectedAllerge
     dial112: "DIAL 112"
   });
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const [verifiedEmergencyNumber, setVerifiedEmergencyNumber] = useState<string | null>(null);
+
+  useEffect(() => {
+    const loadVerifiedEmergencyNumber = async () => {
+      const stored = await storage.get<{ languageCode: string; number: string }>(STORAGE_KEYS.VERIFIED_EMERGENCY_NUMBER);
+      setVerifiedEmergencyNumber(stored && stored.languageCode === languageCode ? stored.number : null);
+    };
+    loadVerifiedEmergencyNumber();
+  }, [languageCode]);
 
   const getLanguageName = (code: string) => {
     if (code === 'en') return 'English';
@@ -357,11 +366,17 @@ const AllergyCard: React.FC<AllergyCardProps> = ({ languageCode, selectedAllerge
   }, []);
 
   const handleEmergencyClick = () => {
+    if (verifiedEmergencyNumber) {
+      navigate(`/emergency/${languageCode}?num=${encodeURIComponent(verifiedEmergencyNumber)}`);
+      return;
+    }
     setIsEmergencyDialogOpen(true);
   };
 
-  const handleEmergencyConfirm = (number: string) => {
+  const handleEmergencyConfirm = async (number: string) => {
     setIsEmergencyDialogOpen(false);
+    await storage.set(STORAGE_KEYS.VERIFIED_EMERGENCY_NUMBER, { languageCode, number });
+    setVerifiedEmergencyNumber(number);
     navigate(`/emergency/${languageCode}?num=${encodeURIComponent(number)}`);
   };
 

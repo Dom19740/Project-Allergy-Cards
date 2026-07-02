@@ -37,7 +37,7 @@ const ONBOARDING_STEPS = [
   },
   {
     title: "Emergency Ready",
-    description: "In urgent situations, use the Emergency Card to quickly communicate your need for medical attention. Quick dial button to local emergency services.",
+    description: "Creaate and save your Emergency Card to quickly communicate your need for medical attention. Quick dial button to local emergency services.",
     image: "/images/screenshot_5_alternate.png"
   },
   {

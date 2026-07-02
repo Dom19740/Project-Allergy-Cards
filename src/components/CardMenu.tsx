@@ -2,7 +2,9 @@
 
 import React from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
-import { Home, HelpCircle, ShieldAlert, MessageSquare, Languages, X, Info, Mail } from 'lucide-react';
+import { Home, HelpCircle, ShieldAlert, MessageSquare, Languages, X, Info, Mail, RotateCcw } from 'lucide-react';
+import { toast } from 'sonner';
+import { storage, STORAGE_KEYS } from '@/lib/storage';
 
 interface CardMenuProps {
   isOpen: boolean;
@@ -35,6 +37,12 @@ const CardMenu: React.FC<CardMenuProps> = ({ isOpen, onClose, onOpenDisclaimer, 
   const handleReportIssue = () => {
     const subject = encodeURIComponent("Simple Allergy Alert Issue Report");
     window.location.href = `mailto:info@simpleallergyalert.com?subject=${subject}`;
+    onClose();
+  };
+
+  const handleResetEmergencyNumber = async () => {
+    await storage.remove(STORAGE_KEYS.VERIFIED_EMERGENCY_NUMBER);
+    toast.success("Emergency number reset. You'll be asked to verify it next time.");
     onClose();
   };
 
@@ -77,16 +85,18 @@ const CardMenu: React.FC<CardMenuProps> = ({ isOpen, onClose, onOpenDisclaimer, 
               <span>{savedCardsItem.label}</span>
             </button>
 
-            <button
-              onClick={() => {
-                onClose();
-                onOpenUnderstandCard();
-              }}
-              className="w-full flex items-center space-x-3 px-4 py-3 text-sm font-medium text-gray-700 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-gray-700 rounded-xl transition-colors text-left"
-            >
-              <HelpCircle className="h-4 w-4 text-red-500" />
-              <span>Understand Your Card</span>
-            </button>
+            {!isEmergency && (
+              <button
+                onClick={() => {
+                  onClose();
+                  onOpenUnderstandCard();
+                }}
+                className="w-full flex items-center space-x-3 px-4 py-3 text-sm font-medium text-gray-700 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-gray-700 rounded-xl transition-colors text-left"
+              >
+                <HelpCircle className="h-4 w-4 text-red-500" />
+                <span>Understand Your Card</span>
+              </button>
+            )}
 
             {restOfMenuItems.map((item) => (
               <button
@@ -98,6 +108,16 @@ const CardMenu: React.FC<CardMenuProps> = ({ isOpen, onClose, onOpenDisclaimer, 
                 <span>{item.label}</span>
               </button>
             ))}
+
+            {isEmergency && (
+              <button
+                onClick={handleResetEmergencyNumber}
+                className="w-full flex items-center space-x-3 px-4 py-3 text-sm font-medium text-gray-700 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-gray-700 rounded-xl transition-colors text-left"
+              >
+                <RotateCcw className="h-4 w-4 text-red-500" />
+                <span>Reset Emergency Number</span>
+              </button>
+            )}
 
             <button
               onClick={handleReportIssue}

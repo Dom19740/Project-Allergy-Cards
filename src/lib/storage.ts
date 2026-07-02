@@ -11,6 +11,7 @@ export const STORAGE_KEYS = {
   LAST_EMERGENCY_LANG: 'lastEmergencyLangCode',
   HAS_SEEN_ONBOARDING: 'hasSeenOnboarding',
   PREFERENCES_LOCK: 'preferencesLock',
+  VERIFIED_EMERGENCY_NUMBER: 'verifiedEmergencyNumber',
 };
 
 export const storage = {
