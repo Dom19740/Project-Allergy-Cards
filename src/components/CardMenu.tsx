@@ -2,16 +2,17 @@
 
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Home, ShieldAlert, MessageSquare, Languages, X, Info, Mail } from 'lucide-react';
+import { Home, HelpCircle, ShieldAlert, MessageSquare, Languages, X, Info, Mail } from 'lucide-react';
 
 interface CardMenuProps {
   isOpen: boolean;
   onClose: () => void;
   onOpenDisclaimer: () => void;
+  onOpenUnderstandCard: () => void;
   isEmergency?: boolean;
 }
 
-const CardMenu: React.FC<CardMenuProps> = ({ isOpen, onClose, onOpenDisclaimer, isEmergency = false }) => {
+const CardMenu: React.FC<CardMenuProps> = ({ isOpen, onClose, onOpenDisclaimer, onOpenUnderstandCard, isEmergency = false }) => {
   const navigate = useNavigate();
   if (!isOpen) return null;
 
@@ -38,6 +39,9 @@ const CardMenu: React.FC<CardMenuProps> = ({ isOpen, onClose, onOpenDisclaimer, 
     { to: "/select-language", label: "Change Language", icon: Languages },
   ];
 
+  const savedCardsItem = menuItems[0];
+  const restOfMenuItems = menuItems.slice(1);
+
   return (
     <>
       {/* Backdrop */}
@@ -57,7 +61,26 @@ const CardMenu: React.FC<CardMenuProps> = ({ isOpen, onClose, onOpenDisclaimer, 
                 <X className="h-4 w-4" />
               </button>
             </div>
-            {menuItems.map((item) => (
+            <button
+              onClick={() => handleNavigation(savedCardsItem.to)}
+              className="w-full flex items-center space-x-3 px-4 py-3 text-sm font-medium text-gray-700 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-gray-700 rounded-xl transition-colors text-left"
+            >
+              <savedCardsItem.icon className="h-4 w-4 text-red-500" />
+              <span>{savedCardsItem.label}</span>
+            </button>
+
+            <button
+              onClick={() => {
+                onClose();
+                onOpenUnderstandCard();
+              }}
+              className="w-full flex items-center space-x-3 px-4 py-3 text-sm font-medium text-gray-700 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-gray-700 rounded-xl transition-colors text-left"
+            >
+              <HelpCircle className="h-4 w-4 text-red-500" />
+              <span>Understand Your Card</span>
+            </button>
+
+            {restOfMenuItems.map((item) => (
               <button
                 key={item.to}
                 onClick={() => handleNavigation(item.to)}
@@ -67,7 +90,7 @@ const CardMenu: React.FC<CardMenuProps> = ({ isOpen, onClose, onOpenDisclaimer, 
                 <span>{item.label}</span>
               </button>
             ))}
-            
+
             <button
               onClick={handleReportIssue}
               className="w-full flex items-center space-x-3 px-4 py-3 text-sm font-medium text-gray-700 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-gray-700 rounded-xl transition-colors text-left"

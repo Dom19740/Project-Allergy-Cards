@@ -10,7 +10,9 @@ import EmergencyActions from '@/components/EmergencyActions';
 import SaveCardDialog from '@/components/SaveCardDialog';
 import CardMenu from '@/components/CardMenu';
 import DisclaimerDialog from '@/components/DisclaimerDialog';
+import UnderstandCardDialog from '@/components/UnderstandCardDialog';
 import { toast } from 'sonner';
+import EmergencyCrossIcon from '@/components/EmergencyCrossIcon';
 import { storage, STORAGE_KEYS } from '@/lib/storage';
 import { SelectedAllergens, CustomMessages, TranslatedContent } from '@/lib/types';
 import { TextToSpeech } from '@capacitor-community/text-to-speech';
@@ -29,6 +31,7 @@ const EmergencyPage = () => {
   const [isSaveDialogOpen, setIsSaveDialogOpen] = useState(false);
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isDisclaimerOpen, setIsDisclaimerOpen] = useState(false);
+  const [isUnderstandCardOpen, setIsUnderstandCardOpen] = useState(false);
   
   const [selectedAllergens, setSelectedAllergens] = useState<SelectedAllergens | null>(null);
   const [customMessages, setCustomMessages] = useState<CustomMessages | null>(null);
@@ -220,9 +223,7 @@ const EmergencyPage = () => {
       <div ref={cardRef} className="flex-1 w-full flex flex-col items-center justify-start text-center overflow-hidden p-4 sm:p-6 md:p-8 pt-[calc(1rem+env(safe-area-inset-top))] bg-white border-none">
         <div className="h-6 sm:h-10 md:h-14" />
         <div className="bg-white border-4 border-black p-4 sm:p-6 rounded-full shadow-lg mb-6 sm:mb-10">
-          <svg viewBox="0 0 24 24" className="h-10 w-10 sm:h-16 sm:w-16" fill="red" aria-hidden="true">
-            <path d="M8 2h8v6h6v8h-6v6H8v-6H2V8h6z" />
-          </svg>
+          <EmergencyCrossIcon className="h-10 w-10 sm:h-16 sm:w-16" />
         </div>
         <div className="w-full max-w-2xl space-y-6 sm:space-y-10">
           <div className="border-b-4 border-red-600 pb-2 sm:pb-4">
@@ -257,16 +258,22 @@ const EmergencyPage = () => {
         isSpeaking={isSpeaking}
       />
 
-      <CardMenu 
-        isOpen={isMenuOpen} 
-        onClose={() => setIsMenuOpen(false)} 
+      <CardMenu
+        isOpen={isMenuOpen}
+        onClose={() => setIsMenuOpen(false)}
         onOpenDisclaimer={() => setIsDisclaimerOpen(true)}
+        onOpenUnderstandCard={() => setIsUnderstandCardOpen(true)}
         isEmergency={true}
       />
 
-      <DisclaimerDialog 
-        isOpen={isDisclaimerOpen} 
-        onClose={() => setIsDisclaimerOpen(false)} 
+      <DisclaimerDialog
+        isOpen={isDisclaimerOpen}
+        onClose={() => setIsDisclaimerOpen(false)}
+      />
+
+      <UnderstandCardDialog
+        isOpen={isUnderstandCardOpen}
+        onClose={() => setIsUnderstandCardOpen(false)}
       />
 
       {selectedAllergens && customMessages && (

@@ -3,6 +3,7 @@
 import React from 'react';
 import { Button } from '@/components/ui/button';
 import { Share2, Download, Save, Loader2, Menu, Languages, Volume2, Square } from 'lucide-react';
+import EmergencyCrossIcon from './EmergencyCrossIcon';
 
 interface CardActionsProps {
   onShare: () => void;
@@ -108,9 +109,7 @@ const CardActions: React.FC<CardActionsProps> = ({
           className="bg-white hover:bg-gray-50 rounded-full h-10 w-10 border-2 border-black"
           title="Emergency"
         >
-          <svg viewBox="0 0 24 24" className="h-5 w-5" fill="red" aria-hidden="true">
-            <path d="M8 2h8v6h6v8h-6v6H8v-6H2V8h6z" />
-          </svg>
+          <EmergencyCrossIcon className="h-5 w-5" />
         </Button>
 
       </div>

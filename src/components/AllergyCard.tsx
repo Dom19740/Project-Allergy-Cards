@@ -12,6 +12,7 @@ import SaveCardDialog from './SaveCardDialog';
 import CardActions from './CardActions';
 import CardMenu from './CardMenu';
 import DisclaimerDialog from './DisclaimerDialog';
+import UnderstandCardDialog from './UnderstandCardDialog';
 import EmergencyNumberDialog from './EmergencyNumberDialog';
 import FullscreenImageOverlay from './FullscreenImageOverlay';
 import AllergenDetailOverlay from './AllergenDetailOverlay';
@@ -40,6 +41,7 @@ const AllergyCard: React.FC<AllergyCardProps> = ({ languageCode, selectedAllerge
   const [isSpeaking, setIsSpeaking] = useState(false);
   const [isSaveDialogOpen, setIsSaveDialogOpen] = useState(false);
   const [isDisclaimerOpen, setIsDisclaimerOpen] = useState(false);
+  const [isUnderstandCardOpen, setIsUnderstandCardOpen] = useState(false);
   const [isEmergencyDialogOpen, setIsEmergencyDialogOpen] = useState(false);
   const [isImageFullscreen, setIsImageFullscreen] = useState(false);
   const [selectedPillIndex, setSelectedPillIndex] = useState<number | null>(null);
@@ -546,8 +548,14 @@ const AllergyCard: React.FC<AllergyCardProps> = ({ languageCode, selectedAllerge
         isDownloading={isDownloading}
         isSpeaking={isSpeaking}
       />
-      <CardMenu isOpen={isMenuOpen} onClose={() => setIsMenuOpen(false)} onOpenDisclaimer={() => setIsDisclaimerOpen(true)} />
+      <CardMenu
+        isOpen={isMenuOpen}
+        onClose={() => setIsMenuOpen(false)}
+        onOpenDisclaimer={() => setIsDisclaimerOpen(true)}
+        onOpenUnderstandCard={() => setIsUnderstandCardOpen(true)}
+      />
       <DisclaimerDialog isOpen={isDisclaimerOpen} onClose={() => setIsDisclaimerOpen(false)} />
+      <UnderstandCardDialog isOpen={isUnderstandCardOpen} onClose={() => setIsUnderstandCardOpen(false)} />
       <EmergencyNumberDialog 
         isOpen={isEmergencyDialogOpen} 
         onClose={() => setIsEmergencyDialogOpen(false)} 
