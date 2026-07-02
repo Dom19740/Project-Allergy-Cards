@@ -5,7 +5,7 @@ import { useNavigate } from 'react-router-dom';
 import { toast } from 'sonner';
 import { Loader2, Utensils, AlertTriangle } from 'lucide-react';
 import { LanguageCode, SelectedAllergens, CustomMessages, TranslatedContent } from '@/lib/types';
-import { ALLERGEN_OPTIONS } from '@/lib/allergens';
+import { ALLERGEN_OPTIONS, getAllergenGridStyle } from '@/lib/allergens';
 import { translateText, TranslationError } from '@/lib/translator';
 import { shareCard, downloadCard } from '@/lib/card-utils';
 import SaveCardDialog from './SaveCardDialog';
@@ -43,7 +43,6 @@ const AllergyCard: React.FC<AllergyCardProps> = ({ languageCode, selectedAllerge
   const [isEmergencyDialogOpen, setIsEmergencyDialogOpen] = useState(false);
   const [isImageFullscreen, setIsImageFullscreen] = useState(false);
   const [selectedPillIndex, setSelectedPillIndex] = useState<number | null>(null);
-  const [isCapturing, setIsCapturing] = useState(false);
   const [customAllergenTranslations, setCustomAllergenTranslations] = useState<{ [key: string]: { [lang: string]: string } }>({});
   const [translatedAllergens, setTranslatedAllergens] = useState<{ [key: string]: string }>(initialTranslations?.allergens || {});
   const [isTranslating, setIsTranslating] = useState(!initialTranslations);
@@ -288,10 +287,8 @@ const AllergyCard: React.FC<AllergyCardProps> = ({ languageCode, selectedAllerge
       }
 
       setIsDownloading(true);
-      setIsCapturing(true);
       await waitForNextPaint();
       const success = await downloadCard(cardRef.current, `allergy-card-${languageCode}.png`);
-      setIsCapturing(false);
       if (success) toast.success("Allergy card saved to your device!");
       else toast.error("Failed to save card.");
       setIsDownloading(false);
@@ -308,12 +305,10 @@ const AllergyCard: React.FC<AllergyCardProps> = ({ languageCode, selectedAllerge
       }
 
       setIsSharing(true);
-      setIsCapturing(true);
       await waitForNextPaint();
       const shortCode = languageCode.split('-')[0].toUpperCase();
       const shareText = `My Allergy Alert Card (${shortCode}) made with Simple Allergy Alert`;
       const success = await shareCard(cardRef.current, shareText, shareText);
-      setIsCapturing(false);
       if (!success) toast.error("Failed to share card.");
       setIsSharing(false);
     }
@@ -397,12 +392,7 @@ const AllergyCard: React.FC<AllergyCardProps> = ({ languageCode, selectedAllerge
     .map(id => ALLERGEN_OPTIONS.find(option => option.id === id))
     .filter(Boolean) as typeof ALLERGEN_OPTIONS;
 
-  let imageGridClasses = "";
-  if (allergensWithImages.length === 1) imageGridClasses = "grid-cols-1 grid-rows-1";
-  else if (allergensWithImages.length === 2) imageGridClasses = "grid-cols-2 grid-rows-1";
-  else if (allergensWithImages.length <= 4) imageGridClasses = "grid-cols-2 grid-rows-2";
-  else if (allergensWithImages.length <= 6) imageGridClasses = "grid-cols-3 grid-rows-2";
-  else imageGridClasses = "grid-cols-3 grid-rows-3";
+  const imageGridStyle = getAllergenGridStyle(allergensWithImages.length);
 
   if (translationError) {
     return (
@@ -509,46 +499,37 @@ const AllergyCard: React.FC<AllergyCardProps> = ({ languageCode, selectedAllerge
           {displayUIText.thankYou}
         </p>
         
-        <div 
-          className="relative w-full max-w-[400px] aspect-square mx-auto flex-shrink min-h-0 cursor-pointer"
-          onClick={() => setIsImageFullscreen(true)}
-        >
-          <div className="absolute inset-0 flex items-center justify-center">
-            {allergensWithImages.length > 0 ? (
-              <div className={`absolute inset-0 grid ${imageGridClasses} gap-1 sm:gap-2 items-center justify-items-center z-0 p-4`}>
-                {allergensWithImages.map((allergen) => (
-                  <div key={allergen.id} className="w-full h-full flex items-center justify-center">
-                    <img src={allergen.image} alt={allergen.name} className="max-w-full max-h-full object-contain" />
-                  </div>
-                ))}
-              </div>
-            ) : (
-              <div className="absolute inset-0 flex items-center justify-center z-0">
-                <Utensils className="w-1/2 h-1/2 text-red-600 opacity-20" />
-              </div>
-            )}
-            <img src="/noentry.png" alt="No entry" className="absolute inset-0 w-full h-full object-contain z-10 opacity-90 pointer-events-none" />
+        <div className="relative w-full flex-1 min-h-0">
+          <div
+            className="relative h-full max-h-[400px] w-auto max-w-full aspect-square mx-auto cursor-pointer"
+            onClick={() => setIsImageFullscreen(true)}
+          >
+            <div className="absolute inset-0 flex items-center justify-center">
+              {allergensWithImages.length > 0 ? (
+                <div className="absolute inset-0 grid gap-1 sm:gap-2 items-center justify-items-center z-0 p-4" style={imageGridStyle}>
+                  {allergensWithImages.map((allergen) => (
+                    <div key={allergen.id} className="w-full h-full flex items-center justify-center">
+                      <img src={allergen.image} alt={allergen.name} className="max-w-full max-h-full object-contain" />
+                    </div>
+                  ))}
+                </div>
+              ) : (
+                <div className="absolute inset-0 flex items-center justify-center z-0">
+                  <Utensils className="w-1/2 h-1/2 text-red-600 opacity-20" />
+                </div>
+              )}
+              <img src="/noentry.png" alt="No entry" className="absolute inset-0 w-full h-full object-contain z-10 opacity-90 pointer-events-none" />
+            </div>
           </div>
         </div>
 
-        <div className="mt-auto pt-2">
-          <button
-            type="button"
-            onClick={() => setShowOriginal(prev => !prev)}
-            className="inline-flex items-center bg-white hover:bg-gray-50 active:bg-gray-100 transition-colors rounded-full px-4 py-1.5 border border-gray-200 shadow-md text-gray-600 text-[14px] sm:text-base font-light mb-0"
-          >
-            {isCapturing
-              ? (showOriginal ? 'English' : getLanguageName(languageCode))
-              : showOriginal
-                ? `English · See ${getLanguageName(languageCode)}`
-                : `${getLanguageName(languageCode)} · See Original`}
-          </button>
-          {!isPremium && (
+        {!isPremium && (
+          <div className="mt-auto pt-2">
             <p className="text-[13px] sm:text-base text-gray-400 font-light">
-              created with Simple Allergy Alert © 2026 dpbcreative
+              created with Simple Allergy Alert © 2026
             </p>
-          )}
-        </div>
+          </div>
+        )}
       </div>
       <CardActions
         onShare={handleShare}
@@ -558,6 +539,9 @@ const AllergyCard: React.FC<AllergyCardProps> = ({ languageCode, selectedAllerge
         onToggleMenu={() => setIsMenuOpen(!isMenuOpen)}
         onEmergency={handleEmergencyClick}
         onReadAloud={handleReadAloud}
+        onToggleOriginal={() => setShowOriginal(prev => !prev)}
+        showOriginal={showOriginal}
+        languageName={getLanguageName(languageCode)}
         isSharing={isSharing}
         isDownloading={isDownloading}
         isSpeaking={isSpeaking}
@@ -574,7 +558,7 @@ const AllergyCard: React.FC<AllergyCardProps> = ({ languageCode, selectedAllerge
         isOpen={isImageFullscreen}
         onClose={() => setIsImageFullscreen(false)}
         allergensWithImages={allergensWithImages}
-        imageGridClasses={imageGridClasses}
+        imageGridStyle={imageGridStyle}
       />
       <AllergenDetailOverlay
         isOpen={selectedPillIndex !== null}

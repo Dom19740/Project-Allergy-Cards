@@ -2,7 +2,7 @@
 
 import React from 'react';
 import { Button } from '@/components/ui/button';
-import { Share2, Download, ArrowLeft, Loader2, Save, Menu, Volume2, Square } from 'lucide-react';
+import { Share2, Download, ArrowLeft, Loader2, Save, Menu, Languages, Volume2, Square } from 'lucide-react';
 
 interface EmergencyActionsProps {
   onBack: () => void;
@@ -10,6 +10,9 @@ interface EmergencyActionsProps {
   onDownload: () => void;
   onToggleMenu: () => void;
   onReadAloud: () => void;
+  onToggleOriginal: () => void;
+  showOriginal: boolean;
+  languageName: string;
   onSave?: () => void;
   isSharing?: boolean;
   isDownloading?: boolean;
@@ -22,6 +25,9 @@ const EmergencyActions: React.FC<EmergencyActionsProps> = ({
   onDownload,
   onToggleMenu,
   onReadAloud,
+  onToggleOriginal,
+  showOriginal,
+  languageName,
   onSave,
   isSharing = false,
   isDownloading = false,
@@ -30,16 +36,6 @@ const EmergencyActions: React.FC<EmergencyActionsProps> = ({
   return (
     <div className="w-full pt-2 pb-[calc(8px+env(safe-area-inset-bottom))] flex justify-center bg-white border-t border-gray-100 z-30">
       <div className="flex items-center space-x-3 bg-white p-2 rounded-full shadow-md border border-gray-200">
-        <Button
-          onClick={onBack}
-          variant="ghost"
-          size="icon"
-          className="text-gray-500 hover:bg-gray-100 rounded-full h-10 w-10"
-          title="Back to Card"
-        >
-          <ArrowLeft className="h-5 w-5" />
-        </Button>
-
         <Button
           onClick={onToggleMenu}
           variant="ghost"
@@ -92,6 +88,26 @@ const EmergencyActions: React.FC<EmergencyActionsProps> = ({
           title={isSpeaking ? "Stop Reading" : "Read Aloud"}
         >
           {isSpeaking ? <Square className="h-5 w-5 fill-current" /> : <Volume2 className="h-5 w-5" />}
+        </Button>
+
+        <Button
+          onClick={onToggleOriginal}
+          variant="ghost"
+          size="icon"
+          className={`${showOriginal ? 'text-indigo-700' : 'text-indigo-600'} hover:bg-transparent rounded-full h-10 w-10 transition-colors`}
+          title={showOriginal ? `English · See ${languageName}` : `${languageName} · See Original`}
+        >
+          <Languages className="h-5 w-5" />
+        </Button>
+
+        <Button
+          onClick={onBack}
+          variant="ghost"
+          size="icon"
+          className="text-gray-500 hover:bg-gray-100 rounded-full h-10 w-10"
+          title="Back to Card"
+        >
+          <ArrowLeft className="h-5 w-5" />
         </Button>
       </div>
     </div>

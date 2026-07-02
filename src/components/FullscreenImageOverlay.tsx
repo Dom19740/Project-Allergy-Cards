@@ -8,14 +8,14 @@ interface FullscreenImageOverlayProps {
   isOpen: boolean;
   onClose: () => void;
   allergensWithImages: typeof ALLERGEN_OPTIONS;
-  imageGridClasses: string;
+  imageGridStyle: { gridTemplateColumns: string; gridTemplateRows: string };
 }
 
-const FullscreenImageOverlay: React.FC<FullscreenImageOverlayProps> = ({ 
-  isOpen, 
-  onClose, 
-  allergensWithImages, 
-  imageGridClasses 
+const FullscreenImageOverlay: React.FC<FullscreenImageOverlayProps> = ({
+  isOpen,
+  onClose,
+  allergensWithImages,
+  imageGridStyle
 }) => {
   if (!isOpen) return null;
 
@@ -34,7 +34,7 @@ const FullscreenImageOverlay: React.FC<FullscreenImageOverlayProps> = ({
       <div className="relative w-full h-full flex items-center justify-center">
         <div className="relative w-full aspect-square max-w-full max-h-full flex items-center justify-center">
           {allergensWithImages.length > 0 ? (
-            <div className={`absolute inset-0 grid ${imageGridClasses} gap-4 items-center justify-items-center z-0 p-8`}>
+            <div className="absolute inset-0 grid gap-4 items-center justify-items-center z-0 p-8" style={imageGridStyle}>
               {allergensWithImages.map((allergen) => (
                 <div key={allergen.id} className="w-full h-full flex items-center justify-center">
                   <img src={allergen.image} alt={allergen.name} className="max-w-full max-h-full object-contain" />

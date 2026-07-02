@@ -33,17 +33,37 @@ const EmergencyPage = () => {
   const [selectedAllergens, setSelectedAllergens] = useState<SelectedAllergens | null>(null);
   const [customMessages, setCustomMessages] = useState<CustomMessages | null>(null);
   const [fullTranslatedContent, setFullTranslatedContent] = useState<TranslatedContent | null>(null);
+  const [showOriginal, setShowOriginal] = useState(false);
 
   // Use the number from URL if available, otherwise fallback to default for language
   const emergencyNumber = searchParams.get('num') || getEmergencyNumber(langCode);
-  
-  const [translatedText, setTranslatedText] = useState({
+
+  const englishText = {
     attention: "ATTENTION",
     emergency: "I am having a severe allergic reaction.",
     needHelp: "I need medical help immediately.",
     callServices: "Please call emergency services.",
     dialText: "CALL"
-  });
+  };
+
+  const [translatedText, setTranslatedText] = useState(englishText);
+
+  const displayText = showOriginal ? englishText : translatedText;
+
+  const getLanguageName = (code: string) => {
+    if (!code || code === 'en') return 'English';
+    try {
+      const displayNames = new Intl.DisplayNames(['en'], { type: 'language' });
+      const name = displayNames.of(code);
+      return name ? name.charAt(0).toUpperCase() + name.slice(1) : code;
+    } catch (e) {
+      return code;
+    }
+  };
+
+  useEffect(() => {
+    setShowOriginal(false);
+  }, [langCode]);
 
   const loadDataAndTranslate = useCallback(async () => {
       if (langCode) {
@@ -199,36 +219,41 @@ const EmergencyPage = () => {
     <div className="flex flex-col w-full h-screen bg-white overflow-hidden">
       <div ref={cardRef} className="flex-1 w-full flex flex-col items-center justify-start text-center overflow-hidden p-4 sm:p-6 md:p-8 pt-[calc(1rem+env(safe-area-inset-top))] bg-white border-none">
         <div className="h-6 sm:h-10 md:h-14" />
-        <div className="bg-red-600 p-4 sm:p-6 rounded-full shadow-lg mb-6 sm:mb-10">
-          <AlertTriangle className="h-10 w-10 sm:h-16 sm:w-16 text-white" />
+        <div className="bg-white border-4 border-black p-4 sm:p-6 rounded-full shadow-lg mb-6 sm:mb-10">
+          <svg viewBox="0 0 24 24" className="h-10 w-10 sm:h-16 sm:w-16" fill="red" aria-hidden="true">
+            <path d="M8 2h8v6h6v8h-6v6H8v-6H2V8h6z" />
+          </svg>
         </div>
         <div className="w-full max-w-2xl space-y-6 sm:space-y-10">
           <div className="border-b-4 border-red-600 pb-2 sm:pb-4">
-            <h1 className="text-3xl sm:text-6xl font-black tracking-tighter uppercase text-red-600">{translatedText.attention}</h1>
+            <h1 className="text-3xl sm:text-6xl font-black tracking-tighter uppercase text-red-600">{displayText.attention}</h1>
           </div>
           <div className="space-y-4 sm:space-y-8">
-            <p className="text-2xl sm:text-4xl font-bold text-gray-900 leading-tight">{translatedText.emergency}</p>
-            <p className="text-2xl sm:text-4xl font-bold text-gray-900 leading-tight">{translatedText.needHelp}</p>
-            <p className="text-2xl sm:text-4xl font-bold text-red-700 leading-tight">{translatedText.callServices}</p>
+            <p className="text-2xl sm:text-4xl font-bold text-gray-900 leading-tight">{displayText.emergency}</p>
+            <p className="text-2xl sm:text-4xl font-bold text-gray-900 leading-tight">{displayText.needHelp}</p>
+            <p className="text-2xl sm:text-4xl font-bold text-red-700 leading-tight">{displayText.callServices}</p>
           </div>
         </div>
         <div className="mt-auto w-full max-w-md pt-6">
           <a href={`tel:${emergencyNumber}`} className="flex flex-col sm:flex-row items-center justify-center gap-2 sm:gap-4 w-full py-4 sm:py-6 px-6 bg-red-700 hover:bg-red-500 text-white rounded-2xl text-2xl sm:text-3xl font-black shadow-xl transition-transform active:scale-95 text-center">
             <Phone className="h-8 w-8 sm:h-10 sm:w-10 fill-current shrink-0" />
-            <span className="leading-tight break-words">{translatedText.dialText} {emergencyNumber}</span>
+            <span className="leading-tight break-words">{displayText.dialText} {emergencyNumber}</span>
           </a>
         </div>
       </div>
-      
-      <EmergencyActions 
-        onBack={() => navigate(-1)} 
-        onShare={handleShare} 
-        onDownload={handleDownload} 
+
+      <EmergencyActions
+        onBack={() => navigate(-1)}
+        onShare={handleShare}
+        onDownload={handleDownload}
         onToggleMenu={() => setIsMenuOpen(true)}
         onReadAloud={handleReadAloud}
-        onSave={handleSave} 
-        isSharing={isSharing} 
-        isDownloading={isDownloading} 
+        onToggleOriginal={() => setShowOriginal(prev => !prev)}
+        showOriginal={showOriginal}
+        languageName={getLanguageName(langCode || 'en')}
+        onSave={handleSave}
+        isSharing={isSharing}
+        isDownloading={isDownloading}
         isSpeaking={isSpeaking}
       />
 

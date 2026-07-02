@@ -3,6 +3,17 @@ export interface Allergen {
   nameKey: string;
 }
 
+// Square-ish grid that scales to any allergen count, so icons stay
+// equally sized instead of overflowing the fixed 3x3 grid used previously.
+export function getAllergenGridStyle(count: number): { gridTemplateColumns: string; gridTemplateRows: string } {
+  const cols = Math.max(1, Math.ceil(Math.sqrt(count)));
+  const rows = Math.max(1, Math.ceil(count / cols));
+  return {
+    gridTemplateColumns: `repeat(${cols}, 1fr)`,
+    gridTemplateRows: `repeat(${rows}, 1fr)`,
+  };
+}
+
 export const ALLERGEN_OPTIONS = [
   { id: "milk", name: "Milk", image: "/allergens/milk.png" },
   { id: "eggs", name: "Eggs", image: "/allergens/eggs.png" },

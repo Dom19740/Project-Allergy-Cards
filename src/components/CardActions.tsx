@@ -2,7 +2,7 @@
 
 import React from 'react';
 import { Button } from '@/components/ui/button';
-import { Share2, Download, Save, Loader2, Menu, Cross, Volume2, Square } from 'lucide-react';
+import { Share2, Download, Save, Loader2, Menu, Languages, Volume2, Square } from 'lucide-react';
 
 interface CardActionsProps {
   onShare: () => void;
@@ -12,6 +12,9 @@ interface CardActionsProps {
   onToggleMenu: () => void;
   onEmergency: () => void;
   onReadAloud: () => void;
+  onToggleOriginal: () => void;
+  showOriginal: boolean;
+  languageName: string;
   isSharing: boolean;
   isDownloading: boolean;
   isSpeaking: boolean;
@@ -25,6 +28,9 @@ const CardActions: React.FC<CardActionsProps> = ({
   onToggleMenu,
   onEmergency,
   onReadAloud,
+  onToggleOriginal,
+  showOriginal,
+  languageName,
   isSharing,
   isDownloading,
   isSpeaking
@@ -86,13 +92,25 @@ const CardActions: React.FC<CardActionsProps> = ({
         </Button>
 
         <Button
+          onClick={onToggleOriginal}
+          variant="ghost"
+          size="icon"
+          className={`${showOriginal ? 'text-indigo-700' : 'text-indigo-600'} hover:bg-transparent rounded-full h-10 w-10 transition-colors`}
+          title={showOriginal ? `English · See ${languageName}` : `${languageName} · See Original`}
+        >
+          <Languages className="h-5 w-5" />
+        </Button>
+
+        <Button
           onClick={onEmergency}
           variant="ghost"
           size="icon"
-          className="text-orange-600 hover:bg-orange-50 rounded-full h-10 w-10"
+          className="bg-white hover:bg-gray-50 rounded-full h-10 w-10 border-2 border-black"
           title="Emergency"
         >
-          <Cross className="h-5 w-5" />
+          <svg viewBox="0 0 24 24" className="h-5 w-5" fill="red" aria-hidden="true">
+            <path d="M8 2h8v6h6v8h-6v6H8v-6H2V8h6z" />
+          </svg>
         </Button>
 
       </div>
