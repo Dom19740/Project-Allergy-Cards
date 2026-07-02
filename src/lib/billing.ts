@@ -22,8 +22,12 @@ const setPremiumCache = async (value: boolean): Promise<void> => {
 };
 
 const readPremiumCache = async (): Promise<boolean> => {
-  const stored = await storage.get<string>(PREMIUM_CACHE_KEY);
-  return stored === 'true';
+  // storage.get() runs JSON.parse() on the raw value, so the literal string
+  // "true" written by setPremiumCache() comes back as the boolean `true`,
+  // not the string 'true' - check for both so this doesn't silently read as
+  // false regardless of what was actually persisted.
+  const stored = await storage.get<string | boolean>(PREMIUM_CACHE_KEY);
+  return stored === 'true' || stored === true;
 };
 
 // cdv-purchase resolves `product.owned` asynchronously as it loads and
@@ -114,8 +118,16 @@ export const refreshPremiumStatus = async (): Promise<boolean> => {
 
   const product = store.get(PREMIUM_PRODUCT_ID);
   const isOwned = product?.owned || false;
-  await setPremiumCache(isOwned);
-  return isOwned;
+  if (isOwned) {
+    await setPremiumCache(true);
+    return true;
+  }
+
+  // Google Play doesn't know about this purchase, but premium may have been
+  // granted through a different verified channel (a promo code, or a web
+  // checkout via Lemon Squeezy) - the Play store has no visibility into
+  // those, so "not owned on Play" must not erase a cache set by one of them.
+  return readPremiumCache();
 };
 
 export const isPremiumUser = async (): Promise<boolean> => {

@@ -55,7 +55,7 @@ const Home = () => {
     <div className="relative flex flex-col h-[100dvh] bg-gray-100 dark:bg-gray-900 overflow-hidden">
       <FixedHeader />
       <p className="absolute left-3 bottom-[calc(0.5rem+env(safe-area-inset-bottom))] text-[10px] text-gray-400 dark:text-gray-500 tracking-widest font-bold z-10">
-        v1.1.3
+        v1.1.3.1
       </p>
       <div className="flex flex-col flex-1 w-full max-w-2xl mx-auto px-6 pt-[calc(100px+env(safe-area-inset-top))] pb-[env(safe-area-inset-bottom)] min-h-0">
         <div className="flex-1 flex flex-col items-center justify-center text-center min-h-0 py-4 gap-8 md:gap-12">
