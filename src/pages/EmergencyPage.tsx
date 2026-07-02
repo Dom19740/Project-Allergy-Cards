@@ -244,7 +244,7 @@ const EmergencyPage = () => {
       </div>
 
       <EmergencyActions
-        onBack={() => navigate(-1)}
+        onBack={() => navigate(`/alert/${langCode}`)}
         onShare={handleShare}
         onDownload={handleDownload}
         onToggleMenu={() => setIsMenuOpen(true)}

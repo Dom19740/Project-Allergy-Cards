@@ -28,6 +28,11 @@ const CardMenu: React.FC<CardMenuProps> = ({ isOpen, onClose, onOpenDisclaimer, 
 
   const handleNavigation = (to: string, state?: typeof editState) => {
     onClose();
+    // Changing language on the emergency card invalidates any previously
+    // verified emergency number, since it was verified for the old language.
+    if (isEmergency && to === "/select-language") {
+      storage.remove(STORAGE_KEYS.VERIFIED_EMERGENCY_NUMBER);
+    }
     // Small delay to allow the menu animation to start closing or just to be safe
     setTimeout(() => {
       navigate(to, state ? { state } : undefined);

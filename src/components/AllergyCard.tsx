@@ -79,6 +79,17 @@ const AllergyCard: React.FC<AllergyCardProps> = ({ languageCode, selectedAllerge
     loadVerifiedEmergencyNumber();
   }, [languageCode]);
 
+  useEffect(() => {
+    const checkPendingEmergencyVerification = async () => {
+      const flag = await storage.getEphemeral<string>(STORAGE_KEYS.OPEN_EMERGENCY_DIALOG_FLAG);
+      if (flag) {
+        await storage.removeEphemeral(STORAGE_KEYS.OPEN_EMERGENCY_DIALOG_FLAG);
+        setIsEmergencyDialogOpen(true);
+      }
+    };
+    checkPendingEmergencyVerification();
+  }, []);
+
   const getLanguageName = (code: string) => {
     if (code === 'en') return 'English';
     try {

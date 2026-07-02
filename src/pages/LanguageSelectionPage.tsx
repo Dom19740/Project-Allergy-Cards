@@ -95,7 +95,16 @@ const LanguageSelectionPage = () => {
           params: { language_code: selectedLanguageCode }
         });
       }
-      navigate(`${returnBase || '/alert'}/${selectedLanguageCode}`);
+      if (returnBase === '/emergency') {
+        // The previously verified emergency number was for the old language,
+        // so send the user back to the allergy card and have it prompt for
+        // re-verification immediately instead of showing the emergency card
+        // with a stale/default number.
+        storage.setEphemeral(STORAGE_KEYS.OPEN_EMERGENCY_DIALOG_FLAG, 'true');
+        navigate(`/alert/${selectedLanguageCode}`);
+      } else {
+        navigate(`${returnBase || '/alert'}/${selectedLanguageCode}`);
+      }
     }
   };
 
