@@ -1,4 +1,5 @@
-import { d as defineHandler, s as setResponseHeader, g as getQuery, c as createError } from "../../_libs/h3.mjs";
+import { d as defineHandler, s as setResponseHeader, r as readBody, c as createError, h as getRequestIP } from "../../_libs/h3.mjs";
+import { e as enforceOrigin } from "../../_chunks/cors.mjs";
 import "../../_libs/rou3.mjs";
 import "../../_libs/srvx.mjs";
 import "node:http";
@@ -6,51 +7,65 @@ import "node:stream";
 import "node:stream/promises";
 import "node:https";
 import "node:http2";
-const restoreRateLimit = /* @__PURE__ */ new Map();
-const enforceRateLimit = (key) => {
+const ipRateLimit = /* @__PURE__ */ new Map();
+const restoreTokenRateLimit = /* @__PURE__ */ new Map();
+const enforceRateLimit = (map, key, limit) => {
   const now = Date.now();
-  const entry = restoreRateLimit.get(key);
+  const entry = map.get(key);
   if (!entry || entry.resetAt < now) {
-    restoreRateLimit.set(key, { count: 1, resetAt: now + 6e4 });
+    map.set(key, { count: 1, resetAt: now + 6e4 });
     return;
   }
-  if (entry.count >= 10) {
+  if (entry.count >= limit) {
     throw createError({ statusCode: 429, statusMessage: "Too Many Requests" });
   }
   entry.count += 1;
 };
-const restoreByEmail_get = defineHandler(async (event) => {
+const restoreByEmail_post = defineHandler(async (event) => {
   setResponseHeader(event, "Cache-Control", "no-store");
-  const query = getQuery(event);
-  const restoreToken = query.restore_token;
+  enforceOrigin(event);
+  const body = await readBody(event);
+  const restoreToken = body?.restoreToken;
   if (!restoreToken || typeof restoreToken !== "string") {
     throw createError({
       statusCode: 401,
       statusMessage: "Unauthorized"
     });
   }
-  enforceRateLimit(restoreToken);
-  const apiKey = process.env.NITRO_LEMONSQUEEZY_API_KEY;
+  const clientIp = getRequestIP(event, { xForwardedFor: true }) || "unknown";
+  enforceRateLimit(ipRateLimit, clientIp, 10);
+  enforceRateLimit(restoreTokenRateLimit, restoreToken, 10);
+  const apiKey = process.env.LEMON_SQUEEZY_API_KEY;
   if (!apiKey) {
     throw createError({
       statusCode: 500,
       statusMessage: "Server configuration error"
     });
   }
-  const response = await fetch(`https://api.lemonsqueezy.com/v1/orders?filter[custom_fields][restore_token]=${encodeURIComponent(restoreToken)}`, {
-    headers: {
-      Accept: "application/vnd.api+json",
-      "Content-Type": "application/vnd.api+json",
-      Authorization: `Bearer ${apiKey}`
-    }
-  });
+  let response;
+  try {
+    response = await fetch(`https://api.lemonsqueezy.com/v1/orders?filter[user_email]=${encodeURIComponent(restoreToken)}`, {
+      headers: {
+        Accept: "application/vnd.api+json",
+        "Content-Type": "application/vnd.api+json",
+        Authorization: `Bearer ${apiKey}`
+      }
+    });
+  } catch {
+    throw createError({ statusCode: 502, statusMessage: "Upstream request failed" });
+  }
   if (!response.ok) {
     throw createError({
       statusCode: 400,
       statusMessage: "Unable to verify purchase"
     });
   }
-  const data = await response.json();
+  let data;
+  try {
+    data = await response.json();
+  } catch {
+    throw createError({ statusCode: 502, statusMessage: "Upstream request failed" });
+  }
   const orders = data.data || [];
   const matchingOrder = orders.find((order) => order.attributes?.status === "paid");
   if (matchingOrder) {
@@ -62,5 +77,5 @@ const restoreByEmail_get = defineHandler(async (event) => {
   });
 });
 export {
-  restoreByEmail_get as default
+  restoreByEmail_post as default
 };

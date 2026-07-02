@@ -1,6 +1,6 @@
 globalThis.__nitro_main__ = import.meta.url;
 import { N as NodeResponse, s as serve } from "./_libs/srvx.mjs";
-import { a as HTTPError, d as defineHandler, h as handleCacheHeaders, f as toResponse, t as toEventHandler, e as defineLazyEventHandler, H as H3Core } from "./_libs/h3.mjs";
+import { a as HTTPError, d as defineHandler, i as handleCacheHeaders, j as toResponse, t as toEventHandler, e as defineLazyEventHandler, H as H3Core } from "./_libs/h3.mjs";
 import { d as defineCachedHandler$1, s as setStorage } from "./_libs/ocache.mjs";
 import { c as createStorage, p as prefixStorage } from "./_libs/unstorage.mjs";
 import { d as decodePath, w as withLeadingSlash, a as withoutTrailingSlash, j as joinURL } from "./_libs/ufo.mjs";
@@ -166,6 +166,20 @@ const assets = {
     "size": 13438,
     "path": "../public/android-chrome-192x192.png"
   },
+  "/android-chrome-512x512.png": {
+    "type": "image/png",
+    "etag": '"8ada-QRxEReU9SvQuxmPDvngmJd7RrYc"',
+    "mtime": "2025-11-05T18:15:12.176Z",
+    "size": 35546,
+    "path": "../public/android-chrome-512x512.png"
+  },
+  "/apple-touch-icon.png": {
+    "type": "image/png",
+    "etag": '"3322-8MbDjdqGrgnrDzkfiFHRVETIgFY"',
+    "mtime": "2025-11-05T18:15:12.184Z",
+    "size": 13090,
+    "path": "../public/apple-touch-icon.png"
+  },
   "/favicon-16x16.png": {
     "type": "image/png",
     "etag": '"2a7-VFpTkqyXZL6QmWBwZfpxRzglwhg"',
@@ -180,19 +194,12 @@ const assets = {
     "size": 1601,
     "path": "../public/favicon-32x32.png"
   },
-  "/apple-touch-icon.png": {
-    "type": "image/png",
-    "etag": '"3322-8MbDjdqGrgnrDzkfiFHRVETIgFY"',
-    "mtime": "2025-11-05T18:15:12.184Z",
-    "size": 13090,
-    "path": "../public/apple-touch-icon.png"
-  },
-  "/android-chrome-512x512.png": {
-    "type": "image/png",
-    "etag": '"8ada-QRxEReU9SvQuxmPDvngmJd7RrYc"',
-    "mtime": "2025-11-05T18:15:12.176Z",
-    "size": 35546,
-    "path": "../public/android-chrome-512x512.png"
+  "/favicon.ico": {
+    "type": "image/vnd.microsoft.icon",
+    "etag": '"3c2e-mN01PVJgUvuoBqiV7T6LT6e1bJQ"',
+    "mtime": "2025-11-05T18:15:12.192Z",
+    "size": 15406,
+    "path": "../public/favicon.ico"
   },
   "/manifest.json": {
     "type": "application/json",
@@ -201,12 +208,12 @@ const assets = {
     "size": 615,
     "path": "../public/manifest.json"
   },
-  "/favicon.ico": {
-    "type": "image/vnd.microsoft.icon",
-    "etag": '"3c2e-mN01PVJgUvuoBqiV7T6LT6e1bJQ"',
-    "mtime": "2025-11-05T18:15:12.192Z",
-    "size": 15406,
-    "path": "../public/favicon.ico"
+  "/noentry.png": {
+    "type": "image/png",
+    "etag": '"4c73-uBWBRpiQgki7Az6KY7y96S7gf04"',
+    "mtime": "2025-11-05T11:20:13.978Z",
+    "size": 19571,
+    "path": "../public/noentry.png"
   },
   "/placeholder.svg": {
     "type": "image/svg+xml",
@@ -214,13 +221,6 @@ const assets = {
     "mtime": "2025-11-05T18:15:58.246Z",
     "size": 17717,
     "path": "../public/placeholder.svg"
-  },
-  "/noentry.png": {
-    "type": "image/png",
-    "etag": '"4c73-uBWBRpiQgki7Az6KY7y96S7gf04"',
-    "mtime": "2025-11-05T11:20:13.978Z",
-    "size": 19571,
-    "path": "../public/noentry.png"
   },
   "/robots.txt": {
     "type": "text/plain; charset=utf-8",
@@ -236,26 +236,19 @@ const assets = {
     "size": 263,
     "path": "../public/site.webmanifest"
   },
-  "/allergens/crustaceans.png": {
-    "type": "image/png",
-    "etag": '"265f2-Y968ZZpuv7hmFCkddPMfPEY6sUc"',
-    "mtime": "2026-04-17T11:03:04.010Z",
-    "size": 157170,
-    "path": "../public/allergens/crustaceans.png"
-  },
-  "/allergens/gluten.png": {
-    "type": "image/png",
-    "etag": '"18223-rKMJMpLi6/yoYh+X3TgZeTJOQfo"',
-    "mtime": "2026-04-17T11:03:04.018Z",
-    "size": 98851,
-    "path": "../public/allergens/gluten.png"
-  },
   "/allergens/celery.png": {
     "type": "image/png",
     "etag": '"19a9e-RqJHNwYr3pm0RGeM0uufeEN9Mwo"',
     "mtime": "2026-04-17T11:04:28.158Z",
     "size": 105118,
     "path": "../public/allergens/celery.png"
+  },
+  "/allergens/crustaceans.png": {
+    "type": "image/png",
+    "etag": '"265f2-Y968ZZpuv7hmFCkddPMfPEY6sUc"',
+    "mtime": "2026-04-17T11:03:04.010Z",
+    "size": 157170,
+    "path": "../public/allergens/crustaceans.png"
   },
   "/allergens/eggs.png": {
     "type": "image/png",
@@ -264,19 +257,19 @@ const assets = {
     "size": 150127,
     "path": "../public/allergens/eggs.png"
   },
+  "/allergens/gluten.png": {
+    "type": "image/png",
+    "etag": '"18223-rKMJMpLi6/yoYh+X3TgZeTJOQfo"',
+    "mtime": "2026-04-17T11:03:04.018Z",
+    "size": 98851,
+    "path": "../public/allergens/gluten.png"
+  },
   "/allergens/fish.png": {
     "type": "image/png",
     "etag": '"2693f-eE/4QnEybN/Z2gn7Tl1Wmz3Xgus"',
     "mtime": "2025-11-05T15:32:50.566Z",
     "size": 158015,
     "path": "../public/allergens/fish.png"
-  },
-  "/allergens/milk.png": {
-    "type": "image/png",
-    "etag": '"f929-yV7cr5y9zGUByYbLsnUJmNat/Xk"',
-    "mtime": "2025-10-29T13:35:47.290Z",
-    "size": 63785,
-    "path": "../public/allergens/milk.png"
   },
   "/allergens/lupin.png": {
     "type": "image/png",
@@ -285,19 +278,12 @@ const assets = {
     "size": 161488,
     "path": "../public/allergens/lupin.png"
   },
-  "/allergens/mustard.png": {
+  "/allergens/milk.png": {
     "type": "image/png",
-    "etag": '"26e6b-uaNodqkDMvc+xbafuxHhfR/dOgo"',
-    "mtime": "2026-04-17T11:03:04.042Z",
-    "size": 159339,
-    "path": "../public/allergens/mustard.png"
-  },
-  "/allergens/shellfish.png": {
-    "type": "image/png",
-    "etag": '"2b492-+Mb61vRQqQ2U+5Sdt2gdlV8yVYc"',
-    "mtime": "2026-04-17T11:04:28.166Z",
-    "size": 177298,
-    "path": "../public/allergens/shellfish.png"
+    "etag": '"16925-AWFDrYWKhh6+E01Bt7nmvmPToO8"',
+    "mtime": "2026-07-01T11:15:28.565Z",
+    "size": 92453,
+    "path": "../public/allergens/milk.png"
   },
   "/allergens/molluscs.png": {
     "type": "image/png",
@@ -306,19 +292,12 @@ const assets = {
     "size": 165353,
     "path": "../public/allergens/molluscs.png"
   },
-  "/allergens/peanuts.png": {
+  "/allergens/mustard.png": {
     "type": "image/png",
-    "etag": '"3c865-0ZGq+oPtNKGJ96sV5vL8ywekez0"',
-    "mtime": "2026-04-17T11:04:28.162Z",
-    "size": 247909,
-    "path": "../public/allergens/peanuts.png"
-  },
-  "/allergens/soy.png": {
-    "type": "image/png",
-    "etag": '"2f46d-j0rV0PhbPh4HW6Ww/oGjDNJ976s"',
-    "mtime": "2026-04-17T11:04:28.170Z",
-    "size": 193645,
-    "path": "../public/allergens/soy.png"
+    "etag": '"26e6b-uaNodqkDMvc+xbafuxHhfR/dOgo"',
+    "mtime": "2026-04-17T11:03:04.042Z",
+    "size": 159339,
+    "path": "../public/allergens/mustard.png"
   },
   "/allergens/sesame.png": {
     "type": "image/png",
@@ -327,47 +306,33 @@ const assets = {
     "size": 188954,
     "path": "../public/allergens/sesame.png"
   },
+  "/allergens/peanuts.png": {
+    "type": "image/png",
+    "etag": '"3c865-0ZGq+oPtNKGJ96sV5vL8ywekez0"',
+    "mtime": "2026-04-17T11:04:28.162Z",
+    "size": 247909,
+    "path": "../public/allergens/peanuts.png"
+  },
+  "/allergens/shellfish.png": {
+    "type": "image/png",
+    "etag": '"2b492-+Mb61vRQqQ2U+5Sdt2gdlV8yVYc"',
+    "mtime": "2026-04-17T11:04:28.166Z",
+    "size": 177298,
+    "path": "../public/allergens/shellfish.png"
+  },
+  "/allergens/soy.png": {
+    "type": "image/png",
+    "etag": '"2ec52-LGGGc0gux4DTs8UUxRkHfBT6yaQ"',
+    "mtime": "2026-07-01T06:53:53.252Z",
+    "size": 191570,
+    "path": "../public/allergens/soy.png"
+  },
   "/allergens/sulphites.png": {
     "type": "image/png",
     "etag": '"276b3-CZ0usPdAlRjNvWWvBnbtYNdAPyM"',
     "mtime": "2026-04-17T11:03:04.058Z",
     "size": 161459,
     "path": "../public/allergens/sulphites.png"
-  },
-  "/assets/button-C6iCvFGT.js": {
-    "type": "text/javascript; charset=utf-8",
-    "etag": '"4cc-dtzWUgAUkFqvR1sUuy5Npm8/Yc8"',
-    "mtime": "2026-06-18T06:02:32.113Z",
-    "size": 1228,
-    "path": "../public/assets/button-C6iCvFGT.js"
-  },
-  "/assets/AllergenSelectionPage-BFApUvaJ.js": {
-    "type": "text/javascript; charset=utf-8",
-    "etag": '"154a-4N/0Ur4jallYyFIZw6nP3/ehAZ0"',
-    "mtime": "2026-06-18T06:02:32.108Z",
-    "size": 5450,
-    "path": "../public/assets/AllergenSelectionPage-BFApUvaJ.js"
-  },
-  "/assets/AllergyAlertPage-CgZCNZt7.js": {
-    "type": "text/javascript; charset=utf-8",
-    "etag": '"3ede-98oQ3kgyA+aCjJSNw05ShnRNuDc"',
-    "mtime": "2026-06-18T06:02:32.108Z",
-    "size": 16094,
-    "path": "../public/assets/AllergyAlertPage-CgZCNZt7.js"
-  },
-  "/assets/dialog-28AQMwdB.js": {
-    "type": "text/javascript; charset=utf-8",
-    "etag": '"7c9-B4QALPjRoA31p2Sc+zFL+8+5EFI"',
-    "mtime": "2026-06-18T06:02:32.108Z",
-    "size": 1993,
-    "path": "../public/assets/dialog-28AQMwdB.js"
-  },
-  "/assets/emergencyNumbers-CChBVRpZ.js": {
-    "type": "text/javascript; charset=utf-8",
-    "etag": '"2eec-OKPXk/nmYqrYjtO6zvTGRhtoScU"',
-    "mtime": "2026-06-18T06:02:32.108Z",
-    "size": 12012,
-    "path": "../public/assets/emergencyNumbers-CChBVRpZ.js"
   },
   "/allergens/treenuts.png": {
     "type": "image/png",
@@ -376,173 +341,173 @@ const assets = {
     "size": 129788,
     "path": "../public/allergens/treenuts.png"
   },
-  "/assets/EmergencyPage-Bhc6lt2p.js": {
+  "/assets/AllergenSelectionPage-VKfV0FdW.js": {
     "type": "text/javascript; charset=utf-8",
-    "etag": '"1b59-shHA/43CILSBkJuGaCbO9BQ0R3I"',
-    "mtime": "2026-06-18T06:02:32.108Z",
-    "size": 7001,
-    "path": "../public/assets/EmergencyPage-Bhc6lt2p.js"
+    "etag": '"152e-Kc/gu5Dx6WdVWmaoDHSXpXsdR34"',
+    "mtime": "2026-07-02T13:34:46.324Z",
+    "size": 5422,
+    "path": "../public/assets/AllergenSelectionPage-VKfV0FdW.js"
   },
-  "/assets/Home-BOtz0v6t.js": {
+  "/assets/AllergyAlertPage-CKrccLOn.js": {
     "type": "text/javascript; charset=utf-8",
-    "etag": '"23c7-kdrTAdsLCGrHwbbm1TbR8JHIgp8"',
-    "mtime": "2026-06-18T06:02:32.107Z",
-    "size": 9159,
-    "path": "../public/assets/Home-BOtz0v6t.js"
+    "etag": '"5092-k1EWVpZrIHiWcyyqOL3Vf2OhwuY"',
+    "mtime": "2026-07-02T13:34:46.324Z",
+    "size": 20626,
+    "path": "../public/assets/AllergyAlertPage-CKrccLOn.js"
   },
-  "/assets/input-CUEK3eZ7.js": {
+  "/assets/dialog-HkHsDTRh.js": {
     "type": "text/javascript; charset=utf-8",
-    "etag": '"244-6g0w3NPpFrJ6RUNafrBdkZLyF0Q"',
-    "mtime": "2026-06-18T06:02:32.108Z",
-    "size": 580,
-    "path": "../public/assets/input-CUEK3eZ7.js"
+    "etag": '"7d4-J7LzjIInzbnhisOeqcAl6/b/Wzg"',
+    "mtime": "2026-07-02T13:34:46.324Z",
+    "size": 2004,
+    "path": "../public/assets/dialog-HkHsDTRh.js"
   },
-  "/assets/FixedHeader-CdSsXzky.js": {
+  "/assets/emergencyNumbers-77ht-_Ut.js": {
     "type": "text/javascript; charset=utf-8",
-    "etag": '"274-vUtfqH0eMG7xXJka6hceZP8bd/g"',
-    "mtime": "2026-06-18T06:02:32.108Z",
-    "size": 628,
-    "path": "../public/assets/FixedHeader-CdSsXzky.js"
+    "etag": '"41bf-L+6TbfMlVio4N+U45f7CGtUXutw"',
+    "mtime": "2026-07-02T13:34:46.324Z",
+    "size": 16831,
+    "path": "../public/assets/emergencyNumbers-77ht-_Ut.js"
+  },
+  "/assets/EmergencyPage-BFoREfr3.js": {
+    "type": "text/javascript; charset=utf-8",
+    "etag": '"21a3-zBajLq5S8hAy4S7KW9CJ/1KPBds"',
+    "mtime": "2026-07-02T13:34:46.324Z",
+    "size": 8611,
+    "path": "../public/assets/EmergencyPage-BFoREfr3.js"
+  },
+  "/assets/Home-B3HNHr6n.js": {
+    "type": "text/javascript; charset=utf-8",
+    "etag": '"1c79-a4o1RfZUcSBzXg43qXK28vlYoA8"',
+    "mtime": "2026-07-02T13:34:46.323Z",
+    "size": 7289,
+    "path": "../public/assets/Home-B3HNHr6n.js"
+  },
+  "/assets/FixedHeader-CwtvIa-I.js": {
+    "type": "text/javascript; charset=utf-8",
+    "etag": '"397-lmMmsX8it61UGJDdCZIZu6DWsDc"',
+    "mtime": "2026-07-02T13:34:46.339Z",
+    "size": 919,
+    "path": "../public/assets/FixedHeader-CwtvIa-I.js"
+  },
+  "/assets/index-B3gPAyG6.js": {
+    "type": "text/javascript; charset=utf-8",
+    "etag": '"4ecc-YG9C1TlhW2TawATm0eMBJMNNEkA"',
+    "mtime": "2026-07-02T13:34:46.323Z",
+    "size": 20172,
+    "path": "../public/assets/index-B3gPAyG6.js"
   },
   "/assets/image-libs-CTVJvpcQ.js": {
     "type": "text/javascript; charset=utf-8",
     "etag": '"32a9-4ZgO8Q+egGelSiVzcWa1kFaINj4"',
-    "mtime": "2026-06-18T06:02:32.107Z",
+    "mtime": "2026-07-02T13:34:46.323Z",
     "size": 12969,
     "path": "../public/assets/image-libs-CTVJvpcQ.js"
   },
-  "/assets/index-B71lZT-R.css": {
+  "/assets/index-Oaq_Zr2z.css": {
     "type": "text/css; charset=utf-8",
-    "etag": '"be5b-heb2sM2FC6rQZ7ivvJYaQb5dzCw"',
-    "mtime": "2026-06-18T06:02:32.107Z",
-    "size": 48731,
-    "path": "../public/assets/index-B71lZT-R.css"
+    "etag": '"bf59-ydmFQS5uaPRtDhtcvn4DuZNAayc"',
+    "mtime": "2026-07-02T13:34:46.315Z",
+    "size": 48985,
+    "path": "../public/assets/index-Oaq_Zr2z.css"
   },
-  "/assets/index-Mqdhq0pc.js": {
+  "/assets/input-BLzAPvZi.js": {
     "type": "text/javascript; charset=utf-8",
-    "etag": '"3d2b-012V7MPl184TN7oFSUqquukgpJk"',
-    "mtime": "2026-06-18T06:02:32.107Z",
-    "size": 15659,
-    "path": "../public/assets/index-Mqdhq0pc.js"
+    "etag": '"244-TsoTzYyMc1LC1NreMa5GPbLxYLw"',
+    "mtime": "2026-07-02T13:34:46.324Z",
+    "size": 580,
+    "path": "../public/assets/input-BLzAPvZi.js"
   },
-  "/assets/label-DGuoxlvq.js": {
+  "/assets/label-DxMFu9It.js": {
     "type": "text/javascript; charset=utf-8",
-    "etag": '"169-bwHacB0yuVmjJlnxN/8CO4iF45g"',
-    "mtime": "2026-06-18T06:02:32.108Z",
-    "size": 361,
-    "path": "../public/assets/label-DGuoxlvq.js"
+    "etag": '"16e-6egTElSuEpQuFacFXc52NhHLcQY"',
+    "mtime": "2026-07-02T13:34:46.324Z",
+    "size": 366,
+    "path": "../public/assets/label-DxMFu9It.js"
   },
-  "/assets/NotFound-BIItBJB3.js": {
+  "/assets/LanguageSelectionPage-RWv4SLfl.js": {
     "type": "text/javascript; charset=utf-8",
-    "etag": '"270-c2J3cCxyGl5wFn6TRmgMfrT1BeY"',
-    "mtime": "2026-06-18T06:02:32.108Z",
+    "etag": '"1cb1-Uqc5FmKdCFQjiZPlZRHoF696TV8"',
+    "mtime": "2026-07-02T13:34:46.323Z",
+    "size": 7345,
+    "path": "../public/assets/LanguageSelectionPage-RWv4SLfl.js"
+  },
+  "/assets/NotFound-DqQmxDIB.js": {
+    "type": "text/javascript; charset=utf-8",
+    "etag": '"270-VlFVFLqnZTr4MEQTUHME/8HuLik"',
+    "mtime": "2026-07-02T13:34:46.324Z",
     "size": 624,
-    "path": "../public/assets/NotFound-BIItBJB3.js"
+    "path": "../public/assets/NotFound-DqQmxDIB.js"
   },
-  "/assets/LanguageSelectionPage-BP7qLveY.js": {
+  "/assets/Onboarding-Z4d3_YJ9.js": {
     "type": "text/javascript; charset=utf-8",
-    "etag": '"1c3f-kkDBpYdu06dZ+2TgFwlQugM7PFE"',
-    "mtime": "2026-06-18T06:02:32.107Z",
-    "size": 7231,
-    "path": "../public/assets/LanguageSelectionPage-BP7qLveY.js"
+    "etag": '"13d9-vXM1XVvXCqSHASfbd6C8odpe3cE"',
+    "mtime": "2026-07-02T13:34:46.324Z",
+    "size": 5081,
+    "path": "../public/assets/Onboarding-Z4d3_YJ9.js"
   },
-  "/assets/Onboarding-Crwb0FDW.js": {
+  "/assets/PageTemplate-DrtheqSL.js": {
     "type": "text/javascript; charset=utf-8",
-    "etag": '"1148-JH/0Eu+T5xpqK+YbFvZ0cF+SCJw"',
-    "mtime": "2026-06-18T06:02:32.108Z",
-    "size": 4424,
-    "path": "../public/assets/Onboarding-Crwb0FDW.js"
+    "etag": '"46e-rulmbXF8gDjZvbLjVqcHuesRPcg"',
+    "mtime": "2026-07-02T13:34:46.363Z",
+    "size": 1134,
+    "path": "../public/assets/PageTemplate-DrtheqSL.js"
   },
-  "/assets/premium-config-DFtRWcjt.js": {
+  "/assets/PremiumOnboarding-DEZdY2Hq.js": {
     "type": "text/javascript; charset=utf-8",
-    "etag": '"1416-ZimU8u1Hj2cGums5Qo/7mFUWeIw"',
-    "mtime": "2026-06-18T06:02:32.108Z",
-    "size": 5142,
-    "path": "../public/assets/premium-config-DFtRWcjt.js"
+    "etag": '"1cfb-rwCbS5XrRWji8lCTLMYLY53b8/U"',
+    "mtime": "2026-07-02T13:34:46.324Z",
+    "size": 7419,
+    "path": "../public/assets/PremiumOnboarding-DEZdY2Hq.js"
   },
-  "/assets/PageTemplate-CsXXQdOM.js": {
+  "/assets/premium-config-BxGL82Av.js": {
     "type": "text/javascript; charset=utf-8",
-    "etag": '"4a0-qMiB1defFlTNkzjrz8aiW9DmzoI"',
-    "mtime": "2026-06-18T06:02:32.108Z",
-    "size": 1184,
-    "path": "../public/assets/PageTemplate-CsXXQdOM.js"
+    "etag": '"1818f-yAJGd6jAJ6oJ3pUFrIgUNJqVIzk"',
+    "mtime": "2026-07-02T13:34:46.324Z",
+    "size": 98703,
+    "path": "../public/assets/premium-config-BxGL82Av.js"
   },
-  "/assets/PremiumOnboarding-CaPBzFDr.js": {
+  "/assets/SafetyDisclaimer-CJhA8Uld.js": {
     "type": "text/javascript; charset=utf-8",
-    "etag": '"1cf3-hmxDqi03VH3evFTYD6zDxxXt9ZE"',
-    "mtime": "2026-06-18T06:02:32.108Z",
-    "size": 7411,
-    "path": "../public/assets/PremiumOnboarding-CaPBzFDr.js"
+    "etag": '"436-csjszQlyp442OAromrZ/pxck7nk"',
+    "mtime": "2026-07-02T13:34:46.324Z",
+    "size": 1078,
+    "path": "../public/assets/SafetyDisclaimer-CJhA8Uld.js"
   },
-  "/assets/PremiumSuccess-Dc7W5uTu.js": {
+  "/assets/SelectAlertPage-BGdT0UAO.js": {
     "type": "text/javascript; charset=utf-8",
-    "etag": '"8c6-CcULI3veWgIeCFU+iTczZ4Q0NYM"',
-    "mtime": "2026-06-18T06:02:32.108Z",
-    "size": 2246,
-    "path": "../public/assets/PremiumSuccess-Dc7W5uTu.js"
+    "etag": '"1072-a3zNP/VTWujWFL7EK0EWI9zXYfM"',
+    "mtime": "2026-07-02T13:34:46.324Z",
+    "size": 4210,
+    "path": "../public/assets/SelectAlertPage-BGdT0UAO.js"
   },
-  "/assets/SelectAlertPage-BK-Edhyt.js": {
+  "/assets/StepHeader-CyNC5kSW.js": {
     "type": "text/javascript; charset=utf-8",
-    "etag": '"e33-YqhXwlyrVMJLASJHwiLQHo8HMQc"',
-    "mtime": "2026-06-18T06:02:32.108Z",
-    "size": 3635,
-    "path": "../public/assets/SelectAlertPage-BK-Edhyt.js"
-  },
-  "/assets/SafetyDisclaimer-ChBvEKRD.js": {
-    "type": "text/javascript; charset=utf-8",
-    "etag": '"431-8e1c4yvaf9QuWF/tS+Mr+26DEQ8"',
-    "mtime": "2026-06-18T06:02:32.108Z",
-    "size": 1073,
-    "path": "../public/assets/SafetyDisclaimer-ChBvEKRD.js"
-  },
-  "/assets/StepHeader-BmaXQA4B.js": {
-    "type": "text/javascript; charset=utf-8",
-    "etag": '"339-NVN2pRHWnnVBjTltrW+tLdv/ioc"',
-    "mtime": "2026-06-18T06:02:32.108Z",
+    "etag": '"339-NTJU7aWmLGMjQpC6EtHOMlPkf8g"',
+    "mtime": "2026-07-02T13:34:46.324Z",
     "size": 825,
-    "path": "../public/assets/StepHeader-BmaXQA4B.js"
+    "path": "../public/assets/StepHeader-CyNC5kSW.js"
   },
-  "/assets/ui-libs-B60XDKY3.js": {
+  "/assets/ui-libs-DtMTV0OK.js": {
     "type": "text/javascript; charset=utf-8",
-    "etag": '"11ec7-2xovMHQxOz8mufeXImA0xsMjn1k"',
-    "mtime": "2026-06-18T06:02:32.102Z",
-    "size": 73415,
-    "path": "../public/assets/ui-libs-B60XDKY3.js"
+    "etag": '"11e08-+i3825Ku3Wwsa3EMnBN/apdS/yw"',
+    "mtime": "2026-07-02T13:34:46.322Z",
+    "size": 73224,
+    "path": "../public/assets/ui-libs-DtMTV0OK.js"
   },
-  "/assets/vendor-Dtyw5iF7.js": {
+  "/assets/useNetworkStatus-CA3mPnpN.js": {
     "type": "text/javascript; charset=utf-8",
-    "etag": '"78aed-JUk98OYoi6vOHASLrLp9cR93a/g"',
-    "mtime": "2026-06-18T06:02:32.107Z",
-    "size": 494317,
-    "path": "../public/assets/vendor-Dtyw5iF7.js"
-  },
-  "/images/screenshot_1.png": {
-    "type": "image/png",
-    "etag": '"53747-rxkBn4pELN/GJ4luj0mmc1rH27k"',
-    "mtime": "2026-05-21T07:55:36.150Z",
-    "size": 341831,
-    "path": "../public/images/screenshot_1.png"
-  },
-  "/images/screenshot_2.png": {
-    "type": "image/png",
-    "etag": '"320fc-NYMYzm1IAEpyuEdSjIi4evLOrFo"',
-    "mtime": "2026-05-21T07:55:36.154Z",
-    "size": 205052,
-    "path": "../public/images/screenshot_2.png"
-  },
-  "/assets/useNetworkStatus-SZZz5_Ba.js": {
-    "type": "text/javascript; charset=utf-8",
-    "etag": '"11f-eFdV5NJfzKiq2hmd77XiEowWuSg"',
-    "mtime": "2026-06-18T06:02:32.108Z",
+    "etag": '"11f-ZJQdl4vOOV5LcXhKq69loomdWLg"',
+    "mtime": "2026-07-02T13:34:46.324Z",
     "size": 287,
-    "path": "../public/assets/useNetworkStatus-SZZz5_Ba.js"
+    "path": "../public/assets/useNetworkStatus-CA3mPnpN.js"
   },
-  "/images/logo_main.png": {
-    "type": "image/png",
-    "etag": '"54dba-JBk10Pf9Bsi8eP9giNZHBMQLyvg"',
-    "mtime": "2026-05-21T07:55:36.145Z",
-    "size": 347578,
-    "path": "../public/images/logo_main.png"
+  "/assets/vendor-UomSsNGT.js": {
+    "type": "text/javascript; charset=utf-8",
+    "etag": '"79614-RETGboJ7YbvQKUfT8CMrRRPT08M"',
+    "mtime": "2026-07-02T13:34:46.323Z",
+    "size": 497172,
+    "path": "../public/assets/vendor-UomSsNGT.js"
   },
   "/images/screenshot_3.png": {
     "type": "image/png",
@@ -551,12 +516,33 @@ const assets = {
     "size": 161323,
     "path": "../public/images/screenshot_3.png"
   },
+  "/images/screenshot_2.png": {
+    "type": "image/png",
+    "etag": '"320fc-NYMYzm1IAEpyuEdSjIi4evLOrFo"',
+    "mtime": "2026-05-21T07:55:36.154Z",
+    "size": 205052,
+    "path": "../public/images/screenshot_2.png"
+  },
+  "/images/logo_main.png": {
+    "type": "image/png",
+    "etag": '"54dba-JBk10Pf9Bsi8eP9giNZHBMQLyvg"',
+    "mtime": "2026-05-21T07:55:36.145Z",
+    "size": 347578,
+    "path": "../public/images/logo_main.png"
+  },
   "/images/screenshot_4.png": {
     "type": "image/png",
     "etag": '"1e526-OlzbAgm9LZNrkr5Rceqbl7Fr5CY"',
     "mtime": "2026-05-21T07:55:36.162Z",
     "size": 124198,
     "path": "../public/images/screenshot_4.png"
+  },
+  "/images/screenshot_1.png": {
+    "type": "image/png",
+    "etag": '"53747-rxkBn4pELN/GJ4luj0mmc1rH27k"',
+    "mtime": "2026-05-21T07:55:36.150Z",
+    "size": 341831,
+    "path": "../public/images/screenshot_1.png"
   },
   "/images/screenshot_4_alternate.png": {
     "type": "image/png",
@@ -567,16 +553,16 @@ const assets = {
   },
   "/images/screenshot_5_alternate.png": {
     "type": "image/png",
-    "etag": '"272d9-9+K+mkK+8p8spGDXoIsb9EFFilk"',
-    "mtime": "2026-05-21T07:55:36.175Z",
-    "size": 160473,
+    "etag": '"28ff1-K95FmEcGOaPJN0nGGRnse5ZxxMI"',
+    "mtime": "2026-06-18T06:35:14.142Z",
+    "size": 167921,
     "path": "../public/images/screenshot_5_alternate.png"
   },
   "/images/screenshot_5.png": {
     "type": "image/png",
-    "etag": '"28866-wz6OGmTHHrkjPgR/BkZ7cVofLQk"',
-    "mtime": "2026-05-21T07:55:36.170Z",
-    "size": 165990,
+    "etag": '"2a6d5-JgikGyCaaWTrmrZa6gmWwP+JZfQ"',
+    "mtime": "2026-06-18T06:34:47.485Z",
+    "size": 173781,
     "path": "../public/images/screenshot_5.png"
   },
   "/images/screenshot_6.png": {
@@ -686,21 +672,24 @@ const findRouteRules = /* @__PURE__ */ (() => {
     return r;
   };
 })();
-const _lazy_eokNte = defineLazyEventHandler(() => import("./_routes/api/restore_by_email.mjs"));
+const _lazy_d6_OmK = defineLazyEventHandler(() => import("./_routes/api/restore_by_email.mjs"));
+const _lazy_3aYzVx = defineLazyEventHandler(() => import("./_routes/api/translate.mjs"));
 const _lazy_5QM8KV = defineLazyEventHandler(() => import("./_routes/api/verify_order.mjs"));
 const _lazy_VGlaqN = defineLazyEventHandler(() => import("./_chunks/renderer-template.mjs"));
 const findRoute = /* @__PURE__ */ (() => {
-  const $0 = { route: "/api/restore-by-email", method: "get", handler: _lazy_eokNte }, $1 = { route: "/api/verify-order", method: "get", handler: _lazy_5QM8KV }, $2 = { route: "/**", handler: _lazy_VGlaqN };
+  const $0 = { route: "/api/restore-by-email", method: "post", handler: _lazy_d6_OmK }, $1 = { route: "/api/translate", method: "post", handler: _lazy_3aYzVx }, $2 = { route: "/api/verify-order", method: "get", handler: _lazy_5QM8KV }, $3 = { route: "/**", handler: _lazy_VGlaqN };
   return (m, p) => {
     if (p.charCodeAt(p.length - 1) === 47) p = p.slice(0, -1) || "/";
     if (p === "/api/restore-by-email") {
-      if (m === "GET") return { data: $0 };
+      if (m === "POST") return { data: $0 };
+    } else if (p === "/api/translate") {
+      if (m === "POST") return { data: $1 };
     } else if (p === "/api/verify-order") {
-      if (m === "GET") return { data: $1 };
+      if (m === "GET") return { data: $2 };
     }
     let s = p.split("/");
     s.length;
-    return { data: $2, params: { "_": s.slice(1).join("/") } };
+    return { data: $3, params: { "_": s.slice(1).join("/") } };
   };
 })();
 const globalMiddleware = [

@@ -133,6 +133,13 @@ var HTTPError = class HTTPError2 extends Error {
     };
   }
 };
+function hasProp(obj, prop) {
+  try {
+    return prop in obj;
+  } catch {
+    return false;
+  }
+}
 function isJSONSerializable(value, _type) {
   if (value === null || value === void 0) return true;
   if (_type !== "object") return _type === "boolean" || _type === "number" || _type === "string";
@@ -366,6 +373,16 @@ function parseQuery(input) {
 function getQuery(event) {
   return parseQuery((event.url || new URL(event.req.url)).search.slice(1));
 }
+function getRequestIP(event, opts = {}) {
+  if (opts.xForwardedFor) {
+    const _header = event.req.headers.get("x-forwarded-for");
+    if (_header) {
+      const xForwardedFor = _header.split(",")[0].trim();
+      if (xForwardedFor) return xForwardedFor;
+    }
+  }
+  return event.req.context?.clientAddress || event.req.ip || void 0;
+}
 function defineHandler(input) {
   if (typeof input === "function") return handlerWithFetch(input);
   const handler = input.handler || (input.fetch ? function _fetchHandler(event) {
@@ -455,6 +472,29 @@ var H3Core = class {
     return routeMiddleware ? [...globalMiddleware, ...routeMiddleware] : globalMiddleware;
   }
 };
+function parseURLEncodedBody(body) {
+  const form = new URLSearchParams(body);
+  const parsedForm = new NullProtoObj();
+  for (const [key, value] of form.entries()) if (hasProp(parsedForm, key)) {
+    if (!Array.isArray(parsedForm[key])) parsedForm[key] = [parsedForm[key]];
+    parsedForm[key].push(value);
+  } else parsedForm[key] = value;
+  return parsedForm;
+}
+async function readBody(event) {
+  const text = await event.req.text();
+  if (!text) return;
+  if ((event.req.headers.get("content-type") || "").startsWith("application/x-www-form-urlencoded")) return parseURLEncodedBody(text);
+  try {
+    return JSON.parse(text);
+  } catch {
+    throw new HTTPError({
+      status: 400,
+      statusText: "Bad Request",
+      message: "Invalid JSON body"
+    });
+  }
+}
 function handleCacheHeaders(event, opts) {
   const cacheControls = ["public", ...opts.cacheControls || []];
   let cacheMatched = false;
@@ -480,6 +520,9 @@ function handleCacheHeaders(event, opts) {
 function createError(arg1, arg2) {
   return new HTTPError(arg1, arg2);
 }
+function getRequestHeader(event, name) {
+  return event.req.headers.get(name) || void 0;
+}
 function setResponseHeader(event, name, value) {
   if (Array.isArray(value)) {
     event.res.headers.delete(name);
@@ -493,9 +536,12 @@ export {
   createError as c,
   defineHandler as d,
   defineLazyEventHandler as e,
-  toResponse as f,
+  getRequestHeader as f,
   getQuery as g,
-  handleCacheHeaders as h,
+  getRequestIP as h,
+  handleCacheHeaders as i,
+  toResponse as j,
+  readBody as r,
   setResponseHeader as s,
   toEventHandler as t
 };
