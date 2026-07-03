@@ -49,7 +49,7 @@ const Home = () => {
     }
   };
 
-  const showDescription = !(hasCards && isPremium);
+  const showDescription = !hasCards;
 
   return (
     <div className="relative flex flex-col h-[100dvh] bg-gray-100 dark:bg-gray-900 overflow-hidden">
@@ -82,7 +82,7 @@ const Home = () => {
           </motion.div>
 
           <AnimatePresence>
-            {hasCards && isPremium && (
+            {hasCards && (
               <motion.div
                 key="cards-list"
                 initial={{ opacity: 0, y: 20 }}

@@ -56,10 +56,10 @@ const EmergencyNumberDialog: React.FC<EmergencyNumberDialogProps> = ({
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent 
-        className="w-[90%] max-w-[400px] rounded-2xl border-gray-200 dark:border-gray-700 shadow-2xl p-5 fixed left-1/2 -translate-x-1/2 top-[calc(1rem+env(safe-area-inset-top))] translate-y-0 animate-in fade-in slide-in-from-top-8 duration-300"
+      <DialogContent
+        className="w-[90%] max-w-[400px] rounded-2xl border-gray-200 dark:border-gray-700 shadow-2xl p-5 fixed left-1/2 -translate-x-1/2 top-[calc(1rem+env(safe-area-inset-top))] translate-y-0 animate-in fade-in slide-in-from-top-8 duration-300 max-h-[calc(100dvh-6rem-env(safe-area-inset-top)-env(safe-area-inset-bottom))] flex flex-col"
       >
-        <DialogHeader className="mb-2">
+        <DialogHeader className="mb-2 shrink-0">
           <DialogTitle className="text-xl font-bold text-gray-900 dark:text-white flex items-center gap-2">
             <AlertCircle className="h-5 w-5 text-red-600" />
             Verify Emergency Number
@@ -69,7 +69,7 @@ const EmergencyNumberDialog: React.FC<EmergencyNumberDialogProps> = ({
           </p>
         </DialogHeader>
 
-        <div className="flex flex-col gap-3 py-1 overflow-hidden px-1">
+        <div className="flex flex-col gap-3 py-1 overflow-y-auto min-h-0 px-1">
           <RadioGroup 
             value={isCustom ? 'custom' : selectedNumber} 
             onValueChange={(val) => {
@@ -80,15 +80,15 @@ const EmergencyNumberDialog: React.FC<EmergencyNumberDialogProps> = ({
                 setSelectedNumber(val);
               }
             }}
-            className="gap-2"
+            className="gap-3"
           >
             {options.map((opt) => (
               <div key={opt.label} className="relative">
                 <RadioGroupItem value={opt.number} id={opt.label} className="sr-only" />
-                <Label 
+                <Label
                   htmlFor={opt.label}
                   className={cn(
-                    "flex items-center justify-between p-3.5 rounded-xl border transition-all cursor-pointer",
+                    "flex items-center justify-between p-4 rounded-xl border transition-all cursor-pointer",
                     !isCustom && selectedNumber === opt.number 
                       ? 'border-red-500 bg-red-50 text-red-700' 
                       : 'border-gray-100 bg-gray-50 text-gray-600 hover:border-gray-200 dark:bg-gray-800 dark:border-gray-700 dark:text-gray-300'
@@ -100,13 +100,13 @@ const EmergencyNumberDialog: React.FC<EmergencyNumberDialogProps> = ({
               </div>
             ))}
             
-            <div className="flex flex-col gap-2">
+            <div className="flex flex-col gap-3">
               <div className="relative">
                 <RadioGroupItem value="custom" id="custom" className="sr-only" />
-                <Label 
+                <Label
                   htmlFor="custom"
                   className={cn(
-                    "flex items-center justify-between p-3.5 rounded-xl border transition-all cursor-pointer",
+                    "flex items-center justify-between p-4 rounded-xl border transition-all cursor-pointer",
                     isCustom 
                       ? 'border-red-500 bg-red-50 text-red-700' 
                       : 'border-gray-100 bg-gray-50 text-gray-600 hover:border-gray-200 dark:bg-gray-800 dark:border-gray-700 dark:text-gray-300'
@@ -133,7 +133,7 @@ const EmergencyNumberDialog: React.FC<EmergencyNumberDialogProps> = ({
           </RadioGroup>
         </div>
 
-        <DialogFooter className="flex flex-row gap-2 mt-4 sm:justify-end">
+        <DialogFooter className="flex flex-row gap-2 mt-4 sm:justify-end shrink-0">
           <Button 
             variant="outline" 
             onClick={onClose}

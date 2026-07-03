@@ -11,9 +11,11 @@ import { toast } from 'sonner';
 import { storage, STORAGE_KEYS } from '@/lib/storage';
 import { cn } from '@/lib/utils';
 import { computeContentSignature } from '@/lib/customMessages';
+import { useBilling } from '@/hooks/useBilling';
 
 const SavedCardsList = () => {
   const navigate = useNavigate();
+  const { isPremium } = useBilling();
   const [allCards, setAllCards] = useState<SavedCard[]>([]);
   const [selectedIndex, setSelectedIndex] = useState(0);
   
@@ -37,16 +39,19 @@ const SavedCardsList = () => {
   }, [emblaApi, onSelect]);
 
   const loadCards = async () => {
-    const standardCards = await storage.get<SavedCard[]>(STORAGE_KEYS.SAVED_CARDS) || [];
+    // Saving standard cards is premium-gated, but the emergency card is
+    // auto-saved for every user regardless of premium status - so it must
+    // stay visible here even when standard cards are hidden.
+    const standardCards = isPremium ? (await storage.get<SavedCard[]>(STORAGE_KEYS.SAVED_CARDS) || []) : [];
     const emergencyCard = await storage.get<SavedCard>(STORAGE_KEYS.SAVED_EMERGENCY_CARD);
-    
+
     const combined = emergencyCard ? [emergencyCard, ...standardCards] : standardCards;
     setAllCards(combined);
   };
 
   useEffect(() => {
     loadCards();
-  }, []);
+  }, [isPremium]);
 
   const handleDelete = async (e: React.MouseEvent, card: SavedCard) => {
     e.stopPropagation();
@@ -91,7 +96,7 @@ const SavedCardsList = () => {
   return (
     <div className="w-full flex flex-col items-start mt-1">
       <div className="w-full mb-1 px-8 flex flex-row items-center justify-between">
-        <h3 className="text-[9px] font-bold text-gray-400 uppercase tracking-widest">
+        <h3 className="text-[18px] font-bold text-gray-400 uppercase tracking-widest">
           Saved Cards
         </h3>
         

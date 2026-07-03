@@ -14,7 +14,7 @@ import UnderstandCardDialog from '@/components/UnderstandCardDialog';
 import { toast } from 'sonner';
 import EmergencyCrossIcon from '@/components/EmergencyCrossIcon';
 import { storage, STORAGE_KEYS } from '@/lib/storage';
-import { SelectedAllergens, CustomMessages, TranslatedContent } from '@/lib/types';
+import { SelectedAllergens, CustomMessages, TranslatedContent, SavedCard } from '@/lib/types';
 import { TextToSpeech } from '@capacitor-community/text-to-speech';
 
 const EmergencyPage = () => {
@@ -183,11 +183,47 @@ const EmergencyPage = () => {
     setIsSaveDialogOpen(true);
   };
 
+  const cardTranslatedContent: TranslatedContent = fullTranslatedContent || {
+    ui: { allergyAlert: "Allergy Alert", iAmAllergicTo: "I am allergic to:", pleaseBeCareful: "Please be careful.", thankYou: "Thank you.", theyMakeMeSick: "They make me sick." },
+    allergens: {},
+    emergency: { ...translatedText, dial112: `${translatedText.dialText} ${emergencyNumber}` }
+  };
+
   useEffect(() => {
     return () => {
       TextToSpeech.stop();
     };
   }, []);
+
+  // Every user gets one emergency card saved automatically the first time
+  // they generate one - this is a safety feature, not gated behind premium
+  // like manual saves are. It only fires once: if a card already exists
+  // (auto-saved earlier, or manually saved/renamed since), later visits to
+  // this page must not silently clobber it - only an explicit manual save
+  // (via SaveCardDialog) should overwrite it after that.
+  useEffect(() => {
+    if (isTranslating || !selectedAllergens || !customMessages) return;
+
+    const autoSaveIfMissing = async () => {
+      const existing = await storage.get<SavedCard>(STORAGE_KEYS.SAVED_EMERGENCY_CARD);
+      if (existing) return;
+
+      const newCard: SavedCard = {
+        id: 'emergency-slot',
+        name: 'Emergency Card',
+        languageCode: langCode || 'en',
+        selectedAllergens,
+        customMessages,
+        translatedContent: cardTranslatedContent,
+        createdAt: Date.now()
+      };
+
+      await storage.set(STORAGE_KEYS.SAVED_EMERGENCY_CARD, newCard);
+      window.dispatchEvent(new CustomEvent('storage-update'));
+    };
+
+    autoSaveIfMissing();
+  }, [isTranslating, selectedAllergens, customMessages, langCode, cardTranslatedContent]);
 
   if (translationError) {
     return (
@@ -284,11 +320,7 @@ const EmergencyPage = () => {
           selectedAllergens={selectedAllergens}
           customMessages={customMessages}
           isEmergency={true}
-          translatedContent={fullTranslatedContent || {
-            ui: { allergyAlert: "Allergy Alert", iAmAllergicTo: "I am allergic to:", pleaseBeCareful: "Please be careful.", thankYou: "Thank you.", theyMakeMeSick: "They make me sick." },
-            allergens: {},
-            emergency: { ...translatedText, dial112: `${translatedText.dialText} ${emergencyNumber}` }
-          }}
+          translatedContent={cardTranslatedContent}
         />
       )}
     </div>

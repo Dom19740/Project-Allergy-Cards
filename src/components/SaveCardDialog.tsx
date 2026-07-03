@@ -38,6 +38,9 @@ const SaveCardDialog: React.FC<SaveCardDialogProps> = ({
 }) => {
   const navigate = useNavigate();
   const { isPremium } = useBilling();
+  // Saving the emergency card is always free - only saving/overwriting
+  // regular allergy cards is gated behind premium.
+  const isLocked = !isEmergency && !isPremium;
   const [cardName, setCardName] = useState(isEmergency ? 'Emergency Card' : '');
   const [existingCards, setExistingCards] = useState<SavedCard[]>([]);
   const [selectedCardId, setSelectedCardId] = useState<string | null>(null);
@@ -73,7 +76,7 @@ const SaveCardDialog: React.FC<SaveCardDialogProps> = ({
   }, [isOpen, isEmergency]);
 
   const handleSave = async () => {
-    if (!isPremium) {
+    if (isLocked) {
       toast.error("Saving cards is a premium feature. Please upgrade to unlock!");
       return;
     }
@@ -174,12 +177,12 @@ const SaveCardDialog: React.FC<SaveCardDialogProps> = ({
               value={cardName}
               onChange={(e) => setCardName(e.target.value)}
               onKeyDown={handleKeyDown}
-              disabled={!isPremium}
+              disabled={isLocked}
               placeholder={isEmergency ? "Emergency Card" : "e.g. My Thai Card"}
               autoFocus
               className="w-full h-11 rounded-xl border-gray-200 focus:ring-red-500 focus:border-gray-200 px-4 disabled:opacity-50"
             />
-            {!isPremium && (
+            {isLocked && (
               <button 
                 onClick={() => {
                   handleClose();
@@ -220,7 +223,7 @@ const SaveCardDialog: React.FC<SaveCardDialogProps> = ({
                     <div key={card.id} className="flex-[0_0_100%] min-w-0 flex justify-center px-1">
                       <button
                         onClick={() => toggleCardSelection(card)}
-                        disabled={!isPremium}
+                        disabled={isLocked}
                         className={cn(
                           "w-full flex items-center justify-between p-3.5 rounded-xl border transition-all text-left disabled:opacity-50",
                           selectedCardId === card.id 
@@ -252,9 +255,9 @@ const SaveCardDialog: React.FC<SaveCardDialogProps> = ({
           >
             Cancel
           </Button>
-          <Button 
-            onClick={handleSave} 
-            disabled={!isPremium}
+          <Button
+            onClick={handleSave}
+            disabled={isLocked}
             variant="primary"
             className="flex-1 h-11 rounded-xl shadow-sm transition-all active:scale-95 font-medium disabled:opacity-50"
           >
