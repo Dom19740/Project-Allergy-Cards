@@ -38,7 +38,7 @@ const SavedCardsList = () => {
 
   const loadCards = async () => {
     const standardCards = await storage.get<SavedCard[]>(STORAGE_KEYS.SAVED_CARDS) || [];
-    const emergencyCard = await storage.getEphemeral<SavedCard>(STORAGE_KEYS.SAVED_EMERGENCY_CARD);
+    const emergencyCard = await storage.get<SavedCard>(STORAGE_KEYS.SAVED_EMERGENCY_CARD);
     
     const combined = emergencyCard ? [emergencyCard, ...standardCards] : standardCards;
     setAllCards(combined);
@@ -51,7 +51,7 @@ const SavedCardsList = () => {
   const handleDelete = async (e: React.MouseEvent, card: SavedCard) => {
     e.stopPropagation();
     if (card.id === 'emergency-slot') {
-      await storage.removeEphemeral(STORAGE_KEYS.SAVED_EMERGENCY_CARD);
+      await storage.remove(STORAGE_KEYS.SAVED_EMERGENCY_CARD);
       toast.success("Emergency card deleted.");
     } else {
       const standardCards = await storage.get<SavedCard[]>(STORAGE_KEYS.SAVED_CARDS) || [];

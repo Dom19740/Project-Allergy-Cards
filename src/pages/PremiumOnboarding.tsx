@@ -1,16 +1,19 @@
 "use client";
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Crown, Check, ChevronRight, Languages, ShieldAlert, MessageSquare, Save, Smartphone, Loader2 } from 'lucide-react';
 import { useBilling } from '@/hooks/useBilling';
 import FixedHeader from '@/components/FixedHeader';
 import PromoCodeDialog from '@/components/PromoCodeDialog';
-import { getPremiumPrice } from '@/lib/billing';
+import { getPremiumPrice, resetPremiumCacheForTesting } from '@/lib/billing';
 import { Capacitor } from '@capacitor/core';
 import { Preferences } from '@capacitor/preferences';
 import { toast } from 'sonner';
+
+const DEV_RESET_TAPS_REQUIRED = 3;
+const DEV_RESET_TAP_WINDOW_MS = 2000;
 
 const PremiumOnboarding = () => {
   const navigate = useNavigate();
@@ -20,6 +23,24 @@ const PremiumOnboarding = () => {
   const [isRestoreOpen, setIsRestoreOpen] = useState(false);
   const [restoreEmail, setRestoreEmail] = useState('');
   const [isRestoring, setIsRestoring] = useState(false);
+  const devTapCount = useRef(0);
+  const devTapResetTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  // Hidden testing affordance: tap the crown icon 3x quickly to clear the
+  // locally cached premium flag, without adb/bmgr gymnastics.
+  const handleDevResetTap = () => {
+    devTapCount.current += 1;
+    if (devTapResetTimer.current) clearTimeout(devTapResetTimer.current);
+    devTapResetTimer.current = setTimeout(() => {
+      devTapCount.current = 0;
+    }, DEV_RESET_TAP_WINDOW_MS);
+
+    if (devTapCount.current >= DEV_RESET_TAPS_REQUIRED) {
+      devTapCount.current = 0;
+      resetPremiumCacheForTesting();
+      toast.info('Premium cache cleared (testing)');
+    }
+  };
 
   const handleEmailRestore = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -106,7 +127,10 @@ const PremiumOnboarding = () => {
               <h2 className="text-2xl font-bold text-gray-900 dark:text-white">
                 {isPremium ? "Premium Unlocked" : "Unlock Premium"}
               </h2>
-              <div className="bg-amber-100 dark:bg-amber-900/30 p-1 rounded-lg">
+              <div
+                onClick={handleDevResetTap}
+                className="bg-amber-100 dark:bg-amber-900/30 p-1 rounded-lg"
+              >
                 <Crown className="h-4 w-4 text-amber-600 fill-amber-600/20" />
               </div>
             </div>

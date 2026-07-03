@@ -44,7 +44,7 @@ export const useDeepLinks = () => {
             });
           }
         } else if (host === 'emergency') {
-          const emergencyCard = await storage.getEphemeral<SavedCard>(STORAGE_KEYS.SAVED_EMERGENCY_CARD);
+          const emergencyCard = await storage.get<SavedCard>(STORAGE_KEYS.SAVED_EMERGENCY_CARD);
           if (emergencyCard) {
             await Promise.all([
               storage.set(STORAGE_KEYS.SELECTED_ALLERGENS, emergencyCard.selectedAllergens),

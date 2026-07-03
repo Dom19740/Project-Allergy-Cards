@@ -66,6 +66,19 @@ export const syncPremiumCache = (value: boolean) => {
   }
 };
 
+// Testing-only escape hatch: refreshPremiumStatus() deliberately never clears
+// a cached "true" on its own (see the comment above), since the Play Store
+// reporting "not owned" is ambiguous with a Lemon Squeezy/promo grant. That
+// means a refunded-but-not-revoked test purchase stays cached as premium
+// forever with no in-app way to undo it. This wipes the cache directly so a
+// tester isn't stuck reaching for adb/bmgr every cycle.
+export const resetPremiumCacheForTesting = async (): Promise<void> => {
+  await storage.remove(PREMIUM_CACHE_KEY);
+  if (typeof window !== 'undefined') {
+    window.dispatchEvent(new CustomEvent('premium-status-changed', { detail: false }));
+  }
+};
+
 /**
  * Initializes the billing store and registers the premium product.
  */
