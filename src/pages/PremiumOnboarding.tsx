@@ -191,7 +191,7 @@ const PremiumOnboarding = () => {
             <Button
               onClick={handleContinue}
               variant="primary"
-              className="w-full py-3 px-8 text-lg h-auto font-bold rounded-xl shadow-lg transition-all active:scale-[0.98] flex items-center justify-center"
+              className="w-[240px] py-3 px-8 text-lg h-auto font-bold rounded-xl shadow-lg transition-all active:scale-[0.98] flex items-center justify-center"
             >
               {isPremium ? "Continue to App" : "Maybe Later"}
               <ChevronRight className="ml-1 h-5 w-5" />

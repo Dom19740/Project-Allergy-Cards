@@ -156,7 +156,7 @@ const Onboarding = () => {
               <Button
                 variant="primary"
                 onClick={handleNext}
-                className="py-3 px-8 text-lg h-auto min-w-[200px] rounded-xl shadow-lg transition-transform active:scale-95 flex items-center"
+                className="py-3 px-8 text-lg h-auto w-[180px] rounded-xl shadow-lg transition-transform active:scale-95 flex items-center justify-center"
               >
                 {currentStep === ONBOARDING_STEPS.length - 1 ? 'Get Started' : 'Continue'}
                 <ChevronRight className="w-5 h-5 ml-1" />
