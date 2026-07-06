@@ -546,13 +546,18 @@ const AllergyCard: React.FC<AllergyCardProps> = ({ languageCode, selectedAllerge
           </div>
         </div>
 
-        {!isPremium && (
-          <div className="mt-auto pt-2">
+        <div className="mt-auto pt-2">
+          {languageCode !== 'en' && (
+            <p className="text-[20px] sm:text-[32px] text-gray-400 font-light mb-1">
+              Translated to {getLanguageName(languageCode)}
+            </p>
+          )}
+          {!isPremium && (
             <p className="text-[13px] sm:text-base text-gray-400 font-light">
               created with Simple Allergy Alert © 2026
             </p>
-          </div>
-        )}
+          )}
+        </div>
       </div>
       <CardActions
         onShare={handleShare}

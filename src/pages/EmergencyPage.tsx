@@ -16,13 +16,15 @@ import EmergencyCrossIcon from '@/components/EmergencyCrossIcon';
 import { storage, STORAGE_KEYS } from '@/lib/storage';
 import { SelectedAllergens, CustomMessages, TranslatedContent, SavedCard } from '@/lib/types';
 import { TextToSpeech } from '@capacitor-community/text-to-speech';
+import { useBilling } from '@/hooks/useBilling';
 
 const EmergencyPage = () => {
   const { langCode } = useParams<{ langCode: string }>();
   const [searchParams] = useSearchParams();
   const navigate = useNavigate();
   const cardRef = useRef<HTMLDivElement>(null);
-  
+  const { isPremium } = useBilling();
+
   const [isTranslating, setIsTranslating] = useState(true);
   const [translationError, setTranslationError] = useState<string | null>(null);
   const [isSharing, setIsSharing] = useState(false);
@@ -276,6 +278,16 @@ const EmergencyPage = () => {
             <Phone className="h-8 w-8 sm:h-10 sm:w-10 fill-current shrink-0" />
             <span className="leading-tight break-words">{displayText.dialText} {emergencyNumber}</span>
           </a>
+          {langCode && langCode !== 'en' && (
+            <p className="text-[20px] sm:text-[32px] text-gray-400 font-light mt-4">
+              Translated to {getLanguageName(langCode)}
+            </p>
+          )}
+          {!isPremium && (
+            <p className="text-[13px] sm:text-base text-gray-400 font-light mt-1">
+              created with Simple Allergy Alert © 2026
+            </p>
+          )}
         </div>
       </div>
 
