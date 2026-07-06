@@ -419,7 +419,7 @@ const AllergyCard: React.FC<AllergyCardProps> = ({ languageCode, selectedAllerge
             We couldn't translate your card into this language. Showing an untranslated card could put you at risk, so we're not displaying it until translation succeeds.
           </p>
           <button
-            className="px-6 py-3 bg-red-600 hover:bg-red-500 text-white rounded-lg font-semibold transition-colors"
+            className="px-6 py-3 bg-red-700 hover:bg-red-800 active:bg-red-600 text-white rounded-lg font-semibold transition-colors"
             onClick={() => translateAllContent()}
           >
             Try Again

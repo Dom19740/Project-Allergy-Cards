@@ -90,7 +90,7 @@ const AllergenSelectionPage = () => {
         <div className="flex-grow overflow-y-auto pt-8">
           <StepHeader 
             title="Select Your Allergens"
-            description="Choose from our standard list or add your own custom allergens."
+            description="Choose from the EU standard allergen list or add your own custom allergens."
           />
           
           <div className="grid grid-cols-2 gap-2 sm:gap-3 w-full pt-8">

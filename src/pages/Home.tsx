@@ -104,7 +104,7 @@ const Home = () => {
           <Button
             onClick={handleGetStarted}
             variant="primary"
-            className="py-3 px-8 text-lg h-auto rounded-xl shadow-lg transition-transform active:scale-95 flex items-center"
+            className="py-3 px-8 text-lg h-auto w-[180px] rounded-xl shadow-lg transition-transform active:scale-95 flex items-center"
           >
             Get Started
           </Button>

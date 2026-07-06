@@ -231,7 +231,7 @@ const EmergencyPage = () => {
             We couldn't translate this emergency message into this language. Showing an untranslated message could put you at risk, so we're not displaying it until translation succeeds.
           </p>
           <button
-            className="px-6 py-3 bg-red-600 hover:bg-red-500 text-white rounded-lg font-semibold transition-colors"
+            className="px-6 py-3 bg-red-700 hover:bg-red-800 active:bg-red-600 text-white rounded-lg font-semibold transition-colors"
             onClick={() => { setIsTranslating(true); loadDataAndTranslate(); }}
           >
             Try Again
@@ -268,7 +268,7 @@ const EmergencyPage = () => {
           </div>
         </div>
         <div className="mt-auto w-full max-w-md pt-4 shrink-0">
-          <a href={`tel:${emergencyNumber}`} className="flex flex-col sm:flex-row items-center justify-center gap-1 sm:gap-4 w-full py-2.5 sm:py-6 px-6 bg-red-700 hover:bg-red-500 text-white rounded-2xl text-xl sm:text-3xl font-black shadow-xl transition-transform active:scale-95 text-center">
+          <a href={`tel:${emergencyNumber}`} className="flex flex-col sm:flex-row items-center justify-center gap-1 sm:gap-4 w-full py-2.5 sm:py-6 px-6 bg-red-700 hover:bg-red-800 active:bg-red-600 text-white rounded-2xl text-xl sm:text-3xl font-black shadow-xl transition-transform active:scale-95 text-center">
             <Phone className="h-6 w-6 sm:h-10 sm:w-10 fill-current shrink-0" />
             <span className="leading-tight break-words">{displayText.dialText} {emergencyNumber}</span>
           </a>

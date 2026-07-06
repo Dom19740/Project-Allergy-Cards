@@ -92,5 +92,13 @@ export default {
       },
     },
   },
+  future: {
+    // Without this, `hover:` styles apply on tap on touch devices and get
+    // "stuck" until the user taps elsewhere (no mouseleave event fires) -
+    // e.g. a red button's hover:bg-red-800 (darker) staying stuck after a
+    // tap makes it look permanently too dark. This scopes hover: to actual
+    // hover-capable pointers (@media (hover: hover)) so touch never triggers it.
+    hoverOnlyWhenSupported: true,
+  },
   plugins: [require("tailwindcss-animate")],
 } satisfies Config;

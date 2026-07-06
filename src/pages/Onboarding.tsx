@@ -3,7 +3,6 @@
 import React, { useState, useCallback, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import useEmblaCarousel from 'embla-carousel-react';
-import { ChevronLeft, ChevronRight } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { storage, STORAGE_KEYS } from '@/lib/storage';
 import FixedHeader from '@/components/FixedHeader';
@@ -27,22 +26,22 @@ const ONBOARDING_STEPS = [
   },
   {
     title: "Choose a Language",
-    description: "Select from over 100 languages to translate your allergy alert instantly.",
+    description: "Select from over 100 languages to translate your allergy alert instantly and offline.",
     image: "/images/screenshot_3.png"
   },
   {
     title: "Share & Save",
-    description: "Save up to 10 cards in the app for quick offline access. Download your card as an image, share it with others.",
+    description: "Save up to 10 cards in the app for quick access. Download your card as an image, share it with others.",
     image: "/images/screenshot_4_alternate.png"
   },
   {
     title: "Emergency Ready",
-    description: "Create and save your Emergency Card to quickly communicate your need for medical attention. Quick dial button to local emergency services.",
+    description: "Create and save your Emergency Card to quickly communicate your need for medical attention. Quick dial local emergency services.",
     image: "/images/screenshot_5_alternate.png"
   },
   {
     title: "Add a Widget",
-    description: "Add our widget to your home screen for instant access to your saved cards and one-tap emergency alerts, even when offline (Android only).",
+    description: "Add the widget to your home screen for instant offline access to your saved cards and one-tap emergency alert (Android only).",
     image: "/images/screenshot_6.png"
   }
 ];
@@ -123,43 +122,45 @@ const Onboarding = () => {
           </div>
 
           {currentStep === 0 ? (
-            <div className="w-full flex items-center justify-center">
+            <div key="row-single" className="w-full flex items-center justify-center">
               <Button
+                key="understand"
                 variant="primary"
                 onClick={handleUnderstand}
-                className="py-3 px-8 text-lg h-auto min-w-[200px] rounded-xl shadow-lg transition-transform active:scale-95"
+                className="py-3 px-8 text-lg h-auto w-[180px] rounded-xl shadow-lg transition-transform active:scale-95"
               >
                 I Understand
               </Button>
             </div>
           ) : (
-            <div className="w-full flex items-center justify-between gap-4">
+            <div key="row-pair" className="w-full flex items-center justify-between gap-4">
               {currentStep === 1 ? (
                 <Button
+                  key="skip"
                   variant="outline"
                   onClick={handleSkip}
-                  className="flex items-center justify-center py-3 px-8 text-lg h-auto min-w-[140px] rounded-xl bg-white dark:bg-transparent border-gray-300 dark:border-gray-600 text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-800 hover:text-gray-900 dark:hover:text-gray-100"
+                  className="flex items-center justify-center py-3 px-8 h-auto min-w-[140px] rounded-xl bg-gray-100 dark:bg-gray-800 border-gray-300 dark:border-gray-600 text-gray-600 dark:text-gray-400 hover:bg-gray-200 dark:hover:bg-gray-700 hover:text-gray-900 dark:hover:text-gray-100"
                 >
                   Skip
                 </Button>
               ) : (
                 <Button
+                  key="back"
                   variant="outline"
                   onClick={handleBack}
-                  className="flex items-center justify-center py-3 px-8 text-lg h-auto min-w-[140px] rounded-xl bg-white dark:bg-transparent border-gray-300 dark:border-gray-600 text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-800 hover:text-gray-900 dark:hover:text-gray-100"
+                  className="flex items-center justify-center py-3 px-8 h-auto min-w-[140px] rounded-xl bg-gray-100 dark:bg-gray-800 border-gray-300 dark:border-gray-600 text-gray-600 dark:text-gray-400 hover:bg-gray-200 dark:hover:bg-gray-700 hover:text-gray-900 dark:hover:text-gray-100"
                 >
-                  <ChevronLeft className="w-5 h-5 mr-1" />
                   Back
                 </Button>
               )}
 
               <Button
+                key="continue"
                 variant="primary"
                 onClick={handleNext}
                 className="py-3 px-8 text-lg h-auto w-[180px] rounded-xl shadow-lg transition-transform active:scale-95 flex items-center justify-center"
               >
                 {currentStep === ONBOARDING_STEPS.length - 1 ? 'Get Started' : 'Continue'}
-                <ChevronRight className="w-5 h-5 ml-1" />
               </Button>
             </div>
           )}

@@ -4,7 +4,7 @@ import React, { useState, useEffect } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Button } from "@/components/ui/button";
-import { ChevronLeft, ChevronRight, Crown, Lock } from "lucide-react";
+import { Crown, Lock } from "lucide-react";
 import FixedHeader from "@/components/FixedHeader";
 import StepHeader from "@/components/StepHeader";
 import { getAllGoogleLanguages, SupportedLanguage } from "@/lib/translator";
@@ -115,7 +115,7 @@ const LanguageSelectionPage = () => {
         <div className="flex-grow pt-2">
           <StepHeader 
             title="Choose a Language"
-            description={isPremium ? "Select any language for your alert." : "Select from our free languages or upgrade to unlock all 100+."}
+            description={isPremium ? "Select any language for your card." : "Select from our free languages or upgrade to unlock all 100+."}
           />
 
           <div className="w-full flex justify-center pt-8 pb-4">
@@ -174,9 +174,8 @@ const LanguageSelectionPage = () => {
           <Button
             variant="outline"
             onClick={() => navigate(-1)}
-            className="flex items-center justify-center py-3 px-8 text-lg h-auto min-w-[140px] rounded-xl bg-white dark:bg-transparent border-gray-300 dark:border-gray-600 text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-800 hover:text-gray-900 dark:hover:text-gray-100"
+            className="flex items-center justify-center py-3 px-8 h-auto min-w-[140px] rounded-xl bg-white dark:bg-transparent border-gray-300 dark:border-gray-600 text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-800 hover:text-gray-900 dark:hover:text-gray-100"
           >
-            <ChevronLeft className="w-5 h-5 mr-1" />
             Back
           </Button>
           <Button
@@ -186,7 +185,6 @@ const LanguageSelectionPage = () => {
             className="py-3 px-8 text-lg h-auto min-w-[140px] rounded-xl shadow-lg transition-transform active:scale-95 flex items-center"
           >
             Continue
-            <ChevronRight className="w-5 h-5 ml-1" />
           </Button>
         </div>
       </div>
