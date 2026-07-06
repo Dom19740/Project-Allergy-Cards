@@ -21,6 +21,7 @@ import { resolveCustomMessages, computeContentSignature, DEFAULT_CUSTOM_MESSAGES
 import { useNetworkStatus } from '@/hooks/useNetworkStatus';
 import { useBilling } from '@/hooks/useBilling';
 import { TextToSpeech } from '@capacitor-community/text-to-speech';
+import { speakText } from '@/lib/tts';
 import { FirebaseAnalytics } from '@capacitor-firebase/analytics';
 import { Capacitor } from '@capacitor/core';
 
@@ -354,17 +355,10 @@ const AllergyCard: React.FC<AllergyCardProps> = ({ languageCode, selectedAllerge
 
     try {
       setIsSpeaking(true);
-      await TextToSpeech.speak({
-        text: textToRead,
-        lang: languageCode,
-        rate: 0.9,
-        pitch: 1.0,
-        volume: 1.0,
-        category: 'ambient',
-      });
+      await speakText(textToRead, languageCode);
     } catch (error) {
       console.error('TTS Error:', error);
-      toast.error("Speech failed. Please check your device volume and settings.");
+      toast.error("Read aloud isn't supported for this language on your device.");
     } finally {
       setIsSpeaking(false);
     }
@@ -490,7 +484,7 @@ const AllergyCard: React.FC<AllergyCardProps> = ({ languageCode, selectedAllerge
         className="flex-1 w-full flex flex-col items-center justify-start text-center overflow-hidden p-4 sm:p-6 md:p-8 pt-[calc(1rem+env(safe-area-inset-top))] bg-white border-none"
       >
         <div className="h-6 sm:h-10 md:h-14" />
-        <h1 className="text-2xl sm:text-4xl md:text-5xl lg:text-6xl font-black leading-tight mb-4 sm:mb-8 md:mb-12 text-red-600 uppercase tracking-tighter whitespace-nowrap">
+        <h1 className="text-2xl sm:text-4xl md:text-5xl lg:text-6xl font-black leading-tight mb-4 sm:mb-8 md:mb-12 text-red-600 uppercase tracking-tighter break-words">
           {displayUIText.allergyAlert}
         </h1>
 

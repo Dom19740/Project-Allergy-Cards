@@ -16,6 +16,7 @@ import EmergencyCrossIcon from '@/components/EmergencyCrossIcon';
 import { storage, STORAGE_KEYS } from '@/lib/storage';
 import { SelectedAllergens, CustomMessages, TranslatedContent, SavedCard } from '@/lib/types';
 import { TextToSpeech } from '@capacitor-community/text-to-speech';
+import { speakText } from '@/lib/tts';
 import { useBilling } from '@/hooks/useBilling';
 
 const EmergencyPage = () => {
@@ -161,17 +162,10 @@ const EmergencyPage = () => {
 
     try {
       setIsSpeaking(true);
-      await TextToSpeech.speak({
-        text: textToRead,
-        lang: langCode || 'en',
-        rate: 0.9,
-        pitch: 1.0,
-        volume: 1.0,
-        category: 'ambient',
-      });
+      await speakText(textToRead, langCode || 'en');
     } catch (error) {
       console.error('TTS Error:', error);
-      toast.error("Speech failed. Please check your device volume and settings.");
+      toast.error("Read aloud isn't supported for this language on your device.");
     } finally {
       setIsSpeaking(false);
     }
