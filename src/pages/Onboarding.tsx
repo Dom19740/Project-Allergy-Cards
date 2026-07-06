@@ -108,7 +108,7 @@ const Onboarding = () => {
           </div>
         </div>
 
-        <div className="w-full flex flex-col items-center mt-auto mb-[calc(20px+env(safe-area-inset-bottom))] space-y-6 shrink-0">
+        <div className="w-full flex flex-col items-center mt-auto mb-[calc(12px+env(safe-area-inset-bottom))] space-y-6 shrink-0">
           <div className="flex space-x-2">
             {ONBOARDING_STEPS.map((_, index) => (
               <div
@@ -123,7 +123,7 @@ const Onboarding = () => {
           </div>
 
           {currentStep === 0 ? (
-            <div className="w-full flex items-center justify-center pb-4">
+            <div className="w-full flex items-center justify-center">
               <Button
                 variant="primary"
                 onClick={handleUnderstand}
@@ -133,7 +133,7 @@ const Onboarding = () => {
               </Button>
             </div>
           ) : (
-            <div className="w-full flex items-center justify-between gap-4 pb-4">
+            <div className="w-full flex items-center justify-between gap-4">
               {currentStep === 1 ? (
                 <Button
                   variant="outline"

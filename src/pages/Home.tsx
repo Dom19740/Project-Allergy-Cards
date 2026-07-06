@@ -54,9 +54,6 @@ const Home = () => {
   return (
     <div className="relative flex flex-col h-[100dvh] bg-gray-100 dark:bg-gray-900 overflow-hidden">
       <FixedHeader />
-      <p className="absolute left-3 bottom-[calc(0.5rem+env(safe-area-inset-bottom))] text-[10px] text-gray-400 dark:text-gray-500 tracking-widest font-bold z-10">
-        v1.1.3.4{isPremium ? 'u' : ''}
-      </p>
       <div className="flex flex-col flex-1 w-full max-w-2xl mx-auto px-6 pt-[calc(100px+env(safe-area-inset-top))] pb-[env(safe-area-inset-bottom)] min-h-0">
         <div className="flex-1 flex flex-col items-center justify-center text-center min-h-0 py-4 gap-8 md:gap-12">
 
@@ -97,7 +94,13 @@ const Home = () => {
           </AnimatePresence>
         </div>
 
-        <div className="flex-shrink-0 w-full flex flex-col justify-center items-center py-6 gap-4 mt-auto">
+        <div className="flex-shrink-0 w-full flex flex-col justify-center items-center gap-2 mt-auto mb-[calc(12px+env(safe-area-inset-bottom))]">
+          <p className="flex items-center gap-2 text-[10px] text-gray-400 dark:text-gray-500 uppercase tracking-widest font-bold">
+            <span>v1.1.3.4{isPremium ? 'u' : ''}</span>
+            <span>·</span>
+            <span>© 2026 <a href="https://simpleallergyalert.com/" target="_blank" rel="noopener noreferrer" className="hover:text-red-600 transition-colors">Simple Allergy Alert</a></span>
+          </p>
+
           <Button
             onClick={handleGetStarted}
             variant="primary"
@@ -105,12 +108,6 @@ const Home = () => {
           >
             Get Started
           </Button>
-
-          <div className="flex flex-col items-center gap-1">
-            <p className="text-[10px] text-gray-400 dark:text-gray-500 uppercase tracking-widest font-bold">
-              © 2026 <a href="https://simpleallergyalert.com/" target="_blank" rel="noopener noreferrer" className="hover:text-red-600 transition-colors">Simple Allergy Alert</a>
-            </p>
-          </div>
         </div>
       </div>
     </div>
