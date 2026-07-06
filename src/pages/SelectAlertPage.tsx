@@ -143,9 +143,9 @@ const SelectAlertPage = () => {
 
         <div className="w-full flex justify-between items-center mt-auto mb-[50px] pt-12 gap-4 shrink-0">
           <Button
-            variant="ghost"
+            variant="outline"
             onClick={() => navigate(-1)}
-            className="flex items-center text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-100"
+            className="flex items-center justify-center py-3 px-8 text-lg h-auto min-w-[140px] rounded-xl bg-white dark:bg-transparent border-gray-300 dark:border-gray-600 text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-800 hover:text-gray-900 dark:hover:text-gray-100"
           >
             <ChevronLeft className="w-5 h-5 mr-1" />
             Back
@@ -153,7 +153,7 @@ const SelectAlertPage = () => {
           <Button
             onClick={handleContinue}
             variant="primary"
-            className="py-3 px-8 text-lg h-auto rounded-xl shadow-lg transition-transform active:scale-95 flex items-center"
+            className="py-3 px-8 text-lg h-auto min-w-[140px] rounded-xl shadow-lg transition-transform active:scale-95 flex items-center"
           >
             Continue
             <ChevronRight className="w-5 h-5 ml-1" />

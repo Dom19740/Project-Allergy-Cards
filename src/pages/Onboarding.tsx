@@ -37,12 +37,12 @@ const ONBOARDING_STEPS = [
   },
   {
     title: "Emergency Ready",
-    description: "Creaate and save your Emergency Card to quickly communicate your need for medical attention. Quick dial button to local emergency services.",
+    description: "Create and save your Emergency Card to quickly communicate your need for medical attention. Quick dial button to local emergency services.",
     image: "/images/screenshot_5_alternate.png"
   },
   {
     title: "Add a Widget",
-    description: "Add our widget to your home screen for instant access to your saved cards and one-tap emergency alerts, even when offline.",
+    description: "Add our widget to your home screen for instant access to your saved cards and one-tap emergency alerts, even when offline (Android only).",
     image: "/images/screenshot_6.png"
   }
 ];
@@ -84,6 +84,11 @@ const Onboarding = () => {
     emblaApi?.scrollNext();
   };
 
+  const handleSkip = async () => {
+    await storage.set(STORAGE_KEYS.HAS_SEEN_ONBOARDING, true);
+    navigate('/premium-onboarding');
+  };
+
   return (
     <div className="flex flex-col h-screen bg-gray-100 dark:bg-gray-900 overflow-hidden">
       <FixedHeader />
@@ -117,21 +122,8 @@ const Onboarding = () => {
             ))}
           </div>
 
-          <div className="w-full flex items-center justify-between gap-4 pb-4">
-            {currentStep > 0 ? (
-              <Button
-                variant="ghost"
-                onClick={handleBack}
-                className="flex items-center text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-100"
-              >
-                <ChevronLeft className="w-5 h-5 mr-1" />
-                Back
-              </Button>
-            ) : (
-              <div />
-            )}
-
-            {currentStep === 0 ? (
+          {currentStep === 0 ? (
+            <div className="w-full flex items-center justify-center pb-4">
               <Button
                 variant="primary"
                 onClick={handleUnderstand}
@@ -139,7 +131,28 @@ const Onboarding = () => {
               >
                 I Understand
               </Button>
-            ) : (
+            </div>
+          ) : (
+            <div className="w-full flex items-center justify-between gap-4 pb-4">
+              {currentStep === 1 ? (
+                <Button
+                  variant="outline"
+                  onClick={handleSkip}
+                  className="flex items-center justify-center py-3 px-8 text-lg h-auto min-w-[140px] rounded-xl bg-white dark:bg-transparent border-gray-300 dark:border-gray-600 text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-800 hover:text-gray-900 dark:hover:text-gray-100"
+                >
+                  Skip
+                </Button>
+              ) : (
+                <Button
+                  variant="outline"
+                  onClick={handleBack}
+                  className="flex items-center justify-center py-3 px-8 text-lg h-auto min-w-[140px] rounded-xl bg-white dark:bg-transparent border-gray-300 dark:border-gray-600 text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-800 hover:text-gray-900 dark:hover:text-gray-100"
+                >
+                  <ChevronLeft className="w-5 h-5 mr-1" />
+                  Back
+                </Button>
+              )}
+
               <Button
                 variant="primary"
                 onClick={handleNext}
@@ -148,8 +161,8 @@ const Onboarding = () => {
                 {currentStep === ONBOARDING_STEPS.length - 1 ? 'Get Started' : 'Continue'}
                 <ChevronRight className="w-5 h-5 ml-1" />
               </Button>
-            )}
-          </div>
+            </div>
+          )}
         </div>
 
       </div>
