@@ -38,6 +38,9 @@ const SelectAlertPage = () => {
     loadMessages();
   }, []);
 
+  const hasCustomAlertText = iAmAllergicTo !== DEFAULT_CUSTOM_MESSAGES.iAmAllergicTo || theyMakeMeSick !== DEFAULT_CUSTOM_MESSAGES.theyMakeMeSick;
+  const blockedOffline = !isOnline && hasCustomAlertText;
+
   const handleContinue = async () => {
     if (Capacitor.isNativePlatform()) {
       FirebaseAnalytics.logEvent({
@@ -86,7 +89,7 @@ const SelectAlertPage = () => {
                     type="button"
                     onClick={() => setIAmAllergicTo(DEFAULT_CUSTOM_MESSAGES.iAmAllergicTo)}
                     disabled={!isPremium || iAmAllergicTo === DEFAULT_CUSTOM_MESSAGES.iAmAllergicTo}
-                    className="flex items-center gap-1 text-xs font-medium text-gray-400 hover:text-red-600 disabled:opacity-40 disabled:hover:text-gray-400 transition-colors"
+                    className="flex items-center gap-1 text-xs font-bold uppercase text-red-600 hover:text-red-700 disabled:opacity-40 disabled:text-gray-400 transition-colors"
                   >
                     <RotateCcw className="h-3 w-3" />
                     Reset
@@ -114,7 +117,7 @@ const SelectAlertPage = () => {
                     type="button"
                     onClick={() => setTheyMakeMeSick(DEFAULT_CUSTOM_MESSAGES.theyMakeMeSick)}
                     disabled={!isPremium || theyMakeMeSick === DEFAULT_CUSTOM_MESSAGES.theyMakeMeSick}
-                    className="flex items-center gap-1 text-xs font-medium text-gray-400 hover:text-red-600 disabled:opacity-40 disabled:hover:text-gray-400 transition-colors"
+                    className="flex items-center gap-1 text-xs font-bold uppercase text-red-600 hover:text-red-700 disabled:opacity-40 disabled:text-gray-400 transition-colors"
                   >
                     <RotateCcw className="h-3 w-3" />
                     Reset
@@ -143,11 +146,11 @@ const SelectAlertPage = () => {
           </div>
         </div>
 
-        {!isOnline && (
+        {blockedOffline && (
           <div className="mx-auto max-w-md mt-4 p-4 bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-800 rounded-xl flex items-center gap-3 text-amber-800 dark:text-amber-200 text-center shrink-0">
             <WifiOff className="h-5 w-5 shrink-0" />
             <p className="text-sm font-medium">
-              Offline: Custom alert text requires an internet connection to translate, but you can still continue with the default options.
+              Offline: Custom alert text requires an internet connection to translate. Reset it or reconnect to continue.
             </p>
           </div>
         )}
@@ -163,6 +166,7 @@ const SelectAlertPage = () => {
           </Button>
           <Button
             onClick={handleContinue}
+            disabled={blockedOffline}
             variant="primary"
             className="py-3 px-8 text-lg h-auto min-w-[140px] rounded-xl shadow-lg transition-transform active:scale-95 flex items-center"
           >

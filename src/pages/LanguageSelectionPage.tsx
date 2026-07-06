@@ -4,12 +4,11 @@ import React, { useState, useEffect } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Button } from "@/components/ui/button";
-import { ChevronLeft, ChevronRight, WifiOff, Crown, Lock } from "lucide-react";
+import { ChevronLeft, ChevronRight, Crown, Lock } from "lucide-react";
 import FixedHeader from "@/components/FixedHeader";
 import StepHeader from "@/components/StepHeader";
 import { getAllGoogleLanguages, SupportedLanguage } from "@/lib/translator";
 import { storage, STORAGE_KEYS } from "@/lib/storage";
-import { useNetworkStatus } from "@/hooks/useNetworkStatus";
 import { useBilling } from "@/hooks/useBilling";
 import { FREE_LANGUAGES } from "@/lib/premium-config";
 import { toast } from "sonner";
@@ -20,7 +19,6 @@ const LanguageSelectionPage = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const returnBase = (location.state as { returnBase?: string } | null)?.returnBase;
-  const isOnline = useNetworkStatus();
   const { isPremium } = useBilling();
   const [selectedLanguageCode, setSelectedLanguageCode] = useState<string>("es-ES");
   const [supportedLanguages, setSupportedLanguages] = useState<SupportedLanguage[]>([]);
@@ -119,15 +117,6 @@ const LanguageSelectionPage = () => {
             title="Choose a Language"
             description={isPremium ? "Select any language for your alert." : "Select from our free languages or upgrade to unlock all 100+."}
           />
-
-          {!isOnline && (
-            <div className="mx-auto max-w-md mt-4 p-4 bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-800 rounded-xl flex items-center gap-3 text-amber-800 dark:text-amber-200 text-center">
-              <WifiOff className="h-5 w-5 shrink-0" />
-              <p className="text-sm font-medium">
-                Offline: Custom allergens and alerts require an internet connection to translate, but you can still continue with the default options.
-              </p>
-            </div>
-          )}
 
           <div className="w-full flex justify-center pt-8 pb-4">
             <div className="w-full max-w-xs sm:max-w-sm md:max-w-md lg:max-w-lg">

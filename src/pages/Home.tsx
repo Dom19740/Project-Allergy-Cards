@@ -96,7 +96,7 @@ const Home = () => {
 
         <div className="flex-shrink-0 w-full flex flex-col justify-center items-center gap-2 mt-auto mb-[calc(12px+env(safe-area-inset-bottom))]">
           <p className="flex items-center gap-2 text-[10px] text-gray-400 dark:text-gray-500 uppercase tracking-widest font-bold">
-            <span>v1.1.3.4{isPremium ? 'u' : ''}</span>
+            <span>v1.1.3.5{isPremium ? 'u' : ''}</span>
             <span>·</span>
             <span>© 2026 <a href="https://simpleallergyalert.com/" target="_blank" rel="noopener noreferrer" className="hover:text-red-600 transition-colors">Simple Allergy Alert</a></span>
           </p>
