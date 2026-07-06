@@ -279,7 +279,7 @@ const EmergencyPage = () => {
             <span className="leading-tight break-words">{displayText.dialText} {emergencyNumber}</span>
           </a>
           {langCode && langCode !== 'en' && (
-            <p className="text-[20px] sm:text-[32px] text-gray-400 font-light mt-2">
+            <p className="text-[14px] sm:text-[32px] text-gray-400 font-light mt-2">
               Translated to {getLanguageName(langCode)}
             </p>
           )}

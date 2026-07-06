@@ -515,7 +515,7 @@ const AllergyCard: React.FC<AllergyCardProps> = ({ languageCode, selectedAllerge
 
         <div className="mt-auto pt-2">
           {languageCode !== 'en' && (
-            <p className="text-[20px] sm:text-[32px] text-gray-400 font-light mb-1">
+            <p className="text-[14px] sm:text-[32px] text-gray-400 font-light mb-1">
               Translated to {getLanguageName(languageCode)}
             </p>
           )}
