@@ -18,6 +18,7 @@ import { SelectedAllergens, CustomMessages, TranslatedContent, SavedCard } from 
 import { TextToSpeech } from '@capacitor-community/text-to-speech';
 import { speakText } from '@/lib/tts';
 import { useBilling } from '@/hooks/useBilling';
+import { useNetworkStatus } from '@/hooks/useNetworkStatus';
 
 const EmergencyPage = () => {
   const { langCode } = useParams<{ langCode: string }>();
@@ -25,6 +26,7 @@ const EmergencyPage = () => {
   const navigate = useNavigate();
   const cardRef = useRef<HTMLDivElement>(null);
   const { isPremium } = useBilling();
+  const isOnline = useNetworkStatus();
 
   const [isTranslating, setIsTranslating] = useState(true);
   const [translationError, setTranslationError] = useState<string | null>(null);
@@ -165,7 +167,11 @@ const EmergencyPage = () => {
       await speakText(textToRead, langCode || 'en');
     } catch (error) {
       console.error('TTS Error:', error);
-      toast.error("Read aloud isn't supported for this language on your device.");
+      if (!isOnline) {
+        toast.error("Read aloud isn't available for this language while you're offline. Reconnect and try again.");
+      } else {
+        toast.error("Read aloud isn't supported for this language on your device.");
+      }
     } finally {
       setIsSpeaking(false);
     }

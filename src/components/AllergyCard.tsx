@@ -356,7 +356,11 @@ const AllergyCard: React.FC<AllergyCardProps> = ({ languageCode, selectedAllerge
       await speakText(textToRead, languageCode);
     } catch (error) {
       console.error('TTS Error:', error);
-      toast.error("Read aloud isn't supported for this language on your device.");
+      if (!isOnline) {
+        toast.error("Read aloud isn't available for this language while you're offline. Reconnect and try again.");
+      } else {
+        toast.error("Read aloud isn't supported for this language on your device.");
+      }
     } finally {
       setIsSpeaking(false);
     }

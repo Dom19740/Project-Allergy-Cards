@@ -21,7 +21,7 @@ const ONBOARDING_STEPS = [
   },
   {
     title: "Select Your Allergens",
-    description: "Choose from our standard list or add your own custom allergens. Customise your allergy alert warnings.",
+    description: "Choose from the EU standard allergen list or add your own custom allergens. Customise your allergy alert warnings.",
     image: "/images/screenshot_2.png"
   },
   {

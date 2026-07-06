@@ -3,7 +3,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
-import { Crown, Check, ChevronRight, Languages, ShieldAlert, MessageSquare, Save, Smartphone, Loader2 } from 'lucide-react';
+import { Crown, Check, Languages, ShieldAlert, MessageSquare, Save, Smartphone, Loader2 } from 'lucide-react';
 import { useBilling } from '@/hooks/useBilling';
 import FixedHeader from '@/components/FixedHeader';
 import PromoCodeDialog from '@/components/PromoCodeDialog';
@@ -194,7 +194,6 @@ const PremiumOnboarding = () => {
               className="w-[240px] py-3 px-8 text-lg h-auto font-bold rounded-xl shadow-lg transition-all active:scale-[0.98] flex items-center justify-center"
             >
               {isPremium ? "Continue to App" : "Maybe Later"}
-              <ChevronRight className="ml-1 h-5 w-5" />
             </Button>
           </div>
         </div>
