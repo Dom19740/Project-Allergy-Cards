@@ -50,7 +50,6 @@ const AllergyCard: React.FC<AllergyCardProps> = ({ languageCode, selectedAllerge
   const [translatedAllergens, setTranslatedAllergens] = useState<{ [key: string]: string }>(initialTranslations?.allergens || {});
   const [isTranslating, setIsTranslating] = useState(!initialTranslations);
   const [translationError, setTranslationError] = useState<string | null>(null);
-  const [customTranslationWarning, setCustomTranslationWarning] = useState<string | null>(null);
   const [showOriginal, setShowOriginal] = useState(false);
 
   const [fullSelectedData, setFullSelectedData] = useState<SelectedAllergens | null>(null);
@@ -174,7 +173,6 @@ const AllergyCard: React.FC<AllergyCardProps> = ({ languageCode, selectedAllerge
 
       setIsTranslating(true);
       setTranslationError(null);
-      setCustomTranslationWarning(null);
 
       // Custom allergen names and custom alert text are free-typed by the
       // user, so they usually aren't covered by the local dictionaries and
@@ -268,7 +266,7 @@ const AllergyCard: React.FC<AllergyCardProps> = ({ languageCode, selectedAllerge
           if (failedCustomKinds.has('alert')) {
             reasons.push("Your custom alert text couldn't be translated because you're offline, so we've used our default alert message (translated) instead.");
           }
-          setCustomTranslationWarning(reasons.join(' '));
+          toast.warning(reasons.join(' '));
         } else {
           await storage.set(STORAGE_KEYS.SESSION_TRANSLATIONS, {
             languageCode,
@@ -426,35 +424,6 @@ const AllergyCard: React.FC<AllergyCardProps> = ({ languageCode, selectedAllerge
           >
             Try Again
           </button>
-        </div>
-      </div>
-    );
-  }
-
-  if (customTranslationWarning) {
-    return (
-      <div className="flex flex-col items-center justify-center min-h-screen bg-white p-6 text-center">
-        <div className="flex flex-col items-center space-y-4 max-w-md">
-          <AlertTriangle className="h-10 w-10 text-amber-500" />
-          <p className="text-lg sm:text-xl font-semibold text-gray-800">Some text couldn't be translated</p>
-          <p className="text-sm text-gray-600">{customTranslationWarning}</p>
-          <p className="text-sm text-gray-600">
-            The rest of your card was translated normally. You can continue with the card as described above, or try again once you're back online.
-          </p>
-          <div className="flex flex-col sm:flex-row gap-3 w-full pt-2">
-            <button
-              className="flex-1 px-6 py-3 bg-gray-200 hover:bg-gray-300 text-gray-800 rounded-lg font-semibold transition-colors"
-              onClick={() => translateAllContent()}
-            >
-              Try Again
-            </button>
-            <button
-              className="flex-1 px-6 py-3 bg-red-600 hover:bg-red-500 text-white rounded-lg font-semibold transition-colors"
-              onClick={() => setCustomTranslationWarning(null)}
-            >
-              Continue
-            </button>
-          </div>
         </div>
       </div>
     );

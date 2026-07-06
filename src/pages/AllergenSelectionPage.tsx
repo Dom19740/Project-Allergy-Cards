@@ -5,13 +5,14 @@ import { useNavigate, useLocation } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { toast } from 'sonner';
-import { X, ChevronLeft, ChevronRight, Utensils, Crown } from 'lucide-react';
+import { X, ChevronLeft, ChevronRight, Utensils, Crown, WifiOff } from 'lucide-react';
 import { ALLERGEN_OPTIONS } from '@/lib/allergens';
 import FixedHeader from '@/components/FixedHeader';
 import StepHeader from '@/components/StepHeader';
 import { storage, STORAGE_KEYS } from '@/lib/storage';
 import { cn } from '@/lib/utils';
 import { useBilling } from '@/hooks/useBilling';
+import { useNetworkStatus } from '@/hooks/useNetworkStatus';
 import { FirebaseAnalytics } from '@capacitor-firebase/analytics';
 import { Capacitor } from '@capacitor/core';
 
@@ -20,6 +21,7 @@ const AllergenSelectionPage = () => {
   const location = useLocation();
   const returnTo = (location.state as { returnTo?: string } | null)?.returnTo;
   const { isPremium } = useBilling();
+  const isOnline = useNetworkStatus();
   const [selectedAllergens, setSelectedAllergens] = useState<string[]>([]);
   const [customAllergenInput, setCustomAllergenInput] = useState<string>('');
   const [customList, setCustomList] = useState<string[]>([]);
@@ -226,6 +228,15 @@ const AllergenSelectionPage = () => {
             )}
           </div>
         </div>
+
+        {!isOnline && (
+          <div className="mx-auto max-w-md mt-4 p-4 bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-800 rounded-xl flex items-center gap-3 text-amber-800 dark:text-amber-200 text-center shrink-0">
+            <WifiOff className="h-5 w-5 shrink-0" />
+            <p className="text-sm font-medium">
+              Offline: Custom allergens require an internet connection to translate, but you can still continue with the default options.
+            </p>
+          </div>
+        )}
 
         <div ref={bottomRef} className="w-full flex justify-between items-center mt-auto mb-[calc(12px+env(safe-area-inset-bottom))] pt-6 gap-4 shrink-0">
           <Button

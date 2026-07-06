@@ -4,11 +4,12 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Label } from '@/components/ui/label';
-import { ChevronLeft, ChevronRight, Crown, RotateCcw } from 'lucide-react';
+import { ChevronLeft, ChevronRight, Crown, RotateCcw, WifiOff } from 'lucide-react';
 import FixedHeader from '@/components/FixedHeader';
 import StepHeader from '@/components/StepHeader';
 import { storage, STORAGE_KEYS } from '@/lib/storage';
 import { useBilling } from '@/hooks/useBilling';
+import { useNetworkStatus } from '@/hooks/useNetworkStatus';
 import { FirebaseAnalytics } from '@capacitor-firebase/analytics';
 import { Capacitor } from '@capacitor/core';
 import { DEFAULT_CUSTOM_MESSAGES } from '@/lib/customMessages';
@@ -18,6 +19,7 @@ const SelectAlertPage = () => {
   const location = useLocation();
   const returnTo = (location.state as { returnTo?: string } | null)?.returnTo;
   const { isPremium } = useBilling();
+  const isOnline = useNetworkStatus();
   const [iAmAllergicTo, setIAmAllergicTo] = useState(DEFAULT_CUSTOM_MESSAGES.iAmAllergicTo);
   const [theyMakeMeSick, setTheyMakeMeSick] = useState(DEFAULT_CUSTOM_MESSAGES.theyMakeMeSick);
 
@@ -140,6 +142,15 @@ const SelectAlertPage = () => {
             )}
           </div>
         </div>
+
+        {!isOnline && (
+          <div className="mx-auto max-w-md mt-4 p-4 bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-800 rounded-xl flex items-center gap-3 text-amber-800 dark:text-amber-200 text-center shrink-0">
+            <WifiOff className="h-5 w-5 shrink-0" />
+            <p className="text-sm font-medium">
+              Offline: Custom alert text requires an internet connection to translate, but you can still continue with the default options.
+            </p>
+          </div>
+        )}
 
         <div className="w-full flex justify-between items-center mt-auto mb-[calc(12px+env(safe-area-inset-bottom))] pt-6 gap-4 shrink-0">
           <Button
