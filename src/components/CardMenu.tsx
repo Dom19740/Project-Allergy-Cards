@@ -11,10 +11,11 @@ interface CardMenuProps {
   onClose: () => void;
   onOpenDisclaimer: () => void;
   onOpenUnderstandCard: () => void;
+  onResetEmergencyNumber?: () => void;
   isEmergency?: boolean;
 }
 
-const CardMenu: React.FC<CardMenuProps> = ({ isOpen, onClose, onOpenDisclaimer, onOpenUnderstandCard, isEmergency = false }) => {
+const CardMenu: React.FC<CardMenuProps> = ({ isOpen, onClose, onOpenDisclaimer, onOpenUnderstandCard, onResetEmergencyNumber, isEmergency = false }) => {
   const navigate = useNavigate();
   const location = useLocation();
   if (!isOpen) return null;
@@ -46,9 +47,13 @@ const CardMenu: React.FC<CardMenuProps> = ({ isOpen, onClose, onOpenDisclaimer, 
   };
 
   const handleResetEmergencyNumber = async () => {
+    onClose();
+    if (onResetEmergencyNumber) {
+      onResetEmergencyNumber();
+      return;
+    }
     await storage.remove(STORAGE_KEYS.VERIFIED_EMERGENCY_NUMBER);
     toast.success("Emergency number reset. You'll be asked to verify it next time.");
-    onClose();
   };
 
   const menuItems = [

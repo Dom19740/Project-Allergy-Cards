@@ -35,10 +35,12 @@ const UnderstandCardDialog: React.FC<UnderstandCardDialogProps> = ({ isOpen, onC
         className="w-[90%] sm:max-w-[425px] rounded-2xl fixed left-1/2 -translate-x-1/2 top-[calc(1.5rem+env(safe-area-inset-top))] translate-y-0 animate-in fade-in slide-in-from-top-8 duration-300 max-h-[85vh] overflow-y-auto"
       >
         <DialogHeader className="flex flex-col items-center text-center">
-          <div className="bg-red-50 dark:bg-red-900/20 p-3 rounded-full mb-2">
-            <HelpCircle className="h-6 w-6 text-red-600" />
-          </div>
-          <DialogTitle className="text-xl font-bold">Understand Your Card</DialogTitle>
+          <DialogTitle className="text-xl font-bold flex items-center gap-2">
+            <div className="bg-red-50 dark:bg-red-900/20 p-2 rounded-full shrink-0">
+              <HelpCircle className="h-5 w-5 text-red-600" />
+            </div>
+            Understand Your Card
+          </DialogTitle>
         </DialogHeader>
 
         <div className="pt-6 pb-2 space-y-2.5">

@@ -7,6 +7,7 @@ import { Loader2, Utensils, AlertTriangle } from 'lucide-react';
 import { LanguageCode, SelectedAllergens, CustomMessages, TranslatedContent } from '@/lib/types';
 import { ALLERGEN_OPTIONS, getAllergenGridStyle } from '@/lib/allergens';
 import { translateText, TranslationError } from '@/lib/translator';
+import { SUPPORTED_LANGUAGES } from '@/lib/supportedLanguages';
 import { shareCard, downloadCard } from '@/lib/card-utils';
 import SaveCardDialog from './SaveCardDialog';
 import CardActions from './CardActions';
@@ -92,6 +93,12 @@ const AllergyCard: React.FC<AllergyCardProps> = ({ languageCode, selectedAllerge
 
   const getLanguageName = (code: string) => {
     if (code === 'en') return 'English';
+    // Prefer our own supported-language list over Intl.DisplayNames: some
+    // browsers/WebViews ship reduced ICU data that doesn't cover less common
+    // languages (e.g. Sindhi), silently returning the code itself instead of
+    // throwing, which then got capitalized into something like "Sd".
+    const known = SUPPORTED_LANGUAGES.find(l => l.code === code);
+    if (known) return known.name;
     try {
       const displayNames = new Intl.DisplayNames(['en'], { type: 'language' });
       const name = displayNames.of(code);

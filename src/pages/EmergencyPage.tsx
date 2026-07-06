@@ -5,12 +5,14 @@ import { useParams, useNavigate, useSearchParams } from 'react-router-dom';
 import { AlertTriangle, Loader2, Phone } from 'lucide-react';
 import { translateText, TranslationError } from '@/lib/translator';
 import { getEmergencyNumber } from '@/lib/emergencyNumbers';
+import { SUPPORTED_LANGUAGES } from '@/lib/supportedLanguages';
 import { shareCard, downloadCard } from '@/lib/card-utils';
 import EmergencyActions from '@/components/EmergencyActions';
 import SaveCardDialog from '@/components/SaveCardDialog';
 import CardMenu from '@/components/CardMenu';
 import DisclaimerDialog from '@/components/DisclaimerDialog';
 import UnderstandCardDialog from '@/components/UnderstandCardDialog';
+import EmergencyNumberDialog from '@/components/EmergencyNumberDialog';
 import { toast } from 'sonner';
 import EmergencyCrossIcon from '@/components/EmergencyCrossIcon';
 import { storage, STORAGE_KEYS } from '@/lib/storage';
@@ -37,7 +39,8 @@ const EmergencyPage = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isDisclaimerOpen, setIsDisclaimerOpen] = useState(false);
   const [isUnderstandCardOpen, setIsUnderstandCardOpen] = useState(false);
-  
+  const [isEmergencyNumberDialogOpen, setIsEmergencyNumberDialogOpen] = useState(false);
+
   const [selectedAllergens, setSelectedAllergens] = useState<SelectedAllergens | null>(null);
   const [customMessages, setCustomMessages] = useState<CustomMessages | null>(null);
   const [fullTranslatedContent, setFullTranslatedContent] = useState<TranslatedContent | null>(null);
@@ -60,6 +63,12 @@ const EmergencyPage = () => {
 
   const getLanguageName = (code: string) => {
     if (!code || code === 'en') return 'English';
+    // Prefer our own supported-language list over Intl.DisplayNames: some
+    // browsers/WebViews ship reduced ICU data that doesn't cover less common
+    // languages (e.g. Sindhi), silently returning the code itself instead of
+    // throwing, which then got capitalized into something like "Sd".
+    const known = SUPPORTED_LANGUAGES.find(l => l.code === code);
+    if (known) return known.name;
     try {
       const displayNames = new Intl.DisplayNames(['en'], { type: 'language' });
       const name = displayNames.of(code);
@@ -175,6 +184,12 @@ const EmergencyPage = () => {
     } finally {
       setIsSpeaking(false);
     }
+  };
+
+  const handleEmergencyNumberConfirm = async (number: string) => {
+    setIsEmergencyNumberDialogOpen(false);
+    await storage.set(STORAGE_KEYS.VERIFIED_EMERGENCY_NUMBER, { languageCode: langCode || 'en', number });
+    navigate(`/emergency/${langCode}?num=${encodeURIComponent(number)}`);
   };
 
   const handleSave = () => {
@@ -311,6 +326,7 @@ const EmergencyPage = () => {
         onClose={() => setIsMenuOpen(false)}
         onOpenDisclaimer={() => setIsDisclaimerOpen(true)}
         onOpenUnderstandCard={() => setIsUnderstandCardOpen(true)}
+        onResetEmergencyNumber={() => setIsEmergencyNumberDialogOpen(true)}
         isEmergency={true}
       />
 
@@ -322,6 +338,13 @@ const EmergencyPage = () => {
       <UnderstandCardDialog
         isOpen={isUnderstandCardOpen}
         onClose={() => setIsUnderstandCardOpen(false)}
+      />
+
+      <EmergencyNumberDialog
+        isOpen={isEmergencyNumberDialogOpen}
+        onClose={() => setIsEmergencyNumberDialogOpen(false)}
+        onConfirm={handleEmergencyNumberConfirm}
+        langCode={langCode || 'en'}
       />
 
       {selectedAllergens && customMessages && (
