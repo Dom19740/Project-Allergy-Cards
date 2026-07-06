@@ -111,10 +111,10 @@ const LanguageSelectionPage = () => {
   const selectedLanguage = supportedLanguages.find(l => l.code === selectedLanguageCode);
 
   return (
-    <div className="flex flex-col h-screen bg-gray-100 dark:bg-gray-900 overflow-hidden">
+    <div className="flex flex-col min-h-screen bg-gray-100 dark:bg-gray-900">
       <FixedHeader />
-      <div className="flex flex-col flex-grow w-full max-w-2xl mx-auto px-4 pt-[calc(80px+env(safe-area-inset-top)+10px)] overflow-hidden">
-        <div className="flex-grow overflow-y-auto pt-2">
+      <div className="flex flex-col flex-grow w-full max-w-2xl mx-auto px-4 pt-[calc(80px+env(safe-area-inset-top)+10px)]">
+        <div className="flex-grow pt-2">
           <StepHeader 
             title="Choose a Language"
             description={isPremium ? "Select any language for your alert." : "Select from our free languages or upgrade to unlock all 100+."}
@@ -181,7 +181,7 @@ const LanguageSelectionPage = () => {
           </div>
         </div>
         
-        <div className="w-full flex justify-between items-center mt-auto mb-[50px] gap-4 shrink-0">
+        <div className="w-full flex justify-between items-center mt-auto mb-[calc(12px+env(safe-area-inset-bottom))] gap-4 shrink-0">
           <Button
             variant="outline"
             onClick={() => navigate(-1)}

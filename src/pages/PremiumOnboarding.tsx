@@ -159,7 +159,7 @@ const PremiumOnboarding = () => {
           </div>
         </div>
 
-        <div className="w-full flex flex-col gap-3 mt-auto mb-[50px]">
+        <div className="w-full flex flex-col gap-3 mt-auto mb-[calc(12px+env(safe-area-inset-bottom))]">
           {!isPremium && (
             <Button 
               onClick={purchasePremium}

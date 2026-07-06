@@ -108,6 +108,23 @@
     -ms-overflow-style: none;
     scrollbar-width: none;
   }
+
+  /*
+   * 100vh on mobile browsers is measured against the viewport as if the
+   * address bar were hidden, so fixed-height layouts get clipped behind it.
+   * 100dvh tracks the *current* visible viewport and resizes as the address
+   * bar shows/hides. Keep the vh rule first as a fallback for browsers that
+   * don't support dvh - the second declaration simply wins when it's valid.
+   * Native Android (Capacitor) has no address bar, so dvh there just equals vh.
+   */
+  .h-screen {
+    height: 100vh;
+    height: 100dvh;
+  }
+  .min-h-screen {
+    min-height: 100vh;
+    min-height: 100dvh;
+  }
 }
 
 /* Ensure toast notifications are above the Android navigation bar and the app's bottom buttons */

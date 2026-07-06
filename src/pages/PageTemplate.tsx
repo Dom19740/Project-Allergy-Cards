@@ -25,7 +25,7 @@ const PageTemplate = () => {
         </div>
 
         {/* Bottom Section: Fixed height button area */}
-        <div className="w-full flex justify-center items-center mt-8 mb-[50px]">
+        <div className="w-full flex justify-center items-center mt-8 mb-[calc(12px+env(safe-area-inset-bottom))]">
           <Button variant="primary" className="py-3 text-lg md:text-xl h-auto transition-all duration-200 ease-in-out hover:scale-105 w-[280px]">
             Button Placeholder
           </Button>

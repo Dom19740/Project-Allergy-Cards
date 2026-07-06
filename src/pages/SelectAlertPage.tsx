@@ -141,7 +141,7 @@ const SelectAlertPage = () => {
           </div>
         </div>
 
-        <div className="w-full flex justify-between items-center mt-auto mb-[50px] pt-12 gap-4 shrink-0">
+        <div className="w-full flex justify-between items-center mt-auto mb-[calc(12px+env(safe-area-inset-bottom))] pt-6 gap-4 shrink-0">
           <Button
             variant="outline"
             onClick={() => navigate(-1)}

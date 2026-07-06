@@ -135,10 +135,10 @@ const AllergenSelectionPage = () => {
   return (
     <div className="flex flex-col min-h-screen bg-gray-100 dark:bg-gray-900">
       <FixedHeader />
-      
+
       <div className="flex flex-col flex-grow w-full max-w-2xl mx-auto px-4 pt-[calc(80px+env(safe-area-inset-top)+10px)]">
         <div className="flex-grow pt-1">
-          <StepHeader 
+          <StepHeader
             title="Select Allergens"
             description="Tap the allergens you want to include on your card."
           />
@@ -227,7 +227,7 @@ const AllergenSelectionPage = () => {
           </div>
         </div>
 
-        <div ref={bottomRef} className="w-full flex justify-between items-center mt-auto mb-[50px] pt-12 gap-4 shrink-0">
+        <div ref={bottomRef} className="w-full flex justify-between items-center mt-auto mb-[calc(12px+env(safe-area-inset-bottom))] pt-6 gap-4 shrink-0">
           <Button
             variant="outline"
             onClick={() => navigate(-1)}
