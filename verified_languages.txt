@@ -25,7 +25,7 @@ Esperanto
 Estonian -
 Filipino -
 Finnish - native verified
-French -
+French - native verified
 Frisian
 Georgian
 German - native verified
@@ -85,7 +85,7 @@ Telugu
 Thai - native verified
 Turkish
 Ukrainian
-Urdu
+Urdu - native verified
 Uzbek
 Vietnamese - native verified
 Yiddish
