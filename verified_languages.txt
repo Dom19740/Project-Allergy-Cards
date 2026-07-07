@@ -1,0 +1,91 @@
+Afrikaans
+Albanian
+Amharic
+Arabic
+Armenian
+Azerbaijani
+Basque
+Belarusian
+Bengali
+Bosnian
+Bulgarian - native verified
+Burmese (Myanmar)
+Catalan - native verified
+Cebuano
+Chichewa
+Chinese (Simplified) - native verified
+Chinese (Cantonese) - native verified
+Corsican
+Croatian -
+Czech - native verified
+Danish
+Dutch - native verified
+English - native verified
+Esperanto
+Estonian -
+Filipino -
+Finnish - native verified
+French -
+Frisian
+Georgian
+German - native verified
+Greek  - native verified
+Gujarati
+Haitian Creole
+Hausa
+Hebrew
+Hindi
+Hungarian
+Icelandic
+Indonesian
+Italian - native verified
+Japanese
+Javanese
+Kannada
+Kazakh
+Khmer (Cambodian)
+Korean - native verified
+Kurdish (Kurmanji)
+Kyrgyz
+Lao
+Latin
+Latvian - 
+Lithuanian
+Luxembourgish
+Macedonian
+Malagasy
+Malay
+Malayalam
+Maori
+Marathi
+Nepali
+Norwegian - 
+Pashto
+Persian
+Polish - native verified
+Portuguese (Brazil) - native verified
+Portuguese (Portugal) - native verified
+Punjabi
+Romanian - 
+Russian - native verified
+Samoan
+Serbian - native verified
+Sindhi
+Sinhala
+Slovak - 
+Slovenian -
+Somali
+Spanish (European) - native verified
+Spanish (Latin) - native verified
+Swahili
+Swedish - native verified
+Sundanese
+Tamil
+Telugu
+Thai - native verified
+Turkish
+Ukrainian
+Urdu
+Uzbek
+Vietnamese - native verified
+Yiddish

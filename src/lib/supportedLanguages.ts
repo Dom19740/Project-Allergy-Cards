@@ -106,3 +106,11 @@ export const SUPPORTED_LANGUAGES: SupportedLanguage[] = [
 ];
 
 export const SUPPORTED_LANGUAGE_CODES = new Set(SUPPORTED_LANGUAGES.map(l => l.code));
+
+// Languages whose translations have been checked line-by-line by a native
+// speaker, rather than relying solely on machine translation. Keep this in
+// sync with verified_languages.txt and the language list in terms.html.
+export const VERIFIED_LANGUAGE_CODES = new Set([
+  'bg', 'ca', 'zh-CN', 'yue', 'cs', 'nl', 'en', 'fi', 'de', 'el', 'it', 'ko',
+  'pl', 'pt-BR', 'pt-PT', 'ru', 'sr', 'es-ES', 'es-419', 'sv', 'th', 'vi',
+]);

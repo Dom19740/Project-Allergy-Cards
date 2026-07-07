@@ -4,13 +4,14 @@ import React, { useState, useEffect } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Button } from "@/components/ui/button";
-import { Crown, Lock } from "lucide-react";
+import { Crown, Lock, BadgeCheck } from "lucide-react";
 import FixedHeader from "@/components/FixedHeader";
 import StepHeader from "@/components/StepHeader";
 import { getAllGoogleLanguages, SupportedLanguage } from "@/lib/translator";
 import { storage, STORAGE_KEYS } from "@/lib/storage";
 import { useBilling } from "@/hooks/useBilling";
 import { FREE_LANGUAGES } from "@/lib/premium-config";
+import { VERIFIED_LANGUAGE_CODES } from "@/lib/supportedLanguages";
 import { toast } from "sonner";
 import { FirebaseAnalytics } from '@capacitor-firebase/analytics';
 import { Capacitor } from '@capacitor/core';
@@ -125,13 +126,19 @@ const LanguageSelectionPage = () => {
                   <span className="text-gray-400">Loading languages...</span>
                 </div>
               ) : (
+                <>
                 <Select value={selectedLanguageCode} onValueChange={handleLanguageChange}>
                   <SelectTrigger
                     className="w-full py-4 text-lg md:text-xl h-auto bg-white text-gray-900 hover:bg-gray-50 border border-red-600 dark:border-red-500"
                   >
-                    <div className="flex items-center">
+                    <div className="flex items-center gap-2">
                       {selectedLanguage ? (
-                        <span>{selectedLanguage.name}</span>
+                        <>
+                          <span>{selectedLanguage.name}</span>
+                          {VERIFIED_LANGUAGE_CODES.has(selectedLanguage.code) && (
+                            <BadgeCheck className="h-4 w-4 text-green-600 shrink-0" />
+                          )}
+                        </>
                       ) : (
                         <SelectValue placeholder="Select Target Language" />
                       )}
@@ -140,6 +147,7 @@ const LanguageSelectionPage = () => {
                   <SelectContent className="bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-50 max-h-[50vh]">
                     {supportedLanguages.map((lang) => {
                       const isLocked = !isPremium && !FREE_LANGUAGES.includes(lang.code);
+                      const isVerified = VERIFIED_LANGUAGE_CODES.has(lang.code);
                       return (
                         <SelectItem
                           key={lang.code}
@@ -147,7 +155,12 @@ const LanguageSelectionPage = () => {
                           className="py-3 text-lg md:text-xl cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-700"
                         >
                           <div className="flex items-center justify-between w-full gap-4">
-                            <span>{lang.name}</span>
+                            <span className="flex items-center gap-2">
+                              {lang.name}
+                              {isVerified && (
+                                <BadgeCheck className="h-4 w-4 text-green-600 shrink-0" aria-label="Verified by a native speaker" />
+                              )}
+                            </span>
                             {isLocked && <Lock className="h-4 w-4 text-amber-500" />}
                           </div>
                         </SelectItem>
@@ -155,6 +168,11 @@ const LanguageSelectionPage = () => {
                     })}
                   </SelectContent>
                 </Select>
+                <p className="mt-2 text-xs text-gray-500 dark:text-gray-400 flex items-center gap-1">
+                  <BadgeCheck className="h-3.5 w-3.5 text-green-600 shrink-0" />
+                  Verified by a native speaker
+                </p>
+                </>
               )}
               
               {!isPremium && (
