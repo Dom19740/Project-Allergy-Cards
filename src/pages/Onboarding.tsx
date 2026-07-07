@@ -26,7 +26,7 @@ const ONBOARDING_STEPS = [
   },
   {
     title: "Choose a Language",
-    description: "Select from over 100 languages to translate your allergy alert instantly and offline.",
+    description: "Select from over 100 languages to translate your allergy alert instantly.",
     image: "/images/screenshot_3.png"
   },
   {
