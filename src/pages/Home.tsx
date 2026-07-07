@@ -74,7 +74,7 @@ const Home = () => {
             <img
               src="/images/logo_main.png"
               alt="App Logo"
-              className="max-h-full w-auto object-contain drop-shadow-xl max-w-[275px] md:max-w-[350px]"
+              className="max-h-full w-auto object-contain max-w-[275px] md:max-w-[350px]"
             />
           </motion.div>
 
