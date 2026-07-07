@@ -106,8 +106,8 @@ const SavedCardsList = () => {
         </h3>
       </div>
 
-      <div className="w-full flex items-center gap-2 px-4">
-        <div className="flex-1 h-[110px] overflow-hidden cursor-grab active:cursor-grabbing" ref={emblaRef}>
+      <div className="w-full flex items-center justify-center gap-2 px-4">
+        <div className="w-full max-w-[280px] h-[110px] overflow-hidden cursor-grab active:cursor-grabbing" ref={emblaRef}>
           <div className="flex flex-col h-full">
             {allCards.map((card) => (
               <div key={card.id} className="flex-[0_0_100%] min-h-0 flex justify-center">
