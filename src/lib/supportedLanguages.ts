@@ -114,3 +114,20 @@ export const VERIFIED_LANGUAGE_CODES = new Set([
   'bg', 'ca', 'zh-CN', 'yue', 'cs', 'nl', 'en', 'fi', 'fr', 'de', 'el', 'it', 'ko',
   'pl', 'pt-BR', 'pt-PT', 'ru', 'sr', 'es-ES', 'es-419', 'sv', 'th', 'ur', 'vi',
 ]);
+
+export const getLanguageName = (code: string): string => {
+  if (code === 'en') return 'English';
+  // Prefer our own supported-language list over Intl.DisplayNames: some
+  // browsers/WebViews ship reduced ICU data that doesn't cover less common
+  // languages (e.g. Sindhi), silently returning the code itself instead of
+  // throwing, which then got capitalized into something like "Sd".
+  const known = SUPPORTED_LANGUAGES.find(l => l.code === code);
+  if (known) return known.name;
+  try {
+    const displayNames = new Intl.DisplayNames(['en'], { type: 'language' });
+    const name = displayNames.of(code);
+    return name ? name.charAt(0).toUpperCase() + name.slice(1) : code;
+  } catch (e) {
+    return code;
+  }
+};

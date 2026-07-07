@@ -237,6 +237,7 @@ const EmergencyPage = () => {
 
       await storage.set(STORAGE_KEYS.SAVED_EMERGENCY_CARD, newCard);
       window.dispatchEvent(new CustomEvent('storage-update'));
+      toast.info("Your Emergency Card has been saved automatically for quick access.");
     };
 
     autoSaveIfMissing();

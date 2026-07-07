@@ -12,6 +12,7 @@ import { storage, STORAGE_KEYS } from '@/lib/storage';
 import { cn } from '@/lib/utils';
 import { computeContentSignature } from '@/lib/customMessages';
 import { useBilling } from '@/hooks/useBilling';
+import { getLanguageName } from '@/lib/supportedLanguages';
 
 const SavedCardsList = () => {
   const navigate = useNavigate();
@@ -116,18 +117,18 @@ const SavedCardsList = () => {
                   <CardContent className="p-2 flex flex-col">
                     <div className="flex justify-between items-start mb-0.5">
                       <div className={cn(
-                        "px-1.5 py-0.5 rounded-md text-[8px] font-bold uppercase tracking-wider",
+                        "px-1.5 py-0.5 rounded-md text-[12px] font-bold uppercase tracking-wider",
                         card.id === 'emergency-slot' ? "bg-red-600 text-white" : "bg-red-50 dark:bg-red-900/20 text-red-600 dark:text-red-400"
                       )}>
-                        {card.id === 'emergency-slot' ? `Emergency (${card.languageCode})` : card.languageCode}
+                        {card.id === 'emergency-slot' ? `${getLanguageName(card.languageCode)}` : getLanguageName(card.languageCode)}
                       </div>
                       <Button
                         variant="ghost"
                         size="icon"
                         onClick={(e) => handleDelete(e, card)}
-                        className="h-6 w-6 text-gray-400 hover:text-red-500 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-full"
+                        className="h-10 w-10 text-gray-400 hover:text-red-500 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-full"
                       >
-                        <Trash2 className="h-3 w-3" />
+                        <Trash2 className="h-4 w-4" />
                       </Button>
                     </div>
                     <div className="text-center py-0.5">
@@ -135,7 +136,7 @@ const SavedCardsList = () => {
                         {card.id === 'emergency-slot' && <AlertTriangle className="w-3.5 h-3.5 text-red-600" />}
                         {card.name}
                       </h4>
-                      <div className="flex items-center justify-center text-[9px] text-gray-500 dark:text-gray-400">
+                      <div className="flex items-center justify-center text-[12px] text-gray-500 dark:text-gray-400">
                         <Clock className="w-2.5 h-2.5 mr-1" />
                         {new Date(card.createdAt).toLocaleDateString()}
                       </div>
