@@ -52,6 +52,10 @@ const SavedCardsList = () => {
 
   useEffect(() => {
     loadCards();
+
+    const handleStorageUpdate = () => loadCards();
+    window.addEventListener('storage-update', handleStorageUpdate);
+    return () => window.removeEventListener('storage-update', handleStorageUpdate);
   }, [isPremium]);
 
   const handleDelete = async (e: React.MouseEvent, card: SavedCard) => {

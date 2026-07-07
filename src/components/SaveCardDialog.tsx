@@ -130,7 +130,9 @@ const SaveCardDialog: React.FC<SaveCardDialogProps> = ({
       
       await storage.set(STORAGE_KEYS.SAVED_CARDS, updatedCards);
     }
-    
+
+    window.dispatchEvent(new CustomEvent('storage-update'));
+
     if (Capacitor.isNativePlatform()) {
       FirebaseAnalytics.logEvent({
         name: 'save_card_success',
