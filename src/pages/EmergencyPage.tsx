@@ -21,6 +21,7 @@ import { TextToSpeech } from '@capacitor-community/text-to-speech';
 import { speakText } from '@/lib/tts';
 import { useBilling } from '@/hooks/useBilling';
 import { useNetworkStatus } from '@/hooks/useNetworkStatus';
+import { useShrinkToFit } from '@/hooks/useShrinkToFit';
 
 const EmergencyPage = () => {
   const { langCode } = useParams<{ langCode: string }>();
@@ -29,6 +30,12 @@ const EmergencyPage = () => {
   const cardRef = useRef<HTMLDivElement>(null);
   const { isPremium } = useBilling();
   const isOnline = useNetworkStatus();
+  // Low floor: this message must always be fully visible (it's the actual
+  // emergency instructions), so let it shrink well below the doubled base
+  // size on cramped screens rather than clip.
+  const { containerRef: messageContainerRef, contentRef: messageContentRef } = useShrinkToFit<HTMLDivElement, HTMLDivElement>(0.3);
+  // Floor of 0.5 against the doubled size never goes below the original size.
+  const { containerRef: dialContainerRef, contentRef: dialContentRef } = useShrinkToFit<HTMLDivElement, HTMLDivElement>(0.5);
 
   const [isTranslating, setIsTranslating] = useState(true);
   const [translationError, setTranslationError] = useState<string | null>(null);
@@ -279,31 +286,33 @@ const EmergencyPage = () => {
         <div className="bg-white border-4 border-black p-3 sm:p-6 rounded-full shadow-lg mb-4 sm:mb-10 shrink-0">
           <EmergencyCrossIcon className="h-8 w-8 sm:h-16 sm:w-16" />
         </div>
-        <div className="w-full max-w-2xl space-y-3 sm:space-y-10 shrink">
-          <div className="border-b-4 border-red-600 pb-2 sm:pb-4">
+        <div className="w-full max-w-2xl flex-1 min-h-0 flex flex-col shrink">
+          <div className="border-b-4 border-red-600 pb-2 sm:pb-4 mb-3 sm:mb-10 shrink-0">
             <h1 className="text-3xl sm:text-6xl font-black tracking-tighter uppercase text-red-600">{displayText.attention}</h1>
           </div>
-          <div className="space-y-2 sm:space-y-8">
-            <p className="text-xl sm:text-4xl font-bold text-gray-900 leading-tight">{displayText.emergency}</p>
-            <p className="text-xl sm:text-4xl font-bold text-gray-900 leading-tight">{displayText.needHelp}</p>
-            <p className="text-xl sm:text-4xl font-bold text-red-700 leading-tight">{displayText.callServices}</p>
+          <div ref={messageContainerRef} className="flex-1 min-h-0 flex flex-col items-center justify-start overflow-hidden">
+            <div ref={messageContentRef} className="w-full space-y-[0.5em]">
+              <p className="text-[2rem] sm:text-[4.5rem] font-bold text-gray-900 leading-tight break-words">{displayText.emergency}</p>
+              <p className="text-[2rem] sm:text-[4.5rem] font-bold text-gray-900 leading-tight break-words">{displayText.needHelp}</p>
+              <p className="text-[2rem] sm:text-[4.5rem] font-bold text-red-700 leading-tight break-words">{displayText.callServices}</p>
+            </div>
           </div>
         </div>
         <div className="mt-auto w-full max-w-md pt-4 shrink-0">
-          <a href={`tel:${emergencyNumber}`} className="flex flex-col sm:flex-row items-center justify-center gap-1 sm:gap-4 w-full py-2.5 sm:py-6 px-6 bg-red-700 hover:bg-red-800 active:bg-red-600 text-white rounded-2xl text-xl sm:text-3xl font-black shadow-xl transition-transform active:scale-95 text-center">
-            <Phone className="h-6 w-6 sm:h-10 sm:w-10 fill-current shrink-0" />
-            <span className="leading-tight break-words">{displayText.dialText} {emergencyNumber}</span>
+          <a href={`tel:${emergencyNumber}`} className="flex items-center justify-center w-full py-2.5 sm:py-6 px-6 bg-red-700 hover:bg-red-800 active:bg-red-600 text-white rounded-2xl font-black shadow-xl transition-transform active:scale-95 text-center overflow-hidden">
+            <div ref={dialContainerRef} className="w-full min-w-0 flex items-center justify-center overflow-hidden">
+              <div ref={dialContentRef} className="flex items-center justify-center gap-2 sm:gap-4">
+                <Phone className="h-8 w-8 sm:h-14 sm:w-14 fill-current shrink-0" />
+                <span className="text-[2.5rem] sm:text-[3.75rem] leading-tight whitespace-nowrap">{displayText.dialText} {emergencyNumber}</span>
+              </div>
+            </div>
           </a>
           {langCode && langCode !== 'en' && (
             <p className="text-[14px] sm:text-[32px] text-gray-400 font-light mt-2">
               Translated to {getLanguageName(langCode)}
             </p>
           )}
-          {!isPremium && (
-            <p className="text-[13px] sm:text-base text-gray-400 font-light mt-1">
-              created with Simple Allergy Alert © 2026
-            </p>
-          )}
+
         </div>
       </div>
 
