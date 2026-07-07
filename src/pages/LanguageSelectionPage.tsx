@@ -169,6 +169,7 @@ const LanguageSelectionPage = () => {
                   </SelectContent>
                 </Select>
                 <p className="mt-2 text-xs text-gray-500 dark:text-gray-400 flex items-center gap-1">
+                  <span>  </span>
                   <BadgeCheck className="h-3.5 w-3.5 text-green-600 shrink-0" />
                   Verified by a native speaker
                 </p>
@@ -181,7 +182,7 @@ const LanguageSelectionPage = () => {
                   className="mt-6 w-full flex items-center justify-center gap-2 text-amber-600 font-bold text-sm hover:underline"
                 >
                   <Crown className="h-4 w-4" />
-                  Unlock 100+ more languages
+                  Unlock all languages
                 </button>
               )}
             </div>

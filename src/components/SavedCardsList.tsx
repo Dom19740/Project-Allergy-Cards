@@ -40,10 +40,9 @@ const SavedCardsList = () => {
   }, [emblaApi, onSelect]);
 
   const loadCards = async () => {
-    // Saving standard cards is premium-gated, but the emergency card is
-    // auto-saved for every user regardless of premium status - so it must
-    // stay visible here even when standard cards are hidden.
-    const standardCards = isPremium ? (await storage.get<SavedCard[]>(STORAGE_KEYS.SAVED_CARDS) || []) : [];
+    // Free users can save 1 standard card; premium unlocks multiple.
+    // The emergency card is always free and always shown alongside them.
+    const standardCards = await storage.get<SavedCard[]>(STORAGE_KEYS.SAVED_CARDS) || [];
     const emergencyCard = await storage.get<SavedCard>(STORAGE_KEYS.SAVED_EMERGENCY_CARD);
 
     const combined = emergencyCard ? [emergencyCard, ...standardCards] : standardCards;

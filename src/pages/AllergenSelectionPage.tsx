@@ -222,11 +222,11 @@ const AllergenSelectionPage = () => {
               </Button>
             </div>
             {!isPremium && (
-              <button 
+              <button
                 onClick={() => navigate('/premium-onboarding')}
-                className="mt-3 w-full flex items-center justify-center gap-2 text-amber-600 font-bold text-xs hover:underline"
+                className="mt-3 w-full flex items-center justify-center gap-2 text-amber-600 font-bold text-sm hover:underline"
               >
-                <Crown className="h-3.5 w-3.5" />
+                <Crown className="h-4 w-4" />
                 Unlock custom allergens
               </button>
             )}

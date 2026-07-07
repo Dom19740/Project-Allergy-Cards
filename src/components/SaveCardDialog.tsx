@@ -38,13 +38,18 @@ const SaveCardDialog: React.FC<SaveCardDialogProps> = ({
 }) => {
   const navigate = useNavigate();
   const { isPremium } = useBilling();
-  // Saving the emergency card is always free - only saving/overwriting
-  // regular allergy cards is gated behind premium.
-  const isLocked = !isEmergency && !isPremium;
   const [cardName, setCardName] = useState(isEmergency ? 'Emergency Card' : '');
   const [existingCards, setExistingCards] = useState<SavedCard[]>([]);
   const [selectedCardId, setSelectedCardId] = useState<string | null>(null);
   const [selectedIndex, setSelectedIndex] = useState(0);
+
+  // Free users get one saved allergy card; premium unlocks multiple.
+  // Overwriting an already-selected card is always allowed - only
+  // creating an additional new card requires premium once the free
+  // slot is used up. The emergency card is always free.
+  const maxSavedCards = isPremium ? PREMIUM_LIMITS.MAX_SAVED_CARDS : PREMIUM_LIMITS.FREE_MAX_SAVED_CARDS;
+  const isAtCardLimit = !isEmergency && existingCards.length >= maxSavedCards;
+  const isLocked = isAtCardLimit && !selectedCardId;
   
   const [emblaRef, emblaApi] = useEmblaCarousel({ 
     loop: false, 
@@ -77,7 +82,11 @@ const SaveCardDialog: React.FC<SaveCardDialogProps> = ({
 
   const handleSave = async () => {
     if (isLocked) {
-      toast.error("Saving cards is a premium feature. Please upgrade to unlock!");
+      toast.error(
+        isPremium
+          ? `You can save up to ${maxSavedCards} cards. Please overwrite an existing card.`
+          : "You can save 1 card for free. Upgrade to save multiple cards!"
+      );
       return;
     }
 
@@ -107,8 +116,12 @@ const SaveCardDialog: React.FC<SaveCardDialogProps> = ({
         updatedCards = savedCards.map(card => card.id === selectedCardId ? newCard : card);
         toast.success(`Card "${cardName}" updated successfully!`);
       } else {
-        if (savedCards.length >= PREMIUM_LIMITS.MAX_SAVED_CARDS) {
-          toast.error(`You can save up to ${PREMIUM_LIMITS.MAX_SAVED_CARDS} cards. Please overwrite an existing card.`);
+        if (savedCards.length >= maxSavedCards) {
+          toast.error(
+            isPremium
+              ? `You can save up to ${maxSavedCards} cards. Please overwrite an existing card.`
+              : "You can save 1 card for free. Upgrade to save multiple cards!"
+          );
           return;
         }
         updatedCards = [...savedCards, newCard];
@@ -182,8 +195,8 @@ const SaveCardDialog: React.FC<SaveCardDialogProps> = ({
               autoFocus
               className="w-full h-11 rounded-xl border-gray-200 focus:ring-red-500 focus:border-gray-200 px-4 disabled:opacity-50"
             />
-            {isLocked && (
-              <button 
+            {isLocked && !isPremium && (
+              <button
                 onClick={() => {
                   handleClose();
                   navigate('/premium-onboarding');
@@ -191,7 +204,7 @@ const SaveCardDialog: React.FC<SaveCardDialogProps> = ({
                 className="mt-2 w-full flex items-center justify-center gap-2 text-amber-600 font-bold text-sm hover:underline"
               >
                 <Crown className="h-4 w-4" />
-                Unlock Save Cards
+                Unlock Multiple Save Cards
               </button>
             )}
           </div>
@@ -223,7 +236,6 @@ const SaveCardDialog: React.FC<SaveCardDialogProps> = ({
                     <div key={card.id} className="flex-[0_0_100%] min-w-0 flex justify-center px-1">
                       <button
                         onClick={() => toggleCardSelection(card)}
-                        disabled={isLocked}
                         className={cn(
                           "w-full flex items-center justify-between p-3.5 rounded-xl border transition-all text-left disabled:opacity-50",
                           selectedCardId === card.id 

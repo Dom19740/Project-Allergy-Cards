@@ -10,4 +10,5 @@ export const FREE_LANGUAGES = ['en', 'nl', 'es-ES', 'fr', 'de', 'zh-CN'];
  */
 export const PREMIUM_LIMITS = {
   MAX_SAVED_CARDS: 10,
+  FREE_MAX_SAVED_CARDS: 1,
 };
