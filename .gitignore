@@ -25,3 +25,8 @@ dist-ssr
 .history/
 .dyad/
 .env
+
+# Test tooling output
+coverage/
+playwright-report/
+test-results/
