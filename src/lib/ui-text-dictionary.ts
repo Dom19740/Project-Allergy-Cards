@@ -496,17 +496,17 @@ export const UI_TEXT_DICTIONARY: Record<string, Record<string, string>> = {
     'dial 112': 'rele 112',
     'call': 'rele',
   },
-  // Hebrew
+// Hebrew
   'iw': {
     'allergy alert!': 'התראת אלרגיה!',
     'please be careful with my food.': 'אנא היזהר עם האוכל שלי.',
     'thank you!': 'תודה לך!',
     'i can not eat:': 'אני לא יכול לאכול:',
-    'they make me very sick and i could die': 'הם עושים אותי מאוד חולה ואני יכול למות',
-    'attention': 'תשומת לב',
+    'they make me very sick and i could die': 'זה עושה אותי מאוד חולה ואני יכול למות',
+    'attention': 'שים לב',
     'i am having a severe allergic reaction.': 'יש לי תגובה אלרגית קשה.',
-    'i need medical help immediately.': 'אני צריך עזרה רפואית מיד.',
-    'please call emergency services.': 'נא להתקשר לשירותי החירום.',
+    'i need medical help immediately.': 'אני צריך עזרה רפואית מידי.',
+    'please call emergency services.': 'נא תתקשר לשירותי החירום.',
     'dial 112': 'חייג 112',
     'call': 'התקשר',
   },

@@ -33,7 +33,7 @@ Greek  - native verified
 Gujarati
 Haitian Creole
 Hausa
-Hebrew
+Hebrew - native verified
 Hindi
 Hungarian
 Icelandic

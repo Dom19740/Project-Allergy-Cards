@@ -111,7 +111,7 @@ export const SUPPORTED_LANGUAGE_CODES = new Set(SUPPORTED_LANGUAGES.map(l => l.c
 // speaker, rather than relying solely on machine translation. Keep this in
 // sync with verified_languages.txt and the language list in terms.html.
 export const VERIFIED_LANGUAGE_CODES = new Set([
-  'bg', 'ca', 'zh-CN', 'yue', 'cs', 'nl', 'en', 'fi', 'fr', 'de', 'el', 'it', 'ko',
+  'bg', 'ca', 'zh-CN', 'yue', 'cs', 'nl', 'en', 'fi', 'fr', 'de', 'el', 'iw', 'it', 'ko',
   'pl', 'pt-BR', 'pt-PT', 'ru', 'sr', 'es-ES', 'es-419', 'sv', 'th', 'ur', 'vi',
 ]);
 
