@@ -311,7 +311,17 @@ const AllergyCard: React.FC<AllergyCardProps> = ({ languageCode, selectedAllerge
 
       setIsDownloading(true);
       await waitForNextPaint();
-      const success = await downloadCard(cardRef.current, `allergy-card-${languageCode}.png`);
+      const allergenNames = selectedAllergens.map(allergenId => {
+        const predefinedAllergen = ALLERGEN_OPTIONS.find(opt => opt.id === allergenId);
+        if (predefinedAllergen) return predefinedAllergen.name;
+        return customAllergenTranslations[allergenId]?.['en'] || allergenId;
+      });
+      const allergenSlug = allergenNames
+        .map(name => name.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, ''))
+        .filter(Boolean)
+        .join('-');
+      const fileName = `allergy-card${allergenSlug ? `-${allergenSlug}` : ''}-${languageCode}.png`;
+      const success = await downloadCard(cardRef.current, fileName);
       if (success) toast.success("Allergy card saved to your device!");
       else toast.error("Failed to save card.");
       setIsDownloading(false);
