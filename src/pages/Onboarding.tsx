@@ -43,6 +43,11 @@ const ONBOARDING_STEPS = [
     title: "Add a Widget",
     description: "Add the widget to your home screen for instant offline access to your saved cards and one-tap emergency alert (Android only).",
     image: "/images/screenshot_6.png"
+  },
+  {
+    title: "Know Your Card",
+    description: "Open the menu on any card to understand all the features.",
+    image: "/images/screenshot_7.png"
   }
 ];
 
