@@ -67,15 +67,10 @@ export default defineHandler(async (event) => {
   }
 
   if (!response.ok) {
-    // TEMPORARY: return (not throw) so the real upstream error is visible
-    // in the browser regardless of how the error serializer formats
-    // thrown errors, to diagnose why a known-valid order_id is failing.
-    const upstreamBody = await response.text().catch(() => "<unreadable>");
-    return {
-      success: false,
-      _debugUpstreamStatus: response.status,
-      _debugUpstreamBody: upstreamBody,
-    };
+    throw createError({
+      statusCode: 400,
+      statusMessage: "Unable to verify purchase",
+    });
   }
 
   let data: any;
@@ -95,22 +90,11 @@ export default defineHandler(async (event) => {
       success: true,
       total: typeof attributes?.total === "number" ? attributes.total : null,
       currency: typeof attributes?.currency === "string" ? attributes.currency : null,
-      // TEMPORARY debug fields - remove once we've confirmed where (if
-      // anywhere) the checkout[custom][ref] value actually lands in the
-      // REST API response, since Lemon Squeezy's docs only confirm it's
-      // delivered via webhooks, not necessarily this GET endpoint.
-      _debugCustomDataGuess: data.meta?.custom_data ?? attributes?.custom_data ?? null,
-      _debugTopLevelKeys: Object.keys(data ?? {}),
-      _debugOrderKeys: Object.keys(data.data ?? {}),
-      _debugAttributeKeys: Object.keys(attributes ?? {}),
     };
   }
 
-  // TEMPORARY: return (not throw) with the actual observed status so we can
-  // see why it wasn't "paid" instead of a generic 403.
-  return {
-    success: false,
-    _debugObservedStatus: status ?? null,
-    _debugAttributeKeys: Object.keys(attributes ?? {}),
-  };
+  throw createError({
+    statusCode: 403,
+    statusMessage: "Purchase not verified",
+  });
 });
