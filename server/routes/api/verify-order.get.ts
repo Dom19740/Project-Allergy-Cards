@@ -90,6 +90,14 @@ export default defineHandler(async (event) => {
       success: true,
       total: typeof attributes?.total === "number" ? attributes.total : null,
       currency: typeof attributes?.currency === "string" ? attributes.currency : null,
+      // TEMPORARY debug fields - remove once we've confirmed where (if
+      // anywhere) the checkout[custom][ref] value actually lands in the
+      // REST API response, since Lemon Squeezy's docs only confirm it's
+      // delivered via webhooks, not necessarily this GET endpoint.
+      _debugCustomDataGuess: data.meta?.custom_data ?? attributes?.custom_data ?? null,
+      _debugTopLevelKeys: Object.keys(data ?? {}),
+      _debugOrderKeys: Object.keys(data.data ?? {}),
+      _debugAttributeKeys: Object.keys(attributes ?? {}),
     };
   }
 
