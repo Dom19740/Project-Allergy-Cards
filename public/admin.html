@@ -49,7 +49,8 @@
 
     <script>
         (function () {
-            var API_BASE = 'https://app.simpleallergyalert.com';
+            // Same-origin (this page is served by the same deployment as
+            // /api/**), so relative paths - no cross-origin/CORS concerns.
             var SESSION_KEY = 'saa_admin_secret';
 
             var authGate = document.getElementById('authGate');
@@ -80,7 +81,7 @@
                     'X-Admin-Secret': getSecret(),
                     'Content-Type': 'application/json',
                 });
-                return fetch(API_BASE + path, options).then(function (res) {
+                return fetch(path, options).then(function (res) {
                     if (res.status === 401) {
                         sessionStorage.removeItem(SESSION_KEY);
                         showAuthGate();
