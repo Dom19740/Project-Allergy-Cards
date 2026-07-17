@@ -508,6 +508,13 @@
             if (webAppLink) {
                 var webUrl = new URL(webAppLink.href);
                 webUrl.searchParams.set('ref', ref);
+                // Also set standard utm_ params so GA4's built-in acquisition
+                // reports (Realtime "First user source" etc.) populate
+                // natively - GA4 only auto-recognizes utm_source/utm_medium/
+                // utm_campaign, not an arbitrary "ref" param.
+                webUrl.searchParams.set('utm_source', 'affiliate');
+                webUrl.searchParams.set('utm_medium', 'referral');
+                webUrl.searchParams.set('utm_campaign', ref);
                 webAppLink.href = webUrl.toString();
             }
         })();
