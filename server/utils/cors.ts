@@ -1,12 +1,17 @@
 import { createError, getRequestHeader, setResponseHeader } from "nitro/h3";
 
 // The web app and this API are the same deployment, so legitimate traffic
-// is same-origin; the native app has no backend calls at all (see
-// src/lib/translator.ts). Nothing else should be allowed to call these
-// rate-limited, paid/third-party-backed routes from a browser.
+// is same-origin. The native Android app is otherwise backend-call-free
+// (see src/lib/translator.ts), with one exception: promo code redemption
+// (src/components/PromoCodeDialog.tsx) calls this API from the app's
+// WebView, whose origin under Capacitor's default config is always
+// https://localhost regardless of which app it is - allowing it doesn't
+// grant meaningful extra access since none of these routes are
+// cookie/session-authenticated, and they're rate-limited independently.
 const ALLOWED_ORIGINS = new Set([
   "https://simpleallergyalert.com",
   "https://app.simpleallergyalert.com",
+  "https://localhost",
 ]);
 
 // Same-origin navigations and non-browser clients (curl, health checks)

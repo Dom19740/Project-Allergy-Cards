@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Promo Codes Admin</title>
+    <meta name="robots" content="noindex, nofollow">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; }
+        .brand-red { background-color: #dc2626; }
+        .text-brand-red { color: #dc2626; }
+    </style>
+</head>
+<body class="bg-gray-50 text-gray-900 min-h-screen">
+
+    <div class="max-w-lg mx-auto px-4 py-10">
+        <h1 class="text-2xl font-black text-gray-900 mb-1">Promo Codes</h1>
+        <p class="text-sm text-gray-500 mb-6">Simple Allergy Alert - internal tool</p>
+
+        <div id="authGate" class="bg-white rounded-2xl border border-gray-200 shadow-sm p-6 space-y-3">
+            <label class="block text-xs font-bold text-gray-500 uppercase tracking-widest">Admin password</label>
+            <input id="secretInput" type="password" class="w-full p-3 border border-gray-200 rounded-xl text-sm" autocomplete="off">
+            <button id="unlockBtn" class="w-full h-11 rounded-xl brand-red text-white font-bold text-sm">Unlock</button>
+            <p id="authError" class="text-xs text-red-600 hidden">Incorrect password.</p>
+        </div>
+
+        <div id="panel" class="hidden space-y-6">
+            <div class="bg-white rounded-2xl border border-gray-200 shadow-sm p-6 space-y-3">
+                <label class="block text-xs font-bold text-gray-500 uppercase tracking-widest">Add a code</label>
+                <div class="flex gap-2">
+                    <input id="newCodeInput" type="text" placeholder="e.g. SAASHANNON" class="flex-1 p-3 border border-gray-200 rounded-xl text-sm uppercase font-bold tracking-widest">
+                    <button id="addBtn" class="px-5 h-auto rounded-xl brand-red text-white font-bold text-sm">Add</button>
+                </div>
+            </div>
+
+            <div class="bg-white rounded-2xl border border-gray-200 shadow-sm p-6">
+                <div class="flex items-center justify-between mb-3">
+                    <label class="block text-xs font-bold text-gray-500 uppercase tracking-widest">Active codes</label>
+                    <button id="refreshBtn" class="text-xs font-bold text-brand-red">Refresh</button>
+                </div>
+                <ul id="codeList" class="divide-y divide-gray-100"></ul>
+                <p id="emptyState" class="text-sm text-gray-400 hidden">No codes yet.</p>
+            </div>
+
+            <p id="statusMessage" class="text-sm"></p>
+        </div>
+    </div>
+
+    <script>
+        (function () {
+            var API_BASE = 'https://app.simpleallergyalert.com';
+            var SESSION_KEY = 'saa_admin_secret';
+
+            var authGate = document.getElementById('authGate');
+            var panel = document.getElementById('panel');
+            var secretInput = document.getElementById('secretInput');
+            var unlockBtn = document.getElementById('unlockBtn');
+            var authError = document.getElementById('authError');
+            var newCodeInput = document.getElementById('newCodeInput');
+            var addBtn = document.getElementById('addBtn');
+            var refreshBtn = document.getElementById('refreshBtn');
+            var codeList = document.getElementById('codeList');
+            var emptyState = document.getElementById('emptyState');
+            var statusMessage = document.getElementById('statusMessage');
+
+            function getSecret() {
+                return sessionStorage.getItem(SESSION_KEY);
+            }
+
+            function showStatus(text, isError) {
+                statusMessage.textContent = text;
+                statusMessage.className = isError ? 'text-sm text-red-600' : 'text-sm text-green-600';
+                setTimeout(function () { statusMessage.textContent = ''; }, 3000);
+            }
+
+            function api(path, options) {
+                options = options || {};
+                options.headers = Object.assign({}, options.headers, {
+                    'X-Admin-Secret': getSecret(),
+                    'Content-Type': 'application/json',
+                });
+                return fetch(API_BASE + path, options).then(function (res) {
+                    if (res.status === 401) {
+                        sessionStorage.removeItem(SESSION_KEY);
+                        showAuthGate();
+                        throw new Error('Unauthorized');
+                    }
+                    if (!res.ok) throw new Error('Request failed');
+                    return res.json();
+                });
+            }
+
+            function renderCodes(codes) {
+                codeList.innerHTML = '';
+                emptyState.classList.toggle('hidden', codes.length > 0);
+                codes.forEach(function (code) {
+                    var li = document.createElement('li');
+                    li.className = 'flex items-center justify-between py-2.5';
+                    var span = document.createElement('span');
+                    span.className = 'font-bold text-sm tracking-widest';
+                    span.textContent = code;
+                    var btn = document.createElement('button');
+                    btn.className = 'text-xs font-bold text-gray-400 hover:text-red-600';
+                    btn.textContent = 'Remove';
+                    btn.onclick = function () { removeCode(code); };
+                    li.appendChild(span);
+                    li.appendChild(btn);
+                    codeList.appendChild(li);
+                });
+            }
+
+            function loadCodes() {
+                return api('/api/admin/promo-codes').then(function (data) {
+                    renderCodes(data.codes || []);
+                });
+            }
+
+            function addCode() {
+                var code = newCodeInput.value.trim().toUpperCase();
+                if (!code) return;
+                addBtn.disabled = true;
+                api('/api/admin/promo-codes', { method: 'POST', body: JSON.stringify({ code: code }) })
+                    .then(function (data) {
+                        renderCodes(data.codes || []);
+                        newCodeInput.value = '';
+                        showStatus('Added ' + code + '.', false);
+                    })
+                    .catch(function () { showStatus('Failed to add code.', true); })
+                    .finally(function () { addBtn.disabled = false; });
+            }
+
+            function removeCode(code) {
+                if (!confirm('Remove ' + code + '? This cannot be undone.')) return;
+                api('/api/admin/promo-codes', { method: 'DELETE', body: JSON.stringify({ code: code }) })
+                    .then(function (data) {
+                        renderCodes(data.codes || []);
+                        showStatus('Removed ' + code + '.', false);
+                    })
+                    .catch(function () { showStatus('Failed to remove code.', true); });
+            }
+
+            function showAuthGate() {
+                authGate.classList.remove('hidden');
+                panel.classList.add('hidden');
+            }
+
+            function showPanel() {
+                authGate.classList.add('hidden');
+                panel.classList.remove('hidden');
+                loadCodes().catch(function () { showStatus('Failed to load codes.', true); });
+            }
+
+            function unlock() {
+                var value = secretInput.value.trim();
+                if (!value) return;
+                sessionStorage.setItem(SESSION_KEY, value);
+                api('/api/admin/promo-codes')
+                    .then(function (data) {
+                        authError.classList.add('hidden');
+                        showPanel();
+                        renderCodes(data.codes || []);
+                    })
+                    .catch(function () {
+                        sessionStorage.removeItem(SESSION_KEY);
+                        authError.classList.remove('hidden');
+                    });
+            }
+
+            unlockBtn.addEventListener('click', unlock);
+            secretInput.addEventListener('keydown', function (e) { if (e.key === 'Enter') unlock(); });
+            addBtn.addEventListener('click', addCode);
+            newCodeInput.addEventListener('keydown', function (e) { if (e.key === 'Enter') addCode(); });
+            refreshBtn.addEventListener('click', function () {
+                loadCodes().catch(function () { showStatus('Failed to load codes.', true); });
+            });
+
+            if (getSecret()) {
+                showPanel();
+            }
+        })();
+    </script>
+</body>
+</html>

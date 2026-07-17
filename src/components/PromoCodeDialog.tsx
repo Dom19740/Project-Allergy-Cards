@@ -23,31 +23,46 @@ interface PromoCodeDialogProps {
 const PromoCodeDialog: React.FC<PromoCodeDialogProps> = ({ isOpen, onClose, onSuccess }) => {
   const [code, setCode] = useState("");
 
+  // Dev-only local reset, not a real promo code - never sent to the server.
+  const RESET_CODE = 'RESET';
+
+  // Native's WebView origin (https://localhost under Capacitor's default
+  // config) is never the app's real domain, so a relative fetch would hit
+  // the local bundle's own origin instead of the deployed API.
+  const apiBase = Capacitor.getPlatform() === 'web' ? '' : 'https://app.simpleallergyalert.com';
+
   const handleRedeem = async () => {
     const normalizedCode = code.trim().toUpperCase();
 
     try {
-      if (normalizedCode === 'SAAFREE') {
-        await storage.set(STORAGE_KEYS.HAS_SEEN_ONBOARDING, true);
-        syncPremiumCache(true);
-      } else if (normalizedCode === 'RESET') {
+      if (normalizedCode === RESET_CODE) {
         await storage.remove(STORAGE_KEYS.HAS_SEEN_ONBOARDING);
         syncPremiumCache(false);
-      } else {
+        toast.success("Premium Locked", { icon: '🔒' });
+        onSuccess();
+        onClose();
+        return;
+      }
+
+      const response = await fetch(`${apiBase}/api/redeem-promo`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ code: normalizedCode }),
+      });
+
+      if (!response.ok) {
         throw new Error('Invalid promo code');
       }
 
-      const data = { success: true };
-      if (!data?.success) {
-        throw new Error('Invalid promo code');
-      }
+      await storage.set(STORAGE_KEYS.HAS_SEEN_ONBOARDING, true);
+      syncPremiumCache(true);
 
       try {
         await import('@capacitor-firebase/analytics').then(({ FirebaseAnalytics }) =>
           FirebaseAnalytics.logEvent({
             name: 'promo_code_redeemed',
             params: {
-              code: 'server_redeemed',
+              code: normalizedCode,
               platform: Capacitor.getPlatform(),
             },
           })
@@ -55,9 +70,7 @@ const PromoCodeDialog: React.FC<PromoCodeDialogProps> = ({ isOpen, onClose, onSu
       } catch {
       }
 
-      toast.success(normalizedCode === 'RESET' ? "Premium Locked" : "Premium Unlocked!", {
-        icon: normalizedCode === 'RESET' ? '🔒' : '🎉',
-      });
+      toast.success("Premium Unlocked!", { icon: '🎉' });
 
       onSuccess();
       onClose();

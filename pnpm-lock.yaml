@@ -128,6 +128,9 @@ importers:
       '@tanstack/react-query':
         specifier: ^5.56.2
         version: 5.74.4(react@18.3.1)
+      '@upstash/redis':
+        specifier: ^1.38.0
+        version: 1.38.0
       '@vercel/analytics':
         specifier: ^2.0.1
         version: 2.0.1(react@18.3.1)
@@ -175,7 +178,7 @@ importers:
         version: 0.3.0(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
       nitro:
         specifier: 3.0.260429-beta
-        version: 3.0.260429-beta(@capacitor/preferences@8.0.1(@capacitor/core@8.1.0))(jiti@2.7.0)(lru-cache@11.5.1)(rollup@4.60.4)(vite@7.3.3(@types/node@22.14.1)(jiti@2.7.0)(yaml@2.7.1))(xml2js@0.6.2)
+        version: 3.0.260429-beta(@capacitor/preferences@8.0.1(@capacitor/core@8.1.0))(@upstash/redis@1.38.0)(jiti@2.7.0)(lru-cache@11.5.1)(rollup@4.60.4)(vite@7.3.3(@types/node@22.14.1)(jiti@2.7.0)(yaml@2.7.1))(xml2js@0.6.2)
       react:
         specifier: ^18.3.1
         version: 18.3.1
@@ -2153,6 +2156,9 @@ packages:
     resolution: {integrity: sha512-aEhgas7aJ6vZnNFC7K4/vMGDGyOiqWcYZPpIWrTKuTAlsvDNKy2GFDqh9smL+iq069ZvR0YzEeq0B8NJlLzjFA==}
     engines: {node: ^18.18.0 || ^20.9.0 || >=21.1.0}
 
+  '@upstash/redis@1.38.0':
+    resolution: {integrity: sha512-wu+dZBptlLy0+MCUEoHmzrY/TnmgDey3+c7EbIGwrLqAvkP8yi5MWZHYGIFtAygmL4Bkz2TdFu+eU0vFPncIcg==}
+
   '@vercel/analytics@2.0.1':
     resolution: {integrity: sha512-MTQG6V9qQrt1tsDeF+2Uoo5aPjqbVPys1xvnIftXSJYG2SrwXRHnqEvVoYID7BTruDz4lCd2Z7rM1BdkUehk2g==}
     peerDependencies:
@@ -3778,6 +3784,9 @@ packages:
     resolution: {integrity: sha512-p1diW6TqL9L07nNxvRMM7hMMw4c5XOo/1ibL4aAIGmSAt9slTE1Xgw5KWuof2uTOvCg9BY7ZRi+GaF+7sfgPeQ==}
     engines: {node: '>=14.17'}
     hasBin: true
+
+  uncrypto@0.1.3:
+    resolution: {integrity: sha512-Ql87qFHB3s/De2ClA9e0gsnS6zXG27SkTiSJwjCc9MebbfapQfuPzumMIUMi38ezPZVNFcHI9sUIepeQfw8J8Q==}
 
   undici-types@6.21.0:
     resolution: {integrity: sha512-iwDZqg0QAGrg9Rav5H4n0M64c3mkR59cJ6wQp+7C4nI0gsmExaedaYLNO44eT4AtBBwjbTiGPMlt2Md0T9H9JQ==}
@@ -5990,6 +5999,10 @@ snapshots:
       '@typescript-eslint/types': 8.30.1
       eslint-visitor-keys: 4.2.0
 
+  '@upstash/redis@1.38.0':
+    dependencies:
+      uncrypto: 0.1.3
+
   '@vercel/analytics@2.0.1(react@18.3.1)':
     optionalDependencies:
       react: 18.3.1
@@ -6960,7 +6973,7 @@ snapshots:
 
   nf3@0.3.17: {}
 
-  nitro@3.0.260429-beta(@capacitor/preferences@8.0.1(@capacitor/core@8.1.0))(jiti@2.7.0)(lru-cache@11.5.1)(rollup@4.60.4)(vite@7.3.3(@types/node@22.14.1)(jiti@2.7.0)(yaml@2.7.1))(xml2js@0.6.2):
+  nitro@3.0.260429-beta(@capacitor/preferences@8.0.1(@capacitor/core@8.1.0))(@upstash/redis@1.38.0)(jiti@2.7.0)(lru-cache@11.5.1)(rollup@4.60.4)(vite@7.3.3(@types/node@22.14.1)(jiti@2.7.0)(yaml@2.7.1))(xml2js@0.6.2):
     dependencies:
       consola: 3.4.2
       crossws: 0.4.5(srvx@0.11.15)
@@ -6975,7 +6988,7 @@ snapshots:
       rolldown: 1.0.2
       srvx: 0.11.15
       unenv: 2.0.0-rc.24
-      unstorage: 2.0.0-alpha.7(@capacitor/preferences@8.0.1(@capacitor/core@8.1.0))(db0@0.3.4)(lru-cache@11.5.1)(ofetch@2.0.0-alpha.3)
+      unstorage: 2.0.0-alpha.7(@capacitor/preferences@8.0.1(@capacitor/core@8.1.0))(@upstash/redis@1.38.0)(db0@0.3.4)(lru-cache@11.5.1)(ofetch@2.0.0-alpha.3)
     optionalDependencies:
       jiti: 2.7.0
       rollup: 4.60.4
@@ -7625,6 +7638,8 @@ snapshots:
 
   typescript@5.8.3: {}
 
+  uncrypto@0.1.3: {}
+
   undici-types@6.21.0: {}
 
   undici@7.28.0:
@@ -7636,9 +7651,10 @@ snapshots:
 
   universalify@2.0.1: {}
 
-  unstorage@2.0.0-alpha.7(@capacitor/preferences@8.0.1(@capacitor/core@8.1.0))(db0@0.3.4)(lru-cache@11.5.1)(ofetch@2.0.0-alpha.3):
+  unstorage@2.0.0-alpha.7(@capacitor/preferences@8.0.1(@capacitor/core@8.1.0))(@upstash/redis@1.38.0)(db0@0.3.4)(lru-cache@11.5.1)(ofetch@2.0.0-alpha.3):
     optionalDependencies:
       '@capacitor/preferences': 8.0.1(@capacitor/core@8.1.0)
+      '@upstash/redis': 1.38.0
       db0: 0.3.4
       lru-cache: 11.5.1
       ofetch: 2.0.0-alpha.3
