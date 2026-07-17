@@ -67,10 +67,15 @@ export default defineHandler(async (event) => {
   }
 
   if (!response.ok) {
-    throw createError({
-      statusCode: 400,
-      statusMessage: "Unable to verify purchase",
-    });
+    // TEMPORARY: return (not throw) so the real upstream error is visible
+    // in the browser regardless of how the error serializer formats
+    // thrown errors, to diagnose why a known-valid order_id is failing.
+    const upstreamBody = await response.text().catch(() => "<unreadable>");
+    return {
+      success: false,
+      _debugUpstreamStatus: response.status,
+      _debugUpstreamBody: upstreamBody,
+    };
   }
 
   let data: any;
@@ -101,8 +106,11 @@ export default defineHandler(async (event) => {
     };
   }
 
-  throw createError({
-    statusCode: 403,
-    statusMessage: "Purchase not verified",
-  });
+  // TEMPORARY: return (not throw) with the actual observed status so we can
+  // see why it wasn't "paid" instead of a generic 403.
+  return {
+    success: false,
+    _debugObservedStatus: status ?? null,
+    _debugAttributeKeys: Object.keys(attributes ?? {}),
+  };
 });
