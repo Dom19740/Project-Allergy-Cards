@@ -69,28 +69,31 @@ const AppContent = () => {
     // Initialize billing system
     initBilling();
 
+    // Affiliate ref capture must not depend on Firebase Analytics succeeding
+    // - an ad blocker or missing config can make every FirebaseAnalytics call
+    // below throw, and this write is the load-bearing one for payout
+    // tracking, so it runs synchronously and unconditionally up front.
+    const urlRef = new URLSearchParams(window.location.search).get('ref');
+    const ref = captureAffiliateRef();
+
     const initFirebase = async () => {
       try {
         // Enable analytics for all platforms (Web uses the JS SDK initialized above)
         await FirebaseAnalytics.setEnabled({ enabled: true });
-        
+
         // Crashlytics is native-only
         if (Capacitor.isNativePlatform()) {
           await FirebaseCrashlytics.setEnabled({ enabled: true });
         }
-        
+
         // Log app open event for all platforms
         await FirebaseAnalytics.logEvent({
           name: 'app_open',
           params: { platform: Capacitor.getPlatform() }
         });
 
-        // Affiliate tracking: only log a fresh "landing" event when ?ref= is
-        // actually present on this pageload (not on every subsequent app
-        // open) - the stored ref itself is still persisted for later use by
-        // the Lemon Squeezy checkout and the purchase event.
-        const urlRef = new URLSearchParams(window.location.search).get('ref');
-        const ref = captureAffiliateRef();
+        // Only log a fresh "landing" event when ?ref= is actually present on
+        // this pageload, not on every subsequent app open.
         if (ref && urlRef) {
           await FirebaseAnalytics.setUserProperty({ key: 'acquisition_ref', value: ref });
           await FirebaseAnalytics.logEvent({ name: 'campaign_landing', params: { ref } });
@@ -99,7 +102,7 @@ const AppContent = () => {
         console.error('Firebase initialization error:', error);
       }
     };
-    
+
     initFirebase();
 
     const migrate = async () => {
