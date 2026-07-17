@@ -31,7 +31,9 @@ export default defineHandler(async (event) => {
 
   let response: Response;
   try {
-    response = await fetch("https://api.lemonsqueezy.com/v1/orders?page%5Bsize%5D=5&sort=-created_at", {
+    // Orders are already returned newest-first by default; no sort param
+    // needed (the API rejects arbitrary sort field names anyway).
+    response = await fetch("https://api.lemonsqueezy.com/v1/orders?page%5Bsize%5D=5", {
       headers: {
         Accept: "application/vnd.api+json",
         "Content-Type": "application/vnd.api+json",
