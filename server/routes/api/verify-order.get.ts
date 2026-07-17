@@ -80,10 +80,17 @@ export default defineHandler(async (event) => {
     throw createError({ statusCode: 502, statusMessage: "Upstream request failed" });
   }
 
-  const status = data.data?.attributes?.status;
+  const attributes = data.data?.attributes;
+  const status = attributes?.status;
 
   if (status === "paid") {
-    return { success: true };
+    // total is in cents (per Lemon Squeezy's order object); surfaced so the
+    // client can log an accurate purchase value instead of a hardcoded one.
+    return {
+      success: true,
+      total: typeof attributes?.total === "number" ? attributes.total : null,
+      currency: typeof attributes?.currency === "string" ? attributes.currency : null,
+    };
   }
 
   throw createError({

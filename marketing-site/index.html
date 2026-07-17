@@ -1,0 +1,530 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Simple Allergy Alert - Travel Safely with Food Allergies</title>
+    <meta name="description" content="Travel and dine abroad safely with Simple Allergy Alert. Create instant allergy travel cards in 100+ languages and communicate food allergies instantly.">
+    <link rel="canonical" href="https://simpleallergyalert.com/">
+    <meta name="robots" content="index, follow">
+    <meta property="og:title" content="Simple Allergy Alert — Travel Safely with Food Allergies">
+    <meta property="og:description" content="Create instant food allergy travel cards in 100+ languages. Share offline allergy cards with restaurant staff and stay safe while dining abroad.">
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://simpleallergyalert.com/">
+    <meta property="og:image" content="https://simpleallergyalert.com/images/screenshot_1.webp">
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="Simple Allergy Alert — Travel Safely with Food Allergies">
+    <meta name="twitter:description" content="Create instant food allergy travel cards in 100+ languages. Share offline allergy cards with restaurant staff and stay safe while dining abroad.">
+    <meta name="twitter:image" content="https://simpleallergyalert.com/images/screenshot_1.webp">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preload" href="images/screenshot_1.webp" as="image">
+    <link rel="icon" href="/favicon.ico">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700;900&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+        /* Keep hero content stable while other assets load */
+        main {
+            min-height: 0;
+        }
+        #screenshotCarousel {
+            flex: 1 1 0;
+            min-height: 0;
+            max-height: 55dvh;
+            display: flex;
+            align-items: center;
+        }
+        #carouselTrack {
+            display: flex;
+            overflow-x: auto;
+            scroll-snap-type: x mandatory;
+            scroll-behavior: smooth;
+            height: 100%;
+        }
+        #carouselTrack::-webkit-scrollbar {
+            display: none;
+        }
+        .carousel-item {
+            width: 100%;
+            flex: 0 0 100%;
+            scroll-snap-align: start;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            height: 100%;
+        }
+        .carousel-item button {
+            width: auto;
+            height: 100%;
+            aspect-ratio: 4 / 7;
+            max-width: 100%;
+            margin: 0 auto;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .carousel-item img {
+            width: 100%;
+            height: 100%;
+        }
+        /* Ensure images reserve space to avoid layout shifts while loading */
+        .carousel-slide {
+            display: block;
+            width: 100%;
+            height: 100%;
+            aspect-ratio: 4 / 7;
+            object-fit: contain;
+        }
+        @media (min-width: 640px) {
+            .carousel-item {
+                width: 50%;
+                flex: 0 0 50%;
+            }
+            #screenshotCarousel {
+                max-height: 52dvh;
+            }
+            .carousel-item button {
+                height: 100%;
+                width: auto;
+            }
+            .carousel-slide { aspect-ratio: 4 / 7; }
+        }
+        @media (min-width: 1024px) {
+            .carousel-item {
+                width: 33.3333%;
+                flex: 0 0 33.3333%;
+            }
+            #screenshotCarousel {
+                max-height: 54dvh;
+            }
+            .carousel-item button {
+                aspect-ratio: 9 / 16;
+                height: 100%;
+                width: auto;
+            }
+            .carousel-slide { aspect-ratio: 9 / 16; }
+        }
+        .brand-red {
+            background-color: #dc2626;
+        }
+        .text-brand-red {
+            color: #dc2626;
+        }
+        /* Disable any accidental transitions on hero text */
+        h1, p { transition: none !important; }
+        .download-badge {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            padding: 0.5rem 0.625rem;
+            border-radius: 1.5rem;
+            min-width: 0;
+        }
+        .download-badge img {
+            height: 2.25rem;
+            width: auto;
+            max-width: 100%;
+            object-fit: contain;
+        }
+        @media (min-width: 480px) {
+            .download-badge {
+                padding: 0.75rem 1rem;
+            }
+            .download-badge img {
+                height: 3rem;
+            }
+        }
+        .demo-button {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+            height: 2.75rem;
+            padding: 0 1.25rem;
+            border-radius: 1.5rem;
+            color: #fff;
+            font-weight: 700;
+            font-size: 0.875rem;
+            letter-spacing: 0.01em;
+            transition: opacity 0.2s ease;
+        }
+        .demo-button:hover {
+            opacity: 0.9;
+        }
+        .demo-button svg {
+            flex-shrink: 0;
+        }
+        #videoModal.hidden {
+            display: none;
+        }
+        #videoModalFrameWrap {
+            width: 100%;
+            max-width: 900px;
+            aspect-ratio: 16 / 9;
+        }
+        #videoModalFrameWrap iframe {
+            width: 100%;
+            height: 100%;
+            border-radius: 1rem;
+        }
+    </style>
+</head>
+<body class="bg-gray-50 text-gray-900 flex flex-col h-[100dvh] overflow-hidden">
+
+    <div id="site-header"><header class="w-full py-3 px-4 flex justify-between sm:justify-center items-center bg-white border-b border-gray-100 shadow-sm">
+    <a href="index.html" class="flex items-center">
+        <div class="brand-red text-white px-4 py-2 rounded-lg text-xl font-black tracking-tight">
+            SIMPLE ALLERGY ALERT
+        </div>
+    </a>
+    <div class="sm:hidden relative">
+        <input type="checkbox" id="mobile-nav-toggle" class="peer sr-only">
+        <label for="mobile-nav-toggle" class="cursor-pointer flex items-center text-gray-400 hover:text-gray-600 transition-colors select-none">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M4 6h16M4 12h16M4 18h16"/>
+            </svg>
+        </label>
+        <div class="hidden peer-checked:flex flex-col absolute top-full right-0 mt-2 bg-white shadow-xl rounded-xl border border-gray-100 py-2 min-w-[200px] z-50">
+            <a href="/faq.html" class="px-5 py-2.5 text-xs font-bold text-gray-500 uppercase tracking-widest hover:bg-gray-50 hover:text-red-600 transition-colors">FAQ</a>
+            <a href="mailto:info@simpleallergyalert.com" class="px-5 py-2.5 text-xs font-bold text-gray-500 uppercase tracking-widest hover:bg-gray-50 hover:text-red-600 transition-colors">Contact</a>
+            <a href="/privacy-policy.html" class="px-5 py-2.5 text-xs font-bold text-gray-500 uppercase tracking-widest hover:bg-gray-50 hover:text-red-600 transition-colors">Privacy</a>
+            <a href="/terms.html" class="px-5 py-2.5 text-xs font-bold text-gray-500 uppercase tracking-widest hover:bg-gray-50 hover:text-red-600 transition-colors">Terms &amp; Conditions</a>
+            <a href="/cookie-policy.html" class="px-5 py-2.5 text-xs font-bold text-gray-500 uppercase tracking-widest hover:bg-gray-50 hover:text-red-600 transition-colors">Cookie Policy</a>
+        </div>
+    </div>
+</header></div>
+
+    <!-- Hero Section -->
+    <main class="flex-grow min-h-0 flex flex-col items-center justify-start overflow-hidden px-4 py-2 text-center max-w-4xl mx-auto">
+
+        <h1 class="text-2xl md:text-4xl font-black text-gray-900 mb-3 tracking-tight">
+            Travel Safely. <span class="text-brand-red">Eat with Confidence.</span>
+        </h1>
+        
+        <p class="text-base md:text-lg text-gray-600 mb-4 max-w-xl leading-relaxed">
+            Create personalized allergy alert cards in over 100 languages.
+        </p>
+
+        <div class="w-full max-w-6xl mx-auto mt-2 flex-grow min-h-0 flex flex-col">
+            <div class="relative overflow-hidden rounded-[32px] border border-gray-200 bg-white shadow-xl flex-grow min-h-0 flex flex-col justify-center">
+                <div id="screenshotCarousel" class="relative overflow-hidden bg-gray-100">
+                    <div id="carouselTrack" class="flex transition-transform duration-500 ease-out">
+                        <div class="carousel-item p-3">
+                            <button type="button" class="group block w-full overflow-hidden rounded-[28px] bg-white shadow-sm">
+                                <img src="images/screenshot_1.webp" alt="Allergy alert card screenshot 1" width="450" height="800" fetchpriority="high" decoding="async" class="carousel-slide object-contain w-full h-full transition-transform duration-300 group-hover:scale-[1.03]">
+                            </button>
+                        </div>
+                        <div class="carousel-item p-3">
+                            <button type="button" class="group block w-full overflow-hidden rounded-[28px] bg-white shadow-sm">
+                                <img src="images/screenshot_2.webp" alt="Allergy alert card screenshot 2" width="450" height="800" loading="lazy" decoding="async" class="carousel-slide object-contain w-full h-full transition-transform duration-300 group-hover:scale-[1.03]">
+                            </button>
+                        </div>
+                        <div class="carousel-item p-3">
+                            <button type="button" class="group block w-full overflow-hidden rounded-[28px] bg-white shadow-sm">
+                                <img src="images/screenshot_3.webp" alt="Allergy alert card screenshot 3" width="450" height="800" loading="lazy" decoding="async" class="carousel-slide object-contain w-full h-full transition-transform duration-300 group-hover:scale-[1.03]">
+                            </button>
+                        </div>
+                        <div class="carousel-item p-3">
+                            <button type="button" class="group block w-full overflow-hidden rounded-[28px] bg-white shadow-sm">
+                                <img src="images/screenshot_4.webp" alt="Allergy alert card screenshot 4" width="450" height="800" loading="lazy" decoding="async" class="carousel-slide object-contain w-full h-full transition-transform duration-300 group-hover:scale-[1.03]">
+                            </button>
+                        </div>
+                        <div class="carousel-item p-3">
+                            <button type="button" class="group block w-full overflow-hidden rounded-[28px] bg-white shadow-sm">
+                                <img src="images/screenshot_5.webp" alt="Allergy alert card screenshot 5" width="450" height="800" loading="lazy" decoding="async" class="carousel-slide object-contain w-full h-full transition-transform duration-300 group-hover:scale-[1.03]">
+                            </button>
+                        </div>
+                        <div class="carousel-item p-3">
+                            <button type="button" class="group block w-full overflow-hidden rounded-[28px] bg-white shadow-sm">
+                                <img src="images/screenshot_6.webp" alt="Allergy alert card screenshot 6" width="450" height="800" loading="lazy" decoding="async" class="carousel-slide object-contain w-full h-full transition-transform duration-300 group-hover:scale-[1.03]">
+                            </button>
+                        </div>
+                        <div class="carousel-item p-3">
+                            <button type="button" class="group block w-full overflow-hidden rounded-[28px] bg-white shadow-sm">
+                                <img src="images/screenshot_4_alternate.webp" alt="Allergy alert card screenshot alternate" width="450" height="800" loading="lazy" decoding="async" class="carousel-slide object-contain w-full h-full transition-transform duration-300 group-hover:scale-[1.03]">
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <button id="carouselPrev" class="absolute left-3 top-1/2 -translate-y-1/2 rounded-full bg-white/90 text-gray-700 shadow-lg border border-gray-200 p-3 hover:bg-white transition">
+                    <span class="sr-only">Previous screenshots</span>
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                        <path fill-rule="evenodd" d="M12.293 16.293a1 1 0 010-1.414L7.414 10l4.879-4.879a1 1 0 10-1.414-1.414l-6 6a1 1 0 000 1.414l6 6a1 1 0 001.414 0z" clip-rule="evenodd">
+                    </svg>
+                </button>
+
+                <button id="carouselNext" class="absolute right-3 top-1/2 -translate-y-1/2 rounded-full bg-white/90 text-gray-700 shadow-lg border border-gray-200 p-3 hover:bg-white transition">
+                    <span class="sr-only">Next screenshots</span>
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                        <path fill-rule="evenodd" d="M7.707 3.293a1 1 0 011.414 0l6 6a1 1 0 010 1.414l-6 6a1 1 0 11-1.414-1.414L12.586 10 7.707 5.121a1 1 0 010-1.414z" clip-rule="evenodd">
+                    </svg>
+                </button>
+            </div>
+        </div>
+        <div id="carouselOverlay" class="fixed inset-0 z-50 hidden items-center justify-center bg-black/80 p-4">
+            <button id="carouselOverlayClose" class="absolute top-4 right-4 rounded-full bg-white/90 p-3 text-gray-900 shadow-lg hover:bg-white transition">
+                <span class="sr-only">Close expanded screenshot</span>
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                    <path fill-rule="evenodd" d="M10 8.586l4.95-4.95a1 1 0 111.414 1.414L11.414 10l4.95 4.95a1 1 0 01-1.414 1.414L10 11.414l-4.95 4.95a1 1 0 01-1.414-1.414L8.586 10 3.636 5.05a1 1 0 011.414-1.414L10 8.586z" clip-rule="evenodd">
+                </svg>
+            </button>
+            <img id="carouselOverlayImage" src="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///ywAAAAAAQABAAACAUwAOw==" alt="Expanded screenshot" class="max-h-full max-w-full rounded-3xl shadow-2xl object-contain">
+        </div>
+
+    </main>
+
+    <!-- Features Grid -->
+    <section class="bg-white py-2 px-4 border-t border-gray-100">
+        <h2 class="sr-only">Download and install links</h2>
+        <div class="flex flex-nowrap justify-center items-center gap-1.5 sm:gap-2 w-full">
+            <a id="playStoreLink" href="https://play.google.com/store/apps/details?id=com.dpbcreative.simpleallergyalert&hl=en-US" target="_blank" rel="noopener" class="download-badge bg-white transition hover:bg-slate-50">
+                <img src="images/GetItOnGooglePlay_Badge_Web_color_English.svg" alt="Get it on Google Play" width="239" height="71" decoding="async">
+            </a>
+            <a id="webAppLink" href="https://app.simpleallergyalert.com/" target="_blank" rel="noopener" class="download-badge bg-white transition hover:bg-slate-50">
+                <img src="images/Use_it_on_web_browser.webp" alt="Use it on Web Browser" width="1001" height="299" decoding="async">
+            </a>
+        </div>
+        <div class="flex justify-center w-full mt-2">
+            <button type="button" id="watchDemoBtn" class="demo-button brand-red">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" viewBox="0 0 20 20" fill="currentColor">
+                    <path d="M6.3 4.6a1 1 0 011.02-.02l8 5a1 1 0 010 1.7l-8 5a1 1 0 01-1.52-.86v-10a1 1 0 01.5-.82z"/>
+                </svg>
+                Watch Demo
+            </button>
+        </div>
+    </section>
+
+    <div id="videoModal" class="hidden fixed inset-0 z-50 items-center justify-center bg-black/80 p-4">
+        <div class="relative w-full flex flex-col items-center" id="videoModalFrameWrap">
+            <button id="videoModalClose" class="absolute -top-10 right-0 rounded-full bg-white/90 p-2 text-gray-900 shadow-lg hover:bg-white transition">
+                <span class="sr-only">Close video</span>
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                    <path fill-rule="evenodd" d="M10 8.586l4.95-4.95a1 1 0 111.414 1.414L11.414 10l4.95 4.95a1 1 0 01-1.414 1.414L10 11.414l-4.95 4.95a1 1 0 01-1.414-1.414L8.586 10 3.636 5.05a1 1 0 011.414-1.414L10 8.586z" clip-rule="evenodd">
+                </svg>
+            </button>
+        </div>
+    </div>
+
+    <script>
+        (function () {
+            function initCarousel() {
+                const slideButtons = Array.from(document.querySelectorAll('.carousel-slide'));
+                const slideItems = Array.from(document.querySelectorAll('.carousel-item'));
+                const dots = Array.from(document.querySelectorAll('.carousel-dot'));
+                const prevBtn = document.getElementById('carouselPrev');
+                const nextBtn = document.getElementById('carouselNext');
+                const overlay = document.getElementById('carouselOverlay');
+                const overlayImage = document.getElementById('carouselOverlayImage');
+                const overlayClose = document.getElementById('carouselOverlayClose');
+                const track = document.getElementById('carouselTrack');
+                const totalSlides = slideItems.length;
+                let visibleSlides = 3;
+                let maxIndex = Math.max(0, totalSlides - visibleSlides);
+                let currentIndex = 0;
+                let autoRotate;
+
+                function getVisibleSlides() {
+                    if (window.innerWidth < 640) return 1;
+                    if (window.innerWidth < 1024) return 2;
+                    return 3;
+                }
+
+                function updateCarouselSettings() {
+                    visibleSlides = getVisibleSlides();
+                    maxIndex = Math.max(0, totalSlides - visibleSlides);
+                    currentIndex = Math.min(maxIndex, currentIndex);
+                }
+
+                function updateTrack(index, smooth = true) {
+                    const slide = slideItems[index];
+                    if (!slide) return;
+                    slide.scrollIntoView({
+                        behavior: smooth ? 'smooth' : 'auto',
+                        inline: 'start',
+                        block: 'nearest'
+                    });
+                }
+
+                function handleResize() {
+                    updateCarouselSettings();
+                    showSlide(currentIndex, false);
+                }
+
+                function showSlide(index, smooth = true) {
+                    currentIndex = Math.min(maxIndex, Math.max(0, index));
+                    updateTrack(currentIndex, smooth);
+                    dots.forEach((dot, dotIndex) => {
+                        dot.classList.toggle('bg-white/90', dotIndex === currentIndex);
+                        dot.classList.toggle('bg-white/50', dotIndex !== currentIndex);
+                    });
+                }
+
+                function nextSlide() {
+                    showSlide(currentIndex >= maxIndex ? 0 : currentIndex + 1);
+                }
+
+                function prevSlide() {
+                    showSlide(currentIndex <= 0 ? maxIndex : currentIndex - 1);
+                }
+
+                function startAutoRotate() {
+                    if (autoRotate) clearInterval(autoRotate);
+                    autoRotate = setInterval(nextSlide, 4500);
+                }
+
+                function openOverlay(img) {
+                    overlayImage.src = img.src;
+                    overlayImage.alt = img.alt;
+                    overlay.classList.remove('hidden');
+                    overlay.classList.add('flex');
+                }
+
+                function closeOverlay() {
+                    overlay.classList.add('hidden');
+                    overlay.classList.remove('flex');
+                    overlayImage.src = '';
+                }
+
+                slideButtons.forEach(slide => {
+                    slide.addEventListener('click', () => {
+                        openOverlay(slide);
+                    });
+                });
+
+                dots.forEach(dot => {
+                    dot.addEventListener('click', () => {
+                        showSlide(Number(dot.dataset.index));
+                        startAutoRotate();
+                    });
+                });
+
+                prevBtn.addEventListener('click', () => {
+                    prevSlide();
+                    startAutoRotate();
+                });
+
+                nextBtn.addEventListener('click', () => {
+                    nextSlide();
+                    startAutoRotate();
+                });
+
+                overlayClose.addEventListener('click', closeOverlay);
+                overlay.addEventListener('click', (event) => {
+                    if (event.target === overlay) {
+                        closeOverlay();
+                    }
+                });
+                document.addEventListener('keydown', (event) => {
+                    if (event.key === 'Escape') {
+                        closeOverlay();
+                    }
+                });
+
+                updateCarouselSettings();
+                showSlide(currentIndex, false);
+
+                startAutoRotate();
+
+                window.addEventListener('resize', handleResize);
+            }
+
+            if (document.readyState === 'loading') {
+                document.addEventListener('DOMContentLoaded', initCarousel);
+            } else {
+                initCarousel();
+            }
+        })();
+
+        (function () {
+            function initVideoModal() {
+                const openBtn = document.getElementById('watchDemoBtn');
+                const modal = document.getElementById('videoModal');
+                const closeBtn = document.getElementById('videoModalClose');
+                const frameWrap = document.getElementById('videoModalFrameWrap');
+                if (!openBtn || !modal || !frameWrap) return;
+
+                const videoId = '6QrO1qJW9Ak';
+
+                function openModal() {
+                    const iframe = document.createElement('iframe');
+                    iframe.src = 'https://www.youtube-nocookie.com/embed/' + videoId + '?autoplay=1&rel=0';
+                    iframe.title = 'Simple Allergy Alert demo video';
+                    iframe.frameBorder = '0';
+                    iframe.allow = 'accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture';
+                    iframe.allowFullscreen = true;
+                    frameWrap.appendChild(iframe);
+                    modal.classList.remove('hidden');
+                    modal.classList.add('flex');
+                }
+
+                function closeModal() {
+                    modal.classList.add('hidden');
+                    modal.classList.remove('flex');
+                    const iframe = frameWrap.querySelector('iframe');
+                    if (iframe) iframe.remove();
+                }
+
+                openBtn.addEventListener('click', openModal);
+                closeBtn.addEventListener('click', closeModal);
+                modal.addEventListener('click', (event) => {
+                    if (event.target === modal) closeModal();
+                });
+                document.addEventListener('keydown', (event) => {
+                    if (event.key === 'Escape') closeModal();
+                });
+            }
+
+            if (document.readyState === 'loading') {
+                document.addEventListener('DOMContentLoaded', initVideoModal);
+            } else {
+                initVideoModal();
+            }
+        })();
+    </script>
+
+    <script>
+        (function () {
+            // Forwards an affiliate ref code (e.g. ?ref=shannon) from this landing
+            // page into both destinations: as a Play Store install referrer (so
+            // Firebase/GA4 auto-attributes the install + later purchase to the
+            // campaign) and as a query param on the webapp link (so it can log
+            // the pageload and tag the Lemon Squeezy checkout).
+            var ref = new URLSearchParams(window.location.search).get('ref');
+            if (!ref || !/^[a-zA-Z0-9_-]{1,64}$/.test(ref)) return;
+
+            var playStoreLink = document.getElementById('playStoreLink');
+            if (playStoreLink) {
+                var referrer = 'utm_source=affiliate&utm_medium=referral&utm_campaign=' + encodeURIComponent(ref);
+                var playUrl = new URL(playStoreLink.href);
+                playUrl.searchParams.set('referrer', referrer);
+                playStoreLink.href = playUrl.toString();
+            }
+
+            var webAppLink = document.getElementById('webAppLink');
+            if (webAppLink) {
+                var webUrl = new URL(webAppLink.href);
+                webUrl.searchParams.set('ref', ref);
+                webAppLink.href = webUrl.toString();
+            }
+        })();
+    </script>
+
+    <div id="site-footer"><footer class="w-full py-3 px-4 bg-gray-50 text-center border-t border-gray-100">
+    <div class="max-w-4xl mx-auto">
+        <p class="text-xs text-gray-500 mb-0 sm:mb-2">© 2026 Simple Allergy Alert. All rights reserved.</p>
+        <div class="hidden sm:flex justify-center space-x-4 text-xs font-bold text-gray-400 uppercase tracking-widest">
+            <a href="/faq.html" class="hover:text-brand-red transition-colors">FAQ</a>
+            <a href="mailto:info@simpleallergyalert.com" class="hover:text-brand-red transition-colors">Contact</a>
+            <a href="/privacy-policy.html" class="hover:text-brand-red transition-colors">Privacy</a>
+            <a href="/terms.html" class="hover:text-brand-red transition-colors">Terms & Conditions</a>
+            <a href="/cookie-policy.html" class="hover:text-brand-red transition-colors">Cookie Policy</a>
+        </div>
+    </div>
+</footer></div>
+    <script src="includes.js"></script>
+</body>
+</html>

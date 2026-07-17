@@ -2,6 +2,7 @@
 
 import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
 import { isPremiumUser, purchasePremium, restorePurchases, PREMIUM_PRODUCT_ID, LEMON_SQUEEZY_CHECKOUT_URL, refreshPremiumStatus } from '@/lib/billing';
+import { getAffiliateRef } from '@/lib/affiliate';
 import { toast } from 'sonner';
 import { Capacitor } from '@capacitor/core';
 
@@ -63,7 +64,12 @@ export const BillingProvider = ({ children }: { children: ReactNode }): React.Re
 
   const handlePurchase = async () => {
     if (Capacitor.getPlatform() === 'web') {
-      window.location.href = LEMON_SQUEEZY_CHECKOUT_URL;
+      const ref = getAffiliateRef();
+      const checkoutUrl = new URL(LEMON_SQUEEZY_CHECKOUT_URL);
+      if (ref) {
+        checkoutUrl.searchParams.set('checkout[custom][ref]', ref);
+      }
+      window.location.href = checkoutUrl.toString();
       return;
     }
 

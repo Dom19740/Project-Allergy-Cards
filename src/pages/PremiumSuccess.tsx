@@ -3,6 +3,8 @@ import { useNavigate, useSearchParams } from 'react-router-dom';
 import { CheckCircle, Loader2, XCircle } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { syncPremiumCache } from '@/lib/billing';
+import { getAffiliateRef } from '@/lib/affiliate';
+import { FirebaseAnalytics } from '@capacitor-firebase/analytics';
 
 const PremiumSuccess = () => {
   const [searchParams] = useSearchParams();
@@ -24,6 +26,15 @@ const PremiumSuccess = () => {
         if (data.success) {
           syncPremiumCache(true);
           setStatus('success');
+
+          FirebaseAnalytics.logEvent({
+            name: 'purchase',
+            params: {
+              value: typeof data.total === 'number' ? data.total / 100 : undefined,
+              currency: data.currency ?? undefined,
+              ref: getAffiliateRef() ?? undefined,
+            },
+          }).catch(() => {});
         } else {
           setStatus('error');
         }

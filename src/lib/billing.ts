@@ -1,6 +1,7 @@
 "use client";
 
 import { Capacitor } from '@capacitor/core';
+import { FirebaseAnalytics } from '@capacitor-firebase/analytics';
 import { storage } from './storage';
 
 export const PREMIUM_PRODUCT_ID = 'premium_unlock';
@@ -79,6 +80,31 @@ export const resetPremiumCacheForTesting = async (): Promise<void> => {
   }
 };
 
+// Google Play charges in the buyer's local currency, so the purchase value
+// must come from the actual offer pricing at confirmation time rather than a
+// hardcoded amount/currency - the price lookup is best-effort so a lookup
+// failure never blocks the 'purchase' conversion event itself from firing.
+const logPlayPurchaseEvent = (store: any) => {
+  let value: number | undefined;
+  let currency: string | undefined;
+
+  try {
+    const product = store.get(PREMIUM_PRODUCT_ID);
+    const pricingPhase = product?.getOffer()?.pricingPhases?.[0];
+    if (typeof pricingPhase?.priceMicros === 'number') {
+      value = pricingPhase.priceMicros / 1_000_000;
+    }
+    currency = pricingPhase?.currency;
+  } catch {
+    // Fall through and log without value/currency.
+  }
+
+  FirebaseAnalytics.logEvent({
+    name: 'purchase',
+    params: { value, currency },
+  }).catch(() => {});
+};
+
 /**
  * Initializes the billing store and registers the premium product.
  */
@@ -105,6 +131,7 @@ export const initBilling = () => {
     store.when().verified((receipt: any) => {
       receipt.finish();
       syncPremiumCache(true);
+      logPlayPurchaseEvent(store);
     });
 
     store.initialize([Platform.GOOGLE_PLAY]);

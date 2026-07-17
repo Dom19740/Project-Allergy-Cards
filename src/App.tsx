@@ -10,6 +10,7 @@ import { Loader2 } from "lucide-react";
 import { storage, STORAGE_KEYS } from "./lib/storage";
 import { useDeepLinks } from "./hooks/useDeepLinks";
 import { initBilling } from "./lib/billing";
+import { captureAffiliateRef } from "./lib/affiliate";
 import { BillingProvider } from "./hooks/useBilling";
 import { FirebaseCrashlytics } from '@capacitor-firebase/crashlytics';
 import { FirebaseAnalytics } from '@capacitor-firebase/analytics';
@@ -83,6 +84,17 @@ const AppContent = () => {
           name: 'app_open',
           params: { platform: Capacitor.getPlatform() }
         });
+
+        // Affiliate tracking: only log a fresh "landing" event when ?ref= is
+        // actually present on this pageload (not on every subsequent app
+        // open) - the stored ref itself is still persisted for later use by
+        // the Lemon Squeezy checkout and the purchase event.
+        const urlRef = new URLSearchParams(window.location.search).get('ref');
+        const ref = captureAffiliateRef();
+        if (ref && urlRef) {
+          await FirebaseAnalytics.setUserProperty({ key: 'acquisition_ref', value: ref });
+          await FirebaseAnalytics.logEvent({ name: 'campaign_landing', params: { ref } });
+        }
       } catch (error) {
         console.error('Firebase initialization error:', error);
       }

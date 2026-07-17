@@ -48,6 +48,12 @@ dependencies {
     implementation platform('com.google.firebase:firebase-bom:33.10.0')
     implementation 'com.google.firebase:firebase-crashlytics'
     implementation 'com.google.firebase:firebase-analytics'
+
+    // Required for Firebase Analytics to reliably auto-capture the Google
+    // Play install referrer (affiliate ?ref= forwarded from the marketing
+    // site) and attribute installs/purchases to a campaign, since Play
+    // deprecated the old broadcast-receiver method.
+    implementation 'com.android.installreferrer:installreferrer:2.2'
 }
 
 apply from: 'capacitor.build.gradle'
