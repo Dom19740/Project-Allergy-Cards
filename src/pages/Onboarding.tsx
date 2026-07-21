@@ -3,6 +3,7 @@
 import React, { useState, useCallback, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import useEmblaCarousel from 'embla-carousel-react';
+import { motion, AnimatePresence } from 'framer-motion';
 import { Button } from '@/components/ui/button';
 import { storage, STORAGE_KEYS } from '@/lib/storage';
 import FixedHeader from '@/components/FixedHeader';
@@ -142,36 +143,42 @@ const Onboarding = () => {
               </Button>
             </div>
           ) : (
-            <div key="row-pair" className="w-full flex items-center justify-between gap-4">
-              {currentStep === 1 ? (
-                <Button
-                  key="skip"
-                  variant="outline"
-                  onClick={handleSkip}
-                  className="flex items-center justify-center py-3 px-8 h-auto min-w-[140px] rounded-xl bg-gray-100 dark:bg-gray-800 border-gray-300 dark:border-gray-600 text-gray-600 dark:text-gray-400 hover:bg-gray-200 dark:hover:bg-gray-700 hover:text-gray-900 dark:hover:text-gray-100"
-                >
-                  Skip
-                </Button>
-              ) : (
-                <Button
-                  key="back"
-                  variant="outline"
-                  onClick={handleBack}
-                  className="flex items-center justify-center py-3 px-8 h-auto min-w-[140px] rounded-xl bg-gray-100 dark:bg-gray-800 border-gray-300 dark:border-gray-600 text-gray-600 dark:text-gray-400 hover:bg-gray-200 dark:hover:bg-gray-700 hover:text-gray-900 dark:hover:text-gray-100"
-                >
-                  Back
-                </Button>
-              )}
+            <motion.div
+              layout
+              className={`w-full flex items-center gap-4 ${currentStep === 1 ? 'justify-center' : 'justify-between'}`}
+            >
+              <AnimatePresence mode="popLayout">
+                {currentStep !== 1 && (
+                  <motion.div
+                    key={currentStep === 2 ? 'skip' : 'back'}
+                    layout
+                    initial={{ opacity: 0, scale: 0.9 }}
+                    animate={{ opacity: 1, scale: 1 }}
+                    exit={{ opacity: 0, scale: 0.9 }}
+                    transition={{ duration: 0.2 }}
+                  >
+                    <Button
+                      variant="outline"
+                      onClick={currentStep === 2 ? handleSkip : handleBack}
+                      className="flex items-center justify-center py-3 px-8 h-auto min-w-[140px] rounded-xl bg-gray-100 dark:bg-gray-800 border-gray-300 dark:border-gray-600 text-gray-600 dark:text-gray-400 hover:bg-gray-200 dark:hover:bg-gray-700 hover:text-gray-900 dark:hover:text-gray-100"
+                    >
+                      {currentStep === 2 ? 'Skip' : 'Back'}
+                    </Button>
+                  </motion.div>
+                )}
+              </AnimatePresence>
 
-              <Button
-                key="continue"
-                variant="primary"
-                onClick={handleNext}
-                className="py-3 px-8 text-lg h-auto w-[180px] rounded-xl shadow-lg transition-transform active:scale-95 flex items-center justify-center"
-              >
-                {currentStep === ONBOARDING_STEPS.length - 1 ? 'Get Started' : 'Continue'}
-              </Button>
-            </div>
+              <motion.div layout>
+                <Button
+                  key="continue"
+                  variant="primary"
+                  onClick={handleNext}
+                  className="py-3 px-8 text-lg h-auto w-[180px] rounded-xl shadow-lg transition-transform active:scale-95 flex items-center justify-center"
+                >
+                  {currentStep === ONBOARDING_STEPS.length - 1 ? 'Get Started' : 'Continue'}
+                </Button>
+              </motion.div>
+            </motion.div>
           )}
         </div>
 
