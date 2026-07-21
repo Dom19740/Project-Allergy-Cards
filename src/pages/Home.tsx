@@ -89,7 +89,7 @@ const Home = () => {
                 animate={{ opacity: 1, y: 0 }}
                 exit={{ opacity: 0, y: 20 }}
                 transition={{ duration: 0.5 }}
-                className="w-full flex-shrink-0 mt-6 flex flex-col items-center"
+                className="w-full flex-shrink-0 mt-auto flex flex-col items-center"
               >
                 <div className="px-4 w-full">
                   <IOSInstallBanner visible={hasCards} />
@@ -119,7 +119,7 @@ const Home = () => {
 
               <button
                 onClick={() => setShowBackupDialog(true)}
-                className="text-xs font-bold text-gray-400 hover:text-red-600 underline"
+                className="text-[11px] font-bold text-gray-400 hover:text-red-600 uppercase tracking-wider"
               >
                 Restore from backup
               </button>

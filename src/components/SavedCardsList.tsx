@@ -142,7 +142,7 @@ const SavedCardsList = () => {
                         variant="ghost"
                         size="icon"
                         onClick={(e) => handleDelete(e, card)}
-                        className="h-10 w-10 text-gray-400 hover:text-red-500 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-full"
+                        className="h-10 w-10 -mt-2.5 -mr-3 text-gray-400 hover:text-red-500 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-full"
                       >
                         <Trash2 className="h-4 w-4" />
                       </Button>

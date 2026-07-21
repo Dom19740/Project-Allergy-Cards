@@ -8,11 +8,22 @@ import { createError, getRequestHeader, setResponseHeader } from "nitro/h3";
 // https://localhost regardless of which app it is - allowing it doesn't
 // grant meaningful extra access since none of these routes are
 // cookie/session-authenticated, and they're rate-limited independently.
-const ALLOWED_ORIGINS = new Set([
+const STATIC_ALLOWED_ORIGINS = [
   "https://simpleallergyalert.com",
   "https://app.simpleallergyalert.com",
   "https://localhost",
-]);
+];
+
+// Preview deployment origins aren't knowable ahead of time - Vercel exposes
+// the current deployment's own host at runtime via VERCEL_URL (this exact
+// deployment) and VERCEL_BRANCH_URL (the stable per-branch preview alias),
+// so trust those too instead of hardcoding every preview URL that'll ever
+// exist. Both are plain hostnames with no protocol.
+const dynamicAllowedOrigins = [process.env.VERCEL_URL, process.env.VERCEL_BRANCH_URL]
+  .filter((host): host is string => !!host)
+  .map((host) => `https://${host}`);
+
+const ALLOWED_ORIGINS = new Set([...STATIC_ALLOWED_ORIGINS, ...dynamicAllowedOrigins]);
 
 // Same-origin navigations and non-browser clients (curl, health checks)
 // often don't send an Origin header at all, so absence is allowed through.
