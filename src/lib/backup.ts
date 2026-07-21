@@ -23,8 +23,10 @@ const isValidSavedCard = (value: any): value is SavedCard =>
   typeof value.createdAt === 'number';
 
 const buildBackupFile = async (): Promise<{ fileName: string; json: string }> => {
-  const savedCards = (await storage.get<SavedCard[]>(STORAGE_KEYS.SAVED_CARDS)) || [];
-  const emergencyCard = await storage.get<SavedCard>(STORAGE_KEYS.SAVED_EMERGENCY_CARD);
+  const [savedCards, emergencyCard] = await Promise.all([
+    storage.get<SavedCard[]>(STORAGE_KEYS.SAVED_CARDS).then((cards) => cards || []),
+    storage.get<SavedCard>(STORAGE_KEYS.SAVED_EMERGENCY_CARD),
+  ]);
 
   const payload: BackupPayload = {
     version: BACKUP_VERSION,
@@ -95,8 +97,13 @@ export const shareBackup = async (): Promise<void> => {
     return;
   }
 
-  const blob = new Blob([json], { type: 'application/json' });
-  const file = new File([blob], fileName, { type: 'application/json' });
+  // Chrome's Web Share API only accepts files whose MIME type is on its
+  // allowlist (text/plain, application/pdf, images, etc.) - application/json
+  // isn't included, so share() can reject the file even after canShare()
+  // returned true for it. text/plain is accepted and doesn't affect how the
+  // file reads back in - importBackup() just parses the text as JSON.
+  const blob = new Blob([json], { type: 'text/plain' });
+  const file = new File([blob], fileName, { type: 'text/plain' });
   const shareData = { title: 'Allergy Cards Backup', files: [file] };
 
   if (!navigator.canShare?.(shareData)) {

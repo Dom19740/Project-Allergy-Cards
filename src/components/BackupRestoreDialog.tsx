@@ -24,7 +24,8 @@ const BackupRestoreDialog: React.FC<BackupRestoreDialogProps> = ({ isOpen, onClo
     setIsBusy(true);
     try {
       await downloadBackup();
-    } catch {
+    } catch (error) {
+      console.error('Backup download failed:', error);
       toast.error('Could not save your backup. Please try again.');
     } finally {
       setIsBusy(false);
@@ -35,7 +36,8 @@ const BackupRestoreDialog: React.FC<BackupRestoreDialogProps> = ({ isOpen, onClo
     setIsBusy(true);
     try {
       await shareBackup();
-    } catch {
+    } catch (error) {
+      console.error('Backup share failed:', error);
       toast.error('Could not share your backup. Please try again.');
     } finally {
       setIsBusy(false);
