@@ -5,7 +5,7 @@ import { useNavigate } from 'react-router-dom';
 import useEmblaCarousel from 'embla-carousel-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
-import { Trash2, Clock, AlertTriangle } from 'lucide-react';
+import { Trash2, Clock, AlertTriangle, Shield } from 'lucide-react';
 import { SavedCard } from '@/lib/types';
 import { toast } from 'sonner';
 import { storage, STORAGE_KEYS } from '@/lib/storage';
@@ -13,12 +13,15 @@ import { cn } from '@/lib/utils';
 import { computeContentSignature } from '@/lib/customMessages';
 import { useBilling } from '@/hooks/useBilling';
 import { getLanguageName } from '@/lib/supportedLanguages';
+import { Capacitor } from '@capacitor/core';
+import BackupRestoreDialog from '@/components/BackupRestoreDialog';
 
 const SavedCardsList = () => {
   const navigate = useNavigate();
   const { isPremium } = useBilling();
   const [allCards, setAllCards] = useState<SavedCard[]>([]);
   const [selectedIndex, setSelectedIndex] = useState(0);
+  const [showBackupDialog, setShowBackupDialog] = useState(false);
   
   const [emblaRef, emblaApi] = useEmblaCarousel({
     loop: false,
@@ -100,11 +103,22 @@ const SavedCardsList = () => {
 
   return (
     <div className="w-full flex flex-col items-start mt-1">
-      <div className="w-full mb-1 px-8">
+      <div className="w-full mb-1 px-8 flex items-center justify-between">
         <h3 className="text-[14px] font-bold text-gray-400 uppercase tracking-widest">
           Saved Cards
         </h3>
+        {Capacitor.getPlatform() === 'web' && (
+          <button
+            onClick={() => setShowBackupDialog(true)}
+            className="flex items-center gap-1 text-[11px] font-bold text-gray-400 hover:text-red-600 uppercase tracking-wider"
+          >
+            <Shield className="w-3 h-3" />
+            Backup
+          </button>
+        )}
       </div>
+
+      <BackupRestoreDialog isOpen={showBackupDialog} onClose={() => setShowBackupDialog(false)} />
 
       <div className="w-full flex items-center justify-center gap-2 px-4">
         <div className="w-full max-w-[280px] h-[110px] overflow-hidden cursor-grab active:cursor-grabbing" ref={emblaRef}>

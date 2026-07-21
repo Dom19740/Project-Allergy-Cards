@@ -69,6 +69,11 @@ const AppContent = () => {
     // Initialize billing system
     initBilling();
 
+    // Reduce the chance Safari auto-evicts saved cards after inactivity.
+    if (Capacitor.getPlatform() === 'web' && navigator.storage?.persist) {
+      navigator.storage.persist();
+    }
+
     // Affiliate ref capture must not depend on Firebase Analytics succeeding
     // - an ad blocker or missing config can make every FirebaseAnalytics call
     // below throw, and this write is the load-bearing one for payout

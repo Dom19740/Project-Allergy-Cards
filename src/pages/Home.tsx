@@ -5,6 +5,7 @@ import { useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import FixedHeader from '@/components/FixedHeader';
 import SavedCardsList from '@/components/SavedCardsList';
+import IOSInstallBanner from '@/components/IOSInstallBanner';
 import { storage, STORAGE_KEYS } from '@/lib/storage';
 import { SavedCard } from '@/lib/types';
 import { useBilling } from '@/hooks/useBilling';
@@ -88,6 +89,9 @@ const Home = () => {
                 transition={{ duration: 0.5 }}
                 className="w-full flex-shrink-0"
               >
+                <div className="px-4">
+                  <IOSInstallBanner visible={hasCards} />
+                </div>
                 <SavedCardsList />
               </motion.div>
             )}

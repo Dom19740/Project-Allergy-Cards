@@ -13,6 +13,7 @@ export const STORAGE_KEYS = {
   PREFERENCES_LOCK: 'preferencesLock',
   VERIFIED_EMERGENCY_NUMBER: 'verifiedEmergencyNumber',
   OPEN_EMERGENCY_DIALOG_FLAG: 'openEmergencyDialogFlag',
+  IOS_BANNER_DISMISSED: 'iosInstallBannerDismissed',
 };
 
 export const storage = {
