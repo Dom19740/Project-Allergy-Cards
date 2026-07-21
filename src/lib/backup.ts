@@ -1,6 +1,7 @@
 import { Capacitor } from '@capacitor/core';
 import { Filesystem, Directory, Encoding } from '@capacitor/filesystem';
 import { Clipboard } from '@capacitor/clipboard';
+import { Share } from '@capacitor/share';
 import { storage, STORAGE_KEYS } from '@/lib/storage';
 import { SavedCard } from '@/lib/types';
 
@@ -60,13 +61,26 @@ export const downloadBackup = async (): Promise<void> => {
   const { fileName, json } = await buildBackupFile();
 
   if (Capacitor.isNativePlatform()) {
-    await Filesystem.writeFile({
+    // Directory.Documents is scoped-storage-hidden on modern Android targets
+    // (writes "succeed" into a folder the user can never actually find), so
+    // write to the always-accessible cache dir and hand it to the OS share
+    // sheet instead - the same working pattern shareCard() already uses.
+    const savedFile = await Filesystem.writeFile({
       path: fileName,
       data: json,
-      directory: Directory.Documents,
+      directory: Directory.Cache,
       encoding: Encoding.UTF8,
-      recursive: true,
     });
+
+    try {
+      await Share.share({
+        title: 'Allergy Cards Backup',
+        url: savedFile.uri,
+      });
+    } catch (error) {
+      if ((error as any)?.code === 'UA') return; // user cancelled the share sheet
+      throw error;
+    }
     return;
   }
 
