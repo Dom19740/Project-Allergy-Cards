@@ -37,7 +37,12 @@ const BackupRestoreDialog: React.FC<BackupRestoreDialogProps> = ({ isOpen, onClo
     try {
       await shareBackup();
     } catch (error) {
-      console.error('Backup share failed:', error);
+      // NotAllowedError from navigator.share() can mean either "no user
+      // activation" or "Permissions-Policy denies web-share" - this check
+      // tells the two apart in the logged diagnostics without needing
+      // devtools access.
+      const policyAllowed = (document as any).featurePolicy?.allowsFeature?.('web-share');
+      console.error('Backup share failed:', error, { webSharePermissionsPolicyAllowed: policyAllowed });
       toast.error('Could not share your backup. Please try again.');
     } finally {
       setIsBusy(false);
