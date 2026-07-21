@@ -25,6 +25,7 @@ dist-ssr
 .history/
 .dyad/
 .env
+.claude/settings.local.json
 
 # Test tooling output
 coverage/

@@ -22,12 +22,7 @@ const isValidSavedCard = (value: any): value is SavedCard =>
   typeof value.languageCode === 'string' &&
   typeof value.createdAt === 'number';
 
-const buildBackupFile = async (): Promise<{ fileName: string; json: string }> => {
-  const [savedCards, emergencyCard] = await Promise.all([
-    storage.get<SavedCard[]>(STORAGE_KEYS.SAVED_CARDS).then((cards) => cards || []),
-    storage.get<SavedCard>(STORAGE_KEYS.SAVED_EMERGENCY_CARD),
-  ]);
-
+const buildPayload = (savedCards: SavedCard[], emergencyCard: SavedCard | null): { fileName: string; json: string } => {
   const payload: BackupPayload = {
     version: BACKUP_VERSION,
     exportedAt: new Date().toISOString(),
@@ -39,6 +34,25 @@ const buildBackupFile = async (): Promise<{ fileName: string; json: string }> =>
     fileName: `allergy-cards-backup-${new Date().toISOString().slice(0, 10)}.json`,
     json: JSON.stringify(payload, null, 2),
   };
+};
+
+const buildBackupFile = async (): Promise<{ fileName: string; json: string }> => {
+  const [savedCards, emergencyCard] = await Promise.all([
+    storage.get<SavedCard[]>(STORAGE_KEYS.SAVED_CARDS).then((cards) => cards || []),
+    storage.get<SavedCard>(STORAGE_KEYS.SAVED_EMERGENCY_CARD),
+  ]);
+
+  return buildPayload(savedCards, emergencyCard);
+};
+
+// Synchronous counterpart of buildBackupFile(), for callers that can't
+// afford even one microtask of delay before their next step (see
+// shareBackup()'s web path below).
+const buildBackupFileSync = (): { fileName: string; json: string } => {
+  const savedCards = storage.getSyncWeb<SavedCard[]>(STORAGE_KEYS.SAVED_CARDS) || [];
+  const emergencyCard = storage.getSyncWeb<SavedCard>(STORAGE_KEYS.SAVED_EMERGENCY_CARD);
+
+  return buildPayload(savedCards, emergencyCard);
 };
 
 const downloadBlob = (json: string, fileName: string) => {
@@ -75,9 +89,8 @@ export const downloadBackup = async (): Promise<void> => {
 };
 
 export const shareBackup = async (): Promise<void> => {
-  const { fileName, json } = await buildBackupFile();
-
   if (Capacitor.isNativePlatform()) {
+    const { fileName, json } = await buildBackupFile();
     try {
       const savedFile = await Filesystem.writeFile({
         path: fileName,
@@ -96,6 +109,14 @@ export const shareBackup = async (): Promise<void> => {
     }
     return;
   }
+
+  // navigator.share() must run with no `await` between the click and this
+  // call, or Chrome rejects it with "NotAllowedError: Permission denied"
+  // even when canShare() said yes - transient user activation doesn't
+  // survive a trip through the async Preferences bridge (confirmed live on
+  // a Vercel preview: the async buildBackupFile() version threw exactly
+  // this). Read localStorage directly and synchronously instead.
+  const { fileName, json } = buildBackupFileSync();
 
   // Chrome's Web Share API only accepts files whose MIME type is on its
   // allowlist (text/plain, application/pdf, images, etc.) - application/json
