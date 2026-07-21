@@ -2,6 +2,7 @@
 
 import React, { useState, useEffect, useRef } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
+import { motion } from 'framer-motion';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { toast } from 'sonner';
@@ -143,7 +144,12 @@ const AllergenSelectionPage = () => {
       <FixedHeader />
 
       <div className="flex flex-col flex-grow w-full max-w-2xl mx-auto px-4 pt-[calc(80px+env(safe-area-inset-top)+10px)]">
-        <div className="flex-grow pt-1">
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ duration: 0.2, ease: "easeOut" }}
+          className="flex-grow pt-1"
+        >
           <StepHeader
             title="Select Allergens"
             description="Tap the allergens you want to include on your card."
@@ -231,7 +237,7 @@ const AllergenSelectionPage = () => {
               </button>
             )}
           </div>
-        </div>
+        </motion.div>
 
         {blockedOffline && (
           <div className="mx-auto max-w-md mt-4 p-4 bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-800 rounded-xl flex items-center gap-3 text-amber-800 dark:text-amber-200 text-center shrink-0">
@@ -246,7 +252,7 @@ const AllergenSelectionPage = () => {
           <Button
             variant="outline"
             onClick={() => navigate(-1)}
-            className="flex items-center justify-center py-3 px-8 h-auto min-w-[140px] rounded-xl bg-white dark:bg-transparent border-gray-300 dark:border-gray-600 text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-800 hover:text-gray-900 dark:hover:text-gray-100"
+            className="flex items-center justify-center py-3 px-8 h-auto min-w-[140px] rounded-xl bg-gray-100 dark:bg-gray-800 border-gray-300 dark:border-gray-600 text-gray-600 dark:text-gray-400 hover:bg-gray-200 dark:hover:bg-gray-700 hover:text-gray-900 dark:hover:text-gray-100"
           >
             Back
           </Button>
@@ -254,7 +260,7 @@ const AllergenSelectionPage = () => {
             onClick={handleContinue}
             disabled={selectedAllergens.length === 0 || blockedOffline}
             variant="primary"
-            className="py-3 px-8 text-lg h-auto min-w-[140px] rounded-xl shadow-lg transition-transform active:scale-95 flex items-center"
+            className="py-3 px-8 text-lg h-auto w-[180px] rounded-xl shadow-lg transition-transform active:scale-95 flex items-center justify-center"
           >
             Continue
           </Button>

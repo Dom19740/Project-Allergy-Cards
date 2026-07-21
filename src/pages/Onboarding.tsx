@@ -1,10 +1,11 @@
 "use client";
 
 import React, { useState, useCallback, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 import useEmblaCarousel from 'embla-carousel-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Button } from '@/components/ui/button';
+import { storage, STORAGE_KEYS } from '@/lib/storage';
 import FixedHeader from '@/components/FixedHeader';
 import OnboardingStep from '@/components/OnboardingStep';
 
@@ -52,13 +53,30 @@ const ONBOARDING_STEPS = [
     title: "Know Your Card",
     description: "Open the menu on any card to understand all the features.",
     image: "/images/screenshot_7.png"
+  },
+  {
+    title: "Unlock Premium",
+    description: "Unlock every feature: more languages, custom allergens and alerts, saved cards, and the home screen widget."
   }
 ];
 
 const Onboarding = () => {
   const [currentStep, setCurrentStep] = useState(0);
+  // Whether the user has ever clicked all the way through to the end of
+  // onboarding before. Until they have, the Intro step's secondary button is
+  // "Back" instead of "Skip", so a first-time viewer can't skip out of the
+  // walkthrough early - only after finishing it once does Skip become
+  // available on later visits (onboarding now shows on every "Get Started").
+  const [hasCompletedBefore, setHasCompletedBefore] = useState(false);
   const navigate = useNavigate();
+  const location = useLocation();
   const [emblaRef, emblaApi] = useEmblaCarousel({ loop: false });
+
+  useEffect(() => {
+    storage.get<string | boolean>(STORAGE_KEYS.HAS_COMPLETED_ONBOARDING).then((value) => {
+      setHasCompletedBefore(value === 'true' || value === true);
+    });
+  }, []);
 
   const onSelect = useCallback(() => {
     if (!emblaApi) return;
@@ -67,16 +85,24 @@ const Onboarding = () => {
 
   useEffect(() => {
     if (!emblaApi) return;
+    // Coming back from Premium Onboarding's Back button - resume at the last
+    // slide instead of restarting the carousel from the beginning.
+    if ((location.state as { jumpToEnd?: boolean } | null)?.jumpToEnd) {
+      emblaApi.scrollTo(ONBOARDING_STEPS.length - 1, true);
+    }
     onSelect();
     emblaApi.on('select', onSelect);
     emblaApi.on('reInit', onSelect);
-  }, [emblaApi, onSelect]);
+  }, [emblaApi, onSelect, location.state]);
 
-  const handleNext = () => {
+  const handleNext = async () => {
     if (currentStep < ONBOARDING_STEPS.length - 1) {
       emblaApi?.scrollNext();
     } else {
-      navigate('/premium-onboarding');
+      // Unlock Premium is the final carousel slide itself, so finishing here
+      // goes straight to card creation instead of hopping to another route.
+      await storage.set(STORAGE_KEYS.HAS_COMPLETED_ONBOARDING, true);
+      navigate('/select-allergens');
     }
   };
 
@@ -91,27 +117,38 @@ const Onboarding = () => {
   };
 
   const handleSkip = () => {
-    navigate('/premium-onboarding');
+    navigate('/select-allergens');
   };
+
+  // Skip only ever shows on the Intro step, and only once the user has
+  // completed onboarding at least once before - see hasCompletedBefore above.
+  const showSkip = currentStep === 2 && hasCompletedBefore;
 
   return (
     <div className="flex flex-col h-screen bg-gray-100 dark:bg-gray-900 overflow-hidden">
       <FixedHeader />
       
       <div className="flex flex-col flex-grow w-full max-w-2xl mx-auto px-4 pt-[calc(80px+env(safe-area-inset-top)+10px)] overflow-hidden">
-        <div className="flex-grow overflow-hidden pt-4 cursor-grab active:cursor-grabbing" ref={emblaRef}>
-          <div className="flex h-full">
-            {ONBOARDING_STEPS.map((step, index) => (
-              <div key={index} className="flex-[0_0_100%] min-w-0 px-4 h-full">
-                <OnboardingStep 
-                  title={step.title}
-                  description={step.description}
-                  image={step.image}
-                />
-              </div>
-            ))}
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ duration: 0.2, ease: "easeOut" }}
+          className="flex-grow overflow-hidden"
+        >
+          <div className="h-full overflow-hidden pt-4 cursor-grab active:cursor-grabbing" ref={emblaRef}>
+            <div className="flex h-full">
+              {ONBOARDING_STEPS.map((step, index) => (
+                <div key={index} className="flex-[0_0_100%] min-w-0 px-4 h-full">
+                  <OnboardingStep
+                    title={step.title}
+                    description={step.description}
+                    image={step.image}
+                  />
+                </div>
+              ))}
+            </div>
           </div>
-        </div>
+        </motion.div>
 
         <div className="w-full flex flex-col items-center mt-auto mb-[calc(12px+env(safe-area-inset-bottom))] space-y-6 shrink-0">
           <div className="flex space-x-2">
@@ -146,7 +183,7 @@ const Onboarding = () => {
               <AnimatePresence mode="popLayout">
                 {currentStep !== 1 && (
                   <motion.div
-                    key={currentStep === 2 ? 'skip' : 'back'}
+                    key={showSkip ? 'skip' : 'back'}
                     layout
                     initial={{ opacity: 0, scale: 0.9 }}
                     animate={{ opacity: 1, scale: 1 }}
@@ -155,10 +192,10 @@ const Onboarding = () => {
                   >
                     <Button
                       variant="outline"
-                      onClick={currentStep === 2 ? handleSkip : handleBack}
+                      onClick={showSkip ? handleSkip : handleBack}
                       className="flex items-center justify-center py-3 px-8 h-auto min-w-[140px] rounded-xl bg-gray-100 dark:bg-gray-800 border-gray-300 dark:border-gray-600 text-gray-600 dark:text-gray-400 hover:bg-gray-200 dark:hover:bg-gray-700 hover:text-gray-900 dark:hover:text-gray-100"
                     >
-                      {currentStep === 2 ? 'Skip' : 'Back'}
+                      {showSkip ? 'Skip' : 'Back'}
                     </Button>
                   </motion.div>
                 )}
@@ -171,7 +208,7 @@ const Onboarding = () => {
                   onClick={handleNext}
                   className="py-3 px-8 text-lg h-auto w-[180px] rounded-xl shadow-lg transition-transform active:scale-95 flex items-center justify-center"
                 >
-                  {currentStep === ONBOARDING_STEPS.length - 1 ? 'Get Started' : 'Continue'}
+                  Continue
                 </Button>
               </motion.div>
             </motion.div>

@@ -14,7 +14,12 @@ test.describe("premium gating", () => {
     await expect(addButton).toBeDisabled();
 
     await page.getByRole("button", { name: "Unlock custom allergens" }).click();
-    await expect(page).toHaveURL(/\/premium-onboarding/);
+    // /premium-onboarding redirects into the onboarding carousel at its
+    // Unlock Premium slide - it's no longer a standalone page. The redirect
+    // plus embla's jump-to-slide both need a beat to settle before asserting.
+    await expect(page).toHaveURL(/\/onboarding/);
+    await page.waitForTimeout(800);
+    await expect(page.getByRole("heading", { name: "Unlock Premium" })).toBeInViewport({ timeout: 10_000 });
   });
 
   test("non-free languages are locked for a free user and show an upgrade prompt instead of being selected", async ({ page }) => {

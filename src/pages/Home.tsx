@@ -28,11 +28,11 @@ const Home = () => {
 
   useEffect(() => {
     checkCards();
-    
+
     const handleStorageChange = () => checkCards();
     window.addEventListener('storage', handleStorageChange);
     window.addEventListener('storage-update', handleStorageChange);
-    
+
     return () => {
       window.removeEventListener('storage', handleStorageChange);
       window.removeEventListener('storage-update', handleStorageChange);
@@ -59,7 +59,12 @@ const Home = () => {
     <div className="relative flex flex-col h-[100dvh] bg-gray-100 dark:bg-gray-900 overflow-hidden">
       <FixedHeader />
       <div className="flex flex-col flex-1 w-full max-w-2xl mx-auto px-6 pt-[calc(100px+env(safe-area-inset-top))] min-h-0">
-        <div className="flex-1 flex flex-col items-center justify-center text-center min-h-0 py-4 gap-8 md:gap-12">
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ duration: 0.2, ease: "easeOut" }}
+          className="flex-1 flex flex-col items-center justify-center text-center min-h-0 py-4 gap-8 md:gap-12"
+        >
 
           <div className="w-full space-y-4 mt-4 flex-shrink-0">
             <h1 className="text-3xl md:text-4xl font-black text-gray-900 dark:text-white tracking-tight leading-tight">
@@ -102,7 +107,7 @@ const Home = () => {
               </motion.div>
             )}
           </AnimatePresence>
-        </div>
+        </motion.div>
 
         <div className="flex-shrink-0 w-full flex flex-col justify-center items-center gap-2 mt-auto mb-[calc(12px+env(safe-area-inset-bottom))]">
           {!hasCards && (

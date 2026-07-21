@@ -4,6 +4,7 @@ import React from 'react';
 import { AlertCircle } from 'lucide-react';
 import SafetyDisclaimer from '@/components/SafetyDisclaimer';
 import InstallChoiceStep from '@/components/InstallChoiceStep';
+import PremiumOfferStep from '@/components/PremiumOfferStep';
 import { useShrinkToFit } from '@/hooks/useShrinkToFit';
 
 interface OnboardingStepProps {
@@ -15,7 +16,8 @@ interface OnboardingStepProps {
 const OnboardingStep: React.FC<OnboardingStepProps> = ({ title, description, image }) => {
   const hasDisclaimer = title === "Safety First";
   const hasInstallChoice = title === "Keep Your Cards Safe";
-  const hasCustomContent = hasDisclaimer || hasInstallChoice;
+  const hasPremiumOffer = title === "Unlock Premium";
+  const hasCustomContent = hasDisclaimer || hasInstallChoice || hasPremiumOffer;
   const { containerRef, contentRef } = useShrinkToFit<HTMLDivElement, HTMLDivElement>();
 
   return (
@@ -36,8 +38,10 @@ const OnboardingStep: React.FC<OnboardingStepProps> = ({ title, description, ima
                     <SafetyDisclaimer />
                   </div>
                 </>
-              ) : (
+              ) : hasInstallChoice ? (
                 <InstallChoiceStep />
+              ) : (
+                <PremiumOfferStep />
               )}
             </div>
           </div>

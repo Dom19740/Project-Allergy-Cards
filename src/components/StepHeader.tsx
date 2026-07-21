@@ -5,7 +5,7 @@ import { LucideIcon } from 'lucide-react';
 import SafetyDisclaimer from '@/components/SafetyDisclaimer';
 
 interface StepHeaderProps {
-  title: string;
+  title: React.ReactNode;
   description: string;
   icon?: LucideIcon;
 }

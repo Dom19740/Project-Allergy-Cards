@@ -13,6 +13,7 @@ export const STORAGE_KEYS = {
   VERIFIED_EMERGENCY_NUMBER: 'verifiedEmergencyNumber',
   OPEN_EMERGENCY_DIALOG_FLAG: 'openEmergencyDialogFlag',
   INSTALL_BANNER_DISMISSED: 'installBannerDismissed',
+  HAS_COMPLETED_ONBOARDING: 'hasCompletedOnboarding',
 };
 
 export const storage = {

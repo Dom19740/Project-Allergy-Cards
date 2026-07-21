@@ -2,6 +2,7 @@
 
 import React, { useState, useEffect } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
+import { motion } from "framer-motion";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Button } from "@/components/ui/button";
 import { Crown, Lock, BadgeCheck } from "lucide-react";
@@ -113,8 +114,13 @@ const LanguageSelectionPage = () => {
     <div className="flex flex-col min-h-screen bg-gray-100 dark:bg-gray-900">
       <FixedHeader />
       <div className="flex flex-col flex-grow w-full max-w-2xl mx-auto px-4 pt-[calc(80px+env(safe-area-inset-top)+10px)]">
-        <div className="flex-grow pt-2">
-          <StepHeader 
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ duration: 0.2, ease: "easeOut" }}
+          className="flex-grow pt-2"
+        >
+          <StepHeader
             title="Choose a Language"
             description={isPremium ? "Select any language for your card." : "Select from our free languages or upgrade to unlock all 100+."}
           />
@@ -187,13 +193,13 @@ const LanguageSelectionPage = () => {
               )}
             </div>
           </div>
-        </div>
-        
+        </motion.div>
+
         <div className="w-full flex justify-between items-center mt-auto mb-[calc(12px+env(safe-area-inset-bottom))] gap-4 shrink-0">
           <Button
             variant="outline"
             onClick={() => navigate(-1)}
-            className="flex items-center justify-center py-3 px-8 h-auto min-w-[140px] rounded-xl bg-white dark:bg-transparent border-gray-300 dark:border-gray-600 text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-800 hover:text-gray-900 dark:hover:text-gray-100"
+            className="flex items-center justify-center py-3 px-8 h-auto min-w-[140px] rounded-xl bg-gray-100 dark:bg-gray-800 border-gray-300 dark:border-gray-600 text-gray-600 dark:text-gray-400 hover:bg-gray-200 dark:hover:bg-gray-700 hover:text-gray-900 dark:hover:text-gray-100"
           >
             Back
           </Button>
@@ -201,7 +207,7 @@ const LanguageSelectionPage = () => {
             onClick={handleContinue}
             disabled={!selectedLanguageCode}
             variant="primary"
-            className="py-3 px-8 text-lg h-auto min-w-[140px] rounded-xl shadow-lg transition-transform active:scale-95 flex items-center"
+            className="py-3 px-8 text-lg h-auto w-[180px] rounded-xl shadow-lg transition-transform active:scale-95 flex items-center justify-center"
           >
             Continue
           </Button>
