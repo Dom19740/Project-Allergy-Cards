@@ -1,5 +1,6 @@
 import { Capacitor } from '@capacitor/core';
 import { Filesystem, Directory, Encoding } from '@capacitor/filesystem';
+import { Clipboard } from '@capacitor/clipboard';
 import { storage, STORAGE_KEYS } from '@/lib/storage';
 import { SavedCard } from '@/lib/types';
 
@@ -112,6 +113,14 @@ export const importBackup = async (file: File, maxSavedCards: number): Promise<{
 export const copyBackupToClipboard = async (): Promise<void> => {
   const { json } = await buildBackupFile();
 
+  // The web Clipboard API isn't reliable inside Capacitor's Android WebView
+  // (permission prompts it can't surface properly), so native platforms use
+  // the dedicated Capacitor plugin, which talks to the OS clipboard directly.
+  if (Capacitor.isNativePlatform()) {
+    await Clipboard.write({ string: json });
+    return;
+  }
+
   if (!navigator.clipboard?.writeText) {
     await downloadBackup();
     return;
@@ -121,15 +130,24 @@ export const copyBackupToClipboard = async (): Promise<void> => {
 };
 
 export const importBackupFromClipboard = async (maxSavedCards: number): Promise<{ importedCards: number; importedEmergency: boolean }> => {
-  if (!navigator.clipboard?.readText) {
-    throw new Error("This browser can't read the clipboard - use Restore from backup instead.");
-  }
-
   let text: string;
-  try {
-    text = await navigator.clipboard.readText();
-  } catch {
-    throw new Error("Couldn't read the clipboard - use Restore from backup instead.");
+
+  if (Capacitor.isNativePlatform()) {
+    try {
+      const result = await Clipboard.read();
+      text = result.value;
+    } catch {
+      throw new Error("Couldn't read the clipboard - use Restore from backup instead.");
+    }
+  } else {
+    if (!navigator.clipboard?.readText) {
+      throw new Error("This browser can't read the clipboard - use Restore from backup instead.");
+    }
+    try {
+      text = await navigator.clipboard.readText();
+    } catch {
+      throw new Error("Couldn't read the clipboard - use Restore from backup instead.");
+    }
   }
 
   return applyBackupText(text, maxSavedCards);

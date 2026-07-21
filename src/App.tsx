@@ -161,7 +161,12 @@ const App = () => (
     <BillingProvider>
       <TooltipProvider>
         <Toaster />
-        <Sonner duration={2000} />
+        <Sonner
+          duration={2000}
+          position="top-center"
+          offset={{ top: "calc(env(safe-area-inset-top) + 90px)" }}
+          mobileOffset={{ top: "calc(env(safe-area-inset-top) + 90px)" }}
+        />
         <BrowserRouter>
           <AppContent />
         </BrowserRouter>
