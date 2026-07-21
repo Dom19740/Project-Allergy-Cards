@@ -61,5 +61,9 @@ test.describe("onboarding install-choice step", () => {
 
     await expect(page.getByText(/Everything stays local to this browser/)).toBeVisible();
     await expect(page.getByRole("link", { name: "Get it on Google Play" })).toHaveCount(0);
+    // Desktop was never offered an install path, so the closing line should
+    // recommend switching device/browser instead of "keep using it in browser".
+    await expect(page.getByText(/we recommend using Google Play on Android or Safari on iPhone/)).toBeVisible();
+    await expect(page.getByText(/You can also keep using it right in your browser/)).toHaveCount(0);
   });
 });

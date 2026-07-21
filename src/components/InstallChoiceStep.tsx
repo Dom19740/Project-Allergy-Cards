@@ -53,12 +53,20 @@ const InstallChoiceStep = () => {
           </p>
         </div>
       ) : (
-        <p>Everything stays local to this browser - no account, no server, no upload.</p>
+        <p>Everything stays local to this browser - no account, no server, no upload. Backup your cards regularly to avoid losing them.</p>
       )}
 
-      <p className="text-sm text-gray-400">
-        You can also keep using it right in your browser - tap Continue when you're ready.
-      </p>
+      {!isNative && (
+        os === null ? (
+          <p className="text-sm text-gray-400">
+            For safer storage, we recommend using Google Play on Android or Safari on iPhone instead.
+          </p>
+        ) : (
+          <p className="text-sm text-gray-400">
+            You can also keep using it right in your browser - tap Continue.
+          </p>
+        )
+      )}
     </div>
   );
 };
