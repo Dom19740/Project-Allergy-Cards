@@ -19,7 +19,7 @@ const benefits = [
   { icon: ShieldAlert, title: "Custom Allergens" },
   { icon: MessageSquare, title: "Custom Alerts" },
   { icon: Save, title: "Save Multiple Cards" },
-  { icon: Smartphone, title: "Home Screen Widget (Android Only)" },
+  { icon: Smartphone, title: "Home Screen Widget", note: "(Android Only)" },
 ];
 
 // The content of the "Unlock Premium" onboarding step - shared between the
@@ -120,13 +120,14 @@ const PremiumOfferStep = () => {
         {benefits.map((benefit, index) => (
           <div
             key={index}
-            className="flex items-center space-x-3 p-2 bg-white dark:bg-gray-800 rounded-xl border border-gray-100 dark:border-gray-700 text-left shadow-sm"
+            className="flex items-center space-x-3 py-1.5 px-2 bg-white dark:bg-gray-800 rounded-xl border border-gray-100 dark:border-gray-700 text-left shadow-sm"
           >
-            <div className="bg-red-50 dark:bg-red-900/20 p-2 rounded-lg shrink-0">
-              <benefit.icon className="h-6 w-6 text-red-600" />
-            </div>
+            <benefit.icon className="h-6 w-6 text-red-600 shrink-0" />
             <div className="flex-grow">
-              <h3 className="font-semibold text-gray-900 dark:text-white text-sm whitespace-nowrap">{benefit.title}</h3>
+              <h3 className="font-semibold text-gray-900 dark:text-white text-sm">
+                {benefit.title}
+                {benefit.note && <> <span className="whitespace-nowrap">{benefit.note}</span></>}
+              </h3>
             </div>
             <Check className="h-3.5 w-3.5 text-green-500" />
           </div>

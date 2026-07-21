@@ -67,7 +67,7 @@ const ProtectCardsDialog: React.FC<ProtectCardsDialogProps> = ({ visible }) => {
 
         <p className="text-sm text-gray-500 dark:text-gray-400 mb-4">
           {os === 'android'
-            ? "Cards saved in your browser can be lost if you clear browsing data. The app on Google Play keeps its own separate, protected copy - but it starts empty, so back up first and restore inside the app."
+            ? "Cards saved in your browser can be lost if you clear browsing data. The Google Play app keeps its own separate, protected copy - but it starts empty, so back up first and restore inside the app."
             : "Cards saved in your browser can be lost if you clear browsing data. Adding this app to your Home Screen keeps a separate, protected copy - but it starts empty, so back up first and restore inside the installed app."}
         </p>
 
