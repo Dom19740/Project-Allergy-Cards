@@ -3,9 +3,9 @@
 import React, { useRef, useState } from 'react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
-import { Download, Share2, Upload } from 'lucide-react';
+import { Download, Upload } from 'lucide-react';
 import { toast } from 'sonner';
-import { downloadBackup, shareBackup, importBackup } from '@/lib/backup';
+import { downloadBackup, importBackup } from '@/lib/backup';
 import { useBilling } from '@/hooks/useBilling';
 import { PREMIUM_LIMITS } from '@/lib/premium-config';
 
@@ -27,23 +27,6 @@ const BackupRestoreDialog: React.FC<BackupRestoreDialogProps> = ({ isOpen, onClo
     } catch (error) {
       console.error('Backup download failed:', error);
       toast.error('Could not save your backup. Please try again.');
-    } finally {
-      setIsBusy(false);
-    }
-  };
-
-  const handleShare = async () => {
-    setIsBusy(true);
-    try {
-      await shareBackup();
-    } catch (error) {
-      // NotAllowedError from navigator.share() can mean either "no user
-      // activation" or "Permissions-Policy denies web-share" - this check
-      // tells the two apart in the logged diagnostics without needing
-      // devtools access.
-      const policyAllowed = (document as any).featurePolicy?.allowsFeature?.('web-share');
-      console.error('Backup share failed:', error, { webSharePermissionsPolicyAllowed: policyAllowed });
-      toast.error('Could not share your backup. Please try again.');
     } finally {
       setIsBusy(false);
     }
@@ -83,20 +66,10 @@ const BackupRestoreDialog: React.FC<BackupRestoreDialogProps> = ({ isOpen, onClo
         </DialogHeader>
 
         <p className="text-sm text-gray-500 dark:text-gray-400 mb-4">
-          Your saved cards live only on this device. Share or download a backup file so you can restore them if you clear your browser data or switch devices.
+          Your saved cards live only on this device. Download a backup file so you can restore them if you clear your browser data or switch devices.
         </p>
 
         <div className="flex flex-col gap-3">
-          <Button
-            onClick={handleShare}
-            disabled={isBusy}
-            variant="outline"
-            className="w-full h-12 rounded-xl border-gray-200 justify-start gap-3 px-4"
-          >
-            <Share2 className="h-4 w-4" />
-            Share backup
-          </Button>
-
           <Button
             onClick={handleDownload}
             disabled={isBusy}

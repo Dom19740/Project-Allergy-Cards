@@ -1,7 +1,5 @@
 import { Capacitor } from '@capacitor/core';
 import { Filesystem, Directory, Encoding } from '@capacitor/filesystem';
-import { Share } from '@capacitor/share';
-import { toast } from 'sonner';
 import { storage, STORAGE_KEYS } from '@/lib/storage';
 import { SavedCard } from '@/lib/types';
 
@@ -45,16 +43,6 @@ const buildBackupFile = async (): Promise<{ fileName: string; json: string }> =>
   return buildPayload(savedCards, emergencyCard);
 };
 
-// Synchronous counterpart of buildBackupFile(), for callers that can't
-// afford even one microtask of delay before their next step (see
-// shareBackup()'s web path below).
-const buildBackupFileSync = (): { fileName: string; json: string } => {
-  const savedCards = storage.getSyncWeb<SavedCard[]>(STORAGE_KEYS.SAVED_CARDS) || [];
-  const emergencyCard = storage.getSyncWeb<SavedCard>(STORAGE_KEYS.SAVED_EMERGENCY_CARD);
-
-  return buildPayload(savedCards, emergencyCard);
-};
-
 const downloadBlob = (json: string, fileName: string) => {
   const blob = new Blob([json], { type: 'application/json' });
   const url = URL.createObjectURL(blob);
@@ -67,10 +55,6 @@ const downloadBlob = (json: string, fileName: string) => {
   URL.revokeObjectURL(url);
 };
 
-// Mirrors src/lib/card-utils.ts's downloadCard/shareCard split: "download"
-// saves the file silently with no share sheet, "share" hands it off to the
-// OS/browser share sheet so it can go straight to email, AirDrop, a cloud
-// drive, etc. without the user having to locate the downloaded file first.
 export const downloadBackup = async (): Promise<void> => {
   const { fileName, json } = await buildBackupFile();
 
@@ -86,60 +70,6 @@ export const downloadBackup = async (): Promise<void> => {
   }
 
   downloadBlob(json, fileName);
-};
-
-export const shareBackup = async (): Promise<void> => {
-  if (Capacitor.isNativePlatform()) {
-    const { fileName, json } = await buildBackupFile();
-    try {
-      const savedFile = await Filesystem.writeFile({
-        path: fileName,
-        data: json,
-        directory: Directory.Cache,
-        encoding: Encoding.UTF8,
-      });
-      await Share.share({
-        title: 'Allergy Cards Backup',
-        url: savedFile.uri,
-      });
-    } catch (error) {
-      if ((error as any).code !== 'UA') { // not a user cancellation
-        throw error;
-      }
-    }
-    return;
-  }
-
-  // navigator.share() must run with no `await` between the click and this
-  // call, or Chrome rejects it with "NotAllowedError: Permission denied"
-  // even when canShare() said yes - transient user activation doesn't
-  // survive a trip through the async Preferences bridge (confirmed live on
-  // a Vercel preview: the async buildBackupFile() version threw exactly
-  // this). Read localStorage directly and synchronously instead.
-  const { fileName, json } = buildBackupFileSync();
-
-  // Chrome's Web Share API only accepts files whose MIME type is on its
-  // allowlist (text/plain, application/pdf, images, etc.) - application/json
-  // isn't included, so share() can reject the file even after canShare()
-  // returned true for it. text/plain is accepted and doesn't affect how the
-  // file reads back in - importBackup() just parses the text as JSON.
-  const blob = new Blob([json], { type: 'text/plain' });
-  const file = new File([blob], fileName, { type: 'text/plain' });
-  const shareData = { title: 'Allergy Cards Backup', files: [file] };
-
-  if (!navigator.canShare?.(shareData)) {
-    downloadBlob(json, fileName);
-    toast.info("Your browser can't share files directly, so we saved it to your device instead.");
-    return;
-  }
-
-  try {
-    await navigator.share(shareData);
-  } catch (error) {
-    if ((error as DOMException).name !== 'AbortError') { // not a user cancellation
-      throw error;
-    }
-  }
 };
 
 export const importBackup = async (file: File, maxSavedCards: number): Promise<{ importedCards: number; importedEmergency: boolean }> => {
