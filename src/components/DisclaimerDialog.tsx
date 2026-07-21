@@ -27,7 +27,6 @@ const DisclaimerDialog: React.FC<DisclaimerDialogProps> = ({ isOpen, onClose }) 
       const nextTapCount = prev + 1;
 
       if (nextTapCount === 3) {
-        localStorage.removeItem('hasSeenOnboarding');
         sessionStorage.removeItem('isPremium');
         onClose();
         navigate('/premium-onboarding');

@@ -12,7 +12,6 @@ import { Input } from "@/components/ui/input";
 import { toast } from "sonner";
 import { Capacitor } from '@capacitor/core';
 import { syncPremiumCache } from '@/lib/billing';
-import { storage, STORAGE_KEYS } from '@/lib/storage';
 
 interface PromoCodeDialogProps {
   isOpen: boolean;
@@ -36,7 +35,6 @@ const PromoCodeDialog: React.FC<PromoCodeDialogProps> = ({ isOpen, onClose, onSu
 
     try {
       if (normalizedCode === RESET_CODE) {
-        await storage.remove(STORAGE_KEYS.HAS_SEEN_ONBOARDING);
         syncPremiumCache(false);
         toast.success("Premium Locked", { icon: '🔒' });
         onSuccess();
@@ -54,7 +52,6 @@ const PromoCodeDialog: React.FC<PromoCodeDialogProps> = ({ isOpen, onClose, onSu
         throw new Error('Invalid promo code');
       }
 
-      await storage.set(STORAGE_KEYS.HAS_SEEN_ONBOARDING, true);
       syncPremiumCache(true);
 
       try {

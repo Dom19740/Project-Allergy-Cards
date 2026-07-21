@@ -39,17 +39,18 @@ const Home = () => {
     };
   }, []);
 
-  const handleGetStarted = async () => {
+  // Always shows onboarding, on every click - not just the first time. Users
+  // who already have a saved card use handleAddCard below instead, which
+  // skips straight to card creation without onboarding in the way.
+  const handleGetStarted = () => {
     if (Capacitor.isNativePlatform()) {
       FirebaseAnalytics.logEvent({ name: 'get_started_click' });
     }
+    navigate('/onboarding');
+  };
 
-    const hasSeenOnboarding = await storage.get<any>(STORAGE_KEYS.HAS_SEEN_ONBOARDING);
-    if (hasSeenOnboarding === 'true' || hasSeenOnboarding === true) {
-      navigate('/select-allergens');
-    } else {
-      navigate('/onboarding');
-    }
+  const handleAddCard = () => {
+    navigate('/select-allergens');
   };
 
   const showDescription = !hasCards;
@@ -93,7 +94,7 @@ const Home = () => {
               >
                 <SavedCardsList />
                 <button
-                  onClick={handleGetStarted}
+                  onClick={handleAddCard}
                   className="mt-3 text-[14px] font-bold text-red-600 uppercase tracking-widest hover:underline"
                 >
                   + Add Card

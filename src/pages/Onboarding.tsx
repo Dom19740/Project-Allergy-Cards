@@ -5,7 +5,6 @@ import { useNavigate } from 'react-router-dom';
 import useEmblaCarousel from 'embla-carousel-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Button } from '@/components/ui/button';
-import { storage, STORAGE_KEYS } from '@/lib/storage';
 import FixedHeader from '@/components/FixedHeader';
 import OnboardingStep from '@/components/OnboardingStep';
 
@@ -73,11 +72,10 @@ const Onboarding = () => {
     emblaApi.on('reInit', onSelect);
   }, [emblaApi, onSelect]);
 
-  const handleNext = async () => {
+  const handleNext = () => {
     if (currentStep < ONBOARDING_STEPS.length - 1) {
       emblaApi?.scrollNext();
     } else {
-      await storage.set(STORAGE_KEYS.HAS_SEEN_ONBOARDING, true);
       navigate('/premium-onboarding');
     }
   };
@@ -88,13 +86,11 @@ const Onboarding = () => {
     }
   };
 
-  const handleUnderstand = async () => {
-    await storage.set(STORAGE_KEYS.HAS_SEEN_ONBOARDING, true);
+  const handleUnderstand = () => {
     emblaApi?.scrollNext();
   };
 
-  const handleSkip = async () => {
-    await storage.set(STORAGE_KEYS.HAS_SEEN_ONBOARDING, true);
+  const handleSkip = () => {
     navigate('/premium-onboarding');
   };
 

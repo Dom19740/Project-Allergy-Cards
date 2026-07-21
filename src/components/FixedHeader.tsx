@@ -2,7 +2,6 @@
 
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { storage, STORAGE_KEYS } from '@/lib/storage';
 
 const FixedHeader = () => {
   const navigate = useNavigate();
@@ -13,9 +12,7 @@ const FixedHeader = () => {
       const nextTapCount = prev + 1;
 
       if (nextTapCount === 3) {
-        localStorage.removeItem('hasSeenOnboarding');
         sessionStorage.removeItem('isPremium');
-        storage.set(STORAGE_KEYS.HAS_SEEN_ONBOARDING, false);
         navigate('/onboarding');
       }
 

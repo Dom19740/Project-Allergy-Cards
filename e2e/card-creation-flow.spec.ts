@@ -6,9 +6,10 @@ test.describe("full allergy card creation flow (free user, dictionary-covered la
     await seedStorage(page, { hasSeenOnboarding: true });
     const translationCalls = trackUnexpectedTranslationCalls(page);
 
-    await page.goto("/");
-    await page.getByRole("button", { name: "Get Started" }).click();
-    await expect(page).toHaveURL(/\/select-allergens/);
+    // Onboarding now shows on every "Get Started" click (not just the
+    // first), so this test - which is about the card-creation flow, not
+    // onboarding - navigates straight to the step it actually cares about.
+    await page.goto("/select-allergens");
 
     await page.getByText("Milk", { exact: true }).click();
     await page.getByText("Peanuts", { exact: true }).click();
