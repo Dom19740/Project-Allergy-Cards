@@ -89,42 +89,50 @@ const Home = () => {
                 animate={{ opacity: 1, y: 0 }}
                 exit={{ opacity: 0, y: 20 }}
                 transition={{ duration: 0.5 }}
-                className="w-full flex-shrink-0"
+                className="w-full flex-shrink-0 mt-6 flex flex-col items-center"
               >
-                <div className="px-4">
+                <div className="px-4 w-full">
                   <IOSInstallBanner visible={hasCards} />
                 </div>
                 <SavedCardsList />
+                <button
+                  onClick={handleGetStarted}
+                  className="mt-3 text-[14px] font-bold text-red-600 uppercase tracking-widest hover:underline"
+                >
+                  + Add Card
+                </button>
               </motion.div>
             )}
           </AnimatePresence>
         </div>
 
         <div className="flex-shrink-0 w-full flex flex-col justify-center items-center gap-2 mt-auto mb-[calc(12px+env(safe-area-inset-bottom))]">
+          {!hasCards && (
+            <>
+              <Button
+                onClick={handleGetStarted}
+                variant="primary"
+                className="py-3 px-8 text-lg h-auto w-[180px] rounded-xl shadow-lg transition-transform active:scale-95 flex items-center"
+              >
+                Get Started
+              </Button>
+
+              <button
+                onClick={() => setShowBackupDialog(true)}
+                className="text-xs font-bold text-gray-400 hover:text-red-600 underline"
+              >
+                Restore from backup
+              </button>
+            </>
+          )}
+
           <p className="flex items-center gap-2 text-[10px] text-gray-400 dark:text-gray-500 uppercase tracking-widest font-bold">
-            {/* 
+            {/*
             <span>v1.1.3.5{isPremium ? 'u' : ''}</span>
             <span>·</span>
             */}
             <span>© 2026 <a href="https://simpleallergyalert.com/" target="_blank" rel="noopener noreferrer" className="hover:text-red-600 transition-colors">Simple Allergy Alert</a></span>
           </p>
-
-          <Button
-            onClick={handleGetStarted}
-            variant="primary"
-            className="py-3 px-8 text-lg h-auto w-[180px] rounded-xl shadow-lg transition-transform active:scale-95 flex items-center"
-          >
-            Get Started
-          </Button>
-
-          {!hasCards && (
-            <button
-              onClick={() => setShowBackupDialog(true)}
-              className="text-xs font-bold text-gray-400 hover:text-red-600 underline"
-            >
-              Restore from backup
-            </button>
-          )}
         </div>
       </div>
 

@@ -102,9 +102,9 @@ const SavedCardsList = () => {
 
   return (
     <div className="w-full flex flex-col items-start mt-1">
-      <div className="w-full mb-1 px-8 flex items-center justify-between">
+      <div className="w-full max-w-[280px] mx-auto mb-1 flex items-center justify-between">
         <h3 className="text-[14px] font-bold text-gray-400 uppercase tracking-widest">
-          Saved Cards
+          Your Cards
         </h3>
         <button
           onClick={() => setShowBackupDialog(true)}
@@ -117,8 +117,9 @@ const SavedCardsList = () => {
 
       <BackupRestoreDialog isOpen={showBackupDialog} onClose={() => setShowBackupDialog(false)} />
 
-      <div className="w-full flex items-center justify-center gap-2 px-4">
-        <div className="w-full max-w-[280px] h-[110px] overflow-hidden cursor-grab active:cursor-grabbing" ref={emblaRef}>
+      <div className="w-full flex items-center justify-center">
+        <div className="relative w-full max-w-[280px]">
+        <div className="h-[110px] overflow-hidden cursor-grab active:cursor-grabbing" ref={emblaRef}>
           <div className="flex flex-col h-full">
             {allCards.map((card) => (
               <div key={card.id} className="flex-[0_0_100%] min-h-0 flex justify-center">
@@ -163,7 +164,7 @@ const SavedCardsList = () => {
           </div>
         </div>
 
-        <div className="flex flex-col items-center gap-1.5 shrink-0">
+        <div className="absolute -right-5 top-1/2 -translate-y-1/2 flex flex-col items-center gap-1.5">
           {allCards.map((_, i) => (
             <div
               key={i}
@@ -173,6 +174,7 @@ const SavedCardsList = () => {
               )}
             />
           ))}
+        </div>
         </div>
       </div>
     </div>
