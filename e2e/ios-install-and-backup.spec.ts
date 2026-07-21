@@ -91,7 +91,7 @@ test.describe("saved card backup & restore", () => {
     await expect(page.getByRole("heading", { name: "Backup & Restore" })).toBeVisible();
 
     const downloadPromise = page.waitForEvent("download");
-    await page.getByRole("button", { name: "Export backup" }).click();
+    await page.getByRole("button", { name: "Download backup" }).click();
     const download = await downloadPromise;
     expect(download.suggestedFilename()).toMatch(/^allergy-cards-backup-.*\.json$/);
 
@@ -117,6 +117,26 @@ test.describe("saved card backup & restore", () => {
     await expect(freshPage.getByText("My Thai Card")).toBeVisible();
 
     await freshContext.close();
+  });
+
+  test("shares a backup, falling back to a download when the browser can't share files", async ({ page }) => {
+    await seedStorage(page, {
+      hasSeenOnboarding: true,
+      savedAllergyCards: [buildSavedCard()],
+    });
+    await page.goto("/");
+
+    await page.getByRole("button", { name: "Backup", exact: true }).click();
+
+    // None of the test browser engines support sharing files via the Web
+    // Share API, so this exercises shareBackup()'s fallback path: same
+    // download as the plain Download button, plus an explanatory toast.
+    const downloadPromise = page.waitForEvent("download");
+    await page.getByRole("button", { name: "Share backup" }).click();
+    const download = await downloadPromise;
+    expect(download.suggestedFilename()).toMatch(/^allergy-cards-backup-.*\.json$/);
+
+    await expect(page.getByText(/can't share files directly/i)).toBeVisible();
   });
 
   test("a clean install with zero saved cards still exposes a restore entry point", async ({ page }) => {

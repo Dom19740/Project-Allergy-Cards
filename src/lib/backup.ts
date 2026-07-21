@@ -1,6 +1,7 @@
 import { Capacitor } from '@capacitor/core';
 import { Filesystem, Directory, Encoding } from '@capacitor/filesystem';
 import { Share } from '@capacitor/share';
+import { toast } from 'sonner';
 import { storage, STORAGE_KEYS } from '@/lib/storage';
 import { SavedCard } from '@/lib/types';
 
@@ -21,7 +22,7 @@ const isValidSavedCard = (value: any): value is SavedCard =>
   typeof value.languageCode === 'string' &&
   typeof value.createdAt === 'number';
 
-export const exportBackup = async (): Promise<void> => {
+const buildBackupFile = async (): Promise<{ fileName: string; json: string }> => {
   const savedCards = (await storage.get<SavedCard[]>(STORAGE_KEYS.SAVED_CARDS)) || [];
   const emergencyCard = await storage.get<SavedCard>(STORAGE_KEYS.SAVED_EMERGENCY_CARD);
 
@@ -32,13 +33,48 @@ export const exportBackup = async (): Promise<void> => {
     emergencyCard,
   };
 
-  const fileName = `allergy-cards-backup-${new Date().toISOString().slice(0, 10)}.json`;
-  const json = JSON.stringify(payload, null, 2);
+  return {
+    fileName: `allergy-cards-backup-${new Date().toISOString().slice(0, 10)}.json`,
+    json: JSON.stringify(payload, null, 2),
+  };
+};
 
-  // Mirrors the proven native share path in src/lib/card-utils.ts (shareCard):
-  // a bare <a download> or navigator.share doesn't reliably work inside the
-  // Android WebView, so write to the cache dir and hand off to the native
-  // share sheet instead.
+const downloadBlob = (json: string, fileName: string) => {
+  const blob = new Blob([json], { type: 'application/json' });
+  const url = URL.createObjectURL(blob);
+  const link = document.createElement('a');
+  link.href = url;
+  link.download = fileName;
+  document.body.appendChild(link);
+  link.click();
+  document.body.removeChild(link);
+  URL.revokeObjectURL(url);
+};
+
+// Mirrors src/lib/card-utils.ts's downloadCard/shareCard split: "download"
+// saves the file silently with no share sheet, "share" hands it off to the
+// OS/browser share sheet so it can go straight to email, AirDrop, a cloud
+// drive, etc. without the user having to locate the downloaded file first.
+export const downloadBackup = async (): Promise<void> => {
+  const { fileName, json } = await buildBackupFile();
+
+  if (Capacitor.isNativePlatform()) {
+    await Filesystem.writeFile({
+      path: fileName,
+      data: json,
+      directory: Directory.Documents,
+      encoding: Encoding.UTF8,
+      recursive: true,
+    });
+    return;
+  }
+
+  downloadBlob(json, fileName);
+};
+
+export const shareBackup = async (): Promise<void> => {
+  const { fileName, json } = await buildBackupFile();
+
   if (Capacitor.isNativePlatform()) {
     try {
       const savedFile = await Filesystem.writeFile({
@@ -61,23 +97,21 @@ export const exportBackup = async (): Promise<void> => {
 
   const blob = new Blob([json], { type: 'application/json' });
   const file = new File([blob], fileName, { type: 'application/json' });
+  const shareData = { title: 'Allergy Cards Backup', files: [file] };
 
-  if (navigator.canShare?.({ files: [file] })) {
-    await navigator.share({
-      files: [file],
-      title: 'Allergy Cards Backup',
-    });
+  if (!navigator.canShare?.(shareData)) {
+    downloadBlob(json, fileName);
+    toast.info("Your browser can't share files directly, so we saved it to your device instead.");
     return;
   }
 
-  const url = URL.createObjectURL(blob);
-  const link = document.createElement('a');
-  link.href = url;
-  link.download = fileName;
-  document.body.appendChild(link);
-  link.click();
-  document.body.removeChild(link);
-  URL.revokeObjectURL(url);
+  try {
+    await navigator.share(shareData);
+  } catch (error) {
+    if ((error as DOMException).name !== 'AbortError') { // not a user cancellation
+      throw error;
+    }
+  }
 };
 
 export const importBackup = async (file: File, maxSavedCards: number): Promise<{ importedCards: number; importedEmergency: boolean }> => {

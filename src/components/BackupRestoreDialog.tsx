@@ -3,9 +3,9 @@
 import React, { useRef, useState } from 'react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
-import { Download, Upload } from 'lucide-react';
+import { Download, Share2, Upload } from 'lucide-react';
 import { toast } from 'sonner';
-import { exportBackup, importBackup } from '@/lib/backup';
+import { downloadBackup, shareBackup, importBackup } from '@/lib/backup';
 import { useBilling } from '@/hooks/useBilling';
 import { PREMIUM_LIMITS } from '@/lib/premium-config';
 
@@ -20,14 +20,23 @@ const BackupRestoreDialog: React.FC<BackupRestoreDialogProps> = ({ isOpen, onClo
   const fileInputRef = useRef<HTMLInputElement>(null);
   const maxSavedCards = isPremium ? PREMIUM_LIMITS.MAX_SAVED_CARDS : PREMIUM_LIMITS.FREE_MAX_SAVED_CARDS;
 
-  const handleExport = async () => {
+  const handleDownload = async () => {
     setIsBusy(true);
     try {
-      await exportBackup();
-    } catch (error: any) {
-      if (error?.name !== 'AbortError') {
-        toast.error('Could not export your cards. Please try again.');
-      }
+      await downloadBackup();
+    } catch {
+      toast.error('Could not save your backup. Please try again.');
+    } finally {
+      setIsBusy(false);
+    }
+  };
+
+  const handleShare = async () => {
+    setIsBusy(true);
+    try {
+      await shareBackup();
+    } catch {
+      toast.error('Could not share your backup. Please try again.');
     } finally {
       setIsBusy(false);
     }
@@ -67,18 +76,28 @@ const BackupRestoreDialog: React.FC<BackupRestoreDialogProps> = ({ isOpen, onClo
         </DialogHeader>
 
         <p className="text-sm text-gray-500 dark:text-gray-400 mb-4">
-          Your saved cards live only on this device. Export a backup file so you can restore them if you clear your browser data or switch devices.
+          Your saved cards live only on this device. Share or download a backup file so you can restore them if you clear your browser data or switch devices.
         </p>
 
         <div className="flex flex-col gap-3">
           <Button
-            onClick={handleExport}
+            onClick={handleShare}
+            disabled={isBusy}
+            variant="outline"
+            className="w-full h-12 rounded-xl border-gray-200 justify-start gap-3 px-4"
+          >
+            <Share2 className="h-4 w-4" />
+            Share backup
+          </Button>
+
+          <Button
+            onClick={handleDownload}
             disabled={isBusy}
             variant="outline"
             className="w-full h-12 rounded-xl border-gray-200 justify-start gap-3 px-4"
           >
             <Download className="h-4 w-4" />
-            Export backup
+            Download backup
           </Button>
 
           <Button
