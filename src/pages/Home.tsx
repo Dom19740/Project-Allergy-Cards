@@ -6,6 +6,7 @@ import { Button } from '@/components/ui/button';
 import FixedHeader from '@/components/FixedHeader';
 import SavedCardsList from '@/components/SavedCardsList';
 import IOSInstallBanner from '@/components/IOSInstallBanner';
+import BackupRestoreDialog from '@/components/BackupRestoreDialog';
 import { storage, STORAGE_KEYS } from '@/lib/storage';
 import { SavedCard } from '@/lib/types';
 import { useBilling } from '@/hooks/useBilling';
@@ -17,6 +18,7 @@ const Home = () => {
   const navigate = useNavigate();
   const { isPremium } = useBilling();
   const [hasCards, setHasCards] = useState(false);
+  const [showBackupDialog, setShowBackupDialog] = useState(false);
 
   const checkCards = async () => {
     const cards = await storage.get<SavedCard[]>(STORAGE_KEYS.SAVED_CARDS);
@@ -114,8 +116,19 @@ const Home = () => {
           >
             Get Started
           </Button>
+
+          {!hasCards && (
+            <button
+              onClick={() => setShowBackupDialog(true)}
+              className="text-xs font-bold text-gray-400 hover:text-red-600 underline"
+            >
+              Restore from backup
+            </button>
+          )}
         </div>
       </div>
+
+      <BackupRestoreDialog isOpen={showBackupDialog} onClose={() => setShowBackupDialog(false)} />
     </div>
   );
 };

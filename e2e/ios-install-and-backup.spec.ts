@@ -77,7 +77,7 @@ test.describe("iOS Home Screen install banner", () => {
 });
 
 test.describe("saved card backup & restore", () => {
-  test("exports saved cards to a file and restores them from it after data loss", async ({ page }) => {
+  test("exports saved cards to a file and restores them on a clean install", async ({ page, browser }) => {
     await seedStorage(page, {
       hasSeenOnboarding: true,
       savedAllergyCards: [buildSavedCard()],
@@ -87,7 +87,7 @@ test.describe("saved card backup & restore", () => {
 
     await expect(page.getByText("My Thai Card")).toBeVisible();
 
-    await page.getByRole("button", { name: "Backup" }).click();
+    await page.getByRole("button", { name: "Backup", exact: true }).click();
     await expect(page.getByRole("heading", { name: "Backup & Restore" })).toBeVisible();
 
     const downloadPromise = page.waitForEvent("download");
@@ -98,18 +98,35 @@ test.describe("saved card backup & restore", () => {
     const backupPath = await download.path();
     expect(backupPath).toBeTruthy();
 
-    // Simulate the data-loss scenario this whole feature exists for: Safari
-    // clears local storage, so the card that was visible above is gone.
-    await page.evaluate(() => window.localStorage.clear());
-    await page.reload();
-    await expect(page.getByText("My Thai Card")).toHaveCount(0);
+    // Simulate the scenario this feature exists for with a genuinely fresh
+    // browser context (zero storage) rather than clearing + reloading the
+    // same page - a reload would just replay this test's own seedStorage
+    // init script and silently put the card right back.
+    const freshContext = await browser.newContext();
+    const freshPage = await freshContext.newPage();
+    await freshPage.goto("/");
+    await expect(freshPage.getByText("My Thai Card")).toHaveCount(0);
 
-    await page.getByRole("button", { name: "Backup" }).click();
-    await page.getByRole("button", { name: "Restore from backup" }).click();
-    await page.locator('input[type="file"]').setInputFiles(backupPath!);
+    // With zero saved cards, the "Saved Cards" section (and its Backup
+    // button) doesn't render at all - restoring has to go through the
+    // standalone Home-screen "Restore from backup" link instead.
+    await freshPage.getByRole("button", { name: "Restore from backup" }).click();
+    await freshPage.locator('input[type="file"]').setInputFiles(backupPath!);
 
-    await expect(page.getByText(/Restored 1 card and emergency card/i)).toBeVisible();
-    await expect(page.getByText("My Thai Card")).toBeVisible();
+    await expect(freshPage.getByText(/Restored 1 card and emergency card/i)).toBeVisible();
+    await expect(freshPage.getByText("My Thai Card")).toBeVisible();
+
+    await freshContext.close();
+  });
+
+  test("a clean install with zero saved cards still exposes a restore entry point", async ({ page }) => {
+    await seedStorage(page, { hasSeenOnboarding: true });
+    await page.goto("/");
+
+    await expect(page.getByRole("button", { name: "Restore from backup" })).toBeVisible();
+    // The Saved Cards section only renders once there's at least one card,
+    // so its own Backup button must not be present here.
+    await expect(page.getByRole("button", { name: "Backup", exact: true })).toHaveCount(0);
   });
 
   test("rejects a file that isn't a valid backup", async ({ page }) => {
@@ -118,7 +135,7 @@ test.describe("saved card backup & restore", () => {
     await seedStorage(page, { hasSeenOnboarding: true, savedAllergyCards: [buildSavedCard()] });
     await page.goto("/");
 
-    await page.getByRole("button", { name: "Backup" }).click();
+    await page.getByRole("button", { name: "Backup", exact: true }).click();
     await page.getByRole("button", { name: "Restore from backup" }).click();
 
     await page.locator('input[type="file"]').setInputFiles({

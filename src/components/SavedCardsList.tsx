@@ -13,7 +13,6 @@ import { cn } from '@/lib/utils';
 import { computeContentSignature } from '@/lib/customMessages';
 import { useBilling } from '@/hooks/useBilling';
 import { getLanguageName } from '@/lib/supportedLanguages';
-import { Capacitor } from '@capacitor/core';
 import BackupRestoreDialog from '@/components/BackupRestoreDialog';
 
 const SavedCardsList = () => {
@@ -107,15 +106,13 @@ const SavedCardsList = () => {
         <h3 className="text-[14px] font-bold text-gray-400 uppercase tracking-widest">
           Saved Cards
         </h3>
-        {Capacitor.getPlatform() === 'web' && (
-          <button
-            onClick={() => setShowBackupDialog(true)}
-            className="flex items-center gap-1 text-[11px] font-bold text-gray-400 hover:text-red-600 uppercase tracking-wider"
-          >
-            <Shield className="w-3 h-3" />
-            Backup
-          </button>
-        )}
+        <button
+          onClick={() => setShowBackupDialog(true)}
+          className="flex items-center gap-1 text-[11px] font-bold text-gray-400 hover:text-red-600 uppercase tracking-wider"
+        >
+          <Shield className="w-3 h-3" />
+          Backup
+        </button>
       </div>
 
       <BackupRestoreDialog isOpen={showBackupDialog} onClose={() => setShowBackupDialog(false)} />

@@ -1,3 +1,6 @@
+import { Capacitor } from '@capacitor/core';
+import { Filesystem, Directory, Encoding } from '@capacitor/filesystem';
+import { Share } from '@capacitor/share';
 import { storage, STORAGE_KEYS } from '@/lib/storage';
 import { SavedCard } from '@/lib/types';
 
@@ -30,7 +33,33 @@ export const exportBackup = async (): Promise<void> => {
   };
 
   const fileName = `allergy-cards-backup-${new Date().toISOString().slice(0, 10)}.json`;
-  const blob = new Blob([JSON.stringify(payload, null, 2)], { type: 'application/json' });
+  const json = JSON.stringify(payload, null, 2);
+
+  // Mirrors the proven native share path in src/lib/card-utils.ts (shareCard):
+  // a bare <a download> or navigator.share doesn't reliably work inside the
+  // Android WebView, so write to the cache dir and hand off to the native
+  // share sheet instead.
+  if (Capacitor.isNativePlatform()) {
+    try {
+      const savedFile = await Filesystem.writeFile({
+        path: fileName,
+        data: json,
+        directory: Directory.Cache,
+        encoding: Encoding.UTF8,
+      });
+      await Share.share({
+        title: 'Allergy Cards Backup',
+        url: savedFile.uri,
+      });
+    } catch (error) {
+      if ((error as any).code !== 'UA') { // not a user cancellation
+        throw error;
+      }
+    }
+    return;
+  }
+
+  const blob = new Blob([json], { type: 'application/json' });
   const file = new File([blob], fileName, { type: 'application/json' });
 
   if (navigator.canShare?.({ files: [file] })) {
