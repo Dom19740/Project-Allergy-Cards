@@ -1,5 +1,7 @@
 import { Capacitor } from '@capacitor/core';
 
+export const PLAY_STORE_URL = 'https://play.google.com/store/apps/details?id=com.dpbcreative.simpleallergyalert';
+
 export type MobileOS = 'ios' | 'android' | null;
 
 export const getMobileOS = (): MobileOS => {

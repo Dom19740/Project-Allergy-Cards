@@ -15,6 +15,10 @@ const ONBOARDING_STEPS = [
     image: "/images/screenshot_1.png"
   },
   {
+    title: "Keep Your Cards Safe",
+    description: "Cards saved in your browser can be lost if you clear browsing data. Install the app to keep them safe."
+  },
+  {
     title: "Intro",
     description: "Create personalized allergy alerts in over 100 languages to communicate your dietary restrictions easily and safely.",
     image: "/images/screenshot_1.png"

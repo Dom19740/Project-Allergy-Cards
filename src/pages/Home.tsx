@@ -5,7 +5,7 @@ import { useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import FixedHeader from '@/components/FixedHeader';
 import SavedCardsList from '@/components/SavedCardsList';
-import InstallBanner from '@/components/InstallBanner';
+import ProtectCardsDialog from '@/components/ProtectCardsDialog';
 import BackupRestoreDialog from '@/components/BackupRestoreDialog';
 import { storage, STORAGE_KEYS } from '@/lib/storage';
 import { SavedCard } from '@/lib/types';
@@ -91,9 +91,6 @@ const Home = () => {
                 transition={{ duration: 0.5 }}
                 className="w-full flex-shrink-0 mt-auto flex flex-col items-center"
               >
-                <div className="px-4 w-full">
-                  <InstallBanner visible={hasCards} />
-                </div>
                 <SavedCardsList />
                 <button
                   onClick={handleGetStarted}
@@ -137,6 +134,7 @@ const Home = () => {
       </div>
 
       <BackupRestoreDialog isOpen={showBackupDialog} onClose={() => setShowBackupDialog(false)} />
+      <ProtectCardsDialog visible={hasCards} />
     </div>
   );
 };

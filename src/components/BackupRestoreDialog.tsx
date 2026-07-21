@@ -3,9 +3,9 @@
 import React, { useRef, useState } from 'react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
-import { Download, Upload } from 'lucide-react';
+import { Download, Upload, Clipboard } from 'lucide-react';
 import { toast } from 'sonner';
-import { downloadBackup, importBackup } from '@/lib/backup';
+import { downloadBackup, importBackup, importBackupFromClipboard } from '@/lib/backup';
 import { useBilling } from '@/hooks/useBilling';
 import { PREMIUM_LIMITS } from '@/lib/premium-config';
 
@@ -34,6 +34,22 @@ const BackupRestoreDialog: React.FC<BackupRestoreDialogProps> = ({ isOpen, onClo
 
   const handleImportClick = () => {
     fileInputRef.current?.click();
+  };
+
+  const handleRestoreFromClipboard = async () => {
+    setIsBusy(true);
+    try {
+      const { importedCards, importedEmergency } = await importBackupFromClipboard(maxSavedCards);
+      const parts = [];
+      if (importedCards > 0) parts.push(`${importedCards} card${importedCards === 1 ? '' : 's'}`);
+      if (importedEmergency) parts.push('emergency card');
+      toast.success(`Restored ${parts.join(' and ')}.`);
+      onClose();
+    } catch (error: any) {
+      toast.error(error?.message || 'Could not restore from the clipboard.');
+    } finally {
+      setIsBusy(false);
+    }
   };
 
   const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -88,6 +104,16 @@ const BackupRestoreDialog: React.FC<BackupRestoreDialogProps> = ({ isOpen, onClo
           >
             <Upload className="h-4 w-4" />
             Restore from backup
+          </Button>
+
+          <Button
+            onClick={handleRestoreFromClipboard}
+            disabled={isBusy}
+            variant="outline"
+            className="w-full h-12 rounded-xl border-gray-200 justify-start gap-3 px-4"
+          >
+            <Clipboard className="h-4 w-4" />
+            Restore from clipboard
           </Button>
           <input
             ref={fileInputRef}

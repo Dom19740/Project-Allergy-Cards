@@ -72,13 +72,12 @@ export const downloadBackup = async (): Promise<void> => {
   downloadBlob(json, fileName);
 };
 
-export const importBackup = async (file: File, maxSavedCards: number): Promise<{ importedCards: number; importedEmergency: boolean }> => {
-  const text = await file.text();
+const applyBackupText = async (text: string, maxSavedCards: number): Promise<{ importedCards: number; importedEmergency: boolean }> => {
   let parsed: any;
   try {
     parsed = JSON.parse(text);
   } catch {
-    throw new Error('That file is not a valid backup (invalid JSON).');
+    throw new Error('That is not a valid backup (invalid JSON).');
   }
 
   const savedCards: SavedCard[] = Array.isArray(parsed?.savedCards)
@@ -87,7 +86,7 @@ export const importBackup = async (file: File, maxSavedCards: number): Promise<{
   const emergencyCard: SavedCard | null = isValidSavedCard(parsed?.emergencyCard) ? parsed.emergencyCard : null;
 
   if (savedCards.length === 0 && !emergencyCard) {
-    throw new Error("That file doesn't contain any saved cards.");
+    throw new Error("That doesn't contain any saved cards.");
   }
 
   const cappedCards = savedCards.slice(0, maxSavedCards);
@@ -99,4 +98,39 @@ export const importBackup = async (file: File, maxSavedCards: number): Promise<{
   window.dispatchEvent(new CustomEvent('storage-update'));
 
   return { importedCards: cappedCards.length, importedEmergency: !!emergencyCard };
+};
+
+export const importBackup = async (file: File, maxSavedCards: number): Promise<{ importedCards: number; importedEmergency: boolean }> => {
+  const text = await file.text();
+  return applyBackupText(text, maxSavedCards);
+};
+
+// Mirrors downloadBackup, but writes to the clipboard instead of a file - a
+// faster alternative for the common case of backing up right before
+// switching to a freshly installed app, where "download, then hunt for the
+// file in Files/Downloads" is more friction than "copy, then paste".
+export const copyBackupToClipboard = async (): Promise<void> => {
+  const { json } = await buildBackupFile();
+
+  if (!navigator.clipboard?.writeText) {
+    await downloadBackup();
+    return;
+  }
+
+  await navigator.clipboard.writeText(json);
+};
+
+export const importBackupFromClipboard = async (maxSavedCards: number): Promise<{ importedCards: number; importedEmergency: boolean }> => {
+  if (!navigator.clipboard?.readText) {
+    throw new Error("This browser can't read the clipboard - use Restore from backup instead.");
+  }
+
+  let text: string;
+  try {
+    text = await navigator.clipboard.readText();
+  } catch {
+    throw new Error("Couldn't read the clipboard - use Restore from backup instead.");
+  }
+
+  return applyBackupText(text, maxSavedCards);
 };

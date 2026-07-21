@@ -21,26 +21,26 @@ const buildSavedCard = (overrides: Record<string, unknown> = {}) => ({
 
 const buildEmergencyCard = () => buildSavedCard({ id: "emergency-slot", name: "Emergency Card" });
 
-test.describe("mobile install banner", () => {
+test.describe("protect cards dialog", () => {
   const isMobileProject = (projectName: string) => projectName === "mobile-safari" || projectName === "mobile-chrome";
 
-  test("is shown on any mobile browser (iOS Safari, Android Chrome), never on desktop", async ({ page }, testInfo) => {
+  test("auto-opens on any mobile browser (iOS Safari, Android Chrome), never on desktop", async ({ page }, testInfo) => {
     await seedStorage(page, {
       hasSeenOnboarding: true,
       savedAllergyCards: [buildSavedCard()],
     });
     await page.goto("/");
 
-    const banner = page.getByText("Protect your saved cards");
+    const heading = page.getByRole("heading", { name: "Protect your saved cards" });
     if (isMobileProject(testInfo.project.name)) {
-      await expect(banner).toBeVisible();
+      await expect(heading).toBeVisible();
     } else {
-      await expect(banner).toHaveCount(0);
+      await expect(heading).toHaveCount(0);
     }
   });
 
   test("dismissal persists across reloads (mobile only)", async ({ page }, testInfo) => {
-    test.skip(!isMobileProject(testInfo.project.name), "mobile-only banner");
+    test.skip(!isMobileProject(testInfo.project.name), "mobile-only dialog");
 
     await seedStorage(page, {
       hasSeenOnboarding: true,
@@ -48,17 +48,17 @@ test.describe("mobile install banner", () => {
     });
     await page.goto("/");
 
-    const banner = page.getByText("Protect your saved cards");
-    await expect(banner).toBeVisible();
+    const heading = page.getByRole("heading", { name: "Protect your saved cards" });
+    await expect(heading).toBeVisible();
 
-    await page.getByLabel("Dismiss").click();
-    await expect(banner).toHaveCount(0);
+    await page.getByRole("button", { name: "Got it" }).click();
+    await expect(heading).toHaveCount(0);
 
     await page.reload();
-    await expect(banner).toHaveCount(0);
+    await expect(heading).toHaveCount(0);
   });
 
-  test("the 'How do I do this?' link shows iOS Safari-specific steps", async ({ page }, testInfo) => {
+  test("shows the iOS Safari 'Add to Home Screen' step", async ({ page }, testInfo) => {
     test.skip(testInfo.project.name !== "mobile-safari", "iOS Safari-specific instructions");
 
     await seedStorage(page, {
@@ -67,15 +67,32 @@ test.describe("mobile install banner", () => {
     });
     await page.goto("/");
 
-    await page.getByText("How do I do this?").click();
-    await expect(page.getByText("Tap the 'Share' button in Safari")).toBeVisible();
-    await expect(page.getByText("Scroll down and tap 'Add to Home Screen'")).toBeVisible();
-
-    await page.getByRole("button", { name: "Got it" }).click();
-    await expect(page.getByText("Protect your saved cards")).toHaveCount(0);
+    await expect(page.getByText("2. Add to Home Screen")).toBeVisible();
+    await expect(page.getByText(/Tap Share, scroll down to 'Add to Home Screen'/)).toBeVisible();
   });
 
-  test("the 'How do I do this?' link shows Android-specific steps", async ({ page }, testInfo) => {
+  test("shows a 'switch to Safari' step for non-Safari iOS browsers", async ({ page }) => {
+    // None of the configured projects represent a third-party iOS browser
+    // (Chrome/Firefox/Brave/DuckDuckGo on iOS - all WebKit wrappers with
+    // their own UA token), so spoof one directly regardless of project.
+    await page.addInitScript(() => {
+      Object.defineProperty(window.navigator, "userAgent", {
+        value:
+          "Mozilla/5.0 (iPhone; CPU iPhone OS 17_0 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) CriOS/120.0.0.0 Mobile/15E148 Safari/604.1",
+        configurable: true,
+      });
+    });
+
+    await seedStorage(page, {
+      hasSeenOnboarding: true,
+      savedAllergyCards: [buildSavedCard()],
+    });
+    await page.goto("/");
+
+    await expect(page.getByText("2. Switch to Safari")).toBeVisible();
+  });
+
+  test("shows a working Google Play link on Android", async ({ page }, testInfo) => {
     test.skip(testInfo.project.name !== "mobile-chrome", "Android-specific instructions");
 
     await seedStorage(page, {
@@ -84,13 +101,14 @@ test.describe("mobile install banner", () => {
     });
     await page.goto("/");
 
-    await page.getByText("How do I do this?").click();
-    await expect(page.getByText("Tap the menu button in your browser")).toBeVisible();
-    await expect(page.getByText("Tap 'Add to Home screen' or 'Install app'")).toBeVisible();
-
-    await page.getByRole("button", { name: "Got it" }).click();
-    await expect(page.getByText("Protect your saved cards")).toHaveCount(0);
+    await expect(page.getByText("2. Get the app from Google Play")).toBeVisible();
+    const playLink = page.getByRole("link", { name: "Get it on Google Play" });
+    await expect(playLink).toHaveAttribute(
+      "href",
+      "https://play.google.com/store/apps/details?id=com.dpbcreative.simpleallergyalert"
+    );
   });
+
 });
 
 test.describe("saved card backup & restore", () => {
@@ -99,6 +117,9 @@ test.describe("saved card backup & restore", () => {
       hasSeenOnboarding: true,
       savedAllergyCards: [buildSavedCard()],
       savedEmergencyCard: buildEmergencyCard(),
+      // Not testing the protect-cards dialog here - dismiss it upfront so it
+      // doesn't cover the Backup button on mobile projects.
+      installBannerDismissed: "true",
     });
     await page.goto("/");
 
@@ -149,7 +170,11 @@ test.describe("saved card backup & restore", () => {
   test("rejects a file that isn't a valid backup", async ({ page }) => {
     // The "Saved Cards" section (and its Backup button) only renders when
     // there's at least one card, so seed one just to reach the entry point.
-    await seedStorage(page, { hasSeenOnboarding: true, savedAllergyCards: [buildSavedCard()] });
+    await seedStorage(page, {
+      hasSeenOnboarding: true,
+      savedAllergyCards: [buildSavedCard()],
+      installBannerDismissed: "true",
+    });
     await page.goto("/");
 
     await page.getByRole("button", { name: "Backup", exact: true }).click();
@@ -162,5 +187,62 @@ test.describe("saved card backup & restore", () => {
     });
 
     await expect(page.getByText(/not a valid backup/i)).toBeVisible();
+  });
+});
+
+test.describe("clipboard backup & restore", () => {
+  // Playwright's WebKit engine (the mobile-safari project) has historically
+  // limited/no support for granting clipboard permissions in automated
+  // tests - which may itself be representative of real Safari's stricter
+  // clipboard behavior. Chromium-based projects only, per the plan.
+  const isClipboardTestable = (projectName: string) => projectName === "chromium" || projectName === "mobile-chrome";
+
+  test("'Copy backup' in the protect-cards dialog writes valid backup JSON to the clipboard", async ({
+    page,
+    context,
+  }, testInfo) => {
+    // ProtectCardsDialog only ever shows on mobile web (isMobileWeb() gate) -
+    // desktop chromium is clipboard-testable but not a valid target for it.
+    test.skip(testInfo.project.name !== "mobile-chrome", "clipboard permissions not reliably grantable here, and this dialog is mobile-only");
+
+    await context.grantPermissions(["clipboard-read", "clipboard-write"]);
+    await seedStorage(page, {
+      hasSeenOnboarding: true,
+      savedAllergyCards: [buildSavedCard()],
+    });
+    await page.goto("/");
+
+    await expect(page.getByRole("heading", { name: "Protect your saved cards" })).toBeVisible();
+    await page.getByRole("button", { name: "Copy backup" }).click();
+    await expect(page.getByText(/Backup copied/i)).toBeVisible();
+
+    const clipboardText = await page.evaluate(() => navigator.clipboard.readText());
+    const parsed = JSON.parse(clipboardText);
+    expect(parsed.savedCards).toHaveLength(1);
+    expect(parsed.savedCards[0].name).toBe("My Thai Card");
+  });
+
+  test("'Restore from clipboard' in Backup & Restore reads a backup back in", async ({ page, context }, testInfo) => {
+    test.skip(!isClipboardTestable(testInfo.project.name), "clipboard permissions not reliably grantable here");
+
+    await context.grantPermissions(["clipboard-read", "clipboard-write"]);
+    // Zero saved cards - reaches the dialog via the Home-screen "Restore
+    // from backup" entry point, same as the file-based clean-install test.
+    await seedStorage(page, { hasSeenOnboarding: true });
+    await page.goto("/");
+
+    const backupPayload = {
+      version: 1,
+      exportedAt: new Date().toISOString(),
+      savedCards: [buildSavedCard()],
+      emergencyCard: null,
+    };
+    await page.evaluate((json) => navigator.clipboard.writeText(json), JSON.stringify(backupPayload));
+
+    await page.getByRole("button", { name: "Restore from backup" }).click();
+    await page.getByRole("button", { name: "Restore from clipboard" }).click();
+
+    await expect(page.getByText(/Restored 1 card/i)).toBeVisible();
+    await expect(page.getByText("My Thai Card")).toBeVisible();
   });
 });
