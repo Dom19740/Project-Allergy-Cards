@@ -5,7 +5,7 @@ import { useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import FixedHeader from '@/components/FixedHeader';
 import SavedCardsList from '@/components/SavedCardsList';
-import IOSInstallBanner from '@/components/IOSInstallBanner';
+import InstallBanner from '@/components/InstallBanner';
 import BackupRestoreDialog from '@/components/BackupRestoreDialog';
 import { storage, STORAGE_KEYS } from '@/lib/storage';
 import { SavedCard } from '@/lib/types';
@@ -92,7 +92,7 @@ const Home = () => {
                 className="w-full flex-shrink-0 mt-auto flex flex-col items-center"
               >
                 <div className="px-4 w-full">
-                  <IOSInstallBanner visible={hasCards} />
+                  <InstallBanner visible={hasCards} />
                 </div>
                 <SavedCardsList />
                 <button

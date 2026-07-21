@@ -21,8 +21,10 @@ const buildSavedCard = (overrides: Record<string, unknown> = {}) => ({
 
 const buildEmergencyCard = () => buildSavedCard({ id: "emergency-slot", name: "Emergency Card" });
 
-test.describe("iOS Home Screen install banner", () => {
-  test("is only shown on iOS Safari (WebKit), never on Chromium/Android", async ({ page }, testInfo) => {
+test.describe("mobile install banner", () => {
+  const isMobileProject = (projectName: string) => projectName === "mobile-safari" || projectName === "mobile-chrome";
+
+  test("is shown on any mobile browser (iOS Safari, Android Chrome), never on desktop", async ({ page }, testInfo) => {
     await seedStorage(page, {
       hasSeenOnboarding: true,
       savedAllergyCards: [buildSavedCard()],
@@ -30,15 +32,15 @@ test.describe("iOS Home Screen install banner", () => {
     await page.goto("/");
 
     const banner = page.getByText("Protect your saved cards");
-    if (testInfo.project.name === "mobile-safari") {
+    if (isMobileProject(testInfo.project.name)) {
       await expect(banner).toBeVisible();
     } else {
       await expect(banner).toHaveCount(0);
     }
   });
 
-  test("dismissal persists across reloads (mobile-safari only)", async ({ page }, testInfo) => {
-    test.skip(testInfo.project.name !== "mobile-safari", "iOS-specific banner");
+  test("dismissal persists across reloads (mobile only)", async ({ page }, testInfo) => {
+    test.skip(!isMobileProject(testInfo.project.name), "mobile-only banner");
 
     await seedStorage(page, {
       hasSeenOnboarding: true,
@@ -56,10 +58,8 @@ test.describe("iOS Home Screen install banner", () => {
     await expect(banner).toHaveCount(0);
   });
 
-  test("the 'How do I do this?' link shows the Add to Home Screen steps (mobile-safari only)", async ({
-    page,
-  }, testInfo) => {
-    test.skip(testInfo.project.name !== "mobile-safari", "iOS-specific banner");
+  test("the 'How do I do this?' link shows iOS Safari-specific steps", async ({ page }, testInfo) => {
+    test.skip(testInfo.project.name !== "mobile-safari", "iOS Safari-specific instructions");
 
     await seedStorage(page, {
       hasSeenOnboarding: true,
@@ -70,6 +70,23 @@ test.describe("iOS Home Screen install banner", () => {
     await page.getByText("How do I do this?").click();
     await expect(page.getByText("Tap the 'Share' button in Safari")).toBeVisible();
     await expect(page.getByText("Scroll down and tap 'Add to Home Screen'")).toBeVisible();
+
+    await page.getByRole("button", { name: "Got it" }).click();
+    await expect(page.getByText("Protect your saved cards")).toHaveCount(0);
+  });
+
+  test("the 'How do I do this?' link shows Android-specific steps", async ({ page }, testInfo) => {
+    test.skip(testInfo.project.name !== "mobile-chrome", "Android-specific instructions");
+
+    await seedStorage(page, {
+      hasSeenOnboarding: true,
+      savedAllergyCards: [buildSavedCard()],
+    });
+    await page.goto("/");
+
+    await page.getByText("How do I do this?").click();
+    await expect(page.getByText("Tap the menu button in your browser")).toBeVisible();
+    await expect(page.getByText("Tap 'Add to Home screen' or 'Install app'")).toBeVisible();
 
     await page.getByRole("button", { name: "Got it" }).click();
     await expect(page.getByText("Protect your saved cards")).toHaveCount(0);

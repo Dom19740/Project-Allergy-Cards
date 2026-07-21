@@ -3,31 +3,47 @@
 import React, { useEffect, useState } from 'react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
-import { ShieldAlert, Share, Plus, Layout, X } from 'lucide-react';
+import { ShieldAlert, Share, Plus, Layout, MoreVertical, X } from 'lucide-react';
 import { storage, STORAGE_KEYS } from '@/lib/storage';
-import { isIOSSafariWeb, isStandalone } from '@/lib/platform';
+import { getMobileOS, isIOSSafari, isMobileWeb, isStandalone } from '@/lib/platform';
 
-const INSTALL_STEPS = [
-  { icon: Share, text: "Tap the 'Share' button in Safari" },
-  { icon: Plus, text: "Scroll down and tap 'Add to Home Screen'" },
-  { icon: Layout, text: "Tap 'Add' in the top right corner" }
-];
+const getInstallSteps = (isSafari: boolean, os: 'ios' | 'android' | null) => {
+  if (isSafari) {
+    return [
+      { icon: Share, text: "Tap the 'Share' button in Safari" },
+      { icon: Plus, text: "Scroll down and tap 'Add to Home Screen'" },
+      { icon: Layout, text: "Tap 'Add' in the top right corner" },
+    ];
+  }
+  if (os === 'ios') {
+    return [
+      { icon: Share, text: "Tap the Share button in your browser" },
+      { icon: Plus, text: "Look for 'Add to Home Screen' - if it's not there, switch to Safari and add it from there instead" },
+    ];
+  }
+  return [
+    { icon: MoreVertical, text: "Tap the menu button in your browser" },
+    { icon: Plus, text: "Tap 'Add to Home screen' or 'Install app'" },
+  ];
+};
 
-interface IOSInstallBannerProps {
+interface InstallBannerProps {
   visible: boolean;
 }
 
-const IOSInstallBanner: React.FC<IOSInstallBannerProps> = ({ visible }) => {
+const InstallBanner: React.FC<InstallBannerProps> = ({ visible }) => {
   const [dismissed, setDismissed] = useState(true);
   const [showInstructions, setShowInstructions] = useState(false);
+  const safari = isIOSSafari();
+  const os = getMobileOS();
 
   useEffect(() => {
     const checkDismissed = async () => {
-      if (!isIOSSafariWeb() || isStandalone()) {
+      if (!isMobileWeb() || isStandalone()) {
         setDismissed(true);
         return;
       }
-      const wasDismissed = await storage.get<string>(STORAGE_KEYS.IOS_BANNER_DISMISSED);
+      const wasDismissed = await storage.get<string>(STORAGE_KEYS.INSTALL_BANNER_DISMISSED);
       setDismissed(wasDismissed === 'true');
     };
     checkDismissed();
@@ -35,10 +51,12 @@ const IOSInstallBanner: React.FC<IOSInstallBannerProps> = ({ visible }) => {
 
   const handleDismiss = async () => {
     setDismissed(true);
-    await storage.set(STORAGE_KEYS.IOS_BANNER_DISMISSED, 'true');
+    await storage.set(STORAGE_KEYS.INSTALL_BANNER_DISMISSED, 'true');
   };
 
   if (!visible || dismissed) return null;
+
+  const browserDataLabel = safari ? "Clearing Safari's history" : "Clearing your browser's data";
 
   return (
     <>
@@ -49,7 +67,7 @@ const IOSInstallBanner: React.FC<IOSInstallBannerProps> = ({ visible }) => {
             Protect your saved cards
           </p>
           <p className="text-xs text-amber-700 dark:text-amber-400 mt-0.5">
-            Clearing Safari's history can erase your saved cards. Add this app to your Home Screen to keep them safe.
+            {browserDataLabel} can erase your saved cards. Add this app to your Home Screen to keep them safe.
           </p>
           <button
             onClick={() => setShowInstructions(true)}
@@ -76,7 +94,7 @@ const IOSInstallBanner: React.FC<IOSInstallBannerProps> = ({ visible }) => {
           </DialogHeader>
 
           <div className="space-y-3 py-1">
-            {INSTALL_STEPS.map((step, index) => (
+            {getInstallSteps(safari, os).map((step, index) => (
               <div
                 key={index}
                 className="flex items-center space-x-4 p-3 bg-gray-50 dark:bg-gray-800 rounded-xl border border-gray-100 dark:border-gray-700"
@@ -90,6 +108,10 @@ const IOSInstallBanner: React.FC<IOSInstallBannerProps> = ({ visible }) => {
               </div>
             ))}
           </div>
+
+          <p className="text-xs text-gray-400 mt-3">
+            Can't find this option? You can also back up your cards anytime with the Backup button below your card list.
+          </p>
 
           <Button
             onClick={() => {
@@ -107,4 +129,4 @@ const IOSInstallBanner: React.FC<IOSInstallBannerProps> = ({ visible }) => {
   );
 };
 
-export default IOSInstallBanner;
+export default InstallBanner;
