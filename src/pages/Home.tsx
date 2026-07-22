@@ -79,10 +79,14 @@ const Home = () => {
               <span className="text-red-600">Eat with Confidence.</span>
             </h1>
 
-            <motion.div
-              animate={{ height: showDescription ? 16 : 0 }}
+            <motion.p
+              initial={false}
+              animate={{ height: showDescription ? 'auto' : 0, opacity: showDescription ? 1 : 0 }}
               transition={{ duration: 0.3, ease: "easeInOut" }}
-            />
+              className="overflow-hidden text-base text-gray-600 dark:text-gray-400"
+            >
+              Create allergy cards in 100+ languages and communicate food allergies instantly.
+            </motion.p>
 
           </div>
 
