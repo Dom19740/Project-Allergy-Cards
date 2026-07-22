@@ -2,6 +2,7 @@
 
 import React, { useState, useEffect, useRef } from 'react';
 import { Button } from '@/components/ui/button';
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Crown, Check, Languages, ShieldAlert, MessageSquare, Save, Smartphone, Loader2 } from 'lucide-react';
 import { useBilling } from '@/hooks/useBilling';
 import StepHeader from '@/components/StepHeader';
@@ -173,45 +174,45 @@ const PremiumOfferStep = () => {
         }}
       />
 
-      {isRestoreOpen && (
-        <div className="fixed inset-0 bg-black/50 flex items-center justify-center p-4 z-50">
-          <div className="bg-white dark:bg-gray-800 rounded-2xl p-6 max-w-sm w-full space-y-4 shadow-xl">
-            <h3 className="text-lg font-bold text-gray-900 dark:text-white">Restore Purchase</h3>
-            <p className="text-xs text-gray-500 dark:text-gray-400">
-              Enter the email address you used during checkout to restore your premium status.
-            </p>
-            <form onSubmit={handleEmailRestore} className="space-y-3">
-              <input
-                type="email"
-                placeholder="your@email.com"
-                value={restoreEmail}
-                onChange={(e) => setRestoreEmail(e.target.value)}
-                className="w-full p-3 border border-gray-200 dark:border-gray-700 rounded-xl bg-transparent text-sm text-gray-900 dark:text-white"
-                required
+      <Dialog open={isRestoreOpen} onOpenChange={setIsRestoreOpen}>
+        <DialogContent className="w-[90%] max-w-sm rounded-2xl p-6 space-y-4 shadow-xl">
+          <DialogHeader>
+            <DialogTitle className="text-lg font-bold text-gray-900 dark:text-white">Restore Purchase</DialogTitle>
+          </DialogHeader>
+          <p className="text-xs text-gray-500 dark:text-gray-400">
+            Enter the email address you used during checkout to restore your premium status.
+          </p>
+          <form onSubmit={handleEmailRestore} className="space-y-3">
+            <input
+              type="email"
+              placeholder="your@email.com"
+              value={restoreEmail}
+              onChange={(e) => setRestoreEmail(e.target.value)}
+              className="w-full p-3 border border-gray-200 dark:border-gray-700 rounded-xl bg-transparent text-sm text-gray-900 dark:text-white"
+              required
+              disabled={isRestoring}
+            />
+            <div className="flex gap-2">
+              <Button
+                type="button"
+                variant="outline"
+                onClick={() => setIsRestoreOpen(false)}
+                className="flex-1"
                 disabled={isRestoring}
-              />
-              <div className="flex gap-2">
-                <Button
-                  type="button"
-                  variant="outline"
-                  onClick={() => setIsRestoreOpen(false)}
-                  className="flex-1"
-                  disabled={isRestoring}
-                >
-                  Cancel
-                </Button>
-                <Button
-                  type="submit"
-                  className="flex-1 bg-amber-500 hover:bg-amber-600 text-white"
-                  disabled={isRestoring}
-                >
-                  {isRestoring ? <Loader2 className="h-4 w-4 animate-spin mx-auto" /> : "Restore"}
-                </Button>
-              </div>
-            </form>
-          </div>
-        </div>
-      )}
+              >
+                Cancel
+              </Button>
+              <Button
+                type="submit"
+                className="flex-1 bg-amber-500 hover:bg-amber-600 text-white"
+                disabled={isRestoring}
+              >
+                {isRestoring ? <Loader2 className="h-4 w-4 animate-spin mx-auto" /> : "Restore"}
+              </Button>
+            </div>
+          </form>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 };
