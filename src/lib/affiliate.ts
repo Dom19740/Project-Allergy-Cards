@@ -10,16 +10,28 @@ const REF_PATTERN = /^[a-zA-Z0-9_-]{1,64}$/;
 export const captureAffiliateRef = (): string | null => {
   if (typeof window === 'undefined') return null;
 
-  const ref = new URLSearchParams(window.location.search).get('ref');
-  if (ref && REF_PATTERN.test(ref)) {
-    window.localStorage.setItem(AFFILIATE_REF_KEY, ref);
-    return ref;
-  }
+  try {
+    const ref = new URLSearchParams(window.location.search).get('ref');
+    if (ref && REF_PATTERN.test(ref)) {
+      window.localStorage.setItem(AFFILIATE_REF_KEY, ref);
+      return ref;
+    }
 
-  return window.localStorage.getItem(AFFILIATE_REF_KEY);
+    return window.localStorage.getItem(AFFILIATE_REF_KEY);
+  } catch {
+    // localStorage can throw (third-party iframe embeds, some in-app
+    // browsers, locked-down enterprise configs) - this call must never
+    // block the caller, since it runs before Firebase init/storage
+    // migration in App.tsx.
+    return null;
+  }
 };
 
 export const getAffiliateRef = (): string | null => {
   if (typeof window === 'undefined') return null;
-  return window.localStorage.getItem(AFFILIATE_REF_KEY);
+  try {
+    return window.localStorage.getItem(AFFILIATE_REF_KEY);
+  } catch {
+    return null;
+  }
 };

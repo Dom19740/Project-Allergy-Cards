@@ -14,10 +14,34 @@ const isNative = async () => {
   return info.platform === 'android' || info.platform === 'ios';
 };
 
+// Per-image safety cap so a single stalled/broken image can't hold up card
+// generation indefinitely - it just falls through and gets captured as-is.
+const IMAGE_LOAD_TIMEOUT_MS = 5000;
+
+// html-to-image rasterizes whatever is currently painted - if an <img> hasn't
+// finished loading yet (cold cache/slow network), it gets captured blank.
+// Preloading elsewhere in the app makes this rare, but doesn't guarantee it,
+// so wait for every image in the card before handing it to toPng.
+const waitForImages = (element: HTMLElement): Promise<void> => {
+  const images = Array.from(element.querySelectorAll('img'));
+  return Promise.all(
+    images.map((img) => {
+      if (img.complete && img.naturalWidth > 0) return Promise.resolve();
+      return new Promise<void>((resolve) => {
+        const done = () => resolve();
+        img.addEventListener('load', done, { once: true });
+        img.addEventListener('error', done, { once: true });
+        setTimeout(done, IMAGE_LOAD_TIMEOUT_MS);
+      });
+    })
+  ).then(() => undefined);
+};
+
 export const generateCardImage = async (element: HTMLElement): Promise<string | null> => {
   try {
-    return await toPng(element, { 
-      cacheBust: true, 
+    await waitForImages(element);
+    return await toPng(element, {
+      cacheBust: true,
       pixelRatio: 3,
       backgroundColor: '#ffffff'
     });

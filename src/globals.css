@@ -131,3 +131,22 @@
 [data-sonner-toaster] {
   bottom: calc(110px + env(safe-area-inset-bottom)) !important;
 }
+
+/* Printing a card (window.print()) should show only the card itself, not the
+   surrounding action bar/menus/dialogs. Elements opt in via .print-card. */
+@media print {
+  body * {
+    visibility: hidden;
+  }
+  .print-card,
+  .print-card * {
+    visibility: visible;
+  }
+  .print-card {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: auto;
+    overflow: visible;
+  }
+}

@@ -56,7 +56,7 @@ const Home = () => {
   const showDescription = !hasCards;
 
   return (
-    <div className="relative flex flex-col h-[100dvh] bg-gray-100 dark:bg-gray-900 overflow-hidden">
+    <div className="relative flex flex-col h-screen bg-gray-100 dark:bg-gray-900 overflow-hidden">
       <FixedHeader />
       <div className="flex flex-col flex-1 w-full max-w-2xl mx-auto px-6 pt-[calc(100px+env(safe-area-inset-top))] min-h-0">
         <motion.div

@@ -10,8 +10,18 @@ const TTS_LANG_ALIASES: Record<string, string> = {
   jw: 'jv', // Javanese
 };
 
-const speakOnce = (text: string, lang: string) =>
-  TextToSpeech.speak({ text, lang, rate: 0.9, pitch: 1.0, volume: 1.0, category: 'ambient' });
+// iOS Safari has a documented bug where backgrounding the tab/locking the
+// screen mid-utterance leaves speechSynthesis stuck - onend/onerror never
+// fire again, so the underlying plugin promise never settles. This is a
+// safety net only (normal speech finishes in well under this), so it errs
+// long rather than risk cutting off legitimately long cards.
+const STUCK_SPEECH_TIMEOUT_MS = 120_000;
+
+const speakOnce = (text: string, lang: string) => {
+  const speak = TextToSpeech.speak({ text, lang, rate: 0.9, pitch: 1.0, volume: 1.0, category: 'ambient' });
+  const timeout = new Promise<void>((resolve) => setTimeout(resolve, STUCK_SPEECH_TIMEOUT_MS));
+  return Promise.race([speak, timeout]);
+};
 
 // Translation and speech are unrelated capabilities under the hood - Google
 // Translate covers 100+ languages, but most of the obscure ones (Cebuano,

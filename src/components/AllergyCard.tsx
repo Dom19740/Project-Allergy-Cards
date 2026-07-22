@@ -25,6 +25,7 @@ import { TextToSpeech } from '@capacitor-community/text-to-speech';
 import { speakText } from '@/lib/tts';
 import { FirebaseAnalytics } from '@capacitor-firebase/analytics';
 import { Capacitor } from '@capacitor/core';
+import { isStandalone, getMobileOS } from '@/lib/platform';
 
 interface AllergyCardProps {
   languageCode: LanguageCode;
@@ -347,7 +348,17 @@ const AllergyCard: React.FC<AllergyCardProps> = ({ languageCode, selectedAllerge
     }
   };
 
-  const handlePrint = () => window.print();
+  const handlePrint = () => {
+    // window.print() is a silent no-op in iOS home-screen web apps - there's
+    // no Safari chrome around them to host the print dialog. Other installed
+    // PWAs (Android/desktop Chrome etc.) print fine in standalone mode, so
+    // this is scoped to iOS specifically rather than isStandalone() alone.
+    if (getMobileOS() === 'ios' && isStandalone()) {
+      toast.info("Printing isn't available in this mode. Try Share instead.");
+      return;
+    }
+    window.print();
+  };
   
   const handleReadAloud = async () => {
     if (isSpeaking) {
@@ -469,9 +480,9 @@ const AllergyCard: React.FC<AllergyCardProps> = ({ languageCode, selectedAllerge
 
   return (
     <div className="flex flex-col w-full h-screen bg-white overflow-hidden">
-      <div 
-        ref={cardRef} 
-        className="flex-1 w-full flex flex-col items-center justify-start text-center overflow-hidden p-4 sm:p-6 md:p-8 pt-[calc(1rem+env(safe-area-inset-top))] bg-white border-none"
+      <div
+        ref={cardRef}
+        className="print-card flex-1 w-full flex flex-col items-center justify-start text-center overflow-hidden p-4 sm:p-6 md:p-8 pt-[calc(1rem+env(safe-area-inset-top))] bg-white border-none"
       >
         <div className="h-6 sm:h-10 md:h-14" />
         <h1 className="text-2xl sm:text-4xl md:text-5xl lg:text-6xl font-black leading-tight mb-4 sm:mb-8 md:mb-12 text-red-600 uppercase tracking-tighter break-words">
