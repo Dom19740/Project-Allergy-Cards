@@ -446,7 +446,7 @@ export const UI_TEXT_DICTIONARY: Record<string, Record<string, string>> = {
     'please be careful with my food.': 'bitte seien sie vorsichtig mit meinem essen.',
     'thank you!': 'Dankeschön!',
     'i can not eat:': 'ich kann nicht essen:',
-    'they make me very sick and i could die': 'sie machen mich sehr krank und ich könnte sterben',
+    'they make me very sick and i could die': 'Das macht mich sehr krank und ich könnte sterben',
     'attention': 'achtung',
     'i am having a severe allergic reaction.': 'ich habe eine schwere allergische reaktion.',
     'i need medical help immediately.': 'ich brauche sofort medizinische hilfe.',
