@@ -2,7 +2,9 @@
 
 import React, { useState, useEffect, useRef } from 'react';
 import { Button } from '@/components/ui/button';
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '@/components/ui/dialog';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
 import { Crown, Check, Languages, ShieldAlert, MessageSquare, Save, Smartphone, Loader2 } from 'lucide-react';
 import { useBilling } from '@/hooks/useBilling';
 import StepHeader from '@/components/StepHeader';
@@ -175,41 +177,48 @@ const PremiumOfferStep = () => {
       />
 
       <Dialog open={isRestoreOpen} onOpenChange={setIsRestoreOpen}>
-        <DialogContent className="w-[90%] max-w-sm rounded-2xl p-6 space-y-4 shadow-xl">
-          <DialogHeader>
-            <DialogTitle className="text-lg font-bold text-gray-900 dark:text-white">Restore Purchase</DialogTitle>
+        <DialogContent className="w-[90%] max-w-[400px] rounded-2xl border-gray-200 dark:border-gray-700 shadow-2xl p-5 fixed left-1/2 -translate-x-1/2 top-[calc(1rem+env(safe-area-inset-top))] translate-y-0 animate-in fade-in slide-in-from-top-8 duration-300">
+          <DialogHeader className="mb-2">
+            <DialogTitle className="text-xl font-bold text-gray-900 dark:text-white">Restore Purchase</DialogTitle>
           </DialogHeader>
-          <p className="text-xs text-gray-500 dark:text-gray-400">
-            Enter the email address you used during checkout to restore your premium status.
-          </p>
-          <form onSubmit={handleEmailRestore} className="space-y-3">
-            <input
-              type="email"
-              placeholder="your@email.com"
-              value={restoreEmail}
-              onChange={(e) => setRestoreEmail(e.target.value)}
-              className="w-full p-3 border border-gray-200 dark:border-gray-700 rounded-xl bg-transparent text-sm text-gray-900 dark:text-white"
-              required
-              disabled={isRestoring}
-            />
-            <div className="flex gap-2">
+
+          <form onSubmit={handleEmailRestore}>
+            <div className="flex flex-col gap-1.5 py-1 px-1">
+              <Label htmlFor="restore-email" className="text-[11px] font-bold text-gray-400 px-1 uppercase tracking-wider">
+                Email Used At Checkout
+              </Label>
+              <Input
+                id="restore-email"
+                type="email"
+                placeholder="your@email.com"
+                value={restoreEmail}
+                onChange={(e) => setRestoreEmail(e.target.value)}
+                disabled={isRestoring}
+                required
+                autoFocus
+                className="w-full h-11 rounded-xl border-gray-200 focus:ring-red-500 focus:border-gray-200 px-4 disabled:opacity-50"
+              />
+            </div>
+
+            <DialogFooter className="flex flex-row gap-2 mt-4 sm:justify-end">
               <Button
                 type="button"
                 variant="outline"
                 onClick={() => setIsRestoreOpen(false)}
-                className="flex-1"
                 disabled={isRestoring}
+                className="flex-1 h-11 rounded-xl border-gray-200 text-gray-600 hover:bg-gray-50"
               >
                 Cancel
               </Button>
               <Button
                 type="submit"
-                className="flex-1 bg-amber-500 hover:bg-amber-600 text-white"
                 disabled={isRestoring}
+                variant="primary"
+                className="flex-1 h-11 rounded-xl shadow-sm transition-all active:scale-95 font-medium disabled:opacity-50"
               >
                 {isRestoring ? <Loader2 className="h-4 w-4 animate-spin mx-auto" /> : "Restore"}
               </Button>
-            </div>
+            </DialogFooter>
           </form>
         </DialogContent>
       </Dialog>

@@ -6,9 +6,11 @@ import {
   DialogContent,
   DialogHeader,
   DialogTitle,
+  DialogFooter,
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 import { toast } from "sonner";
 import { Capacitor } from '@capacitor/core';
 import { syncPremiumCache } from '@/lib/billing';
@@ -84,42 +86,42 @@ const PromoCodeDialog: React.FC<PromoCodeDialogProps> = ({ isOpen, onClose, onSu
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent 
-        className="w-[90%] max-w-[400px] rounded-2xl border-gray-200 dark:border-gray-700 shadow-2xl p-6 fixed left-1/2 -translate-x-1/2 top-[calc(2rem+env(safe-area-inset-top))] translate-y-0 animate-in fade-in slide-in-from-top-8 duration-300"
+      <DialogContent
+        className="w-[90%] max-w-[400px] rounded-2xl border-gray-200 dark:border-gray-700 shadow-2xl p-5 fixed left-1/2 -translate-x-1/2 top-[calc(1rem+env(safe-area-inset-top))] translate-y-0 animate-in fade-in slide-in-from-top-8 duration-300"
       >
-        <DialogHeader className="mb-4">
-          <DialogTitle className="text-xl font-bold">Enter Promo Code</DialogTitle>
-          <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">
-            If you have a special access code, enter it below.
-          </p>
+        <DialogHeader className="mb-2">
+          <DialogTitle className="text-xl font-bold text-gray-900 dark:text-white">Enter Promo Code</DialogTitle>
         </DialogHeader>
-        
-        <div className="py-6">
+
+        <div className="flex flex-col gap-1.5 py-1 px-1">
+
           <Input
-            placeholder="Enter code"
+            id="promo-code"
+            placeholder="ENTER CODE"
             value={code}
             onChange={(e) => setCode(e.target.value)}
             onKeyDown={handleKeyDown}
-            className="uppercase font-bold tracking-widest text-center h-14 text-lg rounded-xl border-gray-200 focus:ring-red-500 focus:border-gray-200"
             autoFocus
+            className="w-full h-11 uppercase font-bold tracking-widest text-center rounded-xl border-gray-200 focus:ring-red-500 focus:border-gray-200 px-4"
           />
         </div>
-        
-        <div className="w-full flex justify-between items-center mt-2 gap-4 shrink-0">
-          <Button 
-            variant="outline" 
+
+        <DialogFooter className="flex flex-row gap-2 mt-4 sm:justify-end">
+          <Button
+            variant="outline"
             onClick={onClose}
-            className="w-full h-12 rounded-xl border-gray-200 text-gray-600 hover:bg-gray-50"
+            className="flex-1 h-11 rounded-xl border-gray-200 text-gray-600 hover:bg-gray-50"
           >
             Cancel
           </Button>
-          <Button 
+          <Button
             onClick={handleRedeem}
-            className="w-full bg-zinc-900 hover:bg-zinc-800 text-white rounded-xl h-12 font-bold"
+            variant="primary"
+            className="flex-1 h-11 rounded-xl shadow-sm transition-all active:scale-95 font-medium"
           >
             Redeem Code
           </Button>
-        </div>
+        </DialogFooter>
       </DialogContent>
     </Dialog>
   );
