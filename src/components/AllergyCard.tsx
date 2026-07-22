@@ -506,9 +506,9 @@ const AllergyCard: React.FC<AllergyCardProps> = ({ languageCode, selectedAllerge
           {displayUIText.thankYou}
         </p>
         
-        <div className="relative w-full flex-1 min-h-0">
+        <div className="relative w-full flex-1 min-h-0 flex items-center justify-center">
           <div
-            className="relative h-full max-h-[400px] w-auto max-w-full aspect-square mx-auto cursor-pointer"
+            className="relative h-full max-h-[400px] w-auto max-w-full aspect-square cursor-pointer"
             onClick={() => setIsImageFullscreen(true)}
           >
             <div className="absolute inset-0 flex items-center justify-center">
