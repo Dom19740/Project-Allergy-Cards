@@ -442,9 +442,9 @@ export const UI_TEXT_DICTIONARY: Record<string, Record<string, string>> = {
   },
   // German
   'de': {
-    'allergy alert!': 'allergie-alarm!',
+    'allergy alert!': 'Allergie-Alarm!',
     'please be careful with my food.': 'bitte seien sie vorsichtig mit meinem essen.',
-    'thank you!': 'danke schön!',
+    'thank you!': 'Dankeschön!',
     'i can not eat:': 'ich kann nicht essen:',
     'they make me very sick and i could die': 'sie machen mich sehr krank und ich könnte sterben',
     'attention': 'achtung',
