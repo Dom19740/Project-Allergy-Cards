@@ -13,12 +13,19 @@ import { useBilling } from '@/hooks/useBilling';
 import { FirebaseAnalytics } from '@capacitor-firebase/analytics';
 import { Capacitor } from '@capacitor/core';
 import { motion, AnimatePresence } from 'framer-motion';
+import { usePageSEO } from '@/hooks/usePageSEO';
 
 const Home = () => {
   const navigate = useNavigate();
   const { isPremium } = useBilling();
   const [hasCards, setHasCards] = useState(false);
   const [showBackupDialog, setShowBackupDialog] = useState(false);
+
+  usePageSEO({
+    title: 'Allergy Card App | Simple Allergy Alert',
+    description: "Simple Allergy Alert is a free allergy card app - create translated allergy alert cards in 100+ languages to show restaurants, hotels and hosts exactly what you can't eat, anywhere in the world.",
+    noindex: false
+  });
 
   const checkCards = async () => {
     const cards = await storage.get<SavedCard[]>(STORAGE_KEYS.SAVED_CARDS);
@@ -85,7 +92,7 @@ const Home = () => {
           >
             <img
               src="/images/logo_main.png"
-              alt="App Logo"
+              alt="Simple Allergy Alert - allergy card app logo"
               className="max-h-full w-auto object-contain max-w-[275px] md:max-w-[350px]"
             />
           </motion.div>

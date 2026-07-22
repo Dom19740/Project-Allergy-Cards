@@ -22,8 +22,11 @@ import { speakText } from '@/lib/tts';
 import { useBilling } from '@/hooks/useBilling';
 import { useNetworkStatus } from '@/hooks/useNetworkStatus';
 import { useShrinkToFit } from '@/hooks/useShrinkToFit';
+import { usePageSEO } from '@/hooks/usePageSEO';
 
 const EmergencyPage = () => {
+  usePageSEO({ title: 'Emergency Card | Simple Allergy Alert' });
+
   const { langCode } = useParams<{ langCode: string }>();
   const [searchParams] = useSearchParams();
   const navigate = useNavigate();

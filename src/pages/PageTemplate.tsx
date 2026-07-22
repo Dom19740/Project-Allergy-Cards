@@ -3,8 +3,11 @@
 import React from 'react';
 import FixedHeader from '@/components/FixedHeader';
 import { Button } from '@/components/ui/button'; // Import Button component
+import { usePageSEO } from '@/hooks/usePageSEO';
 
 const PageTemplate = () => {
+  usePageSEO({ title: 'Simple Allergy Alert' });
+
   return (
     <div className="flex flex-col min-h-screen bg-gray-100 dark:bg-gray-900">
       <FixedHeader />

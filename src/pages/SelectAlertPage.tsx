@@ -14,8 +14,11 @@ import { useNetworkStatus } from '@/hooks/useNetworkStatus';
 import { FirebaseAnalytics } from '@capacitor-firebase/analytics';
 import { Capacitor } from '@capacitor/core';
 import { DEFAULT_CUSTOM_MESSAGES } from '@/lib/customMessages';
+import { usePageSEO } from '@/hooks/usePageSEO';
 
 const SelectAlertPage = () => {
+  usePageSEO({ title: 'Customize Your Alert | Simple Allergy Alert' });
+
   const navigate = useNavigate();
   const location = useLocation();
   const returnTo = (location.state as { returnTo?: string } | null)?.returnTo;

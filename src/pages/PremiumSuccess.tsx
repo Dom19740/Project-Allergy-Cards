@@ -5,8 +5,11 @@ import { Button } from '@/components/ui/button';
 import { syncPremiumCache } from '@/lib/billing';
 import { getAffiliateRef } from '@/lib/affiliate';
 import { FirebaseAnalytics } from '@capacitor-firebase/analytics';
+import { usePageSEO } from '@/hooks/usePageSEO';
 
 const PremiumSuccess = () => {
+  usePageSEO({ title: 'Premium Unlocked | Simple Allergy Alert' });
+
   const [searchParams] = useSearchParams();
   const navigate = useNavigate();
   const [status, setStatus] = useState<'loading' | 'success' | 'error'>('loading');

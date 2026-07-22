@@ -8,6 +8,7 @@ import { Button } from '@/components/ui/button';
 import { storage, STORAGE_KEYS } from '@/lib/storage';
 import FixedHeader from '@/components/FixedHeader';
 import OnboardingStep from '@/components/OnboardingStep';
+import { usePageSEO } from '@/hooks/usePageSEO';
 
 const ONBOARDING_STEPS = [
   {
@@ -61,6 +62,8 @@ const ONBOARDING_STEPS = [
 ];
 
 const Onboarding = () => {
+  usePageSEO({ title: 'Get Started | Simple Allergy Alert' });
+
   const [currentStep, setCurrentStep] = useState(0);
   // Whether the user has ever clicked all the way through to the end of
   // onboarding before. Until they have, the Intro step's secondary button is

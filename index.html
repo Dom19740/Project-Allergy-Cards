@@ -8,9 +8,30 @@
     <meta name="msapplication-TileColor" content="#ffffff" />
     <meta name="color-scheme" content="light dark" />
     <title>Simple Allergy Alert</title>
+    <link rel="canonical" href="https://app.simpleallergyalert.com/" />
 
     <!-- PWA Manifest -->
     <link rel="manifest" href="/manifest.json" />
+
+    <!-- Structured data so search engines can surface this as an app, not
+         just a generic page (eligible for app-style rich results). -->
+    <script type="application/ld+json">
+      {
+        "@context": "https://schema.org",
+        "@type": "SoftwareApplication",
+        "name": "Simple Allergy Alert",
+        "alternateName": "Allergy Card App",
+        "applicationCategory": "HealthApplication",
+        "operatingSystem": "Android, iOS, Web",
+        "url": "https://app.simpleallergyalert.com/",
+        "description": "Create translated allergy alert cards in 100+ languages to show restaurants, hotels and hosts exactly what you can't eat, anywhere in the world.",
+        "offers": {
+          "@type": "Offer",
+          "price": "0",
+          "priceCurrency": "USD"
+        }
+      }
+    </script>
 
     <!-- Favicons / App icons (served from public/) -->
     <link rel="icon" href="/favicon.ico" />

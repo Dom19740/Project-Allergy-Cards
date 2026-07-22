@@ -1,7 +1,10 @@
 import { useLocation } from "react-router-dom";
 import { useEffect } from "react";
+import { usePageSEO } from "@/hooks/usePageSEO";
 
 const NotFound = () => {
+  usePageSEO({ title: 'Page Not Found | Simple Allergy Alert' });
+
   const location = useLocation();
 
   useEffect(() => {

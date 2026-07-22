@@ -16,8 +16,11 @@ import { VERIFIED_LANGUAGE_CODES } from "@/lib/supportedLanguages";
 import { toast } from "sonner";
 import { FirebaseAnalytics } from '@capacitor-firebase/analytics';
 import { Capacitor } from '@capacitor/core';
+import { usePageSEO } from '@/hooks/usePageSEO';
 
 const LanguageSelectionPage = () => {
+  usePageSEO({ title: 'Choose a Language | Simple Allergy Alert' });
+
   const navigate = useNavigate();
   const location = useLocation();
   const returnBase = (location.state as { returnBase?: string } | null)?.returnBase;

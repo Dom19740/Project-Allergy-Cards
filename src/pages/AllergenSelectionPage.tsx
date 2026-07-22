@@ -16,8 +16,11 @@ import { useBilling } from '@/hooks/useBilling';
 import { useNetworkStatus } from '@/hooks/useNetworkStatus';
 import { FirebaseAnalytics } from '@capacitor-firebase/analytics';
 import { Capacitor } from '@capacitor/core';
+import { usePageSEO } from '@/hooks/usePageSEO';
 
 const AllergenSelectionPage = () => {
+  usePageSEO({ title: 'Select Your Allergens | Simple Allergy Alert' });
+
   const navigate = useNavigate();
   const location = useLocation();
   const returnTo = (location.state as { returnTo?: string } | null)?.returnTo;

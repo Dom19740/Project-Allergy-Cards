@@ -7,8 +7,11 @@ import { CustomMessages, LanguageCode, TranslatedContent } from '@/lib/types';
 import NotFound from './NotFound';
 import { storage, STORAGE_KEYS } from '@/lib/storage';
 import { resolveCustomMessages, computeContentSignature } from '@/lib/customMessages';
+import { usePageSEO } from '@/hooks/usePageSEO';
 
 const AllergyAlertPage = () => {
+  usePageSEO({ title: 'Your Allergy Card | Simple Allergy Alert' });
+
   const { langCode } = useParams<{ langCode: string }>();
   const location = useLocation();
   const [selectedAllergens, setSelectedAllergens] = useState<string[]>([]);
