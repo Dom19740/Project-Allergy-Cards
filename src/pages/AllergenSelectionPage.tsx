@@ -6,10 +6,12 @@ import { motion } from 'framer-motion';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { toast } from 'sonner';
-import { X, Utensils, Crown, WifiOff } from 'lucide-react';
+import { X, Utensils, Crown, WifiOff, Camera } from 'lucide-react';
 import { ALLERGEN_OPTIONS } from '@/lib/allergens';
 import FixedHeader from '@/components/FixedHeader';
 import StepHeader from '@/components/StepHeader';
+import CustomAllergenImageDialog from '@/components/CustomAllergenImageDialog';
+import { getCustomAllergenImages, setCustomAllergenImage, removeCustomAllergenImage } from '@/lib/customAllergenImages';
 import { storage, STORAGE_KEYS } from '@/lib/storage';
 import { cn } from '@/lib/utils';
 import { useBilling } from '@/hooks/useBilling';
@@ -29,7 +31,13 @@ const AllergenSelectionPage = () => {
   const [selectedAllergens, setSelectedAllergens] = useState<string[]>([]);
   const [customAllergenInput, setCustomAllergenInput] = useState<string>('');
   const [customList, setCustomList] = useState<string[]>([]);
+  const [customImages, setCustomImages] = useState<Record<string, string>>({});
+  const [imageDialogAllergen, setImageDialogAllergen] = useState<string | null>(null);
   const bottomRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    getCustomAllergenImages().then(setCustomImages);
+  }, []);
 
   useEffect(() => {
     const loadData = async () => {
@@ -87,7 +95,7 @@ const AllergenSelectionPage = () => {
     setSelectedAllergens(prev => [...prev, trimmedInput]);
     setCustomAllergenInput('');
     toast.success(`"${trimmedInput}" added.`);
-    
+
     if (Capacitor.isNativePlatform()) {
       FirebaseAnalytics.logEvent({
         name: 'custom_allergen_added',
@@ -95,6 +103,7 @@ const AllergenSelectionPage = () => {
       });
     }
 
+    setImageDialogAllergen(trimmedInput);
     setTimeout(scrollToBottom, 100);
   };
 
@@ -102,7 +111,31 @@ const AllergenSelectionPage = () => {
     e.stopPropagation();
     setCustomList(prev => prev.filter(item => item !== allergen));
     setSelectedAllergens(prev => prev.filter(item => item !== allergen));
+    setCustomImages(prev => {
+      const next = { ...prev };
+      delete next[allergen];
+      return next;
+    });
+    removeCustomAllergenImage(allergen);
     toast.info(`"${allergen}" removed.`);
+  };
+
+  const handleImageChange = async (dataUrl: string | null) => {
+    const name = imageDialogAllergen;
+    setImageDialogAllergen(null);
+    if (!name) return;
+
+    if (dataUrl) {
+      await setCustomAllergenImage(name, dataUrl);
+      setCustomImages(prev => ({ ...prev, [name]: dataUrl }));
+    } else {
+      await removeCustomAllergenImage(name);
+      setCustomImages(prev => {
+        const next = { ...prev };
+        delete next[name];
+        return next;
+      });
+    }
   };
 
   const standardAllergenIds = ALLERGEN_OPTIONS.map(opt => opt.id);
@@ -193,7 +226,7 @@ const AllergenSelectionPage = () => {
                       : "bg-white dark:bg-gray-800 border-transparent text-gray-700 dark:text-gray-300 hover:border-red-200 dark:hover:border-red-900/30"
                   )}
                 >
-                  <button 
+                  <button
                     onClick={(e) => removeCustomAllergen(e, allergen)}
                     className={cn(
                       "absolute top-0.5 right-0.5 p-0.5 rounded-full hover:bg-black/10 transition-colors",
@@ -202,8 +235,18 @@ const AllergenSelectionPage = () => {
                   >
                     <X className="w-3 h-3" />
                   </button>
-                  <div className="w-8 h-8 rounded-lg flex items-center justify-center shrink-0 bg-white">
-                    <Utensils className={cn("w-4 h-4", isSelected ? "text-red-600" : "text-gray-500")} />
+                  <div className="relative w-8 h-8 rounded-lg flex items-center justify-center shrink-0 bg-white overflow-hidden">
+                    {customImages[allergen] ? (
+                      <img src={customImages[allergen]} alt={allergen} className="w-full h-full object-cover" />
+                    ) : (
+                      <Utensils className={cn("w-4 h-4", isSelected ? "text-red-600" : "text-gray-500")} />
+                    )}
+                    <button
+                      onClick={(e) => { e.stopPropagation(); setImageDialogAllergen(allergen); }}
+                      className="absolute -bottom-1 -right-1 p-0.5 rounded-full bg-gray-700 text-white shadow hover:bg-gray-900"
+                    >
+                      <Camera className="w-2.5 h-2.5" />
+                    </button>
                   </div>
                   <span className="text-[12px] font-bold leading-tight truncate w-full px-1">{allergen}</span>
                 </div>
@@ -269,6 +312,14 @@ const AllergenSelectionPage = () => {
           </Button>
         </div>
       </div>
+
+      <CustomAllergenImageDialog
+        isOpen={imageDialogAllergen !== null}
+        allergenName={imageDialogAllergen ?? ''}
+        currentImage={imageDialogAllergen ? customImages[imageDialogAllergen] : undefined}
+        onClose={() => setImageDialogAllergen(null)}
+        onImageChange={handleImageChange}
+      />
     </div>
   );
 };

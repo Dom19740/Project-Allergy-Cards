@@ -18,6 +18,7 @@ import EmergencyNumberDialog from './EmergencyNumberDialog';
 import FullscreenImageOverlay from './FullscreenImageOverlay';
 import AllergenDetailOverlay from './AllergenDetailOverlay';
 import { storage, STORAGE_KEYS } from '@/lib/storage';
+import { getCustomAllergenImages } from '@/lib/customAllergenImages';
 import { resolveCustomMessages, computeContentSignature, DEFAULT_CUSTOM_MESSAGES } from '@/lib/customMessages';
 import { useNetworkStatus } from '@/hooks/useNetworkStatus';
 import { useBilling } from '@/hooks/useBilling';
@@ -49,6 +50,7 @@ const AllergyCard: React.FC<AllergyCardProps> = ({ languageCode, selectedAllerge
   const [isImageFullscreen, setIsImageFullscreen] = useState(false);
   const [selectedPillIndex, setSelectedPillIndex] = useState<number | null>(null);
   const [customAllergenTranslations, setCustomAllergenTranslations] = useState<{ [key: string]: { [lang: string]: string } }>({});
+  const [customAllergenImages, setCustomAllergenImages] = useState<Record<string, string>>({});
   const [translatedAllergens, setTranslatedAllergens] = useState<{ [key: string]: string }>(initialTranslations?.allergens || {});
   const [isTranslating, setIsTranslating] = useState(!initialTranslations);
   const [translationError, setTranslationError] = useState<string | null>(null);
@@ -72,6 +74,10 @@ const AllergyCard: React.FC<AllergyCardProps> = ({ languageCode, selectedAllerge
   });
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [verifiedEmergencyNumber, setVerifiedEmergencyNumber] = useState<string | null>(null);
+
+  useEffect(() => {
+    getCustomAllergenImages().then(setCustomAllergenImages);
+  }, []);
 
   useEffect(() => {
     const loadVerifiedEmergencyNumber = async () => {
@@ -436,7 +442,12 @@ const AllergyCard: React.FC<AllergyCardProps> = ({ languageCode, selectedAllerge
   const displayAllergenList = showOriginal ? englishAllergenList : translatedAllergenList;
 
   const allergensWithImages = selectedAllergens
-    .map(id => ALLERGEN_OPTIONS.find(option => option.id === id))
+    .map(id => {
+      const predefined = ALLERGEN_OPTIONS.find(option => option.id === id);
+      if (predefined) return predefined;
+      const customImage = customAllergenImages[id];
+      return customImage ? { id, name: id, image: customImage } : null;
+    })
     .filter(Boolean) as typeof ALLERGEN_OPTIONS;
 
   const imageGridStyle = getAllergenGridStyle(allergensWithImages.length);
@@ -594,7 +605,10 @@ const AllergyCard: React.FC<AllergyCardProps> = ({ languageCode, selectedAllerge
         onClose={() => setSelectedPillIndex(null)}
         translatedName={selectedPillIndex !== null ? translatedAllergenList[selectedPillIndex] : ''}
         englishName={selectedPillIndex !== null ? englishAllergenList[selectedPillIndex] : ''}
-        image={selectedPillIndex !== null ? ALLERGEN_OPTIONS.find(opt => opt.id === selectedAllergens[selectedPillIndex])?.image : undefined}
+        image={selectedPillIndex !== null
+          ? (ALLERGEN_OPTIONS.find(opt => opt.id === selectedAllergens[selectedPillIndex])?.image
+              ?? customAllergenImages[selectedAllergens[selectedPillIndex]])
+          : undefined}
       />
       {fullSelectedData && (
         <SaveCardDialog

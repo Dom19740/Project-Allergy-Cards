@@ -1,0 +1,114 @@
+"use client";
+
+import React, { useRef, useState } from 'react';
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
+import { Button } from '@/components/ui/button';
+import { Search, Upload, Trash2 } from 'lucide-react';
+import { toast } from 'sonner';
+import { fileToCompressedDataUrl } from '@/lib/customAllergenImages';
+
+interface CustomAllergenImageDialogProps {
+  isOpen: boolean;
+  onClose: () => void;
+  allergenName: string;
+  currentImage?: string;
+  onImageChange: (dataUrl: string | null) => void;
+}
+
+const CustomAllergenImageDialog: React.FC<CustomAllergenImageDialogProps> = ({
+  isOpen,
+  onClose,
+  allergenName,
+  currentImage,
+  onImageChange,
+}) => {
+  const [isBusy, setIsBusy] = useState(false);
+  const fileInputRef = useRef<HTMLInputElement>(null);
+
+  const handleSearchWeb = () => {
+    const query = encodeURIComponent(allergenName);
+    window.open(`https://www.google.com/search?tbm=isch&q=${query}`, '_blank', 'noopener,noreferrer');
+  };
+
+  const handleUploadClick = () => {
+    fileInputRef.current?.click();
+  };
+
+  const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    e.target.value = '';
+    if (!file) return;
+
+    setIsBusy(true);
+    try {
+      const dataUrl = await fileToCompressedDataUrl(file);
+      onImageChange(dataUrl);
+      onClose();
+    } catch (error: any) {
+      toast.error(error?.message || 'Could not use that image.');
+    } finally {
+      setIsBusy(false);
+    }
+  };
+
+  const handleRemove = () => {
+    onImageChange(null);
+    onClose();
+  };
+
+  return (
+    <Dialog open={isOpen} onOpenChange={onClose}>
+      <DialogContent className="w-[90%] max-w-[400px] rounded-2xl border-gray-200 dark:border-gray-700 shadow-2xl p-5">
+        <DialogHeader className="mb-2">
+          <DialogTitle className="text-xl font-bold text-gray-900 dark:text-white">
+            {currentImage ? `Change image for "${allergenName}"` : `Add an image for "${allergenName}"`}
+          </DialogTitle>
+        </DialogHeader>
+
+        <div className="flex flex-col gap-3">
+          <Button
+            onClick={handleSearchWeb}
+            disabled={isBusy}
+            variant="outline"
+            className="w-full h-12 rounded-xl border-gray-200 justify-start gap-3 px-4"
+          >
+            <Search className="h-4 w-4" />
+            Search the web
+          </Button>
+
+          <Button
+            onClick={handleUploadClick}
+            disabled={isBusy}
+            variant="outline"
+            className="w-full h-12 rounded-xl border-gray-200 justify-start gap-3 px-4"
+          >
+            <Upload className="h-4 w-4" />
+            Upload from device
+          </Button>
+
+          {currentImage && (
+            <Button
+              onClick={handleRemove}
+              disabled={isBusy}
+              variant="outline"
+              className="w-full h-12 rounded-xl border-red-200 text-red-600 justify-start gap-3 px-4 hover:bg-red-50"
+            >
+              <Trash2 className="h-4 w-4" />
+              Remove image
+            </Button>
+          )}
+
+          <input
+            ref={fileInputRef}
+            type="file"
+            accept="image/*"
+            className="hidden"
+            onChange={handleFileChange}
+          />
+        </div>
+      </DialogContent>
+    </Dialog>
+  );
+};
+
+export default CustomAllergenImageDialog;

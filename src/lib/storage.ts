@@ -14,6 +14,7 @@ export const STORAGE_KEYS = {
   OPEN_EMERGENCY_DIALOG_FLAG: 'openEmergencyDialogFlag',
   INSTALL_BANNER_DISMISSED: 'installBannerDismissed',
   HAS_COMPLETED_ONBOARDING: 'hasCompletedOnboarding',
+  CUSTOM_ALLERGEN_IMAGES: 'customAllergenImages',
 };
 
 export const storage = {
