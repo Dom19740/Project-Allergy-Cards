@@ -18,6 +18,27 @@ export default {
       },
     },
     extend: {
+      fontFamily: {
+        // 'Inter' is self-hosted (see src/globals.css) with a genuine 900
+        // weight, so font-black headings render the same on every platform -
+        // stock Android's Roboto has no true Black weight, which is why
+        // those headings looked different there specifically. Falls back to
+        // each platform's native system font for anything Inter doesn't
+        // cover (non-Latin/Cyrillic/Greek scripts), same as before.
+        sans: [
+          "Inter",
+          "ui-sans-serif",
+          "system-ui",
+          "-apple-system",
+          "BlinkMacSystemFont",
+          "Segoe UI",
+          "Roboto",
+          "Helvetica Neue",
+          "Arial",
+          "Noto Sans",
+          "sans-serif",
+        ],
+      },
       colors: {
         border: "hsl(var(--border))",
         input: "hsl(var(--input))",

@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+    Replaces the old per-density/orientation splash.png bitmaps. Those were
+    stretched to exactly fill android:windowBackground's bounds on every
+    device (Android's default behavior for a raw bitmap windowBackground has
+    no aspect-ratio preservation), and since real screens rarely match the
+    fixed aspect ratios those PNGs were baked at, the circular icon came out
+    visibly egg-shaped/stretched. A layer-list with a centered <bitmap> draws
+    the icon at its natural size on every screen instead of stretching it.
+-->
+<layer-list xmlns:android="http://schemas.android.com/apk/res/android">
+    <item android:drawable="@color/ic_launcher_background" />
+    <item>
+        <bitmap
+            android:src="@mipmap/ic_launcher_foreground"
+            android:gravity="center" />
+    </item>
+</layer-list>
