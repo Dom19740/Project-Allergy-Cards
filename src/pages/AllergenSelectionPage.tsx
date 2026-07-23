@@ -11,7 +11,15 @@ import { ALLERGEN_OPTIONS } from '@/lib/allergens';
 import FixedHeader from '@/components/FixedHeader';
 import StepHeader from '@/components/StepHeader';
 import CustomAllergenImageDialog from '@/components/CustomAllergenImageDialog';
-import { getCustomAllergenImages, setCustomAllergenImage, removeCustomAllergenImage, getSavedCardNamesUsingAllergen } from '@/lib/customAllergenImages';
+import {
+  getCustomAllergenImages,
+  setCustomAllergenImage,
+  removeCustomAllergenImage,
+  getSavedCardNamesUsingAllergen,
+  getCustomAllergenNames,
+  addCustomAllergenName,
+  removeCustomAllergenName,
+} from '@/lib/customAllergenImages';
 import { storage, STORAGE_KEYS } from '@/lib/storage';
 import { cn } from '@/lib/utils';
 import { useBilling } from '@/hooks/useBilling';
@@ -41,9 +49,15 @@ const AllergenSelectionPage = () => {
 
   useEffect(() => {
     const loadData = async () => {
+      // The registry (getCustomAllergenNames) is the actual source of truth
+      // for "every custom allergen this device knows about" - it's what
+      // makes them show up immediately after a backup restore, rather than
+      // only once a card that happens to use one gets loaded.
+      const registryNames = await getCustomAllergenNames();
+
       const storedData = await storage.get<any>(STORAGE_KEYS.SELECTED_ALLERGENS);
+      let ids: string[] = [];
       if (storedData) {
-        let ids: string[] = [];
         if (Array.isArray(storedData)) {
           ids = storedData;
         } else if (storedData.ids) {
@@ -52,15 +66,11 @@ const AllergenSelectionPage = () => {
           ids = [...(storedData.standard || []), ...(storedData.custom || [])];
         }
         setSelectedAllergens(ids);
-        
-        if (storedData.persistentCustomList) {
-          setCustomList(storedData.persistentCustomList);
-        } else {
-          const standardIds = ALLERGEN_OPTIONS.map(opt => opt.id);
-          const custom = ids.filter(id => !standardIds.includes(id));
-          setCustomList(custom);
-        }
       }
+
+      const standardIds = ALLERGEN_OPTIONS.map(opt => opt.id);
+      const customFromSelection = ids.filter(id => !standardIds.includes(id));
+      setCustomList(Array.from(new Set([...registryNames, ...customFromSelection])));
     };
     loadData();
   }, []);
@@ -94,6 +104,7 @@ const AllergenSelectionPage = () => {
     setCustomList(prev => [...prev, trimmedInput]);
     setSelectedAllergens(prev => [...prev, trimmedInput]);
     setCustomAllergenInput('');
+    addCustomAllergenName(trimmedInput);
     toast.success(`"${trimmedInput}" added.`);
 
     if (Capacitor.isNativePlatform()) {
@@ -124,6 +135,7 @@ const AllergenSelectionPage = () => {
       return next;
     });
     removeCustomAllergenImage(allergen);
+    removeCustomAllergenName(allergen);
     toast.info(`"${allergen}" removed.`);
   };
 

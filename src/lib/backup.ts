@@ -4,8 +4,9 @@ import { Clipboard } from '@capacitor/clipboard';
 import { Share } from '@capacitor/share';
 import { storage, STORAGE_KEYS } from '@/lib/storage';
 import { SavedCard, CustomAlertPreset } from '@/lib/types';
-import { CustomAllergenImageMap, getCustomAllergenImages } from '@/lib/customAllergenImages';
+import { CustomAllergenImageMap, getCustomAllergenImages, getCustomAllergenNames, mergeCustomAllergenNames } from '@/lib/customAllergenImages';
 import { getCustomAlertPresets, MAX_CUSTOM_ALERT_PRESETS } from '@/lib/customAlertPresets';
+import { ALLERGEN_OPTIONS } from '@/lib/allergens';
 
 const BACKUP_VERSION = 1;
 
@@ -21,6 +22,7 @@ interface BackupPayload {
   savedCards: SavedCard[];
   emergencyCard: SavedCard | null;
   customAllergenImages: CustomAllergenImageMap;
+  customAllergenNames: string[];
   customAlertPresets: CustomAlertPreset[];
 }
 
@@ -28,6 +30,7 @@ export interface ParsedBackup {
   savedCards: SavedCard[];
   emergencyCard: SavedCard | null;
   customAllergenImages: CustomAllergenImageMap;
+  customAllergenNames: string[];
   customAlertPresets: CustomAlertPreset[];
   wasPremiumAtBackup: boolean;
 }
@@ -66,6 +69,7 @@ const buildPayload = (
   savedCards: SavedCard[],
   emergencyCard: SavedCard | null,
   customAllergenImages: CustomAllergenImageMap,
+  customAllergenNames: string[],
   customAlertPresets: CustomAlertPreset[],
   wasPremiumAtBackup: boolean
 ): { fileName: string; json: string } => {
@@ -76,6 +80,7 @@ const buildPayload = (
     savedCards,
     emergencyCard,
     customAllergenImages,
+    customAllergenNames,
     customAlertPresets,
   };
 
@@ -86,14 +91,15 @@ const buildPayload = (
 };
 
 const buildBackupFile = async (isPremium: boolean): Promise<{ fileName: string; json: string }> => {
-  const [savedCards, emergencyCard, customAllergenImages, customAlertPresets] = await Promise.all([
+  const [savedCards, emergencyCard, customAllergenImages, customAllergenNames, customAlertPresets] = await Promise.all([
     storage.get<SavedCard[]>(STORAGE_KEYS.SAVED_CARDS).then((cards) => cards || []),
     storage.get<SavedCard>(STORAGE_KEYS.SAVED_EMERGENCY_CARD),
     getCustomAllergenImages(),
+    getCustomAllergenNames(),
     getCustomAlertPresets(),
   ]);
 
-  return buildPayload(savedCards, emergencyCard, customAllergenImages, customAlertPresets, isPremium);
+  return buildPayload(savedCards, emergencyCard, customAllergenImages, customAllergenNames, customAlertPresets, isPremium);
 };
 
 const downloadBlob = (json: string, fileName: string) => {
@@ -200,22 +206,31 @@ export const parseBackupPayload = (text: string): ParsedBackup => {
     : [];
   const emergencyCard: SavedCard | null = isValidSavedCard(parsed?.emergencyCard) ? parsed.emergencyCard : null;
   const customAllergenImages: CustomAllergenImageMap = isValidImageMap(parsed?.customAllergenImages) ? parsed.customAllergenImages : {};
+  const customAllergenNames: string[] = Array.isArray(parsed?.customAllergenNames)
+    ? parsed.customAllergenNames.filter((n: unknown) => typeof n === 'string')
+    : [];
   const customAlertPresets: CustomAlertPreset[] = Array.isArray(parsed?.customAlertPresets)
     ? parsed.customAlertPresets.filter(isValidPreset)
     : [];
   const wasPremiumAtBackup = parsed?.wasPremiumAtBackup === true;
 
-  if (savedCards.length === 0 && !emergencyCard && Object.keys(customAllergenImages).length === 0 && customAlertPresets.length === 0) {
+  if (
+    savedCards.length === 0 &&
+    !emergencyCard &&
+    Object.keys(customAllergenImages).length === 0 &&
+    customAllergenNames.length === 0 &&
+    customAlertPresets.length === 0
+  ) {
     throw new Error("That doesn't contain any saved cards.");
   }
 
-  return { savedCards, emergencyCard, customAllergenImages, customAlertPresets, wasPremiumAtBackup };
+  return { savedCards, emergencyCard, customAllergenImages, customAllergenNames, customAlertPresets, wasPremiumAtBackup };
 };
 
 // Writes an already-parsed backup to storage, capping saved cards at
 // maxSavedCards (same rule as creating a new card - see SaveCardDialog).
 export const applyParsedBackup = async (parsed: ParsedBackup, maxSavedCards: number): Promise<BackupImportResult> => {
-  const { savedCards, emergencyCard, customAllergenImages: backupImages, customAlertPresets: backupPresets } = parsed;
+  const { savedCards, emergencyCard, customAllergenImages: backupImages, customAllergenNames, customAlertPresets: backupPresets } = parsed;
 
   const cappedCards = savedCards.slice(0, maxSavedCards);
   await storage.set(STORAGE_KEYS.SAVED_CARDS, cappedCards);
@@ -229,6 +244,24 @@ export const applyParsedBackup = async (parsed: ParsedBackup, maxSavedCards: num
     // wipe out custom allergen images already saved on this one.
     const existingImages = await getCustomAllergenImages();
     await storage.set(STORAGE_KEYS.CUSTOM_ALLERGEN_IMAGES, { ...existingImages, ...backupImages });
+  }
+
+  // Union the explicit name registry with names discovered elsewhere in the
+  // backup - the image map's keys and any custom (non-standard) allergen ids
+  // still referenced by imported cards - so an older backup made before this
+  // registry existed still surfaces its custom allergens immediately instead
+  // of only once a card using them gets loaded.
+  // Scan the full (pre-cap) savedCards list, not cappedCards - a custom
+  // allergen used only on a card that got capped out for being over the plan
+  // limit should still register, since it's still a real allergen the user
+  // created and may reuse on a new card.
+  const standardIds = new Set(ALLERGEN_OPTIONS.map((opt) => opt.id));
+  const idsFromCards = [...savedCards, ...(emergencyCard ? [emergencyCard] : [])]
+    .flatMap((card) => card.selectedAllergens?.ids || [])
+    .filter((id) => !standardIds.has(id));
+  const namesToMerge = Array.from(new Set([...customAllergenNames, ...Object.keys(backupImages), ...idsFromCards]));
+  if (namesToMerge.length > 0) {
+    await mergeCustomAllergenNames(namesToMerge);
   }
 
   let importedPresetCount = 0;

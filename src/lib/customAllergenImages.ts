@@ -36,6 +36,42 @@ export async function removeCustomAllergenImage(name: string): Promise<void> {
   await storage.set(STORAGE_KEYS.CUSTOM_ALLERGEN_IMAGES, map);
 }
 
+// The device-wide list of every custom allergen name the user has ever
+// created, independent of any single card or in-progress wizard session.
+// AllergenSelectionPage used to derive its chip list from the *last loaded
+// card's* selectedAllergens (STORAGE_KEYS.SELECTED_ALLERGENS), which meant a
+// custom allergen only reappeared once you specifically loaded the card that
+// used it - including right after a backup restore, since the restore never
+// touches that in-progress-wizard key. This registry is the actual source of
+// truth so the Select Allergens screen can show everything immediately.
+export async function getCustomAllergenNames(): Promise<string[]> {
+  return (await storage.get<string[]>(STORAGE_KEYS.CUSTOM_ALLERGEN_NAMES)) || [];
+}
+
+export async function addCustomAllergenName(name: string): Promise<string[]> {
+  const names = await getCustomAllergenNames();
+  if (names.includes(name)) return names;
+  const updated = [...names, name];
+  await storage.set(STORAGE_KEYS.CUSTOM_ALLERGEN_NAMES, updated);
+  return updated;
+}
+
+export async function removeCustomAllergenName(name: string): Promise<string[]> {
+  const names = await getCustomAllergenNames();
+  const updated = names.filter((n) => n !== name);
+  await storage.set(STORAGE_KEYS.CUSTOM_ALLERGEN_NAMES, updated);
+  return updated;
+}
+
+// Union merge used by backup restore - never drops names already known on
+// this device to make room for a backup taken elsewhere.
+export async function mergeCustomAllergenNames(names: string[]): Promise<string[]> {
+  const existing = await getCustomAllergenNames();
+  const merged = Array.from(new Set([...existing, ...names]));
+  await storage.set(STORAGE_KEYS.CUSTOM_ALLERGEN_NAMES, merged);
+  return merged;
+}
+
 // Fits the whole image within a square canvas (letterboxed with white
 // padding on the shorter side) then downscales to targetSize, matching the
 // 350x350 dimensions of the built-in allergen icons in public/allergens/ so

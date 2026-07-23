@@ -2,11 +2,15 @@
 
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { Menu } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import FixedHeader from '@/components/FixedHeader';
 import SavedCardsList from '@/components/SavedCardsList';
 import ProtectCardsDialog from '@/components/ProtectCardsDialog';
 import BackupRestoreDialog from '@/components/BackupRestoreDialog';
+import HomeMenu from '@/components/HomeMenu';
+import PromoCodeDialog from '@/components/PromoCodeDialog';
+import RestorePurchaseDialog from '@/components/RestorePurchaseDialog';
 import { storage, STORAGE_KEYS } from '@/lib/storage';
 import { SavedCard } from '@/lib/types';
 import { useBilling } from '@/hooks/useBilling';
@@ -17,9 +21,12 @@ import { usePageSEO } from '@/hooks/usePageSEO';
 
 const Home = () => {
   const navigate = useNavigate();
-  const { isPremium } = useBilling();
+  const { isPremium, restorePurchases } = useBilling();
   const [hasCards, setHasCards] = useState(false);
   const [showBackupDialog, setShowBackupDialog] = useState(false);
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const [showPromoCodeDialog, setShowPromoCodeDialog] = useState(false);
+  const [showRestorePurchaseDialog, setShowRestorePurchaseDialog] = useState(false);
 
   usePageSEO({
     title: 'Allergy Card App | Simple Allergy Alert',
@@ -58,6 +65,14 @@ const Home = () => {
 
   const handleAddCard = () => {
     navigate('/select-allergens');
+  };
+
+  const handleRestorePurchaseClick = () => {
+    if (Capacitor.getPlatform() === 'web') {
+      setShowRestorePurchaseDialog(true);
+    } else {
+      restorePurchases();
+    }
   };
 
   const showDescription = !hasCards;
@@ -130,20 +145,23 @@ const Home = () => {
             transition={{ duration: 0.3, ease: "easeInOut" }}
             className="w-full flex flex-col items-center gap-2 overflow-hidden"
           >
-            <Button
-              onClick={handleGetStarted}
-              variant="primary"
-              className="py-3 px-8 text-lg h-auto w-[180px] rounded-xl shadow-lg transition-transform active:scale-95 flex items-center"
-            >
-              Get Started
-            </Button>
+            <div className="relative w-full flex items-center justify-center">
+              <button
+                onClick={() => setIsMenuOpen(true)}
+                aria-label="Menu"
+                className="absolute left-0 flex items-center justify-center h-10 w-10 rounded-full text-gray-500 hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors"
+              >
+                <Menu className="h-5 w-5" />
+              </button>
 
-            <button
-              onClick={() => setShowBackupDialog(true)}
-              className="text-[11px] font-bold text-gray-400 hover:text-red-600 uppercase tracking-wider"
-            >
-              Restore from backup
-            </button>
+              <Button
+                onClick={handleGetStarted}
+                variant="primary"
+                className="py-3 px-8 text-lg h-auto w-[180px] rounded-xl shadow-lg transition-transform active:scale-95 flex items-center"
+              >
+                Get Started
+              </Button>
+            </div>
           </motion.div>
 
           <p className="flex items-center gap-2 text-[10px] text-gray-400 dark:text-gray-500 uppercase tracking-widest font-bold">
@@ -156,6 +174,21 @@ const Home = () => {
         </div>
       </div>
 
+      <HomeMenu
+        isOpen={isMenuOpen}
+        onClose={() => setIsMenuOpen(false)}
+        onOpenPromoCode={() => setShowPromoCodeDialog(true)}
+        onOpenRestorePurchase={handleRestorePurchaseClick}
+        onOpenBackupRestore={() => setShowBackupDialog(true)}
+      />
+      <PromoCodeDialog
+        isOpen={showPromoCodeDialog}
+        onClose={() => setShowPromoCodeDialog(false)}
+        onSuccess={() => {
+          // Success logic is handled inside the dialog
+        }}
+      />
+      <RestorePurchaseDialog isOpen={showRestorePurchaseDialog} onClose={() => setShowRestorePurchaseDialog(false)} />
       <BackupRestoreDialog isOpen={showBackupDialog} onClose={() => setShowBackupDialog(false)} />
       <ProtectCardsDialog visible={hasCards} />
     </div>
