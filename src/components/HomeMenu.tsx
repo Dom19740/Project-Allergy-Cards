@@ -6,6 +6,7 @@ import { X, Gift, RotateCcw, Upload } from 'lucide-react';
 interface HomeMenuProps {
   isOpen: boolean;
   onClose: () => void;
+  isPremium: boolean;
   onOpenPromoCode: () => void;
   onOpenRestorePurchase: () => void;
   onOpenBackupRestore: () => void;
@@ -14,13 +15,14 @@ interface HomeMenuProps {
 // Mirrors CardMenu's bottom-sheet look and feel, but triggered from a
 // separate burger button on the Home screen rather than the card's action
 // bar - see the burger icon next to the Get Started button in Home.tsx.
-const HomeMenu: React.FC<HomeMenuProps> = ({ isOpen, onClose, onOpenPromoCode, onOpenRestorePurchase, onOpenBackupRestore }) => {
+const HomeMenu: React.FC<HomeMenuProps> = ({ isOpen, onClose, isPremium, onOpenPromoCode, onOpenRestorePurchase, onOpenBackupRestore }) => {
   if (!isOpen) return null;
 
   const menuItems = [
     { label: "Redeem Promo Code", icon: Gift, onClick: onOpenPromoCode },
-    { label: "Restore Purchase", icon: RotateCcw, onClick: onOpenRestorePurchase },
-    { label: "Restore from Backup", icon: Upload, onClick: onOpenBackupRestore },
+    // Nothing left to restore once Premium is already unlocked on this device.
+    ...(!isPremium ? [{ label: "Restore Purchase", icon: RotateCcw, onClick: onOpenRestorePurchase }] : []),
+    { label: "Restore Backup", icon: Upload, onClick: onOpenBackupRestore },
   ];
 
   const handleItemClick = (action: () => void) => {

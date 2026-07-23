@@ -73,6 +73,7 @@ const Onboarding = () => {
   const [hasCompletedBefore, setHasCompletedBefore] = useState(false);
   const navigate = useNavigate();
   const location = useLocation();
+  const premiumReturnTo = (location.state as { premiumReturnTo?: string } | null)?.premiumReturnTo;
   const [emblaRef, emblaApi] = useEmblaCarousel({ loop: false });
 
   useEffect(() => {
@@ -146,6 +147,7 @@ const Onboarding = () => {
                     title={step.title}
                     description={step.description}
                     image={step.image}
+                    returnTo={premiumReturnTo}
                   />
                 </div>
               ))}

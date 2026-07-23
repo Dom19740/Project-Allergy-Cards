@@ -11,9 +11,10 @@ interface OnboardingStepProps {
   title: string;
   description: string;
   image?: string;
+  returnTo?: string;
 }
 
-const OnboardingStep: React.FC<OnboardingStepProps> = ({ title, description, image }) => {
+const OnboardingStep: React.FC<OnboardingStepProps> = ({ title, description, image, returnTo }) => {
   const hasDisclaimer = title === "Safety First";
   const hasInstallChoice = title === "Keep Your Cards Safe";
   const hasPremiumOffer = title === "Unlock Premium";
@@ -41,7 +42,7 @@ const OnboardingStep: React.FC<OnboardingStepProps> = ({ title, description, ima
               ) : hasInstallChoice ? (
                 <InstallChoiceStep />
               ) : (
-                <PremiumOfferStep />
+                <PremiumOfferStep returnTo={returnTo} />
               )}
             </div>
           </div>

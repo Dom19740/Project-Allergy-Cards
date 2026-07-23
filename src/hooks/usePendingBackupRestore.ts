@@ -1,4 +1,5 @@
 import { useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { toast } from 'sonner';
 import { parseBackupPayload, applyParsedBackup, takePendingBackupRestore } from '@/lib/backup';
 import { PREMIUM_LIMITS } from '@/lib/premium-config';
@@ -10,6 +11,8 @@ import { PREMIUM_LIMITS } from '@/lib/premium-config';
 // not just a client-side flag - finish that import automatically instead of
 // making the user re-open the file/clipboard a second time.
 export const usePendingBackupRestore = () => {
+  const navigate = useNavigate();
+
   useEffect(() => {
     const tryResume = async () => {
       const pendingText = await takePendingBackupRestore();
@@ -19,6 +22,10 @@ export const usePendingBackupRestore = () => {
         const parsed = parseBackupPayload(pendingText);
         const result = await applyParsedBackup(parsed, PREMIUM_LIMITS.MAX_SAVED_CARDS);
         toast.success(`Premium restored - imported all ${result.importedCards} card${result.importedCards === 1 ? '' : 's'} from your backup.`);
+        // The user started this from the Home screen menu - land them back
+        // there instead of leaving them on the premium/onboarding screen
+        // they detoured through to restore their purchase.
+        navigate('/');
       } catch {
         toast.error("Premium restored, but couldn't finish importing your backup. Try Paste from clipboard or Restore from file again.");
       }
@@ -30,5 +37,6 @@ export const usePendingBackupRestore = () => {
 
     window.addEventListener('premium-status-changed', handleStatusChange);
     return () => window.removeEventListener('premium-status-changed', handleStatusChange);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 };

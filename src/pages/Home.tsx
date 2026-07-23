@@ -177,6 +177,7 @@ const Home = () => {
       <HomeMenu
         isOpen={isMenuOpen}
         onClose={() => setIsMenuOpen(false)}
+        isPremium={isPremium}
         onOpenPromoCode={() => setShowPromoCodeDialog(true)}
         onOpenRestorePurchase={handleRestorePurchaseClick}
         onOpenBackupRestore={() => setShowBackupDialog(true)}

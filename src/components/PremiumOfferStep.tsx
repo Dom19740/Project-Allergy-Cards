@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useState, useEffect, useRef } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Crown, Check, Languages, ShieldAlert, MessageSquare, Save, Smartphone } from 'lucide-react';
 import { useBilling } from '@/hooks/useBilling';
@@ -22,16 +23,36 @@ const benefits = [
   { icon: Smartphone, title: "Home Screen Widget", note: "(Android Only)" },
 ];
 
+interface PremiumOfferStepProps {
+  // Wherever the user was before being sent here to unlock Premium (e.g. the
+  // allergen or language screen) - once Premium actually activates while
+  // they're looking at this step, send them straight back there instead of
+  // leaving them stranded on the onboarding carousel.
+  returnTo?: string;
+}
+
 // The content of the "Unlock Premium" onboarding step - shared between the
 // carousel slide (OnboardingStep) and the standalone /premium-onboarding
 // route, which now just redirects into the carousel at this step.
-const PremiumOfferStep = () => {
+const PremiumOfferStep: React.FC<PremiumOfferStepProps> = ({ returnTo }) => {
+  const navigate = useNavigate();
   const { purchasePremium, isPremium } = useBilling();
   const [isPromoOpen, setIsPromoOpen] = useState(false);
   const [price, setPrice] = useState('Loading...');
   const [isRestoreOpen, setIsRestoreOpen] = useState(false);
   const devTapCount = useRef(0);
   const devTapResetTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const wasPremiumRef = useRef(isPremium);
+
+  // Fires only on the false -> true transition while this step is mounted -
+  // not on initial mount, so swiping through onboarding while already
+  // Premium doesn't unexpectedly bounce the user away from the carousel.
+  useEffect(() => {
+    if (!wasPremiumRef.current && isPremium && returnTo) {
+      navigate(returnTo);
+    }
+    wasPremiumRef.current = isPremium;
+  }, [isPremium, returnTo, navigate]);
 
   // Hidden testing affordance: tap the crown icon 3x quickly to clear the
   // locally cached premium flag, without adb/bmgr gymnastics.

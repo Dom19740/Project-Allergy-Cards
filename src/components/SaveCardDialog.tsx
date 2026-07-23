@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState, useEffect, useCallback } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 import useEmblaCarousel from 'embla-carousel-react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
@@ -37,6 +37,7 @@ const SaveCardDialog: React.FC<SaveCardDialogProps> = ({
   isEmergency = false
 }) => {
   const navigate = useNavigate();
+  const location = useLocation();
   const { isPremium } = useBilling();
   const [cardName, setCardName] = useState(isEmergency ? 'Emergency Card' : '');
   const [existingCards, setExistingCards] = useState<SavedCard[]>([]);
@@ -201,7 +202,7 @@ const SaveCardDialog: React.FC<SaveCardDialogProps> = ({
               <button
                 onClick={() => {
                   handleClose();
-                  navigate('/premium-onboarding');
+                  navigate('/premium-onboarding', { state: { premiumReturnTo: location.pathname } });
                 }}
                 className="mt-1 w-full flex items-center justify-center gap-2 text-amber-600 font-bold text-sm hover:underline"
               >

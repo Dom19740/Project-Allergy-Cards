@@ -34,29 +34,13 @@ const BackupRestoreDialog: React.FC<BackupRestoreDialogProps> = ({ isOpen, onClo
   const maxSavedCards = isPremium ? PREMIUM_LIMITS.MAX_SAVED_CARDS : PREMIUM_LIMITS.FREE_MAX_SAVED_CARDS;
 
   const notifyRestoreResult = (result: BackupImportResult) => {
-    const { importedCards, skippedCards, importedEmergency, importedImages, importedPresets } = result;
+    const { importedCards, importedEmergency, importedImages, importedPresets } = result;
     const parts = [];
     if (importedCards > 0) parts.push(`${importedCards} card${importedCards === 1 ? '' : 's'}`);
     if (importedEmergency) parts.push('emergency card');
     if (importedImages > 0) parts.push(`${importedImages} custom allergen image${importedImages === 1 ? '' : 's'}`);
     if (importedPresets > 0) parts.push(`${importedPresets} custom alert${importedPresets === 1 ? '' : 's'}`);
     toast.success(`Restored ${parts.join(' and ')}.`);
-
-    // Fallback for backups made before the premium-marker gate existed (or
-    // where the marker was false) - still cap silently-dropped cards with a
-    // nudge rather than no explanation at all.
-    if (skippedCards > 0) {
-      toast.error(
-        `${skippedCards} more card${skippedCards === 1 ? ' was' : 's were'} in this backup but couldn't fit your ${maxSavedCards}-card limit. If you already own Premium, restore your purchase to unlock them.`,
-        {
-          duration: 8000,
-          action: {
-            label: 'Restore Purchase',
-            onClick: () => navigate('/premium-onboarding'),
-          },
-        }
-      );
-    }
   };
 
   // Parses (but doesn't yet write) a backup. If it was made under Premium and
@@ -179,7 +163,7 @@ const BackupRestoreDialog: React.FC<BackupRestoreDialogProps> = ({ isOpen, onClo
               variant="outline"
               className="w-full h-12 rounded-xl border-gray-200 justify-start gap-3 px-4"
             >
-              <Download className="h-4 w-4" />
+              <Download className="h-4 w-4 text-red-500" />
               Backup to file
             </Button>
 
@@ -189,7 +173,7 @@ const BackupRestoreDialog: React.FC<BackupRestoreDialogProps> = ({ isOpen, onClo
               variant="outline"
               className="w-full h-12 rounded-xl border-gray-200 justify-start gap-3 px-4"
             >
-              <Upload className="h-4 w-4" />
+              <Upload className="h-4 w-4 text-red-500" />
               Restore from file
             </Button>
 
@@ -199,7 +183,7 @@ const BackupRestoreDialog: React.FC<BackupRestoreDialogProps> = ({ isOpen, onClo
               variant="outline"
               className="w-full h-12 rounded-xl border-gray-200 justify-start gap-3 px-4"
             >
-              <ClipboardCopy className="h-4 w-4" />
+              <ClipboardCopy className="h-4 w-4 text-red-500" />
               Copy to clipboard
             </Button>
 
@@ -209,7 +193,7 @@ const BackupRestoreDialog: React.FC<BackupRestoreDialogProps> = ({ isOpen, onClo
               variant="outline"
               className="w-full h-12 rounded-xl border-gray-200 justify-start gap-3 px-4"
             >
-              <ClipboardPaste className="h-4 w-4" />
+              <ClipboardPaste className="h-4 w-4 text-red-500" />
               Paste from clipboard
             </Button>
             <input
@@ -237,7 +221,7 @@ const BackupRestoreDialog: React.FC<BackupRestoreDialogProps> = ({ isOpen, onClo
           </DialogHeader>
 
           <p className="text-sm text-gray-500 dark:text-gray-400 mb-4">
-            This backup has {gatedBackup?.parsed.savedCards.length} cards saved with Premium unlocked, but this device is on the free plan ({maxSavedCards} card). Restore your purchase first so none of them get left behind, or continue now and add just the first one.
+            This backup has {gatedBackup?.parsed.savedCards.length} cards saved with Premium unlocked, but this device is on the free plan. Restore your purchase first so none of them get lost, or continue now and add just the first one.
           </p>
 
           <div className="flex flex-col gap-2">

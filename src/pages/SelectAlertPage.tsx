@@ -243,7 +243,7 @@ const SelectAlertPage = () => {
 
             {!isPremium && (
               <button
-                onClick={() => navigate('/premium-onboarding')}
+                onClick={() => navigate('/premium-onboarding', { state: { premiumReturnTo: location.pathname } })}
                 className="mt-6 w-full flex items-center justify-center gap-2 text-amber-600 font-bold text-sm hover:underline"
               >
                 <Crown className="h-4 w-4" />

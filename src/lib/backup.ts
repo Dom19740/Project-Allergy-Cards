@@ -85,7 +85,7 @@ const buildPayload = (
   };
 
   return {
-    fileName: `allergy-cards-backup-${new Date().toISOString().slice(0, 10)}.json`,
+    fileName: `simple-allergy-alert-${new Date().toISOString().slice(0, 10)}.json`,
     json: JSON.stringify(payload, null, 2),
   };
 };
