@@ -148,9 +148,9 @@ const SavedCardsList = () => {
                       </Button>
                     </div>
                     <div className="text-center py-0.5">
-                      <h4 className="text-base font-bold text-gray-800 dark:text-gray-100 line-clamp-1 flex items-center justify-center gap-1.5">
-                        {card.id === 'emergency-slot' && <AlertTriangle className="w-3.5 h-3.5 text-red-600" />}
-                        {card.name}
+                      <h4 className="text-base font-bold text-gray-800 dark:text-gray-100 flex items-center justify-center gap-1.5 min-w-0">
+                        {card.id === 'emergency-slot' && <AlertTriangle className="w-3.5 h-3.5 text-red-600 shrink-0" />}
+                        <span className="truncate">{card.name}</span>
                       </h4>
                       <div className="flex items-center justify-center text-[12px] text-gray-500 dark:text-gray-400">
                         <Clock className="w-2.5 h-2.5 mr-1" />

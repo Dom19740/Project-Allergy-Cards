@@ -2,7 +2,7 @@
 
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { ShieldAlert, X } from 'lucide-react';
+import { FileText, X } from 'lucide-react';
 import { SavedCard } from '@/lib/types';
 import { storage, STORAGE_KEYS } from '@/lib/storage';
 import { computeContentSignature } from '@/lib/customMessages';
@@ -72,7 +72,7 @@ const CardSelectorMenu: React.FC<CardSelectorMenuProps> = ({ isOpen, onClose }) 
                   onClick={() => handleSelect(card)}
                   className="w-full flex items-center space-x-3 px-4 py-3 text-sm font-medium text-gray-700 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-gray-700 rounded-xl transition-colors text-left"
                 >
-                  <ShieldAlert className="h-4 w-4 text-red-500 shrink-0" />
+                  <FileText className="h-4 w-4 text-red-500 shrink-0" />
                   <span className="truncate">{card.name}</span>
                 </button>
               ))}

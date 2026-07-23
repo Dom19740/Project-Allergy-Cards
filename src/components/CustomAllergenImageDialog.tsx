@@ -41,7 +41,11 @@ const CustomAllergenImageDialog: React.FC<CustomAllergenImageDialogProps> = ({
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const handleSearchWeb = () => {
-    const query = encodeURIComponent(allergenName);
+    // Biasing toward white-background photos makes the saved image sit
+    // consistently alongside the built-in allergen icons (see the letterboxing
+    // comment on fileToCompressedDataUrl below), instead of carrying over
+    // whatever busy background the source photo happened to have.
+    const query = encodeURIComponent(`${allergenName} white background`);
     window.open(`https://www.google.com/search?tbm=isch&q=${query}`, '_blank', 'noopener,noreferrer');
   };
 
