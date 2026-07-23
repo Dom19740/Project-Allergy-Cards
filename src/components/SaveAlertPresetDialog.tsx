@@ -36,7 +36,7 @@ const SaveAlertPresetDialog: React.FC<SaveAlertPresetDialogProps> = ({ isOpen, o
 
   return (
     <Dialog open={isOpen} onOpenChange={handleClose}>
-      <DialogContent className="w-[90%] max-w-[400px] rounded-2xl border-gray-200 dark:border-gray-700 shadow-2xl p-5">
+      <DialogContent className="w-[90%] max-w-[400px] rounded-2xl border-gray-200 dark:border-gray-700 shadow-2xl p-5 fixed left-1/2 -translate-x-1/2 top-[calc(1rem+env(safe-area-inset-top))] translate-y-0 animate-in fade-in slide-in-from-top-8 duration-300">
         <DialogHeader className="mb-2">
           <DialogTitle className="text-xl font-bold text-gray-900 dark:text-white">
             Name This Alert

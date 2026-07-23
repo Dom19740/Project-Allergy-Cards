@@ -174,16 +174,16 @@ const SaveCardDialog: React.FC<SaveCardDialogProps> = ({
   return (
     <Dialog open={isOpen} onOpenChange={handleClose}>
       <DialogContent 
-        className="w-[90%] max-w-[400px] rounded-2xl border-gray-200 dark:border-gray-700 shadow-2xl p-5 fixed left-1/2 -translate-x-1/2 top-[calc(1rem+env(safe-area-inset-top))] translate-y-0 animate-in fade-in slide-in-from-top-8 duration-300"
+        className="w-[90%] max-w-[400px] rounded-2xl border-gray-200 dark:border-gray-700 shadow-2xl p-4 fixed left-1/2 -translate-x-1/2 top-[calc(1rem+env(safe-area-inset-top))] translate-y-0 animate-in fade-in slide-in-from-top-8 duration-300"
       >
-        <DialogHeader className="mb-2">
+        <DialogHeader className="mb-1">
           <DialogTitle className="text-xl font-bold text-gray-900 dark:text-white">
             {isEmergency ? 'Save Emergency Card' : 'Save Allergy Card'}
           </DialogTitle>
         </DialogHeader>
-        
-        <div className="flex flex-col gap-3 py-1 overflow-hidden px-1">
-          <div className="flex flex-col gap-1.5">
+
+        <div className="flex flex-col gap-2 overflow-hidden px-1">
+          <div className="flex flex-col gap-1">
             <Label htmlFor="name" className="text-[11px] font-bold text-gray-400 px-1 uppercase tracking-wider">
               {selectedCardId ? 'Update Card Name' : 'Card Name'}
             </Label>
@@ -195,7 +195,7 @@ const SaveCardDialog: React.FC<SaveCardDialogProps> = ({
               disabled={isLocked}
               placeholder={isEmergency ? "Emergency Card" : "e.g. My Thai Card"}
               autoFocus
-              className="w-full h-11 rounded-xl border-gray-200 focus:ring-red-500 focus:border-gray-200 px-4 disabled:opacity-50"
+              className="w-full h-10 rounded-xl border-gray-200 focus:ring-red-500 focus:border-gray-200 px-4 disabled:opacity-50"
             />
             {isLocked && !isPremium && (
               <button
@@ -203,7 +203,7 @@ const SaveCardDialog: React.FC<SaveCardDialogProps> = ({
                   handleClose();
                   navigate('/premium-onboarding');
                 }}
-                className="mt-2 w-full flex items-center justify-center gap-2 text-amber-600 font-bold text-sm hover:underline"
+                className="mt-1 w-full flex items-center justify-center gap-2 text-amber-600 font-bold text-sm hover:underline"
               >
                 <Crown className="h-4 w-4" />
                 Unlock Multiple Save Cards
@@ -212,7 +212,7 @@ const SaveCardDialog: React.FC<SaveCardDialogProps> = ({
           </div>
 
           {!isEmergency && existingCards.length > 0 && (
-            <div className="flex flex-col gap-1.5 mt-1 overflow-hidden">
+            <div className="flex flex-col gap-1 overflow-hidden">
               <div className="flex items-center justify-between px-1">
                 <Label className="text-[11px] font-bold text-gray-400 uppercase tracking-wider">
                   Or Overwrite Existing
@@ -220,12 +220,12 @@ const SaveCardDialog: React.FC<SaveCardDialogProps> = ({
                 {existingCards.length > 1 && (
                   <div className="flex justify-end gap-1.5">
                     {existingCards.map((_, i) => (
-                      <div 
-                        key={i} 
+                      <div
+                        key={i}
                         className={cn(
-                          "h-1 rounded-full transition-all duration-300", 
+                          "h-1 rounded-full transition-all duration-300",
                           i === selectedIndex ? "w-3 bg-red-600" : "w-1 bg-gray-300 dark:bg-gray-700"
-                        )} 
+                        )}
                       />
                     ))}
                   </div>
@@ -239,9 +239,9 @@ const SaveCardDialog: React.FC<SaveCardDialogProps> = ({
                       <button
                         onClick={() => toggleCardSelection(card)}
                         className={cn(
-                          "w-full flex items-center justify-between p-3.5 rounded-xl border transition-all text-left disabled:opacity-50",
-                          selectedCardId === card.id 
-                            ? 'border-red-500 bg-red-50 text-red-700' 
+                          "w-full flex items-center justify-between p-2.5 rounded-xl border transition-all text-left disabled:opacity-50",
+                          selectedCardId === card.id
+                            ? 'border-red-500 bg-red-50 text-red-700'
                             : 'border-gray-100 bg-gray-50 text-gray-600 hover:border-gray-200 dark:bg-gray-800 dark:border-gray-700 dark:text-gray-300'
                         )}
                       >
@@ -261,7 +261,7 @@ const SaveCardDialog: React.FC<SaveCardDialogProps> = ({
           )}
         </div>
 
-        <DialogFooter className="flex flex-row gap-2 mt-4 sm:justify-end">
+        <DialogFooter className="flex flex-row gap-2 mt-3 sm:justify-end">
           <Button 
             variant="outline" 
             onClick={handleClose}

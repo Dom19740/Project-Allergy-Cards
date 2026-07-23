@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useRef, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
 import { Download, Upload, Clipboard } from 'lucide-react';
@@ -15,10 +16,39 @@ interface BackupRestoreDialogProps {
 }
 
 const BackupRestoreDialog: React.FC<BackupRestoreDialogProps> = ({ isOpen, onClose }) => {
+  const navigate = useNavigate();
   const { isPremium } = useBilling();
   const [isBusy, setIsBusy] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const maxSavedCards = isPremium ? PREMIUM_LIMITS.MAX_SAVED_CARDS : PREMIUM_LIMITS.FREE_MAX_SAVED_CARDS;
+
+  // The backup file itself never carries premium status - it's just saved
+  // cards, so trusting a flag inside it would let anyone unlock premium by
+  // editing a JSON file. Cards beyond the local plan's limit are capped on
+  // import (same rule as creating a new card), so instead of silently
+  // dropping them we point the user at the real restore-purchase flow.
+  const notifyRestoreResult = (result: { importedCards: number; skippedCards: number; importedEmergency: boolean; importedImages: number; importedPresets: number }) => {
+    const { importedCards, skippedCards, importedEmergency, importedImages, importedPresets } = result;
+    const parts = [];
+    if (importedCards > 0) parts.push(`${importedCards} card${importedCards === 1 ? '' : 's'}`);
+    if (importedEmergency) parts.push('emergency card');
+    if (importedImages > 0) parts.push(`${importedImages} custom allergen image${importedImages === 1 ? '' : 's'}`);
+    if (importedPresets > 0) parts.push(`${importedPresets} custom alert${importedPresets === 1 ? '' : 's'}`);
+    toast.success(`Restored ${parts.join(' and ')}.`);
+
+    if (skippedCards > 0) {
+      toast.error(
+        `${skippedCards} more card${skippedCards === 1 ? ' was' : 's were'} in this backup but couldn't fit your ${maxSavedCards}-card limit. If you already own Premium, restore your purchase to unlock them.`,
+        {
+          duration: 8000,
+          action: {
+            label: 'Restore Purchase',
+            onClick: () => navigate('/premium-onboarding'),
+          },
+        }
+      );
+    }
+  };
 
   const handleDownload = async () => {
     setIsBusy(true);
@@ -39,13 +69,8 @@ const BackupRestoreDialog: React.FC<BackupRestoreDialogProps> = ({ isOpen, onClo
   const handleRestoreFromClipboard = async () => {
     setIsBusy(true);
     try {
-      const { importedCards, importedEmergency, importedImages, importedPresets } = await importBackupFromClipboard(maxSavedCards);
-      const parts = [];
-      if (importedCards > 0) parts.push(`${importedCards} card${importedCards === 1 ? '' : 's'}`);
-      if (importedEmergency) parts.push('emergency card');
-      if (importedImages > 0) parts.push(`${importedImages} custom allergen image${importedImages === 1 ? '' : 's'}`);
-      if (importedPresets > 0) parts.push(`${importedPresets} custom alert${importedPresets === 1 ? '' : 's'}`);
-      toast.success(`Restored ${parts.join(' and ')}.`);
+      const result = await importBackupFromClipboard(maxSavedCards);
+      notifyRestoreResult(result);
       onClose();
     } catch (error: any) {
       toast.error(error?.message || 'Could not restore from the clipboard.');
@@ -61,13 +86,8 @@ const BackupRestoreDialog: React.FC<BackupRestoreDialogProps> = ({ isOpen, onClo
 
     setIsBusy(true);
     try {
-      const { importedCards, importedEmergency, importedImages, importedPresets } = await importBackup(file, maxSavedCards);
-      const parts = [];
-      if (importedCards > 0) parts.push(`${importedCards} card${importedCards === 1 ? '' : 's'}`);
-      if (importedEmergency) parts.push('emergency card');
-      if (importedImages > 0) parts.push(`${importedImages} custom allergen image${importedImages === 1 ? '' : 's'}`);
-      if (importedPresets > 0) parts.push(`${importedPresets} custom alert${importedPresets === 1 ? '' : 's'}`);
-      toast.success(`Restored ${parts.join(' and ')}.`);
+      const result = await importBackup(file, maxSavedCards);
+      notifyRestoreResult(result);
       onClose();
     } catch (error: any) {
       toast.error(error?.message || 'Could not restore that backup file.');

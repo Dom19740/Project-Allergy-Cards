@@ -114,7 +114,7 @@ export const downloadBackup = async (): Promise<void> => {
   downloadBlob(json, fileName);
 };
 
-const applyBackupText = async (text: string, maxSavedCards: number): Promise<{ importedCards: number; importedEmergency: boolean; importedImages: number; importedPresets: number }> => {
+const applyBackupText = async (text: string, maxSavedCards: number): Promise<{ importedCards: number; skippedCards: number; importedEmergency: boolean; importedImages: number; importedPresets: number }> => {
   let parsed: any;
   try {
     parsed = JSON.parse(text);
@@ -167,10 +167,16 @@ const applyBackupText = async (text: string, maxSavedCards: number): Promise<{ i
 
   window.dispatchEvent(new CustomEvent('storage-update'));
 
-  return { importedCards: cappedCards.length, importedEmergency: !!emergencyCard, importedImages: importedImageCount, importedPresets: importedPresetCount };
+  return {
+    importedCards: cappedCards.length,
+    skippedCards: savedCards.length - cappedCards.length,
+    importedEmergency: !!emergencyCard,
+    importedImages: importedImageCount,
+    importedPresets: importedPresetCount,
+  };
 };
 
-export const importBackup = async (file: File, maxSavedCards: number): Promise<{ importedCards: number; importedEmergency: boolean; importedImages: number; importedPresets: number }> => {
+export const importBackup = async (file: File, maxSavedCards: number): Promise<{ importedCards: number; skippedCards: number; importedEmergency: boolean; importedImages: number; importedPresets: number }> => {
   const text = await file.text();
   return applyBackupText(text, maxSavedCards);
 };
@@ -198,7 +204,7 @@ export const copyBackupToClipboard = async (): Promise<void> => {
   await navigator.clipboard.writeText(json);
 };
 
-export const importBackupFromClipboard = async (maxSavedCards: number): Promise<{ importedCards: number; importedEmergency: boolean; importedImages: number; importedPresets: number }> => {
+export const importBackupFromClipboard = async (maxSavedCards: number): Promise<{ importedCards: number; skippedCards: number; importedEmergency: boolean; importedImages: number; importedPresets: number }> => {
   let text: string;
 
   if (Capacitor.isNativePlatform()) {
