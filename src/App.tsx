@@ -9,6 +9,7 @@ import { usePreloadImages } from "./hooks/usePreloadImages";
 import { Loader2 } from "lucide-react";
 import { storage, STORAGE_KEYS } from "./lib/storage";
 import { useDeepLinks } from "./hooks/useDeepLinks";
+import { usePendingBackupRestore } from "./hooks/usePendingBackupRestore";
 import { initBilling } from "./lib/billing";
 import { captureAffiliateRef } from "./lib/affiliate";
 import { BillingProvider } from "./hooks/useBilling";
@@ -64,6 +65,7 @@ const LoadingFallback = () => (
 const AppContent = () => {
   usePreloadImages();
   useDeepLinks();
+  usePendingBackupRestore();
 
   useEffect(() => {
     // Initialize billing system

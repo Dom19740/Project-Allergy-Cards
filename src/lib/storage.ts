@@ -16,6 +16,7 @@ export const STORAGE_KEYS = {
   HAS_COMPLETED_ONBOARDING: 'hasCompletedOnboarding',
   CUSTOM_ALLERGEN_IMAGES: 'customAllergenImages',
   CUSTOM_ALERT_PRESETS: 'customAlertPresets',
+  PENDING_BACKUP_RESTORE: 'pendingBackupRestore',
 };
 
 export const storage = {

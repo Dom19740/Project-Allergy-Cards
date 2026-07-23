@@ -8,6 +8,7 @@ import { toast } from 'sonner';
 import { storage, STORAGE_KEYS } from '@/lib/storage';
 import { getMobileOS, isIOSSafari, isMobileWeb, isStandalone, PLAY_STORE_URL } from '@/lib/platform';
 import { copyBackupToClipboard } from '@/lib/backup';
+import { useBilling } from '@/hooks/useBilling';
 
 interface ProtectCardsDialogProps {
   visible: boolean;
@@ -16,6 +17,7 @@ interface ProtectCardsDialogProps {
 const ProtectCardsDialog: React.FC<ProtectCardsDialogProps> = ({ visible }) => {
   const [dismissed, setDismissed] = useState(true);
   const [isBackingUp, setIsBackingUp] = useState(false);
+  const { isPremium } = useBilling();
   const os = getMobileOS();
   const safari = isIOSSafari();
 
@@ -41,7 +43,7 @@ const ProtectCardsDialog: React.FC<ProtectCardsDialogProps> = ({ visible }) => {
   const handleBackupNow = async () => {
     setIsBackingUp(true);
     try {
-      await copyBackupToClipboard();
+      await copyBackupToClipboard(isPremium);
       toast.success('Backup copied - you can paste it after installing.');
     } catch (error) {
       console.error('Backup copy failed:', error);

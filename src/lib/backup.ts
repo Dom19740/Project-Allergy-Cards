@@ -12,10 +12,32 @@ const BACKUP_VERSION = 1;
 interface BackupPayload {
   version: number;
   exportedAt: string;
+  // A snapshot of whether Premium was unlocked when this backup was made.
+  // This is never trusted to grant Premium on its own (that would let anyone
+  // unlock it for free by editing the file) - it only decides whether the
+  // restore flow should nudge the user to restore their purchase *before*
+  // capping their cards, instead of after.
+  wasPremiumAtBackup: boolean;
   savedCards: SavedCard[];
   emergencyCard: SavedCard | null;
   customAllergenImages: CustomAllergenImageMap;
   customAlertPresets: CustomAlertPreset[];
+}
+
+export interface ParsedBackup {
+  savedCards: SavedCard[];
+  emergencyCard: SavedCard | null;
+  customAllergenImages: CustomAllergenImageMap;
+  customAlertPresets: CustomAlertPreset[];
+  wasPremiumAtBackup: boolean;
+}
+
+export interface BackupImportResult {
+  importedCards: number;
+  skippedCards: number;
+  importedEmergency: boolean;
+  importedImages: number;
+  importedPresets: number;
 }
 
 const isValidSavedCard = (value: any): value is SavedCard =>
@@ -44,11 +66,13 @@ const buildPayload = (
   savedCards: SavedCard[],
   emergencyCard: SavedCard | null,
   customAllergenImages: CustomAllergenImageMap,
-  customAlertPresets: CustomAlertPreset[]
+  customAlertPresets: CustomAlertPreset[],
+  wasPremiumAtBackup: boolean
 ): { fileName: string; json: string } => {
   const payload: BackupPayload = {
     version: BACKUP_VERSION,
     exportedAt: new Date().toISOString(),
+    wasPremiumAtBackup,
     savedCards,
     emergencyCard,
     customAllergenImages,
@@ -61,7 +85,7 @@ const buildPayload = (
   };
 };
 
-const buildBackupFile = async (): Promise<{ fileName: string; json: string }> => {
+const buildBackupFile = async (isPremium: boolean): Promise<{ fileName: string; json: string }> => {
   const [savedCards, emergencyCard, customAllergenImages, customAlertPresets] = await Promise.all([
     storage.get<SavedCard[]>(STORAGE_KEYS.SAVED_CARDS).then((cards) => cards || []),
     storage.get<SavedCard>(STORAGE_KEYS.SAVED_EMERGENCY_CARD),
@@ -69,7 +93,7 @@ const buildBackupFile = async (): Promise<{ fileName: string; json: string }> =>
     getCustomAlertPresets(),
   ]);
 
-  return buildPayload(savedCards, emergencyCard, customAllergenImages, customAlertPresets);
+  return buildPayload(savedCards, emergencyCard, customAllergenImages, customAlertPresets, isPremium);
 };
 
 const downloadBlob = (json: string, fileName: string) => {
@@ -84,8 +108,8 @@ const downloadBlob = (json: string, fileName: string) => {
   URL.revokeObjectURL(url);
 };
 
-export const downloadBackup = async (): Promise<void> => {
-  const { fileName, json } = await buildBackupFile();
+export const downloadBackup = async (isPremium: boolean): Promise<void> => {
+  const { fileName, json } = await buildBackupFile(isPremium);
 
   if (Capacitor.isNativePlatform()) {
     // Directory.Documents is scoped-storage-hidden on modern Android targets
@@ -114,7 +138,56 @@ export const downloadBackup = async (): Promise<void> => {
   downloadBlob(json, fileName);
 };
 
-const applyBackupText = async (text: string, maxSavedCards: number): Promise<{ importedCards: number; skippedCards: number; importedEmergency: boolean; importedImages: number; importedPresets: number }> => {
+// Mirrors downloadBackup, but writes to the clipboard instead of a file - a
+// faster alternative for the common case of backing up right before
+// switching to a freshly installed app, where "download, then hunt for the
+// file in Files/Downloads" is more friction than "copy, then paste".
+export const copyBackupToClipboard = async (isPremium: boolean): Promise<void> => {
+  const { json } = await buildBackupFile(isPremium);
+
+  // The web Clipboard API isn't reliable inside Capacitor's Android WebView
+  // (permission prompts it can't surface properly), so native platforms use
+  // the dedicated Capacitor plugin, which talks to the OS clipboard directly.
+  if (Capacitor.isNativePlatform()) {
+    await Clipboard.write({ string: json });
+    return;
+  }
+
+  if (!navigator.clipboard?.writeText) {
+    await downloadBackup(isPremium);
+    return;
+  }
+
+  await navigator.clipboard.writeText(json);
+};
+
+export const readBackupFileText = (file: File): Promise<string> => file.text();
+
+export const readClipboardText = async (): Promise<string> => {
+  if (Capacitor.isNativePlatform()) {
+    try {
+      const result = await Clipboard.read();
+      return result.value;
+    } catch {
+      throw new Error("Couldn't read the clipboard - use Restore from backup instead.");
+    }
+  }
+
+  if (!navigator.clipboard?.readText) {
+    throw new Error("This browser can't read the clipboard - use Restore from backup instead.");
+  }
+  try {
+    return await navigator.clipboard.readText();
+  } catch {
+    throw new Error("Couldn't read the clipboard - use Restore from backup instead.");
+  }
+};
+
+// Validates and normalizes raw backup text without writing anything to
+// storage, so callers can inspect it (e.g. check wasPremiumAtBackup against
+// the current card count) and decide whether to prompt the user before
+// applying it.
+export const parseBackupPayload = (text: string): ParsedBackup => {
   let parsed: any;
   try {
     parsed = JSON.parse(text);
@@ -126,14 +199,23 @@ const applyBackupText = async (text: string, maxSavedCards: number): Promise<{ i
     ? parsed.savedCards.filter(isValidSavedCard)
     : [];
   const emergencyCard: SavedCard | null = isValidSavedCard(parsed?.emergencyCard) ? parsed.emergencyCard : null;
-  const backupImages: CustomAllergenImageMap = isValidImageMap(parsed?.customAllergenImages) ? parsed.customAllergenImages : {};
-  const backupPresets: CustomAlertPreset[] = Array.isArray(parsed?.customAlertPresets)
+  const customAllergenImages: CustomAllergenImageMap = isValidImageMap(parsed?.customAllergenImages) ? parsed.customAllergenImages : {};
+  const customAlertPresets: CustomAlertPreset[] = Array.isArray(parsed?.customAlertPresets)
     ? parsed.customAlertPresets.filter(isValidPreset)
     : [];
+  const wasPremiumAtBackup = parsed?.wasPremiumAtBackup === true;
 
-  if (savedCards.length === 0 && !emergencyCard && Object.keys(backupImages).length === 0 && backupPresets.length === 0) {
+  if (savedCards.length === 0 && !emergencyCard && Object.keys(customAllergenImages).length === 0 && customAlertPresets.length === 0) {
     throw new Error("That doesn't contain any saved cards.");
   }
+
+  return { savedCards, emergencyCard, customAllergenImages, customAlertPresets, wasPremiumAtBackup };
+};
+
+// Writes an already-parsed backup to storage, capping saved cards at
+// maxSavedCards (same rule as creating a new card - see SaveCardDialog).
+export const applyParsedBackup = async (parsed: ParsedBackup, maxSavedCards: number): Promise<BackupImportResult> => {
+  const { savedCards, emergencyCard, customAllergenImages: backupImages, customAlertPresets: backupPresets } = parsed;
 
   const cappedCards = savedCards.slice(0, maxSavedCards);
   await storage.set(STORAGE_KEYS.SAVED_CARDS, cappedCards);
@@ -176,54 +258,17 @@ const applyBackupText = async (text: string, maxSavedCards: number): Promise<{ i
   };
 };
 
-export const importBackup = async (file: File, maxSavedCards: number): Promise<{ importedCards: number; skippedCards: number; importedEmergency: boolean; importedImages: number; importedPresets: number }> => {
-  const text = await file.text();
-  return applyBackupText(text, maxSavedCards);
+// Stashes a backup's raw text across the trip to the restore-purchase flow
+// (sessionStorage survives client-side route changes), so it can be finished
+// automatically once premium-status-changed fires with a real, verified
+// purchase - see usePendingBackupRestore.
+export const stashPendingBackupRestore = async (text: string): Promise<void> => {
+  await storage.setEphemeral(STORAGE_KEYS.PENDING_BACKUP_RESTORE, { text });
 };
 
-// Mirrors downloadBackup, but writes to the clipboard instead of a file - a
-// faster alternative for the common case of backing up right before
-// switching to a freshly installed app, where "download, then hunt for the
-// file in Files/Downloads" is more friction than "copy, then paste".
-export const copyBackupToClipboard = async (): Promise<void> => {
-  const { json } = await buildBackupFile();
-
-  // The web Clipboard API isn't reliable inside Capacitor's Android WebView
-  // (permission prompts it can't surface properly), so native platforms use
-  // the dedicated Capacitor plugin, which talks to the OS clipboard directly.
-  if (Capacitor.isNativePlatform()) {
-    await Clipboard.write({ string: json });
-    return;
-  }
-
-  if (!navigator.clipboard?.writeText) {
-    await downloadBackup();
-    return;
-  }
-
-  await navigator.clipboard.writeText(json);
-};
-
-export const importBackupFromClipboard = async (maxSavedCards: number): Promise<{ importedCards: number; skippedCards: number; importedEmergency: boolean; importedImages: number; importedPresets: number }> => {
-  let text: string;
-
-  if (Capacitor.isNativePlatform()) {
-    try {
-      const result = await Clipboard.read();
-      text = result.value;
-    } catch {
-      throw new Error("Couldn't read the clipboard - use Restore from backup instead.");
-    }
-  } else {
-    if (!navigator.clipboard?.readText) {
-      throw new Error("This browser can't read the clipboard - use Restore from backup instead.");
-    }
-    try {
-      text = await navigator.clipboard.readText();
-    } catch {
-      throw new Error("Couldn't read the clipboard - use Restore from backup instead.");
-    }
-  }
-
-  return applyBackupText(text, maxSavedCards);
+export const takePendingBackupRestore = async (): Promise<string | null> => {
+  const pending = await storage.getEphemeral<{ text: string }>(STORAGE_KEYS.PENDING_BACKUP_RESTORE);
+  if (!pending) return null;
+  await storage.removeEphemeral(STORAGE_KEYS.PENDING_BACKUP_RESTORE);
+  return pending.text;
 };
