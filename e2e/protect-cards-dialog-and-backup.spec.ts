@@ -7,7 +7,11 @@ import { seedStorage } from "./helpers";
 const buildSavedCard = (overrides: Record<string, unknown> = {}) => ({
   id: "card-1",
   name: "My Thai Card",
-  languageCode: "th",
+  // Deliberately a free language (see FREE_LANGUAGES in premium-config.ts) -
+  // these tests are about the backup/restore round-trip itself, not premium
+  // gating, and a non-free language would make backupRequiresPremium() gate
+  // the restore instead of completing it.
+  languageCode: "en",
   selectedAllergens: { standard: ["milk"], custom: {}, ids: ["milk"] },
   customMessages: { iAmAllergicTo: "I am allergic to", theyMakeMeSick: "They make me sick" },
   translatedContent: {
@@ -129,9 +133,9 @@ test.describe("saved card backup & restore", () => {
     await expect(page.getByRole("heading", { name: "Backup & Restore" })).toBeVisible();
 
     const downloadPromise = page.waitForEvent("download");
-    await page.getByRole("button", { name: "Download backup" }).click();
+    await page.getByRole("button", { name: "Backup to file" }).click();
     const download = await downloadPromise;
-    expect(download.suggestedFilename()).toMatch(/^allergy-cards-backup-.*\.json$/);
+    expect(download.suggestedFilename()).toMatch(/^simple-allergy-alert-.*\.json$/);
 
     const backupPath = await download.path();
     expect(backupPath).toBeTruthy();
@@ -147,8 +151,10 @@ test.describe("saved card backup & restore", () => {
 
     // With zero saved cards, the "Saved Cards" section (and its Backup
     // button) doesn't render at all - restoring has to go through the
-    // standalone Home-screen "Restore from backup" link instead.
-    await freshPage.getByRole("button", { name: "Restore from backup" }).click();
+    // Home-screen burger menu instead.
+    await freshPage.getByRole("button", { name: "Menu" }).click();
+    await freshPage.getByRole("button", { name: "Restore Backup" }).click();
+    await freshPage.getByRole("button", { name: "Restore from file" }).click();
     await freshPage.locator('input[type="file"]').setInputFiles(backupPath!);
 
     await expect(freshPage.getByText(/Restored 1 card and emergency card/i)).toBeVisible();
@@ -161,10 +167,12 @@ test.describe("saved card backup & restore", () => {
     await seedStorage(page, { hasSeenOnboarding: true });
     await page.goto("/");
 
-    await expect(page.getByRole("button", { name: "Restore from backup" })).toBeVisible();
     // The Saved Cards section only renders once there's at least one card,
-    // so its own Backup button must not be present here.
+    // so its own Backup button must not be present here - restoring has to
+    // go through the Home-screen burger menu instead.
     await expect(page.getByRole("button", { name: "Backup", exact: true })).toHaveCount(0);
+    await page.getByRole("button", { name: "Menu" }).click();
+    await expect(page.getByRole("button", { name: "Restore Backup" })).toBeVisible();
   });
 
   test("rejects a file that isn't a valid backup", async ({ page }) => {
@@ -178,7 +186,7 @@ test.describe("saved card backup & restore", () => {
     await page.goto("/");
 
     await page.getByRole("button", { name: "Backup", exact: true }).click();
-    await page.getByRole("button", { name: "Restore from backup" }).click();
+    await page.getByRole("button", { name: "Restore from file" }).click();
 
     await page.locator('input[type="file"]').setInputFiles({
       name: "not-a-backup.json",
@@ -222,12 +230,12 @@ test.describe("clipboard backup & restore", () => {
     expect(parsed.savedCards[0].name).toBe("My Thai Card");
   });
 
-  test("'Restore from clipboard' in Backup & Restore reads a backup back in", async ({ page, context }, testInfo) => {
+  test("'Paste from clipboard' in Backup & Restore reads a backup back in", async ({ page, context }, testInfo) => {
     test.skip(!isClipboardTestable(testInfo.project.name), "clipboard permissions not reliably grantable here");
 
     await context.grantPermissions(["clipboard-read", "clipboard-write"]);
-    // Zero saved cards - reaches the dialog via the Home-screen "Restore
-    // from backup" entry point, same as the file-based clean-install test.
+    // Zero saved cards - reaches the dialog via the Home-screen burger menu,
+    // same as the file-based clean-install test.
     await seedStorage(page, { hasSeenOnboarding: true });
     await page.goto("/");
 
@@ -239,8 +247,9 @@ test.describe("clipboard backup & restore", () => {
     };
     await page.evaluate((json) => navigator.clipboard.writeText(json), JSON.stringify(backupPayload));
 
-    await page.getByRole("button", { name: "Restore from backup" }).click();
-    await page.getByRole("button", { name: "Restore from clipboard" }).click();
+    await page.getByRole("button", { name: "Menu" }).click();
+    await page.getByRole("button", { name: "Restore Backup" }).click();
+    await page.getByRole("button", { name: "Paste from clipboard" }).click();
 
     await expect(page.getByText(/Restored 1 card/i)).toBeVisible();
     await expect(page.getByText("My Thai Card")).toBeVisible();

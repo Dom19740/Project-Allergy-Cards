@@ -53,6 +53,12 @@ test.describe("offline handling", () => {
     await page.getByRole("button", { name: "Add" }).click();
     await expect(page.getByText("Kiwi", { exact: true })).toBeVisible();
 
+    // Adding a custom allergen auto-opens an "Add an image" prompt, which
+    // sits over the rest of the page (and marks it aria-hidden) until
+    // dismissed - close it so Continue is reachable again.
+    await page.getByRole("heading", { name: 'Add an image for "Kiwi"' }).waitFor();
+    await page.keyboard.press("Escape");
+
     const continueButton = page.getByRole("button", { name: "Continue" });
     await expect(continueButton).toBeEnabled();
 
