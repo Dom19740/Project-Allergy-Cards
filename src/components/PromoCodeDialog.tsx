@@ -27,6 +27,14 @@ const PromoCodeDialog: React.FC<PromoCodeDialogProps> = ({ isOpen, onClose, onSu
   // Dev-only local reset, not a real promo code - never sent to the server.
   const RESET_CODE = 'RESET';
 
+  // Hardcoded unlock code for local dev-server testing only - never sent to
+  // the server, so premium can be tested without a real promo code from
+  // Redis. Gated on import.meta.env.DEV (true only under `vite`/`pnpm dev`,
+  // false for any `vite build` output) so Vite's dead-code elimination
+  // strips this whole branch - including the literal string - out of every
+  // shipped build (web deploy and the Android APK).
+  const TEST_UNLOCK_CODE = 'SAADEV';
+
   // Native's WebView origin (https://localhost under Capacitor's default
   // config) is never the app's real domain, so a relative fetch would hit
   // the local bundle's own origin instead of the deployed API.
@@ -39,6 +47,14 @@ const PromoCodeDialog: React.FC<PromoCodeDialogProps> = ({ isOpen, onClose, onSu
       if (normalizedCode === RESET_CODE) {
         syncPremiumCache(false);
         toast.success("Premium Locked", { icon: '🔒' });
+        onSuccess();
+        onClose();
+        return;
+      }
+
+      if (import.meta.env.DEV && normalizedCode === TEST_UNLOCK_CODE) {
+        syncPremiumCache(true);
+        toast.success("Premium Unlocked!", { icon: '🎉' });
         onSuccess();
         onClose();
         return;

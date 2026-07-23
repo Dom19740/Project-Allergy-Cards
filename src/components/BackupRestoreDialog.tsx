@@ -95,7 +95,7 @@ const BackupRestoreDialog: React.FC<BackupRestoreDialogProps> = ({ isOpen, onClo
             className="w-full h-12 rounded-xl border-gray-200 justify-start gap-3 px-4"
           >
             <Download className="h-4 w-4" />
-            Download backup
+            Backup
           </Button>
 
           <Button
@@ -105,7 +105,7 @@ const BackupRestoreDialog: React.FC<BackupRestoreDialogProps> = ({ isOpen, onClo
             className="w-full h-12 rounded-xl border-gray-200 justify-start gap-3 px-4"
           >
             <Upload className="h-4 w-4" />
-            Restore from backup
+            Restore
           </Button>
 
           <Button
@@ -115,7 +115,7 @@ const BackupRestoreDialog: React.FC<BackupRestoreDialogProps> = ({ isOpen, onClo
             className="w-full h-12 rounded-xl border-gray-200 justify-start gap-3 px-4"
           >
             <Clipboard className="h-4 w-4" />
-            Restore from clipboard
+            Paste from clipboard
           </Button>
           <input
             ref={fileInputRef}

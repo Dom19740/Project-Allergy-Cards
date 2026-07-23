@@ -38,17 +38,11 @@ const CustomAllergenImageDialog: React.FC<CustomAllergenImageDialogProps> = ({
   onImageChange,
 }) => {
   const [isBusy, setIsBusy] = useState(false);
-  const [hasSearched, setHasSearched] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
-
-  React.useEffect(() => {
-    if (isOpen) setHasSearched(false);
-  }, [isOpen, allergenName]);
 
   const handleSearchWeb = () => {
     const query = encodeURIComponent(allergenName);
     window.open(`https://www.google.com/search?tbm=isch&q=${query}`, '_blank', 'noopener,noreferrer');
-    setHasSearched(true);
   };
 
   const handleUploadClick = () => {
@@ -87,21 +81,20 @@ const CustomAllergenImageDialog: React.FC<CustomAllergenImageDialogProps> = ({
         </DialogHeader>
 
         <div className="flex flex-col gap-3">
-          <Button
-            onClick={handleSearchWeb}
-            disabled={isBusy}
-            variant="outline"
-            className="w-full h-12 rounded-xl border-gray-200 justify-start gap-3 px-4"
-          >
-            <Search className="h-4 w-4" />
-            Search the web
-          </Button>
-
-          {hasSearched && (
-            <p className="text-xs text-gray-500 dark:text-gray-400 -mt-1 px-1">
+          <div className="rounded-xl border border-gray-200 dark:border-gray-700 overflow-hidden">
+            <Button
+              onClick={handleSearchWeb}
+              disabled={isBusy}
+              variant="outline"
+              className="w-full h-12 rounded-none border-0 justify-start gap-3 px-4"
+            >
+              <Search className="h-4 w-4" />
+              Search the web
+            </Button>
+            <p className="text-xs text-gray-500 dark:text-gray-400 bg-gray-50 dark:bg-gray-800/60 px-4 py-2 border-t border-gray-200 dark:border-gray-700">
               {getSaveImageHint()}
             </p>
-          )}
+          </div>
 
           <Button
             onClick={handleUploadClick}

@@ -148,7 +148,7 @@ const ProtectCardsDialog: React.FC<ProtectCardsDialogProps> = ({ visible }) => {
                 3. Restore your backup
               </p>
               <p className="text-xs text-gray-500 dark:text-gray-400 mt-0.5">
-                Open the app, tap Backup, then Restore from clipboard (or Restore from backup if that doesn't work)
+                Open the app, tap Backup, then Paste from clipboard (or Restore from backup if that doesn't work)
               </p>
             </div>
           </div>

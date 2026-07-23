@@ -1,7 +1,7 @@
 "use client";
 
 import React from 'react';
-import { X, Utensils } from 'lucide-react';
+import { Utensils } from 'lucide-react';
 import { ALLERGEN_OPTIONS } from '@/lib/allergens';
 
 interface FullscreenImageOverlayProps {
@@ -24,13 +24,6 @@ const FullscreenImageOverlay: React.FC<FullscreenImageOverlayProps> = ({
       className="fixed inset-0 z-[100] bg-white flex items-center justify-center p-0 m-0"
       onClick={onClose}
     >
-      <button 
-        onClick={onClose}
-        className="absolute top-[calc(1rem+env(safe-area-inset-top))] right-4 z-[110] p-2 bg-gray-100 rounded-full text-gray-600 hover:bg-gray-200 transition-colors"
-      >
-        <X size={24} />
-      </button>
-      
       <div className="relative w-full h-full flex items-center justify-center">
         <div className="relative w-full aspect-square max-w-full max-h-full flex items-center justify-center">
           {allergensWithImages.length > 0 ? (
