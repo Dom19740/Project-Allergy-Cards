@@ -15,6 +15,7 @@ export const STORAGE_KEYS = {
   INSTALL_BANNER_DISMISSED: 'installBannerDismissed',
   HAS_COMPLETED_ONBOARDING: 'hasCompletedOnboarding',
   CUSTOM_ALLERGEN_IMAGES: 'customAllergenImages',
+  CUSTOM_ALERT_PRESETS: 'customAlertPresets',
 };
 
 export const storage = {

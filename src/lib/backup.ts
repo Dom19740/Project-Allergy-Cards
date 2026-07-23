@@ -3,8 +3,9 @@ import { Filesystem, Directory, Encoding } from '@capacitor/filesystem';
 import { Clipboard } from '@capacitor/clipboard';
 import { Share } from '@capacitor/share';
 import { storage, STORAGE_KEYS } from '@/lib/storage';
-import { SavedCard } from '@/lib/types';
+import { SavedCard, CustomAlertPreset } from '@/lib/types';
 import { CustomAllergenImageMap, getCustomAllergenImages } from '@/lib/customAllergenImages';
+import { getCustomAlertPresets, MAX_CUSTOM_ALERT_PRESETS } from '@/lib/customAlertPresets';
 
 const BACKUP_VERSION = 1;
 
@@ -14,6 +15,7 @@ interface BackupPayload {
   savedCards: SavedCard[];
   emergencyCard: SavedCard | null;
   customAllergenImages: CustomAllergenImageMap;
+  customAlertPresets: CustomAlertPreset[];
 }
 
 const isValidSavedCard = (value: any): value is SavedCard =>
@@ -30,10 +32,19 @@ const isValidImageMap = (value: any): value is CustomAllergenImageMap =>
   !Array.isArray(value) &&
   Object.values(value).every((v) => typeof v === 'string');
 
+const isValidPreset = (value: any): value is CustomAlertPreset =>
+  value &&
+  typeof value === 'object' &&
+  typeof value.id === 'string' &&
+  typeof value.name === 'string' &&
+  typeof value.iAmAllergicTo === 'string' &&
+  typeof value.theyMakeMeSick === 'string';
+
 const buildPayload = (
   savedCards: SavedCard[],
   emergencyCard: SavedCard | null,
-  customAllergenImages: CustomAllergenImageMap
+  customAllergenImages: CustomAllergenImageMap,
+  customAlertPresets: CustomAlertPreset[]
 ): { fileName: string; json: string } => {
   const payload: BackupPayload = {
     version: BACKUP_VERSION,
@@ -41,6 +52,7 @@ const buildPayload = (
     savedCards,
     emergencyCard,
     customAllergenImages,
+    customAlertPresets,
   };
 
   return {
@@ -50,13 +62,14 @@ const buildPayload = (
 };
 
 const buildBackupFile = async (): Promise<{ fileName: string; json: string }> => {
-  const [savedCards, emergencyCard, customAllergenImages] = await Promise.all([
+  const [savedCards, emergencyCard, customAllergenImages, customAlertPresets] = await Promise.all([
     storage.get<SavedCard[]>(STORAGE_KEYS.SAVED_CARDS).then((cards) => cards || []),
     storage.get<SavedCard>(STORAGE_KEYS.SAVED_EMERGENCY_CARD),
     getCustomAllergenImages(),
+    getCustomAlertPresets(),
   ]);
 
-  return buildPayload(savedCards, emergencyCard, customAllergenImages);
+  return buildPayload(savedCards, emergencyCard, customAllergenImages, customAlertPresets);
 };
 
 const downloadBlob = (json: string, fileName: string) => {
@@ -101,7 +114,7 @@ export const downloadBackup = async (): Promise<void> => {
   downloadBlob(json, fileName);
 };
 
-const applyBackupText = async (text: string, maxSavedCards: number): Promise<{ importedCards: number; importedEmergency: boolean; importedImages: number }> => {
+const applyBackupText = async (text: string, maxSavedCards: number): Promise<{ importedCards: number; importedEmergency: boolean; importedImages: number; importedPresets: number }> => {
   let parsed: any;
   try {
     parsed = JSON.parse(text);
@@ -114,8 +127,11 @@ const applyBackupText = async (text: string, maxSavedCards: number): Promise<{ i
     : [];
   const emergencyCard: SavedCard | null = isValidSavedCard(parsed?.emergencyCard) ? parsed.emergencyCard : null;
   const backupImages: CustomAllergenImageMap = isValidImageMap(parsed?.customAllergenImages) ? parsed.customAllergenImages : {};
+  const backupPresets: CustomAlertPreset[] = Array.isArray(parsed?.customAlertPresets)
+    ? parsed.customAlertPresets.filter(isValidPreset)
+    : [];
 
-  if (savedCards.length === 0 && !emergencyCard && Object.keys(backupImages).length === 0) {
+  if (savedCards.length === 0 && !emergencyCard && Object.keys(backupImages).length === 0 && backupPresets.length === 0) {
     throw new Error("That doesn't contain any saved cards.");
   }
 
@@ -133,12 +149,28 @@ const applyBackupText = async (text: string, maxSavedCards: number): Promise<{ i
     await storage.set(STORAGE_KEYS.CUSTOM_ALLERGEN_IMAGES, { ...existingImages, ...backupImages });
   }
 
+  let importedPresetCount = 0;
+  if (backupPresets.length > 0) {
+    // Merge rather than replace, same reasoning as the image map above -
+    // never drop presets already saved on this device to make room for a
+    // backup taken elsewhere. Existing local presets win on id collisions.
+    const existingPresets = await getCustomAlertPresets();
+    const existingIds = new Set(existingPresets.map((p) => p.id));
+    const newPresets = backupPresets.filter((p) => !existingIds.has(p.id));
+    const room = Math.max(0, MAX_CUSTOM_ALERT_PRESETS - existingPresets.length);
+    const presetsToAdd = newPresets.slice(0, room);
+    importedPresetCount = presetsToAdd.length;
+    if (presetsToAdd.length > 0) {
+      await storage.set(STORAGE_KEYS.CUSTOM_ALERT_PRESETS, [...existingPresets, ...presetsToAdd]);
+    }
+  }
+
   window.dispatchEvent(new CustomEvent('storage-update'));
 
-  return { importedCards: cappedCards.length, importedEmergency: !!emergencyCard, importedImages: importedImageCount };
+  return { importedCards: cappedCards.length, importedEmergency: !!emergencyCard, importedImages: importedImageCount, importedPresets: importedPresetCount };
 };
 
-export const importBackup = async (file: File, maxSavedCards: number): Promise<{ importedCards: number; importedEmergency: boolean; importedImages: number }> => {
+export const importBackup = async (file: File, maxSavedCards: number): Promise<{ importedCards: number; importedEmergency: boolean; importedImages: number; importedPresets: number }> => {
   const text = await file.text();
   return applyBackupText(text, maxSavedCards);
 };
@@ -166,7 +198,7 @@ export const copyBackupToClipboard = async (): Promise<void> => {
   await navigator.clipboard.writeText(json);
 };
 
-export const importBackupFromClipboard = async (maxSavedCards: number): Promise<{ importedCards: number; importedEmergency: boolean; importedImages: number }> => {
+export const importBackupFromClipboard = async (maxSavedCards: number): Promise<{ importedCards: number; importedEmergency: boolean; importedImages: number; importedPresets: number }> => {
   let text: string;
 
   if (Capacitor.isNativePlatform()) {

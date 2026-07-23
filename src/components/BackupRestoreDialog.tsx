@@ -39,11 +39,12 @@ const BackupRestoreDialog: React.FC<BackupRestoreDialogProps> = ({ isOpen, onClo
   const handleRestoreFromClipboard = async () => {
     setIsBusy(true);
     try {
-      const { importedCards, importedEmergency, importedImages } = await importBackupFromClipboard(maxSavedCards);
+      const { importedCards, importedEmergency, importedImages, importedPresets } = await importBackupFromClipboard(maxSavedCards);
       const parts = [];
       if (importedCards > 0) parts.push(`${importedCards} card${importedCards === 1 ? '' : 's'}`);
       if (importedEmergency) parts.push('emergency card');
       if (importedImages > 0) parts.push(`${importedImages} custom allergen image${importedImages === 1 ? '' : 's'}`);
+      if (importedPresets > 0) parts.push(`${importedPresets} custom alert${importedPresets === 1 ? '' : 's'}`);
       toast.success(`Restored ${parts.join(' and ')}.`);
       onClose();
     } catch (error: any) {
@@ -60,11 +61,12 @@ const BackupRestoreDialog: React.FC<BackupRestoreDialogProps> = ({ isOpen, onClo
 
     setIsBusy(true);
     try {
-      const { importedCards, importedEmergency, importedImages } = await importBackup(file, maxSavedCards);
+      const { importedCards, importedEmergency, importedImages, importedPresets } = await importBackup(file, maxSavedCards);
       const parts = [];
       if (importedCards > 0) parts.push(`${importedCards} card${importedCards === 1 ? '' : 's'}`);
       if (importedEmergency) parts.push('emergency card');
       if (importedImages > 0) parts.push(`${importedImages} custom allergen image${importedImages === 1 ? '' : 's'}`);
+      if (importedPresets > 0) parts.push(`${importedPresets} custom alert${importedPresets === 1 ? '' : 's'}`);
       toast.success(`Restored ${parts.join(' and ')}.`);
       onClose();
     } catch (error: any) {

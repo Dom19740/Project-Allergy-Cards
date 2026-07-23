@@ -23,6 +23,13 @@ export interface CustomMessages {
   theyMakeMeSick: string;
 }
 
+export interface CustomAlertPreset {
+  id: string;
+  name: string;
+  iAmAllergicTo: string;
+  theyMakeMeSick: string;
+}
+
 export interface TranslatedContent {
   ui: {
     allergyAlert: string;

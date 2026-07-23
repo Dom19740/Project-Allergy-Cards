@@ -60,7 +60,7 @@ const CardMenu: React.FC<CardMenuProps> = ({ isOpen, onClose, onOpenDisclaimer, 
     { to: "/", label: "Saved Cards", icon: Home },
     ...(!isEmergency ? [
       { to: "/select-allergens", label: "Edit Allergens", icon: ShieldAlert, state: editState },
-      { to: "/select-alert", label: "Edit Alert", icon: MessageSquare, state: editState },
+      { to: "/select-alert", label: "Edit Alerts", icon: MessageSquare, state: editState },
     ] : []),
     { to: "/select-language", label: "Change Language", icon: Languages, state: editState },
   ];

@@ -5,19 +5,24 @@ import { useNavigate, useLocation } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { Button } from '@/components/ui/button';
 import { Label } from '@/components/ui/label';
-import { Crown, RotateCcw, WifiOff } from 'lucide-react';
+import { Crown, RotateCcw, WifiOff, X, Plus } from 'lucide-react';
+import { toast } from 'sonner';
 import FixedHeader from '@/components/FixedHeader';
 import StepHeader from '@/components/StepHeader';
+import SaveAlertPresetDialog from '@/components/SaveAlertPresetDialog';
 import { storage, STORAGE_KEYS } from '@/lib/storage';
 import { useBilling } from '@/hooks/useBilling';
 import { useNetworkStatus } from '@/hooks/useNetworkStatus';
 import { FirebaseAnalytics } from '@capacitor-firebase/analytics';
 import { Capacitor } from '@capacitor/core';
 import { DEFAULT_CUSTOM_MESSAGES } from '@/lib/customMessages';
+import { getCustomAlertPresets, saveCustomAlertPreset, deleteCustomAlertPreset, MAX_CUSTOM_ALERT_PRESETS } from '@/lib/customAlertPresets';
+import { CustomAlertPreset } from '@/lib/types';
+import { cn } from '@/lib/utils';
 import { usePageSEO } from '@/hooks/usePageSEO';
 
 const SelectAlertPage = () => {
-  usePageSEO({ title: 'Customize Your Alert | Simple Allergy Alert' });
+  usePageSEO({ title: 'Customise Alerts | Simple Allergy Alert' });
 
   const navigate = useNavigate();
   const location = useLocation();
@@ -26,6 +31,9 @@ const SelectAlertPage = () => {
   const isOnline = useNetworkStatus();
   const [iAmAllergicTo, setIAmAllergicTo] = useState(DEFAULT_CUSTOM_MESSAGES.iAmAllergicTo);
   const [theyMakeMeSick, setTheyMakeMeSick] = useState(DEFAULT_CUSTOM_MESSAGES.theyMakeMeSick);
+  const [presets, setPresets] = useState<CustomAlertPreset[]>([]);
+  const [selectedPresetId, setSelectedPresetId] = useState<string | null>(null);
+  const [isSaveDialogOpen, setIsSaveDialogOpen] = useState(false);
 
   useEffect(() => {
     const loadMessages = async () => {
@@ -40,7 +48,67 @@ const SelectAlertPage = () => {
       }
     };
     loadMessages();
+    getCustomAlertPresets().then(setPresets);
   }, []);
+
+  const selectedPreset = presets.find((p) => p.id === selectedPresetId) || null;
+
+  const matchesDefaults = iAmAllergicTo === DEFAULT_CUSTOM_MESSAGES.iAmAllergicTo
+    && theyMakeMeSick === DEFAULT_CUSTOM_MESSAGES.theyMakeMeSick;
+
+  // Autosave: while a preset is active (selected), any edit to the fields
+  // writes straight through to that preset - no separate save step. Editing
+  // without an active preset is normal behaviour (just local state, only
+  // persisted as the active alert text when Continue is pressed).
+  useEffect(() => {
+    if (!selectedPreset) return;
+    if (iAmAllergicTo === selectedPreset.iAmAllergicTo && theyMakeMeSick === selectedPreset.theyMakeMeSick) return;
+    const updated = { ...selectedPreset, iAmAllergicTo, theyMakeMeSick };
+    saveCustomAlertPreset(updated).then(setPresets);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [iAmAllergicTo, theyMakeMeSick, selectedPresetId]);
+
+  const handleResetBoth = () => {
+    setIAmAllergicTo(DEFAULT_CUSTOM_MESSAGES.iAmAllergicTo);
+    setTheyMakeMeSick(DEFAULT_CUSTOM_MESSAGES.theyMakeMeSick);
+  };
+
+  const handleSelectPreset = (preset: CustomAlertPreset) => {
+    setSelectedPresetId(preset.id);
+    setIAmAllergicTo(preset.iAmAllergicTo);
+    setTheyMakeMeSick(preset.theyMakeMeSick);
+  };
+
+  const handleDeletePreset = async (e: React.MouseEvent, id: string) => {
+    e.stopPropagation();
+    const updated = await deleteCustomAlertPreset(id);
+    setPresets(updated);
+    if (selectedPresetId === id) {
+      setSelectedPresetId(null);
+    }
+  };
+
+  const handleActionTileClick = () => {
+    if (presets.length >= MAX_CUSTOM_ALERT_PRESETS) {
+      toast.error(`You can save up to ${MAX_CUSTOM_ALERT_PRESETS} custom alerts. Delete one to add another.`);
+      return;
+    }
+    setIsSaveDialogOpen(true);
+  };
+
+  const handleSaveNewPreset = async (name: string) => {
+    const newPreset: CustomAlertPreset = {
+      id: crypto.randomUUID(),
+      name,
+      iAmAllergicTo,
+      theyMakeMeSick,
+    };
+    const updated = await saveCustomAlertPreset(newPreset);
+    setPresets(updated);
+    setSelectedPresetId(newPreset.id);
+    setIsSaveDialogOpen(false);
+    toast.success(`"${name}" saved.`);
+  };
 
   const hasCustomAlertText = iAmAllergicTo !== DEFAULT_CUSTOM_MESSAGES.iAmAllergicTo || theyMakeMeSick !== DEFAULT_CUSTOM_MESSAGES.theyMakeMeSick;
   const blockedOffline = !isOnline && hasCustomAlertText;
@@ -80,9 +148,50 @@ const SelectAlertPage = () => {
           className="flex-grow pt-2"
         >
           <StepHeader
-            title="Customise Alert"
-            description="Personalise the warning messages that will appear on the card."
+            title="Customise Alerts"
+            description="Personalise the alert messages that will appear on the card."
           />
+
+          {isPremium && (
+            <div className="flex flex-wrap gap-2 px-2 pt-4">
+              <div
+                onClick={handleActionTileClick}
+                className="relative flex items-center justify-center min-w-[60px] px-2 py-4 rounded-xl shadow-sm cursor-pointer transition-all duration-200 border-2 text-center bg-white dark:bg-gray-800 border-gray-300 dark:border-gray-600 text-gray-500 dark:text-gray-400 hover:border-red-200 dark:hover:border-red-900/30"
+              >
+                <span className="absolute top-0.5 right-0.5 p-0.5 text-gray-400">
+                  <Plus className="w-3 h-3" />
+                </span>
+                <span className="text-[12px] font-bold leading-tight px-1">New</span>
+              </div>
+
+              {presets.map((preset) => {
+                const isSelected = selectedPresetId === preset.id;
+                return (
+                  <div
+                    key={preset.id}
+                    onClick={() => handleSelectPreset(preset)}
+                    className={cn(
+                      "relative flex items-center justify-center min-w-[60px] px-2 py-4 rounded-xl shadow-sm cursor-pointer transition-all duration-200 border-2 text-center",
+                      isSelected
+                        ? "bg-red-600 border-red-600 text-white"
+                        : "bg-white dark:bg-gray-800 border-transparent text-gray-700 dark:text-gray-300 hover:border-red-200 dark:hover:border-red-900/30"
+                    )}
+                  >
+                    <button
+                      onClick={(e) => handleDeletePreset(e, preset.id)}
+                      className={cn(
+                        "absolute top-0.5 right-0.5 p-0.5 rounded-full hover:bg-black/10 transition-colors",
+                        isSelected ? "text-white" : "text-gray-400"
+                      )}
+                    >
+                      <X className="w-3 h-3" />
+                    </button>
+                    <span className="text-[12px] font-bold leading-tight px-1">{preset.name}</span>
+                  </div>
+                );
+              })}
+            </div>
+          )}
 
           <div className="w-full text-left pt-8 pb-4">
             <div className="space-y-6">
@@ -92,12 +201,12 @@ const SelectAlertPage = () => {
                     htmlFor="allergic-to"
                     className="text-sm font-medium text-gray-500 dark:text-gray-400"
                   >
-                    Primary Warning
+                    Primary Alert
                   </Label>
                   <button
                     type="button"
-                    onClick={() => setIAmAllergicTo(DEFAULT_CUSTOM_MESSAGES.iAmAllergicTo)}
-                    disabled={!isPremium || iAmAllergicTo === DEFAULT_CUSTOM_MESSAGES.iAmAllergicTo}
+                    onClick={handleResetBoth}
+                    disabled={!isPremium || matchesDefaults}
                     className="flex items-center gap-1 text-xs font-bold uppercase text-red-600 hover:text-red-700 disabled:opacity-40 disabled:text-gray-400 transition-colors"
                   >
                     <RotateCcw className="h-3 w-3" />
@@ -115,23 +224,12 @@ const SelectAlertPage = () => {
               </div>
 
               <div className="space-y-2">
-                <div className="flex items-center justify-between ml-2">
-                  <Label
-                    htmlFor="make-me-sick"
-                    className="text-sm font-medium text-gray-500 dark:text-gray-400"
-                  >
-                    Secondary Warning
-                  </Label>
-                  <button
-                    type="button"
-                    onClick={() => setTheyMakeMeSick(DEFAULT_CUSTOM_MESSAGES.theyMakeMeSick)}
-                    disabled={!isPremium || theyMakeMeSick === DEFAULT_CUSTOM_MESSAGES.theyMakeMeSick}
-                    className="flex items-center gap-1 text-xs font-bold uppercase text-red-600 hover:text-red-700 disabled:opacity-40 disabled:text-gray-400 transition-colors"
-                  >
-                    <RotateCcw className="h-3 w-3" />
-                    Reset
-                  </button>
-                </div>
+                <Label
+                  htmlFor="make-me-sick"
+                  className="text-sm font-medium text-gray-500 dark:text-gray-400 ml-2"
+                >
+                  Secondary Alert
+                </Label>
                 <textarea
                   id="make-me-sick"
                   value={theyMakeMeSick}
@@ -142,9 +240,9 @@ const SelectAlertPage = () => {
                 />
               </div>
             </div>
-            
+
             {!isPremium && (
-              <button 
+              <button
                 onClick={() => navigate('/premium-onboarding')}
                 className="mt-6 w-full flex items-center justify-center gap-2 text-amber-600 font-bold text-sm hover:underline"
               >
@@ -154,6 +252,12 @@ const SelectAlertPage = () => {
             )}
           </div>
         </motion.div>
+
+        <SaveAlertPresetDialog
+          isOpen={isSaveDialogOpen}
+          onClose={() => setIsSaveDialogOpen(false)}
+          onSave={handleSaveNewPreset}
+        />
 
         {blockedOffline && (
           <div className="mx-auto max-w-md mt-4 p-4 bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-800 rounded-xl flex items-center gap-3 text-amber-800 dark:text-amber-200 text-center shrink-0">
