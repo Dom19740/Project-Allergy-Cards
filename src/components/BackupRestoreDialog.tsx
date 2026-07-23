@@ -13,6 +13,7 @@ import {
   readClipboardText,
   parseBackupPayload,
   applyParsedBackup,
+  backupRequiresPremium,
   stashPendingBackupRestore,
   ParsedBackup,
   BackupImportResult,
@@ -43,15 +44,16 @@ const BackupRestoreDialog: React.FC<BackupRestoreDialogProps> = ({ isOpen, onClo
     toast.success(`Restored ${parts.join(' and ')}.`);
   };
 
-  // Parses (but doesn't yet write) a backup. If it was made under Premium and
-  // has more cards than this device's current plan allows, gate on restoring
-  // the purchase first instead of silently capping cards - the marker is
-  // never trusted to grant Premium itself, only to decide whether to show
-  // this prompt before the import happens.
+  // Parses (but doesn't yet write) a backup. A backup containing anything a
+  // free account could never have created (multiple cards, a premium
+  // language, custom allergens, custom alerts) can only have come from a
+  // Premium account - so it can only be restored onto one. Block the import
+  // entirely and require restoring Premium first, rather than silently
+  // importing a stripped-down subset that isn't what the user actually had.
   const processBackupText = async (text: string) => {
     const parsed = parseBackupPayload(text);
 
-    if (parsed.wasPremiumAtBackup && !isPremium && parsed.savedCards.length > maxSavedCards) {
+    if (!isPremium && backupRequiresPremium(parsed)) {
       setGatedBackup({ text, parsed });
       return;
     }
@@ -127,21 +129,6 @@ const BackupRestoreDialog: React.FC<BackupRestoreDialogProps> = ({ isOpen, onClo
     navigate('/premium-onboarding');
   };
 
-  const handleGateContinueAnyway = async () => {
-    if (!gatedBackup) return;
-    setIsBusy(true);
-    try {
-      const result = await applyParsedBackup(gatedBackup.parsed, maxSavedCards);
-      notifyRestoreResult(result);
-    } catch (error: any) {
-      toast.error(error?.message || 'Could not restore that backup.');
-    } finally {
-      setIsBusy(false);
-      setGatedBackup(null);
-      onClose();
-    }
-  };
-
   return (
     <>
       <Dialog open={isOpen} onOpenChange={onClose}>
@@ -207,8 +194,16 @@ const BackupRestoreDialog: React.FC<BackupRestoreDialogProps> = ({ isOpen, onClo
         </DialogContent>
       </Dialog>
 
-      <Dialog open={!!gatedBackup} onOpenChange={(open) => { if (!open) setGatedBackup(null); }}>
+      {/* Deliberately not user-dismissable via backdrop click, outside tap, or
+          Escape - only the explicit Cancel/Restore Purchase buttons close it,
+          so a stray tap can't silently discard a backup that requires this
+          decision. */}
+      <Dialog open={!!gatedBackup} onOpenChange={() => {}}>
         <DialogContent
+          hideClose
+          onEscapeKeyDown={(e) => e.preventDefault()}
+          onPointerDownOutside={(e) => e.preventDefault()}
+          onInteractOutside={(e) => e.preventDefault()}
           className="w-[90%] max-w-[400px] rounded-2xl border-gray-200 dark:border-gray-700 shadow-2xl p-5 fixed left-1/2 -translate-x-1/2 top-[calc(1rem+env(safe-area-inset-top))] translate-y-0 animate-in fade-in slide-in-from-top-8 duration-300"
         >
           <DialogHeader className="mb-1">
@@ -221,7 +216,7 @@ const BackupRestoreDialog: React.FC<BackupRestoreDialogProps> = ({ isOpen, onClo
           </DialogHeader>
 
           <p className="text-sm text-gray-500 dark:text-gray-400 mb-4">
-            This backup has {gatedBackup?.parsed.savedCards.length} cards saved with Premium unlocked, but this device is on the free plan. Restore your purchase first so none of them get lost, or continue now and add just the first one.
+            This backup includes Premium features - multiple cards, a premium language, custom allergens, or custom alerts - so it can only be restored on a Premium account. Restore your purchase first, then this backup will finish importing automatically.
           </p>
 
           <div className="flex flex-col gap-2">
@@ -234,12 +229,12 @@ const BackupRestoreDialog: React.FC<BackupRestoreDialogProps> = ({ isOpen, onClo
               Restore Purchase
             </Button>
             <Button
-              onClick={handleGateContinueAnyway}
+              onClick={() => setGatedBackup(null)}
               disabled={isBusy}
               variant="outline"
               className="w-full h-11 rounded-xl border-gray-200 text-gray-600"
             >
-              Continue with {maxSavedCards} card
+              Cancel
             </Button>
           </div>
         </DialogContent>

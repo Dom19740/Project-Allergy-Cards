@@ -7,6 +7,7 @@ import { SavedCard, CustomAlertPreset } from '@/lib/types';
 import { CustomAllergenImageMap, getCustomAllergenImages, getCustomAllergenNames, mergeCustomAllergenNames } from '@/lib/customAllergenImages';
 import { getCustomAlertPresets, MAX_CUSTOM_ALERT_PRESETS } from '@/lib/customAlertPresets';
 import { ALLERGEN_OPTIONS } from '@/lib/allergens';
+import { FREE_LANGUAGES, PREMIUM_LIMITS } from '@/lib/premium-config';
 
 const BACKUP_VERSION = 1;
 
@@ -225,6 +226,23 @@ export const parseBackupPayload = (text: string): ParsedBackup => {
   }
 
   return { savedCards, emergencyCard, customAllergenImages, customAllergenNames, customAlertPresets, wasPremiumAtBackup };
+};
+
+// True if this backup contains anything a free-tier account could never have
+// created - multiple cards, a non-free language, custom allergens, or custom
+// alert presets. A backup like that can only have come from a Premium
+// account, so it can only be restored onto a Premium account - not even
+// partially. wasPremiumAtBackup is checked too as a direct signal, but the
+// content checks are what actually matter (and cover backups made before
+// that marker existed).
+export const backupRequiresPremium = (parsed: ParsedBackup): boolean => {
+  if (parsed.wasPremiumAtBackup) return true;
+  if (parsed.savedCards.length > PREMIUM_LIMITS.FREE_MAX_SAVED_CARDS) return true;
+  if (parsed.customAlertPresets.length > 0) return true;
+  if (parsed.customAllergenNames.length > 0 || Object.keys(parsed.customAllergenImages).length > 0) return true;
+
+  const allCards = [...parsed.savedCards, ...(parsed.emergencyCard ? [parsed.emergencyCard] : [])];
+  return allCards.some((card) => !FREE_LANGUAGES.includes(card.languageCode));
 };
 
 // Writes an already-parsed backup to storage, capping saved cards at
