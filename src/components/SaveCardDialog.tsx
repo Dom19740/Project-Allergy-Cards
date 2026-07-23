@@ -71,23 +71,38 @@ const SaveCardDialog: React.FC<SaveCardDialogProps> = ({
     emblaApi.on('reInit', onSelect);
   }, [emblaApi, onSelect]);
 
+  const notifyAtCardLimit = () => {
+    // Premium is already the highest tier, so "upgrade" only ever applies to
+    // the free-tier message - it has nowhere higher to go.
+    toast.error(
+      isPremium
+        ? `You've saved the maximum of ${maxSavedCards} cards. Delete or overwrite an existing card to save a new one.`
+        : `You can save ${maxSavedCards} card for free. Upgrade, delete, or overwrite your existing card to save a new one.`
+    );
+  };
+
   useEffect(() => {
     if (isOpen && !isEmergency) {
       const loadCards = async () => {
         const savedCards = await storage.get<SavedCard[]>(STORAGE_KEYS.SAVED_CARDS) || [];
         setExistingCards(savedCards);
+
+        // Warn immediately on open if already at the limit, rather than only
+        // after the user types a name and taps Save - that way it's obvious
+        // up front why the fields look locked, instead of looking broken.
+        const limit = isPremium ? PREMIUM_LIMITS.MAX_SAVED_CARDS : PREMIUM_LIMITS.FREE_MAX_SAVED_CARDS;
+        if (savedCards.length >= limit) {
+          notifyAtCardLimit();
+        }
       };
       loadCards();
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isOpen, isEmergency]);
 
   const handleSave = async () => {
     if (isLocked) {
-      toast.error(
-        isPremium
-          ? `You can save up to ${maxSavedCards} cards. Please overwrite an existing card.`
-          : "You can save 1 card for free. Upgrade to save multiple cards!"
-      );
+      notifyAtCardLimit();
       return;
     }
 
@@ -118,11 +133,7 @@ const SaveCardDialog: React.FC<SaveCardDialogProps> = ({
         toast.success(`Card "${cardName}" updated successfully!`);
       } else {
         if (savedCards.length >= maxSavedCards) {
-          toast.error(
-            isPremium
-              ? `You can save up to ${maxSavedCards} cards. Please overwrite an existing card.`
-              : "You can save 1 card for free. Upgrade to save multiple cards!"
-          );
+          notifyAtCardLimit();
           return;
         }
         updatedCards = [...savedCards, newCard];
@@ -183,7 +194,7 @@ const SaveCardDialog: React.FC<SaveCardDialogProps> = ({
           </DialogTitle>
         </DialogHeader>
 
-        <div className="flex flex-col gap-2 px-1">
+        <div className="flex flex-col gap-2 px-1 min-w-0">
           <div className="flex flex-col gap-1">
             <Label htmlFor="name" className="text-[11px] font-bold text-gray-400 px-1 uppercase tracking-wider">
               {selectedCardId ? 'Update Card Name' : 'Card Name'}
@@ -213,18 +224,18 @@ const SaveCardDialog: React.FC<SaveCardDialogProps> = ({
           </div>
 
           {!isEmergency && existingCards.length > 0 && (
-            <div className="flex flex-col gap-1 overflow-hidden">
-              <div className="flex items-center justify-between px-1">
-                <Label className="text-[11px] font-bold text-gray-400 uppercase tracking-wider">
+            <div className="flex flex-col gap-1 overflow-hidden min-w-0">
+              <div className="flex items-center justify-between px-1 min-w-0">
+                <Label className="text-[11px] font-bold text-gray-400 uppercase tracking-wider shrink-0">
                   Or Overwrite Existing
                 </Label>
                 {existingCards.length > 1 && (
-                  <div className="flex justify-end gap-1.5">
+                  <div className="flex justify-end gap-1.5 shrink-0">
                     {existingCards.map((_, i) => (
                       <div
                         key={i}
                         className={cn(
-                          "h-1 rounded-full transition-all duration-300",
+                          "h-1 rounded-full transition-all duration-300 shrink-0",
                           i === selectedIndex ? "w-3 bg-red-600" : "w-1 bg-gray-300 dark:bg-gray-700"
                         )}
                       />
@@ -233,17 +244,22 @@ const SaveCardDialog: React.FC<SaveCardDialogProps> = ({
                 )}
               </div>
 
-              <div className="w-full overflow-hidden cursor-grab active:cursor-grabbing" ref={emblaRef}>
+              <div className="w-full min-w-0 overflow-hidden cursor-grab active:cursor-grabbing" ref={emblaRef}>
                 <div className="flex">
                   {existingCards.map((card) => (
                     <div key={card.id} className="flex-[0_0_100%] min-w-0 flex justify-center px-1">
                       <button
                         onClick={() => toggleCardSelection(card)}
                         className={cn(
-                          "w-full flex items-center justify-between p-2.5 rounded-xl border transition-all text-left disabled:opacity-50",
+                          "w-full flex items-center justify-between p-2.5 rounded-xl border transition-all text-left",
                           selectedCardId === card.id
-                            ? 'border-red-500 bg-red-50 text-red-700'
-                            : 'border-gray-100 bg-gray-50 text-gray-600 hover:border-gray-200 dark:bg-gray-800 dark:border-gray-700 dark:text-gray-300'
+                            ? 'border-red-500 bg-red-50 text-red-700 dark:bg-red-900/20 dark:text-red-400'
+                            // Overwriting is always a real, clickable option (not a fallback), even
+                            // while the card-name field above is locked at the save limit - so it
+                            // needs to read as active/interactive, not washed-out like a disabled
+                            // control. White background + solid border + full-contrast text instead
+                            // of the previous all-gray palette.
+                            : 'border-gray-200 bg-white text-gray-800 hover:border-red-300 hover:bg-red-50/50 dark:bg-gray-800 dark:border-gray-600 dark:text-gray-100 dark:hover:border-red-900/50'
                         )}
                       >
                         <div className="flex flex-col overflow-hidden">
@@ -272,7 +288,6 @@ const SaveCardDialog: React.FC<SaveCardDialogProps> = ({
           </Button>
           <Button
             onClick={handleSave}
-            disabled={isLocked}
             variant="primary"
             className="flex-1 h-11 rounded-xl shadow-sm transition-all active:scale-95 font-medium disabled:opacity-50"
           >
