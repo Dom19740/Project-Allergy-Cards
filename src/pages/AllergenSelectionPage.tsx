@@ -235,18 +235,21 @@ const AllergenSelectionPage = () => {
                   >
                     <X className="w-3 h-3" />
                   </button>
-                  <div className="relative w-8 h-8 rounded-lg flex items-center justify-center shrink-0 bg-white overflow-hidden">
+                  <button
+                    onClick={(e) => { e.stopPropagation(); setImageDialogAllergen(allergen); }}
+                    className={cn(
+                      "absolute bottom-0.5 right-0.5 p-0.5 rounded-full hover:bg-black/10 transition-colors",
+                      isSelected ? "text-white" : "text-gray-400"
+                    )}
+                  >
+                    <Camera className="w-3 h-3" />
+                  </button>
+                  <div className="w-8 h-8 rounded-lg flex items-center justify-center shrink-0 bg-white overflow-hidden">
                     {customImages[allergen] ? (
                       <img src={customImages[allergen]} alt={allergen} className="w-full h-full object-cover" />
                     ) : (
                       <Utensils className={cn("w-4 h-4", isSelected ? "text-red-600" : "text-gray-500")} />
                     )}
-                    <button
-                      onClick={(e) => { e.stopPropagation(); setImageDialogAllergen(allergen); }}
-                      className="absolute -bottom-1 -right-1 p-0.5 rounded-full bg-gray-700 text-white shadow hover:bg-gray-900"
-                    >
-                      <Camera className="w-2.5 h-2.5" />
-                    </button>
                   </div>
                   <span className="text-[12px] font-bold leading-tight truncate w-full px-1">{allergen}</span>
                 </div>

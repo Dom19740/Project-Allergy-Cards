@@ -5,7 +5,22 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/u
 import { Button } from '@/components/ui/button';
 import { Search, Upload, Trash2 } from 'lucide-react';
 import { toast } from 'sonner';
+import { Capacitor } from '@capacitor/core';
 import { fileToCompressedDataUrl } from '@/lib/customAllergenImages';
+
+// The gesture to save an image out of the search results differs by platform
+// - both iOS and Android use a touch-and-hold, but the menu item it opens
+// (and where the file ends up) has a different name on each.
+const getSaveImageHint = (): string => {
+  const platform = Capacitor.getPlatform();
+  if (platform === 'ios') {
+    return 'Touch and hold the photo you like and choose "Save to Photos", then come back here and tap Upload from device.';
+  }
+  if (platform === 'android') {
+    return 'Touch and hold the photo you like and choose "Download image", then come back here and tap Upload from device.';
+  }
+  return 'Right-click (or press and hold) the photo you like and choose "Save image", then come back here and tap Upload from device.';
+};
 
 interface CustomAllergenImageDialogProps {
   isOpen: boolean;
@@ -23,11 +38,17 @@ const CustomAllergenImageDialog: React.FC<CustomAllergenImageDialogProps> = ({
   onImageChange,
 }) => {
   const [isBusy, setIsBusy] = useState(false);
+  const [hasSearched, setHasSearched] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
+
+  React.useEffect(() => {
+    if (isOpen) setHasSearched(false);
+  }, [isOpen, allergenName]);
 
   const handleSearchWeb = () => {
     const query = encodeURIComponent(allergenName);
     window.open(`https://www.google.com/search?tbm=isch&q=${query}`, '_blank', 'noopener,noreferrer');
+    setHasSearched(true);
   };
 
   const handleUploadClick = () => {
@@ -75,6 +96,12 @@ const CustomAllergenImageDialog: React.FC<CustomAllergenImageDialogProps> = ({
             <Search className="h-4 w-4" />
             Search the web
           </Button>
+
+          {hasSearched && (
+            <p className="text-xs text-gray-500 dark:text-gray-400 -mt-1 px-1">
+              {getSaveImageHint()}
+            </p>
+          )}
 
           <Button
             onClick={handleUploadClick}

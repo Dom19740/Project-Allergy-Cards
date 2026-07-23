@@ -76,7 +76,11 @@ const AllergyCard: React.FC<AllergyCardProps> = ({ languageCode, selectedAllerge
   const [verifiedEmergencyNumber, setVerifiedEmergencyNumber] = useState<string | null>(null);
 
   useEffect(() => {
-    getCustomAllergenImages().then(setCustomAllergenImages);
+    const loadCustomAllergenImages = () => getCustomAllergenImages().then(setCustomAllergenImages);
+    loadCustomAllergenImages();
+
+    window.addEventListener('storage-update', loadCustomAllergenImages);
+    return () => window.removeEventListener('storage-update', loadCustomAllergenImages);
   }, []);
 
   useEffect(() => {
