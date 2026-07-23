@@ -182,7 +182,7 @@ const SaveCardDialog: React.FC<SaveCardDialogProps> = ({
           </DialogTitle>
         </DialogHeader>
 
-        <div className="flex flex-col gap-2 overflow-hidden px-1">
+        <div className="flex flex-col gap-2 px-1">
           <div className="flex flex-col gap-1">
             <Label htmlFor="name" className="text-[11px] font-bold text-gray-400 px-1 uppercase tracking-wider">
               {selectedCardId ? 'Update Card Name' : 'Card Name'}
