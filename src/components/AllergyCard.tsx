@@ -4,7 +4,7 @@ import React, { useRef, useState, useEffect, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'sonner';
 import { Loader2, Utensils, AlertTriangle } from 'lucide-react';
-import { LanguageCode, SelectedAllergens, CustomMessages, TranslatedContent } from '@/lib/types';
+import { LanguageCode, SelectedAllergens, CustomMessages, TranslatedContent, SavedCard } from '@/lib/types';
 import { ALLERGEN_OPTIONS, getAllergenGridStyle } from '@/lib/allergens';
 import { translateText, TranslationError } from '@/lib/translator';
 import { SUPPORTED_LANGUAGES } from '@/lib/supportedLanguages';
@@ -12,6 +12,7 @@ import { shareCard, downloadCard } from '@/lib/card-utils';
 import SaveCardDialog from './SaveCardDialog';
 import CardActions from './CardActions';
 import CardMenu from './CardMenu';
+import CardSelectorMenu from './CardSelectorMenu';
 import DisclaimerDialog from './DisclaimerDialog';
 import UnderstandCardDialog from './UnderstandCardDialog';
 import EmergencyNumberDialog from './EmergencyNumberDialog';
@@ -73,7 +74,20 @@ const AllergyCard: React.FC<AllergyCardProps> = ({ languageCode, selectedAllerge
     dial112: "DIAL 112"
   });
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const [isCardSelectorOpen, setIsCardSelectorOpen] = useState(false);
+  const [hasMultipleCards, setHasMultipleCards] = useState(false);
   const [verifiedEmergencyNumber, setVerifiedEmergencyNumber] = useState<string | null>(null);
+
+  useEffect(() => {
+    const loadSavedCardsCount = async () => {
+      const savedCards = await storage.get<SavedCard[]>(STORAGE_KEYS.SAVED_CARDS) || [];
+      setHasMultipleCards(savedCards.length > 1);
+    };
+    loadSavedCardsCount();
+
+    window.addEventListener('storage-update', loadSavedCardsCount);
+    return () => window.removeEventListener('storage-update', loadSavedCardsCount);
+  }, []);
 
   useEffect(() => {
     const loadCustomAllergenImages = () => getCustomAllergenImages().then(setCustomAllergenImages);
@@ -575,6 +589,8 @@ const AllergyCard: React.FC<AllergyCardProps> = ({ languageCode, selectedAllerge
         onPrint={handlePrint}
         onSave={() => setIsSaveDialogOpen(true)}
         onToggleMenu={() => setIsMenuOpen(!isMenuOpen)}
+        onOpenCardSelector={() => setIsCardSelectorOpen(true)}
+        showCardSelector={hasMultipleCards}
         onEmergency={handleEmergencyClick}
         onReadAloud={handleReadAloud}
         onToggleOriginal={() => setShowOriginal(prev => !prev)}
@@ -590,6 +606,7 @@ const AllergyCard: React.FC<AllergyCardProps> = ({ languageCode, selectedAllerge
         onOpenDisclaimer={() => setIsDisclaimerOpen(true)}
         onOpenUnderstandCard={() => setIsUnderstandCardOpen(true)}
       />
+      <CardSelectorMenu isOpen={isCardSelectorOpen} onClose={() => setIsCardSelectorOpen(false)} />
       <DisclaimerDialog isOpen={isDisclaimerOpen} onClose={() => setIsDisclaimerOpen(false)} />
       <UnderstandCardDialog isOpen={isUnderstandCardOpen} onClose={() => setIsUnderstandCardOpen(false)} />
       <EmergencyNumberDialog 

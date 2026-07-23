@@ -11,7 +11,7 @@ import { ALLERGEN_OPTIONS } from '@/lib/allergens';
 import FixedHeader from '@/components/FixedHeader';
 import StepHeader from '@/components/StepHeader';
 import CustomAllergenImageDialog from '@/components/CustomAllergenImageDialog';
-import { getCustomAllergenImages, setCustomAllergenImage, removeCustomAllergenImage } from '@/lib/customAllergenImages';
+import { getCustomAllergenImages, setCustomAllergenImage, removeCustomAllergenImage, getSavedCardNamesUsingAllergen } from '@/lib/customAllergenImages';
 import { storage, STORAGE_KEYS } from '@/lib/storage';
 import { cn } from '@/lib/utils';
 import { useBilling } from '@/hooks/useBilling';
@@ -107,8 +107,15 @@ const AllergenSelectionPage = () => {
     setTimeout(scrollToBottom, 100);
   };
 
-  const removeCustomAllergen = (e: React.MouseEvent, allergen: string) => {
+  const removeCustomAllergen = async (e: React.MouseEvent, allergen: string) => {
     e.stopPropagation();
+
+    const cardNames = await getSavedCardNamesUsingAllergen(allergen);
+    if (cardNames.length > 0) {
+      toast.error(`Can't remove "${allergen}" - it's used on the saved card "${cardNames[0]}". Delete that card first.`);
+      return;
+    }
+
     setCustomList(prev => prev.filter(item => item !== allergen));
     setSelectedAllergens(prev => prev.filter(item => item !== allergen));
     setCustomImages(prev => {
@@ -122,8 +129,21 @@ const AllergenSelectionPage = () => {
 
   const handleImageChange = async (dataUrl: string | null) => {
     const name = imageDialogAllergen;
+    if (!name) {
+      setImageDialogAllergen(null);
+      return;
+    }
+
+    if (!dataUrl) {
+      const cardNames = await getSavedCardNamesUsingAllergen(name);
+      if (cardNames.length > 0) {
+        toast.error(`Can't remove the photo for "${name}" - it's used on the saved card "${cardNames[0]}". Delete that card first.`);
+        setImageDialogAllergen(null);
+        return;
+      }
+    }
+
     setImageDialogAllergen(null);
-    if (!name) return;
 
     if (dataUrl) {
       await setCustomAllergenImage(name, dataUrl);

@@ -56,17 +56,15 @@ const CardMenu: React.FC<CardMenuProps> = ({ isOpen, onClose, onOpenDisclaimer, 
     toast.success("Emergency number reset. You'll be asked to verify it next time.");
   };
 
-  const menuItems = [
-    { to: "/", label: "Saved Cards", icon: Home },
-    ...(!isEmergency ? [
-      { to: "/select-allergens", label: "Edit Allergens", icon: ShieldAlert, state: editState },
-      { to: "/select-alert", label: "Edit Alerts", icon: MessageSquare, state: editState },
-    ] : []),
+  const homeItem = { to: "/", label: "Home", icon: Home };
+
+  const editItems = !isEmergency ? [
+    { to: "/select-allergens", label: "Edit Allergens", icon: ShieldAlert, state: editState },
+    { to: "/select-alert", label: "Edit Alerts", icon: MessageSquare, state: editState },
+    { to: "/select-language", label: "Change Language", icon: Languages, state: editState },
+  ] : [
     { to: "/select-language", label: "Change Language", icon: Languages, state: editState },
   ];
-
-  const savedCardsItem = menuItems[0];
-  const restOfMenuItems = menuItems.slice(1);
 
   return (
     <>
@@ -88,27 +86,14 @@ const CardMenu: React.FC<CardMenuProps> = ({ isOpen, onClose, onOpenDisclaimer, 
               </button>
             </div>
             <button
-              onClick={() => handleNavigation(savedCardsItem.to)}
+              onClick={() => handleNavigation(homeItem.to)}
               className="w-full flex items-center space-x-3 px-4 py-3 text-sm font-medium text-gray-700 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-gray-700 rounded-xl transition-colors text-left"
             >
-              <savedCardsItem.icon className="h-4 w-4 text-red-500" />
-              <span>{savedCardsItem.label}</span>
+              <homeItem.icon className="h-4 w-4 text-red-500" />
+              <span>{homeItem.label}</span>
             </button>
 
-            {!isEmergency && (
-              <button
-                onClick={() => {
-                  onClose();
-                  onOpenUnderstandCard();
-                }}
-                className="w-full flex items-center space-x-3 px-4 py-3 text-sm font-medium text-gray-700 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-gray-700 rounded-xl transition-colors text-left"
-              >
-                <HelpCircle className="h-4 w-4 text-red-500" />
-                <span>Understand Your Card</span>
-              </button>
-            )}
-
-            {restOfMenuItems.map((item) => (
+            {editItems.map((item) => (
               <button
                 key={item.to}
                 onClick={() => handleNavigation(item.to, item.state)}
@@ -129,13 +114,18 @@ const CardMenu: React.FC<CardMenuProps> = ({ isOpen, onClose, onOpenDisclaimer, 
               </button>
             )}
 
-            <button
-              onClick={handleReportIssue}
-              className="w-full flex items-center space-x-3 px-4 py-3 text-sm font-medium text-gray-700 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-gray-700 rounded-xl transition-colors text-left"
-            >
-              <Mail className="h-4 w-4 text-red-500" />
-              <span>Report an Issue</span>
-            </button>
+            {!isEmergency && (
+              <button
+                onClick={() => {
+                  onClose();
+                  onOpenUnderstandCard();
+                }}
+                className="w-full flex items-center space-x-3 px-4 py-3 text-sm font-medium text-gray-700 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-gray-700 rounded-xl transition-colors text-left"
+              >
+                <HelpCircle className="h-4 w-4 text-red-500" />
+                <span>Understand Your Card</span>
+              </button>
+            )}
 
             <button
               onClick={() => {
@@ -146,6 +136,14 @@ const CardMenu: React.FC<CardMenuProps> = ({ isOpen, onClose, onOpenDisclaimer, 
             >
               <Info className="h-4 w-4 text-red-500" />
               <span>Disclaimer</span>
+            </button>
+
+            <button
+              onClick={handleReportIssue}
+              className="w-full flex items-center space-x-3 px-4 py-3 text-sm font-medium text-gray-700 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-gray-700 rounded-xl transition-colors text-left"
+            >
+              <Mail className="h-4 w-4 text-red-500" />
+              <span>Report an Issue</span>
             </button>
           </div>
         </div>

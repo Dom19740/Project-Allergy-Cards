@@ -38,7 +38,8 @@ const DisclaimerDialog: React.FC<DisclaimerDialogProps> = ({ isOpen, onClose }) 
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent 
+      <DialogContent
+        hideClose
         className="w-[90%] sm:max-w-[425px] rounded-2xl fixed left-1/2 -translate-x-1/2 top-[calc(1.5rem+env(safe-area-inset-top))] translate-y-0 animate-in fade-in slide-in-from-top-8 duration-300"
       >
         <DialogHeader className="flex flex-col items-center text-center">

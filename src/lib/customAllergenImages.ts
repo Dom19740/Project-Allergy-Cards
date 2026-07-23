@@ -1,6 +1,23 @@
 import { storage, STORAGE_KEYS } from '@/lib/storage';
+import { SavedCard } from '@/lib/types';
 
 export type CustomAllergenImageMap = { [allergenName: string]: string };
+
+// Saved cards reference a custom allergen by name only - they don't embed a
+// snapshot of its image. Deleting the image (or the allergen) out from under
+// a saved card silently drops that allergen from the card's image grid, so
+// callers must check this before removing.
+export async function getSavedCardNamesUsingAllergen(allergenName: string): Promise<string[]> {
+  const [standardCards, emergencyCard] = await Promise.all([
+    storage.get<SavedCard[]>(STORAGE_KEYS.SAVED_CARDS),
+    storage.get<SavedCard>(STORAGE_KEYS.SAVED_EMERGENCY_CARD),
+  ]);
+
+  const allCards = [...(standardCards || []), ...(emergencyCard ? [emergencyCard] : [])];
+  return allCards
+    .filter(card => card.selectedAllergens?.ids?.includes(allergenName))
+    .map(card => card.name);
+}
 
 export async function getCustomAllergenImages(): Promise<CustomAllergenImageMap> {
   return (await storage.get<CustomAllergenImageMap>(STORAGE_KEYS.CUSTOM_ALLERGEN_IMAGES)) || {};

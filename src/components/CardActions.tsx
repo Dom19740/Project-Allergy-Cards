@@ -2,7 +2,7 @@
 
 import React from 'react';
 import { Button } from '@/components/ui/button';
-import { Share2, Download, Save, Loader2, Menu, Languages, Volume2, Square } from 'lucide-react';
+import { Share2, Download, Save, Loader2, Menu, Languages, Volume2, Square, Layers } from 'lucide-react';
 import EmergencyCrossIcon from './EmergencyCrossIcon';
 
 interface CardActionsProps {
@@ -11,6 +11,8 @@ interface CardActionsProps {
   onPrint: () => void;
   onSave: () => void;
   onToggleMenu: () => void;
+  onOpenCardSelector?: () => void;
+  showCardSelector?: boolean;
   onEmergency: () => void;
   onReadAloud: () => void;
   onToggleOriginal: () => void;
@@ -27,6 +29,8 @@ const CardActions: React.FC<CardActionsProps> = ({
   onPrint,
   onSave,
   onToggleMenu,
+  onOpenCardSelector,
+  showCardSelector,
   onEmergency,
   onReadAloud,
   onToggleOriginal,
@@ -49,6 +53,18 @@ const CardActions: React.FC<CardActionsProps> = ({
         >
           <Menu className="h-5 w-5" />
         </Button>
+
+        {showCardSelector && (
+          <Button
+            onClick={onOpenCardSelector}
+            variant="ghost"
+            size="icon"
+            className="text-orange-600 hover:bg-orange-50 rounded-full h-10 w-10"
+            title="Switch Card"
+          >
+            <Layers className="h-5 w-5" />
+          </Button>
+        )}
 
         <Button
           onClick={onSave}
@@ -106,7 +122,7 @@ const CardActions: React.FC<CardActionsProps> = ({
           onClick={onEmergency}
           variant="ghost"
           size="icon"
-          className="bg-white hover:bg-red-50 rounded-full h-10 w-10 border-2 border-black transition-colors"
+          className="bg-white hover:bg-red-50 rounded-full h-10 w-10 border-2 border-red-600 transition-colors"
           title="Emergency"
         >
           <EmergencyCrossIcon className="h-5 w-5" />

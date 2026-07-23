@@ -119,20 +119,20 @@ const PremiumOfferStep = () => {
           : "Get the full power of Simple Allergy Alert and travel with total peace of mind."}
       />
 
-      <div className="w-full space-y-1">
+      <div className="w-full space-y-2">
         {benefits.map((benefit, index) => (
           <div
             key={index}
-            className="flex items-center space-x-3 py-1.5 px-2 bg-white dark:bg-gray-800 rounded-xl border border-gray-100 dark:border-gray-700 text-left shadow-sm"
+            className="flex items-center space-x-2.5 py-2 px-3 bg-white dark:bg-gray-800 rounded-xl border border-gray-100 dark:border-gray-700 text-left shadow-sm"
           >
-            <benefit.icon className="h-6 w-6 text-red-600 shrink-0" />
+            <benefit.icon className="h-4 w-4 text-red-600 shrink-0" />
             <div className="flex-grow">
-              <h3 className="font-semibold text-gray-900 dark:text-white text-sm">
+              <h3 className="font-semibold text-gray-900 dark:text-white text-xs">
                 {benefit.title}
                 {benefit.note && <> <span className="whitespace-nowrap">{benefit.note}</span></>}
               </h3>
             </div>
-            <Check className="h-3.5 w-3.5 text-green-500" />
+            <Check className="h-3 w-3 text-green-500 shrink-0" />
           </div>
         ))}
       </div>
