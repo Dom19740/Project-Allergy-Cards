@@ -59,7 +59,14 @@ const runReport = async (body: Record<string, unknown>): Promise<GA4Row[]> => {
   return data.rows ?? [];
 };
 
-const ALL_TIME_RANGE = { startDate: "2025-01-01", endDate: "today" };
+// Fixed cutoff, not "today" as a relative keyword - a relative "today" would
+// shift forward every day and lose prior days' real data. Set to the date
+// this cutoff was introduced, so all of that day's testing is included but
+// prior test-purchase noise (license-tester Play purchases fire the same
+// analytics event as real ones, with nothing distinguishing them) is
+// excluded. Bump forward manually if more test activity happens later and
+// needs excluding too.
+const ALL_TIME_RANGE = { startDate: "2026-07-24", endDate: "today" };
 
 const eventNameFilter = (eventName: string) => ({
   fieldName: "eventName",
