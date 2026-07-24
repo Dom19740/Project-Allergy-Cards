@@ -14,7 +14,7 @@
 </head>
 <body class="bg-gray-50 text-gray-900 min-h-screen">
 
-    <div class="max-w-lg mx-auto px-4 py-10">
+    <div class="max-w-3xl mx-auto px-4 py-10">
         <h1 class="text-2xl font-black text-gray-900 mb-1">Promo Codes</h1>
         <p class="text-sm text-gray-500 mb-6">Simple Allergy Alert - internal tool</p>
 
@@ -48,17 +48,21 @@
                     <label class="block text-xs font-bold text-gray-500 uppercase tracking-widest">Affiliate payouts</label>
                     <button id="refreshAffiliatesBtn" class="text-xs font-bold text-brand-red">Refresh</button>
                 </div>
-                <table class="w-full text-sm" id="affiliateTable">
+                <div class="overflow-x-auto">
+                <table class="w-full text-sm whitespace-nowrap" id="affiliateTable">
                     <thead>
                         <tr class="text-left text-xs text-gray-400 uppercase tracking-widest">
-                            <th class="pb-2 font-bold">Referrer</th>
-                            <th class="pb-2 font-bold">Opens</th>
-                            <th class="pb-2 font-bold">Paid</th>
-                            <th class="pb-2 font-bold">Refunded</th>
+                            <th class="pb-2 pr-3 font-bold">Referrer</th>
+                            <th class="pb-2 pr-3 font-bold">Web opens</th>
+                            <th class="pb-2 pr-3 font-bold">Web paid</th>
+                            <th class="pb-2 pr-3 font-bold">Web refunded</th>
+                            <th class="pb-2 pr-3 font-bold">Play installs</th>
+                            <th class="pb-2 pr-3 font-bold">Play purchases</th>
                         </tr>
                     </thead>
                     <tbody id="affiliateRows" class="divide-y divide-gray-100"></tbody>
                 </table>
+                </div>
                 <p id="affiliateEmptyState" class="text-sm text-gray-400 hidden">No affiliate activity recorded yet.</p>
             </div>
 
@@ -158,9 +162,14 @@
                 summary.forEach(function (row) {
                     var tr = document.createElement('tr');
                     addCell(tr, row.ref, true);
-                    addCell(tr, String(row.opens), false);
-                    addCell(tr, row.paidCount + ' (' + formatMoney(row.paidTotal, row.currency) + ')', false);
-                    addCell(tr, row.refundedCount + ' (' + formatMoney(row.refundedTotal, row.currency) + ')', false);
+                    addCell(tr, String(row.webOpens), false);
+                    addCell(tr, row.webPaidCount + ' (' + formatMoney(row.webPaidTotal, row.currency) + ')', false);
+                    addCell(tr, row.webRefundedCount + ' (' + formatMoney(row.webRefundedTotal, row.currency) + ')', false);
+                    addCell(tr, String(row.playInstalls), false);
+                    // Play purchase revenue currency isn't reported per-row (GA4 reports
+                    // it pre-converted to the property's base reporting currency) - USD
+                    // matches every other total shown on this page.
+                    addCell(tr, row.playPurchaseCount + ' (' + formatMoney(row.playPurchaseTotal, 'USD') + ')', false);
                     affiliateRows.appendChild(tr);
                 });
             }

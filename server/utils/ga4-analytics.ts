@@ -20,11 +20,11 @@ const getAuth = (): GoogleAuth => {
   return auth;
 };
 
-// Counts campaign_landing events (fired once per webapp pageload that
-// carries a fresh ?ref=) grouped by the "ref" custom dimension, which must
-// already be registered in GA4 (Admin > Custom definitions) - unregistered
-// event params aren't queryable via this API at all.
-//
+interface GA4Row {
+  dimensionValues?: { value?: string }[];
+  metricValues?: { value?: string }[];
+}
+
 // Calls the GA4 Data API's plain REST endpoint directly rather than the
 // official @google-analytics/data SDK: that SDK pulls in google-gax/
 // @grpc/grpc-js, which rely on __dirname and dynamic require() and don't
@@ -32,7 +32,7 @@ const getAuth = (): GoogleAuth => {
 // crash - "__dirname is not defined in ES module scope"). google-auth-library
 // alone (just for minting an access token from the service account) bundles
 // fine.
-export const getWebappOpenCountsByRef = async (): Promise<Record<string, number>> => {
+const runReport = async (body: Record<string, unknown>): Promise<GA4Row[]> => {
   const client = await getAuth().getClient();
   const { token } = await client.getAccessToken();
   if (!token) {
@@ -47,17 +47,7 @@ export const getWebappOpenCountsByRef = async (): Promise<Record<string, number>
         Authorization: `Bearer ${token}`,
         "Content-Type": "application/json",
       },
-      body: JSON.stringify({
-        dateRanges: [{ startDate: "2025-01-01", endDate: "today" }],
-        dimensions: [{ name: "customEvent:ref" }],
-        metrics: [{ name: "eventCount" }],
-        dimensionFilter: {
-          filter: {
-            fieldName: "eventName",
-            stringFilter: { matchType: "EXACT", value: "campaign_landing" },
-          },
-        },
-      }),
+      body: JSON.stringify(body),
     }
   );
 
@@ -66,13 +56,103 @@ export const getWebappOpenCountsByRef = async (): Promise<Record<string, number>
   }
 
   const data: any = await response.json();
+  return data.rows ?? [];
+};
+
+const ALL_TIME_RANGE = { startDate: "2025-01-01", endDate: "today" };
+
+const eventNameFilter = (eventName: string) => ({
+  fieldName: "eventName",
+  stringFilter: { matchType: "EXACT" as const, value: eventName },
+});
+
+// caseSensitive: false since GA4's exact casing for the "platform" dimension
+// ("Android"/"ANDROID"/"android") isn't confirmed and an exact-but-wrong-case
+// match would silently return zero rows instead of erroring.
+const platformFilter = (platform: string) => ({
+  fieldName: "platform",
+  stringFilter: { matchType: "EXACT" as const, value: platform, caseSensitive: false },
+});
+
+// Counts campaign_landing events (fired once per webapp pageload that
+// carries a fresh ?ref=) grouped by the "ref" custom dimension, which must
+// already be registered in GA4 (Admin > Custom definitions) - unregistered
+// event params aren't queryable via this API at all. Web-only in practice:
+// campaign_landing only fires when a ?ref= is present in the page's own
+// query string, which native Android cold starts never have.
+export const getWebappOpenCountsByRef = async (): Promise<Record<string, number>> => {
+  const rows = await runReport({
+    dateRanges: [ALL_TIME_RANGE],
+    dimensions: [{ name: "customEvent:ref" }],
+    metrics: [{ name: "eventCount" }],
+    dimensionFilter: { filter: eventNameFilter("campaign_landing") },
+  });
+
   const counts: Record<string, number> = {};
-  for (const row of data.rows ?? []) {
+  for (const row of rows) {
     const ref = row.dimensionValues?.[0]?.value;
-    const count = row.metricValues?.[0]?.value;
-    if (ref) {
-      counts[ref] = Number(count ?? 0);
-    }
+    if (ref) counts[ref] = Number(row.metricValues?.[0]?.value ?? 0);
   }
   return counts;
+};
+
+// Android never attaches a "ref" event param (only web does), so Play
+// installs/purchases are grouped by GA4's own automatic campaign
+// attribution instead - "firstUserCampaignName", populated from the Play
+// Install Referrer string includes.js already sends
+// (utm_campaign=<ref>), so its value lines up with the same ref names used
+// everywhere else. This depends on GA4 correctly carrying that first-touch
+// attribution forward to later events (e.g. a purchase in a later app
+// session) - unverified as of this build, called out explicitly to the user.
+export const getPlayInstallCountsByRef = async (): Promise<Record<string, number>> => {
+  const rows = await runReport({
+    dateRanges: [ALL_TIME_RANGE],
+    dimensions: [{ name: "firstUserCampaignName" }],
+    metrics: [{ name: "eventCount" }],
+    dimensionFilter: {
+      andGroup: {
+        expressions: [{ filter: eventNameFilter("first_open") }, { filter: platformFilter("android") }],
+      },
+    },
+  });
+
+  const counts: Record<string, number> = {};
+  for (const row of rows) {
+    const ref = row.dimensionValues?.[0]?.value;
+    if (ref) counts[ref] = Number(row.metricValues?.[0]?.value ?? 0);
+  }
+  return counts;
+};
+
+export interface PlayPurchaseSummary {
+  count: number;
+  // Cents, to match the Lemon Squeezy ledger's unit - GA4's purchaseRevenue
+  // metric is a decimal amount, converted here.
+  total: number;
+}
+
+// Platform filter matters here (unlike opens) because "purchase" fires on
+// both web and Android - without it, web purchases would double-count into
+// this Play-specific total too.
+export const getPlayPurchaseCountsByRef = async (): Promise<Record<string, PlayPurchaseSummary>> => {
+  const rows = await runReport({
+    dateRanges: [ALL_TIME_RANGE],
+    dimensions: [{ name: "firstUserCampaignName" }],
+    metrics: [{ name: "eventCount" }, { name: "purchaseRevenue" }],
+    dimensionFilter: {
+      andGroup: {
+        expressions: [{ filter: eventNameFilter("purchase") }, { filter: platformFilter("android") }],
+      },
+    },
+  });
+
+  const result: Record<string, PlayPurchaseSummary> = {};
+  for (const row of rows) {
+    const ref = row.dimensionValues?.[0]?.value;
+    if (!ref) continue;
+    const count = Number(row.metricValues?.[0]?.value ?? 0);
+    const revenue = Number(row.metricValues?.[1]?.value ?? 0);
+    result[ref] = { count, total: Math.round(revenue * 100) };
+  }
+  return result;
 };
