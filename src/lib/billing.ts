@@ -9,6 +9,7 @@ export const PRODUCT_ID = PREMIUM_PRODUCT_ID;
 
 export const LEMON_SQUEEZY_CHECKOUT_URL = 'https://happymunkeestudio.lemonsqueezy.com/checkout/buy/91c95564-fa69-44ce-afcf-6422dfea4ed5';
 const PREMIUM_CACHE_KEY = 'isPremium';
+const LAST_LOGGED_PURCHASE_KEY = 'lastLoggedPlayPurchaseTransactionId';
 const STORE_READY_TIMEOUT_MS = 5000;
 
 // Persisted via Capacitor Preferences (native Android SharedPreferences,
@@ -105,6 +106,32 @@ const logPlayPurchaseEvent = (store: any) => {
   }).catch(() => {});
 };
 
+// premium_unlock is non-consumable, so Play re-delivers and re-verifies its
+// receipt on every app launch for any device that owns it - store.when()
+// .verified() fires every time that happens, not just on the original
+// purchase. Without this guard, simply reopening the app would silently log
+// a fresh 'purchase' analytics event forever, permanently inflating purchase
+// counts for both test devices and real customers alike. transactionId stays
+// stable across re-deliveries of the same purchase, so it's a reliable
+// per-purchase dedup key.
+const logPlayPurchaseEventOnce = async (store: any, receipt: any) => {
+  const transactionId: string | undefined = receipt?.lastTransaction?.()?.transactionId;
+  if (!transactionId) {
+    // No stable id to dedupe against - log rather than silently drop what
+    // could be a genuine purchase, matching prior behavior for this edge case.
+    logPlayPurchaseEvent(store);
+    return;
+  }
+
+  const lastLogged = await storage.get<string>(LAST_LOGGED_PURCHASE_KEY);
+  if (lastLogged === transactionId) {
+    return;
+  }
+
+  await storage.set(LAST_LOGGED_PURCHASE_KEY, transactionId);
+  logPlayPurchaseEvent(store);
+};
+
 /**
  * Initializes the billing store and registers the premium product.
  */
@@ -131,7 +158,7 @@ export const initBilling = () => {
     store.when().verified((receipt: any) => {
       receipt.finish();
       syncPremiumCache(true);
-      logPlayPurchaseEvent(store);
+      logPlayPurchaseEventOnce(store, receipt);
     });
 
     store.initialize([Platform.GOOGLE_PLAY]);
