@@ -52,13 +52,14 @@
                     <thead>
                         <tr class="text-left text-xs text-gray-400 uppercase tracking-widest">
                             <th class="pb-2 font-bold">Referrer</th>
+                            <th class="pb-2 font-bold">Opens</th>
                             <th class="pb-2 font-bold">Paid</th>
                             <th class="pb-2 font-bold">Refunded</th>
                         </tr>
                     </thead>
                     <tbody id="affiliateRows" class="divide-y divide-gray-100"></tbody>
                 </table>
-                <p id="affiliateEmptyState" class="text-sm text-gray-400 hidden">No affiliate purchases recorded yet.</p>
+                <p id="affiliateEmptyState" class="text-sm text-gray-400 hidden">No affiliate activity recorded yet.</p>
             </div>
 
             <p id="statusMessage" class="text-sm"></p>
@@ -157,6 +158,7 @@
                 summary.forEach(function (row) {
                     var tr = document.createElement('tr');
                     addCell(tr, row.ref, true);
+                    addCell(tr, String(row.opens), false);
                     addCell(tr, row.paidCount + ' (' + formatMoney(row.paidTotal, row.currency) + ')', false);
                     addCell(tr, row.refundedCount + ' (' + formatMoney(row.refundedTotal, row.currency) + ')', false);
                     affiliateRows.appendChild(tr);
