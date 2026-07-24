@@ -43,6 +43,25 @@
                 <p id="emptyState" class="text-sm text-gray-400 hidden">No codes yet.</p>
             </div>
 
+            <div class="bg-white rounded-2xl border border-gray-200 shadow-sm p-6">
+                <div class="flex items-center justify-between mb-3">
+                    <label class="block text-xs font-bold text-gray-500 uppercase tracking-widest">Affiliate payouts</label>
+                    <button id="refreshAffiliatesBtn" class="text-xs font-bold text-brand-red">Refresh</button>
+                </div>
+                <table class="w-full text-sm" id="affiliateTable">
+                    <thead>
+                        <tr class="text-left text-xs text-gray-400 uppercase tracking-widest">
+                            <th class="pb-2 font-bold">Referrer</th>
+                            <th class="pb-2 font-bold">Paid</th>
+                            <th class="pb-2 font-bold">Refunded</th>
+                            <th class="pb-2 font-bold">Net owed</th>
+                        </tr>
+                    </thead>
+                    <tbody id="affiliateRows" class="divide-y divide-gray-100"></tbody>
+                </table>
+                <p id="affiliateEmptyState" class="text-sm text-gray-400 hidden">No affiliate purchases recorded yet.</p>
+            </div>
+
             <p id="statusMessage" class="text-sm"></p>
         </div>
     </div>
@@ -64,6 +83,9 @@
             var codeList = document.getElementById('codeList');
             var emptyState = document.getElementById('emptyState');
             var statusMessage = document.getElementById('statusMessage');
+            var refreshAffiliatesBtn = document.getElementById('refreshAffiliatesBtn');
+            var affiliateRows = document.getElementById('affiliateRows');
+            var affiliateEmptyState = document.getElementById('affiliateEmptyState');
 
             function getSecret() {
                 return sessionStorage.getItem(SESSION_KEY);
@@ -117,6 +139,38 @@
                 });
             }
 
+            // Totals from the API are in the smallest currency unit (cents for USD).
+            function formatMoney(cents, currency) {
+                var amount = (cents / 100).toFixed(2);
+                return currency ? amount + ' ' + currency : amount;
+            }
+
+            function addCell(tr, text, bold) {
+                var td = document.createElement('td');
+                td.className = bold ? 'py-2 pr-2 font-bold' : 'py-2 pr-2';
+                td.textContent = text;
+                tr.appendChild(td);
+            }
+
+            function renderAffiliateSummary(summary) {
+                affiliateRows.innerHTML = '';
+                affiliateEmptyState.classList.toggle('hidden', summary.length > 0);
+                summary.forEach(function (row) {
+                    var tr = document.createElement('tr');
+                    addCell(tr, row.ref, true);
+                    addCell(tr, row.paidCount + ' (' + formatMoney(row.paidTotal, row.currency) + ')', false);
+                    addCell(tr, row.refundedCount + ' (' + formatMoney(row.refundedTotal, row.currency) + ')', false);
+                    addCell(tr, formatMoney(row.netTotal, row.currency), true);
+                    affiliateRows.appendChild(tr);
+                });
+            }
+
+            function loadAffiliatePayouts() {
+                return api('/api/admin/affiliate-summary').then(function (data) {
+                    renderAffiliateSummary(data.summary || []);
+                });
+            }
+
             function addCode() {
                 var code = newCodeInput.value.trim().toUpperCase();
                 if (!code) return;
@@ -150,6 +204,7 @@
                 authGate.classList.add('hidden');
                 panel.classList.remove('hidden');
                 loadCodes().catch(function () { showStatus('Failed to load codes.', true); });
+                loadAffiliatePayouts().catch(function () { showStatus('Failed to load affiliate payouts.', true); });
             }
 
             function unlock() {
@@ -174,6 +229,9 @@
             newCodeInput.addEventListener('keydown', function (e) { if (e.key === 'Enter') addCode(); });
             refreshBtn.addEventListener('click', function () {
                 loadCodes().catch(function () { showStatus('Failed to load codes.', true); });
+            });
+            refreshAffiliatesBtn.addEventListener('click', function () {
+                loadAffiliatePayouts().catch(function () { showStatus('Failed to load affiliate payouts.', true); });
             });
 
             if (getSecret()) {
