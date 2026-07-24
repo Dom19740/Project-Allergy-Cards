@@ -3,7 +3,17 @@ import { setResponseHeader } from "nitro/h3";
 import { enforceOrigin } from "../../../utils/cors";
 import { enforceAdminAuth } from "../../../utils/admin-auth";
 import { getAffiliateSummary } from "../../../utils/affiliate-store";
-import { getPlayInstallCountsByRef, getPlayPurchaseCountsByRef, getWebappOpenCountsByRef } from "../../../utils/ga4-analytics";
+import {
+  getPlayInstallCountsByRef,
+  getPlayPurchaseCountsByRef,
+  getSiteTotals,
+  getWebappOpenCountsByRef,
+} from "../../../utils/ga4-analytics";
+
+// GA4's own placeholder values for "no campaign attribution" - not real
+// referrers, so excluded from the per-referrer breakdown. Organic activity
+// still shows up, just in the site-wide totals instead.
+const NON_REFERRAL_VALUES = new Set(["(direct)", "(not set)", "(none)"]);
 
 export default defineHandler(async (event) => {
   setResponseHeader(event, "Cache-Control", "no-store");
@@ -18,11 +28,13 @@ export default defineHandler(async (event) => {
   let webOpensByRef: Record<string, number> = {};
   let playInstallsByRef: Record<string, number> = {};
   let playPurchasesByRef: Record<string, { count: number; total: number }> = {};
+  let totals: Awaited<ReturnType<typeof getSiteTotals>> | null = null;
   try {
-    [webOpensByRef, playInstallsByRef, playPurchasesByRef] = await Promise.all([
+    [webOpensByRef, playInstallsByRef, playPurchasesByRef, totals] = await Promise.all([
       getWebappOpenCountsByRef(),
       getPlayInstallCountsByRef(),
       getPlayPurchaseCountsByRef(),
+      getSiteTotals(),
     ]);
   } catch (error) {
     console.error("Failed to fetch GA4 metrics:", error);
@@ -35,6 +47,7 @@ export default defineHandler(async (event) => {
     ...Object.keys(playInstallsByRef),
     ...Object.keys(playPurchasesByRef),
   ]);
+  for (const value of NON_REFERRAL_VALUES) allRefs.delete(value);
 
   // Totals are in the smallest currency unit (cents for USD), matching how
   // Lemon Squeezy itself reports order totals.
@@ -57,5 +70,5 @@ export default defineHandler(async (event) => {
       };
     });
 
-  return { success: true, summary };
+  return { success: true, totals, summary };
 });

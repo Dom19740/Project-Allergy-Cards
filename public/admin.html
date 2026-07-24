@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Promo Codes Admin</title>
+    <title>Admin | Simple Allergy Alert</title>
     <meta name="robots" content="noindex, nofollow">
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
@@ -15,8 +15,8 @@
 <body class="bg-gray-50 text-gray-900 min-h-screen">
 
     <div class="max-w-3xl mx-auto px-4 py-10">
-        <h1 class="text-2xl font-black text-gray-900 mb-1">Promo Codes</h1>
-        <p class="text-sm text-gray-500 mb-6">Simple Allergy Alert - internal tool</p>
+        <h1 class="text-2xl font-black text-gray-900 mb-1">Simple Allergy Alert Admin</h1>
+        <p class="text-sm text-gray-500 mb-6">Internal tool</p>
 
         <div id="authGate" class="bg-white rounded-2xl border border-gray-200 shadow-sm p-6 space-y-3">
             <label class="block text-xs font-bold text-gray-500 uppercase tracking-widest">Admin password</label>
@@ -26,6 +26,8 @@
         </div>
 
         <div id="panel" class="hidden space-y-6">
+            <h2 class="text-lg font-black text-gray-900">Promo Codes</h2>
+
             <div class="bg-white rounded-2xl border border-gray-200 shadow-sm p-6 space-y-3">
                 <label class="block text-xs font-bold text-gray-500 uppercase tracking-widest">Add a code</label>
                 <div class="flex gap-2">
@@ -43,27 +45,56 @@
                 <p id="emptyState" class="text-sm text-gray-400 hidden">No codes yet.</p>
             </div>
 
-            <div class="bg-white rounded-2xl border border-gray-200 shadow-sm p-6">
-                <div class="flex items-center justify-between mb-3">
-                    <label class="block text-xs font-bold text-gray-500 uppercase tracking-widest">Affiliate payouts</label>
+            <h2 class="text-lg font-black text-gray-900">Traffic</h2>
+
+            <div>
+                <div class="flex items-center justify-between mb-2">
+                    <h3 class="text-sm font-black text-gray-700 uppercase tracking-wide">Total Traffic</h3>
                     <button id="refreshAffiliatesBtn" class="text-xs font-bold text-brand-red">Refresh</button>
                 </div>
-                <div class="overflow-x-auto">
-                <table class="w-full text-sm whitespace-nowrap" id="affiliateTable">
-                    <thead>
-                        <tr class="text-left text-xs text-gray-400 uppercase tracking-widest">
-                            <th class="pb-2 pr-3 font-bold">Referrer</th>
-                            <th class="pb-2 pr-3 font-bold">Web opens</th>
-                            <th class="pb-2 pr-3 font-bold">Web paid</th>
-                            <th class="pb-2 pr-3 font-bold">Web refunded</th>
-                            <th class="pb-2 pr-3 font-bold">Play installs</th>
-                            <th class="pb-2 pr-3 font-bold">Play purchases</th>
-                        </tr>
-                    </thead>
-                    <tbody id="affiliateRows" class="divide-y divide-gray-100"></tbody>
-                </table>
+                <div class="bg-white rounded-2xl border border-gray-200 shadow-sm p-6">
+                    <div class="grid grid-cols-2 sm:grid-cols-4 gap-4">
+                        <div>
+                            <div class="text-xs font-bold text-gray-400 uppercase tracking-widest mb-1">Web opens</div>
+                            <div id="totalWebOpens" class="text-xl font-black text-gray-900">-</div>
+                        </div>
+                        <div>
+                            <div class="text-xs font-bold text-gray-400 uppercase tracking-widest mb-1">Web purchases</div>
+                            <div id="totalWebPurchases" class="text-xl font-black text-gray-900">-</div>
+                        </div>
+                        <div>
+                            <div class="text-xs font-bold text-gray-400 uppercase tracking-widest mb-1">Play installs</div>
+                            <div id="totalPlayInstalls" class="text-xl font-black text-gray-900">-</div>
+                        </div>
+                        <div>
+                            <div class="text-xs font-bold text-gray-400 uppercase tracking-widest mb-1">Play purchases</div>
+                            <div id="totalPlayPurchases" class="text-xl font-black text-gray-900">-</div>
+                        </div>
+                    </div>
+                    <p class="text-xs text-gray-400 mt-4">All traffic, including organic (not just referrals).</p>
                 </div>
-                <p id="affiliateEmptyState" class="text-sm text-gray-400 hidden">No affiliate activity recorded yet.</p>
+            </div>
+
+            <div>
+                <h3 class="text-sm font-black text-gray-700 uppercase tracking-wide mb-2">Affiliate Traffic</h3>
+                <div class="bg-white rounded-2xl border border-gray-200 shadow-sm p-6">
+                    <div class="overflow-x-auto">
+                    <table class="w-full text-sm whitespace-nowrap" id="affiliateTable">
+                        <thead>
+                            <tr class="text-left text-xs text-gray-400 uppercase tracking-widest">
+                                <th class="pb-2 pr-3 font-bold">Referrer</th>
+                                <th class="pb-2 pr-3 font-bold">Web opens</th>
+                                <th class="pb-2 pr-3 font-bold">Web paid</th>
+                                <th class="pb-2 pr-3 font-bold">Web refunded</th>
+                                <th class="pb-2 pr-3 font-bold">Play installs</th>
+                                <th class="pb-2 pr-3 font-bold">Play purchases</th>
+                            </tr>
+                        </thead>
+                        <tbody id="affiliateRows" class="divide-y divide-gray-100"></tbody>
+                    </table>
+                    </div>
+                    <p id="affiliateEmptyState" class="text-sm text-gray-400 hidden">No affiliate activity recorded yet.</p>
+                </div>
             </div>
 
             <p id="statusMessage" class="text-sm"></p>
@@ -90,6 +121,10 @@
             var refreshAffiliatesBtn = document.getElementById('refreshAffiliatesBtn');
             var affiliateRows = document.getElementById('affiliateRows');
             var affiliateEmptyState = document.getElementById('affiliateEmptyState');
+            var totalWebOpens = document.getElementById('totalWebOpens');
+            var totalWebPurchases = document.getElementById('totalWebPurchases');
+            var totalPlayInstalls = document.getElementById('totalPlayInstalls');
+            var totalPlayPurchases = document.getElementById('totalPlayPurchases');
 
             function getSecret() {
                 return sessionStorage.getItem(SESSION_KEY);
@@ -174,8 +209,17 @@
                 });
             }
 
+            function renderTotals(totals) {
+                if (!totals) return;
+                totalWebOpens.textContent = String(totals.webOpens);
+                totalWebPurchases.textContent = totals.webPurchaseCount + ' (' + formatMoney(totals.webPurchaseTotal, 'USD') + ')';
+                totalPlayInstalls.textContent = String(totals.playInstalls);
+                totalPlayPurchases.textContent = totals.playPurchaseCount + ' (' + formatMoney(totals.playPurchaseTotal, 'USD') + ')';
+            }
+
             function loadAffiliatePayouts() {
                 return api('/api/admin/affiliate-summary').then(function (data) {
+                    renderTotals(data.totals);
                     renderAffiliateSummary(data.summary || []);
                 });
             }

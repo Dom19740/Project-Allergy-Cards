@@ -156,3 +156,58 @@ export const getPlayPurchaseCountsByRef = async (): Promise<Record<string, PlayP
   }
   return result;
 };
+
+// A single-row (no dimension breakdown) count/revenue query, for site-wide
+// totals that include organic traffic - unlike the per-ref queries above,
+// which are structurally referral-only for web (see getWebappOpenCountsByRef).
+const runTotalQuery = async (
+  eventName: string,
+  platform: string
+): Promise<{ count: number; total: number }> => {
+  const rows = await runReport({
+    dateRanges: [ALL_TIME_RANGE],
+    metrics: [{ name: "eventCount" }, { name: "purchaseRevenue" }],
+    dimensionFilter: {
+      andGroup: {
+        expressions: [{ filter: eventNameFilter(eventName) }, { filter: platformFilter(platform) }],
+      },
+    },
+  });
+  const row = rows[0];
+  return {
+    count: Number(row?.metricValues?.[0]?.value ?? 0),
+    total: Math.round(Number(row?.metricValues?.[1]?.value ?? 0) * 100),
+  };
+};
+
+export interface SiteTotals {
+  webOpens: number;
+  webPurchaseCount: number;
+  webPurchaseTotal: number;
+  playInstalls: number;
+  playPurchaseCount: number;
+  playPurchaseTotal: number;
+}
+
+// Site-wide totals across ALL traffic, referral or not - the counterpart to
+// the per-ref breakdowns above, which only ever show referral-attributed
+// activity (by design for web, by GA4 automatic attribution for Play).
+// "first_visit" is GA4's own auto-collected event for a visitor's first-ever
+// web session, the closest web equivalent to "first_open" on Android.
+export const getSiteTotals = async (): Promise<SiteTotals> => {
+  const [webOpens, webPurchases, playOpens, playPurchases] = await Promise.all([
+    runTotalQuery("first_visit", "web"),
+    runTotalQuery("purchase", "web"),
+    runTotalQuery("first_open", "android"),
+    runTotalQuery("purchase", "android"),
+  ]);
+
+  return {
+    webOpens: webOpens.count,
+    webPurchaseCount: webPurchases.count,
+    webPurchaseTotal: webPurchases.total,
+    playInstalls: playOpens.count,
+    playPurchaseCount: playPurchases.count,
+    playPurchaseTotal: playPurchases.total,
+  };
+};
