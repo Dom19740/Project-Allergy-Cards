@@ -54,7 +54,6 @@
                             <th class="pb-2 font-bold">Referrer</th>
                             <th class="pb-2 font-bold">Paid</th>
                             <th class="pb-2 font-bold">Refunded</th>
-                            <th class="pb-2 font-bold">Net owed</th>
                         </tr>
                     </thead>
                     <tbody id="affiliateRows" class="divide-y divide-gray-100"></tbody>
@@ -160,7 +159,6 @@
                     addCell(tr, row.ref, true);
                     addCell(tr, row.paidCount + ' (' + formatMoney(row.paidTotal, row.currency) + ')', false);
                     addCell(tr, row.refundedCount + ' (' + formatMoney(row.refundedTotal, row.currency) + ')', false);
-                    addCell(tr, formatMoney(row.netTotal, row.currency), true);
                     affiliateRows.appendChild(tr);
                 });
             }
