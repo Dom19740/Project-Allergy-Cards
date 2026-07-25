@@ -114,6 +114,18 @@ const logPlayPurchaseEvent = (store: any) => {
 // counts for both test devices and real customers alike. transactionId stays
 // stable across re-deliveries of the same purchase, so it's a reliable
 // per-purchase dedup key.
+// cdv-purchase's ReceiptsMonitor re-emits verification state from several
+// independent triggers (the approve/verify flow, a receiptsReady pass, and a
+// 10s polling interval), so store.when().verified() can fire several times
+// in quick succession for the same receipt within one session. storage.get/
+// set round-trip through the native Preferences bridge, so a purely
+// await-based guard has a window where multiple concurrent calls all read
+// "not yet logged" before the first write lands. This in-memory set closes
+// that gap: it's set synchronously before any await, so no two calls in the
+// same session can pass the check for the same transactionId - the persisted
+// key still guards across app restarts.
+const loggedThisSession = new Set<string>();
+
 const logPlayPurchaseEventOnce = async (store: any, receipt: any) => {
   const transactionId: string | undefined = receipt?.lastTransaction?.()?.transactionId;
   if (!transactionId) {
@@ -122,6 +134,11 @@ const logPlayPurchaseEventOnce = async (store: any, receipt: any) => {
     logPlayPurchaseEvent(store);
     return;
   }
+
+  if (loggedThisSession.has(transactionId)) {
+    return;
+  }
+  loggedThisSession.add(transactionId);
 
   const lastLogged = await storage.get<string>(LAST_LOGGED_PURCHASE_KEY);
   if (lastLogged === transactionId) {
