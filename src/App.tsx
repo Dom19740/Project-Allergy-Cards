@@ -11,7 +11,7 @@ import { storage, STORAGE_KEYS } from "./lib/storage";
 import { useDeepLinks } from "./hooks/useDeepLinks";
 import { usePendingBackupRestore } from "./hooks/usePendingBackupRestore";
 import { initBilling } from "./lib/billing";
-import { captureAffiliateRef } from "./lib/affiliate";
+import { captureAffiliateRef, consumeInstallReferrerRef } from "./lib/affiliate";
 import { BillingProvider } from "./hooks/useBilling";
 import { FirebaseCrashlytics } from '@capacitor-firebase/crashlytics';
 import { FirebaseAnalytics } from '@capacitor-firebase/analytics';
@@ -104,6 +104,25 @@ const AppContent = () => {
         if (ref && urlRef) {
           await FirebaseAnalytics.setUserProperty({ key: 'acquisition_ref', value: ref });
           await FirebaseAnalytics.logEvent({ name: 'campaign_landing', params: { ref } });
+        }
+
+        // Android has no ?ref= in its cold-start URL - MainActivity.java reads
+        // the Play Install Referrer instead and drops it into Capacitor
+        // storage. That native read can still be in flight on the very first
+        // cold start, so retry once after a short delay before giving up; a
+        // later app open will pick it up regardless since the native side
+        // only ever writes it once per install.
+        if (Capacitor.getPlatform() === 'android') {
+          let installRef = await consumeInstallReferrerRef();
+          if (!installRef) {
+            await new Promise((resolve) => setTimeout(resolve, 3000));
+            installRef = await consumeInstallReferrerRef();
+          }
+
+          if (installRef) {
+            await FirebaseAnalytics.setUserProperty({ key: 'acquisition_ref', value: installRef });
+            await FirebaseAnalytics.logEvent({ name: 'campaign_landing', params: { ref: installRef } });
+          }
         }
       } catch (error) {
         console.error('Firebase initialization error:', error);

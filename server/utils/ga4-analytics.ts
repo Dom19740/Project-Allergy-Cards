@@ -86,15 +86,21 @@ const platformFilter = (platform: string) => ({
 // inflate every time the same visitor reloads/revisits with the param still
 // in the URL) grouped by the "ref" custom dimension, which must already be
 // registered in GA4 (Admin > Custom definitions) - unregistered event params
-// aren't queryable via this API at all. Web-only in practice: campaign_landing
-// only fires when a ?ref= is present in the page's own query string, which
-// native Android cold starts never have.
+// aren't queryable via this API at all. Platform-filtered to web because
+// campaign_landing now also fires on Android (MainActivity.java reads the
+// Play Install Referrer and the app logs the same event with the recovered
+// ref) - without this filter, Android installs would double-count into
+// "webapp opens" on top of getPlayInstallCountsByRef below.
 export const getWebappOpenCountsByRef = async (): Promise<Record<string, number>> => {
   const rows = await runReport({
     dateRanges: [ALL_TIME_RANGE],
     dimensions: [{ name: "customEvent:ref" }],
     metrics: [{ name: "totalUsers" }],
-    dimensionFilter: { filter: eventNameFilter("campaign_landing") },
+    dimensionFilter: {
+      andGroup: {
+        expressions: [{ filter: eventNameFilter("campaign_landing") }, { filter: platformFilter("web") }],
+      },
+    },
   });
 
   const counts: Record<string, number> = {};
@@ -105,22 +111,22 @@ export const getWebappOpenCountsByRef = async (): Promise<Record<string, number>
   return counts;
 };
 
-// Android never attaches a "ref" event param (only web does), so Play
-// installs/purchases are grouped by GA4's own automatic campaign
-// attribution instead - "firstUserCampaignName", populated from the Play
-// Install Referrer string includes.js already sends
-// (utm_campaign=<ref>), so its value lines up with the same ref names used
-// everywhere else. This depends on GA4 correctly carrying that first-touch
-// attribution forward to later events (e.g. a purchase in a later app
-// session) - unverified as of this build, called out explicitly to the user.
+// Android now logs its own campaign_landing event with a real "ref" param -
+// MainActivity.java reads the Play Install Referrer string
+// (utm_campaign=<ref>, sent by includes.js) once per install and the app
+// fires campaign_landing with the recovered ref, the same event web fires.
+// That means both platforms are queryable via the same registered "ref"
+// custom dimension here, with no dependence on GA4's automatic
+// firstUserCampaignName attribution (which was unverified and is no longer
+// used). Mirrors getWebappOpenCountsByRef, just platform-filtered to android.
 export const getPlayInstallCountsByRef = async (): Promise<Record<string, number>> => {
   const rows = await runReport({
     dateRanges: [ALL_TIME_RANGE],
-    dimensions: [{ name: "firstUserCampaignName" }],
-    metrics: [{ name: "eventCount" }],
+    dimensions: [{ name: "customEvent:ref" }],
+    metrics: [{ name: "totalUsers" }],
     dimensionFilter: {
       andGroup: {
-        expressions: [{ filter: eventNameFilter("first_open") }, { filter: platformFilter("android") }],
+        expressions: [{ filter: eventNameFilter("campaign_landing") }, { filter: platformFilter("android") }],
       },
     },
   });
@@ -142,11 +148,15 @@ export interface PlayPurchaseSummary {
 
 // Platform filter matters here (unlike opens) because "purchase" fires on
 // both web and Android - without it, web purchases would double-count into
-// this Play-specific total too.
+// this Play-specific total too. Grouped by the same "ref" custom dimension as
+// getPlayInstallCountsByRef now - src/lib/billing.ts's logPlayPurchaseEvent
+// attaches getAffiliateRef() (which the native install-referrer capture folds
+// into, alongside web's ?ref=) as the "ref" param, so this no longer depends
+// on GA4's automatic firstUserCampaignName attribution either.
 export const getPlayPurchaseCountsByRef = async (): Promise<Record<string, PlayPurchaseSummary>> => {
   const rows = await runReport({
     dateRanges: [ALL_TIME_RANGE],
-    dimensions: [{ name: "firstUserCampaignName" }],
+    dimensions: [{ name: "customEvent:ref" }],
     metrics: [{ name: "eventCount" }, { name: "purchaseRevenue" }],
     dimensionFilter: {
       andGroup: {

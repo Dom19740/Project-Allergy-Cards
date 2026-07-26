@@ -3,6 +3,7 @@
 import { Capacitor } from '@capacitor/core';
 import { FirebaseAnalytics } from '@capacitor-firebase/analytics';
 import { storage } from './storage';
+import { getAffiliateRef } from './affiliate';
 
 export const PREMIUM_PRODUCT_ID = 'premium_unlock';
 export const PRODUCT_ID = PREMIUM_PRODUCT_ID;
@@ -102,7 +103,7 @@ const logPlayPurchaseEvent = (store: any) => {
 
   FirebaseAnalytics.logEvent({
     name: 'purchase',
-    params: { value, currency },
+    params: { value, currency, ref: getAffiliateRef() ?? undefined },
   }).catch(() => {});
 };
 
