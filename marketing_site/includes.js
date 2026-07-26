@@ -140,14 +140,64 @@ function initVideoModal(container) {
     });
 }
 
+function getReferralCode() {
+    const refFromUrl = new URLSearchParams(window.location.search).get('ref');
+    const referralStorageKey = 'simpleallergyalert_ref';
+    const referralExpiryKey = 'simpleallergyalert_ref_expiry';
+    const expiryDays = 60;
+
+    if (refFromUrl && /^[a-zA-Z0-9_-]{1,64}$/.test(refFromUrl)) {
+        try {
+            window.localStorage.setItem(referralStorageKey, refFromUrl);
+            window.localStorage.setItem(referralExpiryKey, String(Date.now() + expiryDays * 24 * 60 * 60 * 1000));
+        } catch (error) {
+            console.warn('Could not persist referral code:', error);
+        }
+        return refFromUrl;
+    }
+
+    try {
+        const storedRef = window.localStorage.getItem(referralStorageKey);
+        const storedExpiry = Number(window.localStorage.getItem(referralExpiryKey));
+        if (storedRef && /^[a-zA-Z0-9_-]{1,64}$/.test(storedRef) && storedExpiry && storedExpiry > Date.now()) {
+            return storedRef;
+        }
+
+        if (storedRef) {
+            window.localStorage.removeItem(referralStorageKey);
+            window.localStorage.removeItem(referralExpiryKey);
+        }
+    } catch (error) {
+        console.warn('Could not read referral code from local storage:', error);
+    }
+
+    return null;
+}
+
+function persistReferralForNavigation(ref) {
+    const referralStorageKey = 'simpleallergyalert_ref';
+    const referralExpiryKey = 'simpleallergyalert_ref_expiry';
+    const expiryDays = 60;
+    const expiryMs = expiryDays * 24 * 60 * 60 * 1000;
+
+    try {
+        window.localStorage.setItem(referralStorageKey, ref);
+        window.localStorage.setItem(referralExpiryKey, String(Date.now() + expiryMs));
+        document.cookie = `simpleallergyalert_ref=${encodeURIComponent(ref)}; path=/; max-age=${expiryDays * 24 * 60 * 60}; SameSite=Lax; domain=.simpleallergyalert.com`;
+        window.name = JSON.stringify({ ref, savedAt: Date.now() });
+    } catch (error) {
+        console.warn('Could not persist referral for app navigation:', error);
+    }
+}
+
 function forwardAffiliateRef(container) {
     // Forwards an affiliate ref code (e.g. ?ref=shannon) from the current
     // page into both destinations: as a Play Store install referrer (so
     // Firebase/GA4 auto-attributes the install + later purchase to the
     // campaign) and as a query param on the webapp link (so it can log
     // the pageload and tag the Lemon Squeezy checkout).
-    const ref = new URLSearchParams(window.location.search).get('ref');
-    if (!ref || !/^[a-zA-Z0-9_-]{1,64}$/.test(ref)) return;
+    const ref = getReferralCode();
+    if (!ref) return;
 
     const playStoreLink = container.querySelector('#playStoreLink');
     if (playStoreLink) {
@@ -159,16 +209,15 @@ function forwardAffiliateRef(container) {
 
     const webAppLink = container.querySelector('#webAppLink');
     if (webAppLink) {
-        const webUrl = new URL(webAppLink.href);
-        webUrl.searchParams.set('ref', ref);
-        // Also set standard utm_ params so GA4's built-in acquisition
-        // reports (Realtime "First user source" etc.) populate
-        // natively - GA4 only auto-recognizes utm_source/utm_medium/
-        // utm_campaign, not an arbitrary "ref" param.
-        webUrl.searchParams.set('utm_source', 'affiliate');
-        webUrl.searchParams.set('utm_medium', 'referral');
-        webUrl.searchParams.set('utm_campaign', ref);
+        const webUrl = new URL('https://app.simpleallergyalert.com/');
         webAppLink.href = webUrl.toString();
+
+        if (webAppLink.dataset.referralHandlerAttached !== '1') {
+            webAppLink.dataset.referralHandlerAttached = '1';
+            webAppLink.addEventListener('click', () => {
+                persistReferralForNavigation(ref);
+            });
+        }
     }
 }
 

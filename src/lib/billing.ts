@@ -107,13 +107,19 @@ const logPlayPurchaseEvent = (store: any) => {
 };
 
 // premium_unlock is non-consumable, so Play re-delivers and re-verifies its
-// receipt on every app launch for any device that owns it - store.when()
-// .verified() fires every time that happens, not just on the original
-// purchase. Without this guard, simply reopening the app would silently log
-// a fresh 'purchase' analytics event forever, permanently inflating purchase
-// counts for both test devices and real customers alike. transactionId stays
-// stable across re-deliveries of the same purchase, so it's a reliable
-// per-purchase dedup key.
+// receipt any time the store reconciles receipts for a device that owns it -
+// store.when().verified() (and .approved(), which cdv-purchase's Google Play
+// adapter re-derives identically for an already-acknowledged non-consumable -
+// see googleplay-adapter.ts's toState()) fires every time that happens, not
+// just on the original purchase. Confirmed in production: this reconciliation
+// can be triggered by things with no user action at all - Play's own
+// automated build-validation opens on a fresh .aab upload, and what looks
+// like a background app refresh when Play redistributes a release to an
+// already-enrolled tester (e.g. after resuming a paused testing track) - so
+// neither event name is a safe "a purchase happened" signal on its own.
+// transactionId stays stable across re-deliveries of the same purchase, so
+// it's a reliable per-purchase dedup key, but it isn't sufficient by itself -
+// see isPurchaseInFlight() below for the other half of this guard.
 // cdv-purchase's ReceiptsMonitor re-emits verification state from several
 // independent triggers (the approve/verify flow, a receiptsReady pass, and a
 // 10s polling interval), so store.when().verified() can fire several times
@@ -125,6 +131,20 @@ const logPlayPurchaseEvent = (store: any) => {
 // same session can pass the check for the same transactionId - the persisted
 // key still guards across app restarts.
 const loggedThisSession = new Set<string>();
+
+// The real problem isn't which cdv-purchase event to hook - verified() and
+// approved() both fire for routine reconciliation of a purchase that already
+// happened, indistinguishable from a fresh one by transactionId alone (it's
+// the same id either way, by design). What actually distinguishes "the user
+// is buying this right now" is whether purchasePremium() was called recently
+// in this session. The timeout guards against a cancelled/abandoned Play
+// purchase dialog leaving this stuck open - offer.order() resolves once the
+// purchase flow is launched, not once the user finishes it, so there's no
+// other reliable place to clear the flag if they back out.
+const PURCHASE_IN_FLIGHT_TIMEOUT_MS = 5 * 60 * 1000;
+let purchaseInFlightUntil = 0;
+
+const isPurchaseInFlight = (): boolean => Date.now() < purchaseInFlightUntil;
 
 const logPlayPurchaseEventOnce = async (store: any, receipt: any) => {
   const transactionId: string | undefined = receipt?.lastTransaction?.()?.transactionId;
@@ -175,7 +195,9 @@ export const initBilling = () => {
     store.when().verified((receipt: any) => {
       receipt.finish();
       syncPremiumCache(true);
-      logPlayPurchaseEventOnce(store, receipt);
+      if (isPurchaseInFlight()) {
+        logPlayPurchaseEventOnce(store, receipt);
+      }
     });
 
     store.initialize([Platform.GOOGLE_PLAY]);
@@ -225,6 +247,7 @@ export const purchasePremium = async () => {
     if (product) {
       const offer = product.getOffer();
       if (offer) {
+        purchaseInFlightUntil = Date.now() + PURCHASE_IN_FLIGHT_TIMEOUT_MS;
         await offer.order();
       }
     }
