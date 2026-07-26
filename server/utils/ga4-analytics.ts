@@ -81,17 +81,19 @@ const platformFilter = (platform: string) => ({
   stringFilter: { matchType: "EXACT" as const, value: platform, caseSensitive: false },
 });
 
-// Counts campaign_landing events (fired once per webapp pageload that
-// carries a fresh ?ref=) grouped by the "ref" custom dimension, which must
-// already be registered in GA4 (Admin > Custom definitions) - unregistered
-// event params aren't queryable via this API at all. Web-only in practice:
-// campaign_landing only fires when a ?ref= is present in the page's own
-// query string, which native Android cold starts never have.
+// Counts unique users who landed with a given ref (campaign_landing fires on
+// every webapp pageload that carries a fresh ?ref=, so eventCount would
+// inflate every time the same visitor reloads/revisits with the param still
+// in the URL) grouped by the "ref" custom dimension, which must already be
+// registered in GA4 (Admin > Custom definitions) - unregistered event params
+// aren't queryable via this API at all. Web-only in practice: campaign_landing
+// only fires when a ?ref= is present in the page's own query string, which
+// native Android cold starts never have.
 export const getWebappOpenCountsByRef = async (): Promise<Record<string, number>> => {
   const rows = await runReport({
     dateRanges: [ALL_TIME_RANGE],
     dimensions: [{ name: "customEvent:ref" }],
-    metrics: [{ name: "eventCount" }],
+    metrics: [{ name: "totalUsers" }],
     dimensionFilter: { filter: eventNameFilter("campaign_landing") },
   });
 
