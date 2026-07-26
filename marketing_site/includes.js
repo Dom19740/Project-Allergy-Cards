@@ -210,6 +210,7 @@ function forwardAffiliateRef(container) {
     const webAppLink = container.querySelector('#webAppLink');
     if (webAppLink) {
         const webUrl = new URL('https://app.simpleallergyalert.com/');
+        webUrl.searchParams.set('ref', ref);
         webAppLink.href = webUrl.toString();
 
         if (webAppLink.dataset.referralHandlerAttached !== '1') {
