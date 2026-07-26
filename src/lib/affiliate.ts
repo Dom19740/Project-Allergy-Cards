@@ -3,6 +3,19 @@
 const AFFILIATE_REF_KEY = 'affiliateRef';
 const REF_PATTERN = /^[a-zA-Z0-9_-]{1,64}$/;
 
+// Purely cosmetic - removes ?ref= from the visible address bar once it's
+// safely persisted to localStorage. Isolated in its own try/catch so a
+// history API failure can never affect ref capture itself.
+const stripRefFromAddressBar = () => {
+  try {
+    const url = new URL(window.location.href);
+    url.searchParams.delete('ref');
+    window.history.replaceState(window.history.state, '', url.pathname + url.search + url.hash);
+  } catch {
+    // ignore
+  }
+};
+
 // Reads ?ref= from the current URL and persists it to localStorage so it
 // survives the rest of the session (onboarding, then checkout, then the
 // Lemon Squeezy redirect back to /premium-success) without needing to be
@@ -14,6 +27,7 @@ export const captureAffiliateRef = (): string | null => {
     const ref = new URLSearchParams(window.location.search).get('ref');
     if (ref && REF_PATTERN.test(ref)) {
       window.localStorage.setItem(AFFILIATE_REF_KEY, ref);
+      stripRefFromAddressBar();
       return ref;
     }
 

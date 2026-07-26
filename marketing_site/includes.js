@@ -140,6 +140,19 @@ function initVideoModal(container) {
     });
 }
 
+function stripRefFromAddressBar() {
+    // Purely cosmetic - removes ?ref= from the visible address bar once it's
+    // safely persisted to localStorage. Isolated in its own try/catch so a
+    // history API failure can never affect referral capture itself.
+    try {
+        const url = new URL(window.location.href);
+        url.searchParams.delete('ref');
+        window.history.replaceState(window.history.state, '', url.pathname + url.search + url.hash);
+    } catch (error) {
+        // ignore
+    }
+}
+
 function getReferralCode() {
     const refFromUrl = new URLSearchParams(window.location.search).get('ref');
     const referralStorageKey = 'simpleallergyalert_ref';
@@ -153,6 +166,7 @@ function getReferralCode() {
         } catch (error) {
             console.warn('Could not persist referral code:', error);
         }
+        stripRefFromAddressBar();
         return refFromUrl;
     }
 
