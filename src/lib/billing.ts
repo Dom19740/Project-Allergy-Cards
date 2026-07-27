@@ -4,6 +4,7 @@ import { Capacitor } from '@capacitor/core';
 import { FirebaseAnalytics } from '@capacitor-firebase/analytics';
 import { storage } from './storage';
 import { getAffiliateRef } from './affiliate';
+import { sendOrQueueTrackEvent, hashEventId } from './trackEvent';
 
 export const PREMIUM_PRODUCT_ID = 'premium_unlock';
 export const PRODUCT_ID = PREMIUM_PRODUCT_ID;
@@ -86,7 +87,7 @@ export const resetPremiumCacheForTesting = async (): Promise<void> => {
 // must come from the actual offer pricing at confirmation time rather than a
 // hardcoded amount/currency - the price lookup is best-effort so a lookup
 // failure never blocks the 'purchase' conversion event itself from firing.
-const logPlayPurchaseEvent = (store: any) => {
+const logPlayPurchaseEvent = (store: any, transactionId?: string) => {
   let value: number | undefined;
   let currency: string | undefined;
 
@@ -105,6 +106,18 @@ const logPlayPurchaseEvent = (store: any) => {
     name: 'purchase',
     params: { value, currency, ref: getAffiliateRef() ?? undefined },
   }).catch(() => {});
+
+  // Same real-time Redis pipeline as web opens/Android installs. Hashing
+  // transactionId keeps the eventId stable across re-verifications of the
+  // same non-consumable purchase (see the reconciliation comments above) so
+  // retries from the offline queue dedupe correctly server-side, without
+  // depending on price/currency lookup (which can legitimately fail above).
+  const ref = getAffiliateRef();
+  if (ref && transactionId) {
+    hashEventId(transactionId).then((eventId) =>
+      sendOrQueueTrackEvent({ event: 'purchase', ref, platform: 'android', eventId, amount: value, currency })
+    );
+  }
 };
 
 // premium_unlock is non-consumable, so Play re-delivers and re-verifies its
@@ -152,6 +165,8 @@ const logPlayPurchaseEventOnce = async (store: any, receipt: any) => {
   if (!transactionId) {
     // No stable id to dedupe against - log rather than silently drop what
     // could be a genuine purchase, matching prior behavior for this edge case.
+    // (transactionId is undefined here, so logPlayPurchaseEvent's tracking
+    // call is skipped - there's no basis for a stable eventId.)
     logPlayPurchaseEvent(store);
     return;
   }
@@ -167,7 +182,7 @@ const logPlayPurchaseEventOnce = async (store: any, receipt: any) => {
   }
 
   await storage.set(LAST_LOGGED_PURCHASE_KEY, transactionId);
-  logPlayPurchaseEvent(store);
+  logPlayPurchaseEvent(store, transactionId);
 };
 
 /**

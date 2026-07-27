@@ -12,7 +12,8 @@ import { useDeepLinks } from "./hooks/useDeepLinks";
 import { usePendingBackupRestore } from "./hooks/usePendingBackupRestore";
 import { initBilling } from "./lib/billing";
 import { captureAffiliateRef, consumeInstallReferrerRef } from "./lib/affiliate";
-import { sendTrackEvent } from "./lib/trackEvent";
+import { sendTrackEvent, sendOrQueueTrackEvent, getOrCreatePersistedEventId } from "./lib/trackEvent";
+import { useTrackEventQueueFlush } from "./hooks/useTrackEventQueueFlush";
 import { BillingProvider } from "./hooks/useBilling";
 import { FirebaseCrashlytics } from '@capacitor-firebase/crashlytics';
 import { FirebaseAnalytics } from '@capacitor-firebase/analytics';
@@ -67,6 +68,7 @@ const AppContent = () => {
   usePreloadImages();
   useDeepLinks();
   usePendingBackupRestore();
+  useTrackEventQueueFlush();
 
   useEffect(() => {
     // Initialize billing system
@@ -130,6 +132,15 @@ const AppContent = () => {
           if (installRef) {
             await FirebaseAnalytics.setUserProperty({ key: 'acquisition_ref', value: installRef });
             await FirebaseAnalytics.logEvent({ name: 'campaign_landing', params: { ref: installRef } });
+
+            // Same real-time Redis pipeline as the web landing case above.
+            // eventId is persisted (not re-generated) so that if this POST
+            // fails offline, the retry queue's flush later reuses the exact
+            // same id - installRef itself is only ever available this one
+            // time (consumeInstallReferrerRef() clears the native-written
+            // key after this read), so the queue is the only retry path.
+            const installEventId = await getOrCreatePersistedEventId('installTrackEventId');
+            await sendOrQueueTrackEvent({ event: 'install', ref: installRef, platform: 'android', eventId: installEventId });
           }
         }
       } catch (error) {
