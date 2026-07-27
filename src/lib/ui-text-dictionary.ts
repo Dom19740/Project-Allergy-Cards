@@ -970,7 +970,7 @@ export const UI_TEXT_DICTIONARY: Record<string, Record<string, string>> = {
     'i need medical help immediately.': 'preciso de ajuda médica imediatamente.',
     'please call emergency services.': 'ligue para os serviços de emergência.',
     'dial 112': 'disque 112',
-    'call': 'chamar',
+    'call': 'chama',
   },
   // Portuguese (European)
   'pt-PT': {
@@ -984,7 +984,7 @@ export const UI_TEXT_DICTIONARY: Record<string, Record<string, string>> = {
     'i need medical help immediately.': 'preciso de ajuda médica imediatamente.',
     'please call emergency services.': 'ligue para os serviços de emergência.',
     'dial 112': 'ligar para o 112',
-    'call': 'ligar',
+    'call': 'liga',
   },
   // Punjabi
   'pa': {

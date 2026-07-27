@@ -184,6 +184,14 @@
                 return currency ? amount + ' ' + currency : amount;
             }
 
+            function formatPlayRevenue(byCurrency) {
+                var currencies = Object.keys(byCurrency || {});
+                if (currencies.length === 0) return formatMoney(0, null);
+                return currencies.map(function (currency) {
+                    return formatMoney(byCurrency[currency], currency);
+                }).join(', ');
+            }
+
             function addCell(tr, text, bold) {
                 var td = document.createElement('td');
                 td.className = bold ? 'py-2 pr-2 font-bold' : 'py-2 pr-2';
@@ -201,10 +209,7 @@
                     addCell(tr, row.webPaidCount + ' (' + formatMoney(row.webPaidTotal, row.currency) + ')', false);
                     addCell(tr, row.webRefundedCount + ' (' + formatMoney(row.webRefundedTotal, row.currency) + ')', false);
                     addCell(tr, String(row.playInstalls), false);
-                    // Play purchase revenue currency isn't reported per-row (GA4 reports
-                    // it pre-converted to the property's base reporting currency) - USD
-                    // matches every other total shown on this page.
-                    addCell(tr, row.playPurchaseCount + ' (' + formatMoney(row.playPurchaseTotal, 'USD') + ')', false);
+                    addCell(tr, row.playPurchaseCount + ' (' + formatPlayRevenue(row.playPurchaseRevenueByCurrency) + ')', false);
                     affiliateRows.appendChild(tr);
                 });
             }

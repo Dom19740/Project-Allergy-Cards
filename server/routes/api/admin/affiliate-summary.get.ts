@@ -2,12 +2,12 @@ import { defineHandler } from "nitro";
 import { setResponseHeader } from "nitro/h3";
 import { enforceOrigin } from "../../../utils/cors";
 import { enforceAdminAuth } from "../../../utils/admin-auth";
-import { getAffiliateSummary } from "../../../utils/affiliate-store";
+import { getAffiliateSummary, getEventCountersByRef } from "../../../utils/affiliate-store";
 import {
-  getPlayInstallCountsByRef,
-  getPlayPurchaseCountsByRef,
+  // getPlayInstallCountsByRef,   -- now sourced from our own Redis counters (see getEventCountersByRef)
+  // getPlayPurchaseCountsByRef,  -- now sourced from our own Redis counters (see getEventCountersByRef)
   getSiteTotals,
-  getWebappOpenCountsByRef,
+  // getWebappOpenCountsByRef,    -- now sourced from our own Redis counters (see getEventCountersByRef)
 } from "../../../utils/ga4-analytics";
 
 // GA4's own placeholder values for "no campaign attribution" - not real
@@ -22,31 +22,20 @@ export default defineHandler(async (event) => {
 
   const purchaseSummary = await getAffiliateSummary();
 
-  // GA4 is a separate system from the purchase ledger - a failure here
-  // (misconfigured credentials, API outage) shouldn't hide purchase data
-  // that's already known to be correct, so these just default to empty.
-  let webOpensByRef: Record<string, number> = {};
-  let playInstallsByRef: Record<string, number> = {};
-  let playPurchasesByRef: Record<string, { count: number; total: number }> = {};
+  // Web opens / Play installs / Play purchases now come from our own Redis
+  // counters (real-time, written by /api/track), not GA4. Site-wide totals
+  // still need GA4 - our own pipeline only ever sees traffic that already has
+  // a ref, so it has no organic (non-referred) numbers to report.
+  let eventCountersByRef: Awaited<ReturnType<typeof getEventCountersByRef>> = {};
   let totals: Awaited<ReturnType<typeof getSiteTotals>> | null = null;
   try {
-    [webOpensByRef, playInstallsByRef, playPurchasesByRef, totals] = await Promise.all([
-      getWebappOpenCountsByRef(),
-      getPlayInstallCountsByRef(),
-      getPlayPurchaseCountsByRef(),
-      getSiteTotals(),
-    ]);
+    [eventCountersByRef, totals] = await Promise.all([getEventCountersByRef(), getSiteTotals()]);
   } catch (error) {
-    console.error("Failed to fetch GA4 metrics:", error);
+    console.error("Failed to fetch traffic metrics:", error);
   }
 
   const purchaseByRef = new Map(purchaseSummary.map((row) => [row.ref, row]));
-  const allRefs = new Set([
-    ...purchaseByRef.keys(),
-    ...Object.keys(webOpensByRef),
-    ...Object.keys(playInstallsByRef),
-    ...Object.keys(playPurchasesByRef),
-  ]);
+  const allRefs = new Set([...purchaseByRef.keys(), ...Object.keys(eventCountersByRef)]);
   for (const value of NON_REFERRAL_VALUES) allRefs.delete(value);
 
   // Totals are in the smallest currency unit (cents for USD), matching how
@@ -55,18 +44,18 @@ export default defineHandler(async (event) => {
     .sort()
     .map((ref) => {
       const purchaseRow = purchaseByRef.get(ref);
-      const playPurchases = playPurchasesByRef[ref];
+      const counters = eventCountersByRef[ref];
       return {
         ref,
-        webOpens: webOpensByRef[ref] ?? 0,
+        webOpens: counters?.webOpens ?? 0,
         currency: purchaseRow?.currency ?? null,
         webPaidCount: purchaseRow?.paidCount ?? 0,
         webPaidTotal: purchaseRow?.paidTotal ?? 0,
         webRefundedCount: purchaseRow?.refundedCount ?? 0,
         webRefundedTotal: purchaseRow?.refundedTotal ?? 0,
-        playInstalls: playInstallsByRef[ref] ?? 0,
-        playPurchaseCount: playPurchases?.count ?? 0,
-        playPurchaseTotal: playPurchases?.total ?? 0,
+        playInstalls: counters?.playInstalls ?? 0,
+        playPurchaseCount: counters?.playPurchaseCount ?? 0,
+        playPurchaseRevenueByCurrency: counters?.playPurchaseRevenueByCurrency ?? {},
       };
     });
 

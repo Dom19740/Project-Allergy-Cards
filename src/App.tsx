@@ -12,6 +12,7 @@ import { useDeepLinks } from "./hooks/useDeepLinks";
 import { usePendingBackupRestore } from "./hooks/usePendingBackupRestore";
 import { initBilling } from "./lib/billing";
 import { captureAffiliateRef, consumeInstallReferrerRef } from "./lib/affiliate";
+import { sendTrackEvent } from "./lib/trackEvent";
 import { BillingProvider } from "./hooks/useBilling";
 import { FirebaseCrashlytics } from '@capacitor-firebase/crashlytics';
 import { FirebaseAnalytics } from '@capacitor-firebase/analytics';
@@ -104,6 +105,13 @@ const AppContent = () => {
         if (ref && urlRef) {
           await FirebaseAnalytics.setUserProperty({ key: 'acquisition_ref', value: ref });
           await FirebaseAnalytics.logEvent({ name: 'campaign_landing', params: { ref } });
+
+          // Parallel real-time pipeline alongside GA4/Firebase (unaffected
+          // above) - lets the admin dashboard show web opens within seconds
+          // instead of GA4's ~24-48h processing lag.
+          if (Capacitor.getPlatform() === 'web') {
+            void sendTrackEvent({ event: 'landing', ref, platform: 'web', eventId: crypto.randomUUID() });
+          }
         }
 
         // Android has no ?ref= in its cold-start URL - MainActivity.java reads
