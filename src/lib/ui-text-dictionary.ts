@@ -978,13 +978,13 @@ export const UI_TEXT_DICTIONARY: Record<string, Record<string, string>> = {
     'please be careful with my food.': 'por favor, tenha cuidado com a minha comida.',
     'thank you!': 'obrigado!',
     'i can not eat:': 'não posso comer:',
-    'they make me very sick and i could die': 'deixam-me muito doente e eu poderia morrer',
+    'they make me very sick and i could die': 'deixam-me muito doente e eu posso morrer',
     'attention': 'atenção',
     'i am having a severe allergic reaction.': 'estou a ter uma reação alérgica grave.',
-    'i need medical help immediately.': 'preciso de ajuda médica imediatamente.',
+    'i need medical help immediately.': 'preciso de ajuda médica urgente.',
     'please call emergency services.': 'ligue para os serviços de emergência.',
     'dial 112': 'ligar para o 112',
-    'call': 'liga',
+    'call': 'ligue',
   },
   // Punjabi
   'pa': {
