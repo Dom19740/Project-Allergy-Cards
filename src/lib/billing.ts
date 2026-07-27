@@ -166,7 +166,10 @@ const logPlayPurchaseEventOnce = async (store: any, receipt: any) => {
     // No stable id to dedupe against - log rather than silently drop what
     // could be a genuine purchase, matching prior behavior for this edge case.
     // (transactionId is undefined here, so logPlayPurchaseEvent's tracking
-    // call is skipped - there's no basis for a stable eventId.)
+    // call is skipped - there's no basis for a stable eventId. Confirmed this
+    // is the normal case for license-tester purchases specifically - Play
+    // doesn't issue a transactionId for those, so they can never exercise the
+    // /api/track POST. Only real orders have one.)
     logPlayPurchaseEvent(store);
     return;
   }
