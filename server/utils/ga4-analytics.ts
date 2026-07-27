@@ -68,6 +68,14 @@ const runReport = async (body: Record<string, unknown>): Promise<GA4Row[]> => {
 // needs excluding too.
 const ALL_TIME_RANGE = { startDate: "2026-07-24", endDate: "today" };
 
+// Separate fixed cutoff for getSiteTotals() specifically (the admin panel's
+// "Total Traffic" tiles) - launch date for real referral links, so pre-launch
+// test traffic (which ALL_TIME_RANGE above still includes, for the per-ref
+// breakdown functions) doesn't inflate the organic-inclusive totals real
+// visitors will be judged against. Bump forward manually if needed, same as
+// ALL_TIME_RANGE.
+const SITE_TOTALS_RANGE = { startDate: "2026-07-28", endDate: "today" };
+
 const eventNameFilter = (eventName: string) => ({
   fieldName: "eventName",
   stringFilter: { matchType: "EXACT" as const, value: eventName },
@@ -184,7 +192,7 @@ const runTotalQuery = async (
   platform: string
 ): Promise<{ count: number; total: number }> => {
   const rows = await runReport({
-    dateRanges: [ALL_TIME_RANGE],
+    dateRanges: [SITE_TOTALS_RANGE],
     metrics: [{ name: "eventCount" }, { name: "purchaseRevenue" }],
     dimensionFilter: {
       andGroup: {
