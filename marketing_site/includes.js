@@ -480,6 +480,17 @@ function syncDocumentHead(newDocument) {
     if (nextDescription && currentDescription) {
         currentDescription.setAttribute('content', nextDescription.getAttribute('content') || '');
     }
+
+    // Each page ships its own #page-styles block (hero/carousel CSS on index,
+    // .prose typography on the legal pages). A same-document nav only swaps
+    // #scrollArea, so without this the destination page keeps rendering with
+    // whichever page's styles happened to be in <head> already - looking
+    // broken until a hard refresh re-parses the real page.
+    const nextStyles = newDocument.getElementById('page-styles');
+    const currentStyles = document.getElementById('page-styles');
+    if (nextStyles && currentStyles) {
+        currentStyles.textContent = nextStyles.textContent;
+    }
 }
 
 function applyNavigatedContent(html, url, { pushState }) {
