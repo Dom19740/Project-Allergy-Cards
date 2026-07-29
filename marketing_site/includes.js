@@ -386,6 +386,12 @@ function initCarousel(scope) {
     const resizeHandler = handleResize;
     window.addEventListener('resize', resizeHandler);
 
+    // Web fonts swapping in after first paint can nudge the hero's height by
+    // a few pixels, which is enough to leave a sliver of the next slide
+    // showing. `load` fires once everything (fonts, images) has settled, so
+    // re-measure then as a final safety net.
+    window.addEventListener('load', resizeHandler);
+
     updateCarouselSettings();
     showSlide(currentIndex, false);
     startAutoRotate();
@@ -394,6 +400,7 @@ function initCarousel(scope) {
         teardown() {
             if (autoRotate) clearInterval(autoRotate);
             window.removeEventListener('resize', resizeHandler);
+            window.removeEventListener('load', resizeHandler);
             document.removeEventListener('keydown', keydownHandler);
         }
     };
@@ -552,7 +559,16 @@ window.addEventListener('popstate', () => {
 });
 
 window.addEventListener('DOMContentLoaded', () => {
-    loadFragment('site-header', 'header.html');
-    loadFragment('site-footer', 'footer.html');
-    initCarouselIfPresent(document);
+    // The header fragment loads asynchronously and, once injected, pushes the
+    // hero section down - shrinking the carousel's available height. Measuring
+    // slide widths before that settles locks the frame to a too-wide value
+    // (computed from the taller, header-less layout), which then never
+    // corrects itself since nothing re-triggers a resize. Wait for both
+    // fragments to land first so the carousel measures its final layout.
+    Promise.all([
+        loadFragment('site-header', 'header.html'),
+        loadFragment('site-footer', 'footer.html')
+    ]).finally(() => {
+        initCarouselIfPresent(document);
+    });
 });

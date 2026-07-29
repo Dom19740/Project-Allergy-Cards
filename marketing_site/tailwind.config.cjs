@@ -11,10 +11,12 @@
  *  root and commit the updated tailwind.generated.css, or the new class will
  *  silently have no effect in production.
  */
+const path = require("path");
+
 module.exports = {
   content: [
-    "./*.html",
-    "./*.js",
+    path.join(__dirname, "*.html"),
+    path.join(__dirname, "*.js"),
   ],
   theme: {
     extend: {},
