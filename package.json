@@ -8,6 +8,7 @@
     "build": "vite build",
     "build:android": "vite build --config vite.config.mobile.ts && npx cap sync android",
     "build:dev": "vite build --mode development",
+    "build:marketing-css": "npx tailwindcss@3 -i ./marketing_site/tailwind-input.css -o ./marketing_site/tailwind.generated.css --config ./marketing_site/tailwind.config.cjs --minify",
     "lint": "eslint .",
     "preview": "vite preview",
     "test": "vitest run",
