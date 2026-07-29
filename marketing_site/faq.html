@@ -54,7 +54,68 @@
 
     <!-- FAQ Schema -->
     <script type="application/ld+json">
-    
+    {
+        "@context": "https://schema.org",
+        "@type": "FAQPage",
+        "mainEntity": [
+            {
+                "@type": "Question",
+                "name": "Why I built Simple Allergy Alert",
+                "acceptedAnswer": {
+                    "@type": "Answer",
+                    "text": "Simple Allergy Alert was built out of personal experience, having spent over 20 years travelling and living abroad with a severe nut allergy, including Europe, South America and South East Asia. For most of that time, I relied on printed allergy cards, created and reprinted before every trip, one per language, one per destination. That approach works, but it's rigid. A printed card's language can't be updated on the fly to cater for an unplanned stopover in Kuala Lumpur, it's easily worn out from daily use, and easily lost (or stolen, in one case). That gap is what led to building an app that generates a custom card instantly, in over 100 languages, and can be adjusted the moment your plans change, whether that's a new destination or being able to ask for emergency help if something goes wrong."
+                }
+            },
+            {
+                "@type": "Question",
+                "name": "Is my allergy information stored or shared with the app?",
+                "acceptedAnswer": {
+                    "@type": "Answer",
+                    "text": "No. Simple Allergy Alert stores data only on your own device. We do not upload allergy, personal, or medical information to our servers, so your details remain private and secure."
+                }
+            },
+            {
+                "@type": "Question",
+                "name": "How do I explain a peanut allergy in Japanese?",
+                "acceptedAnswer": {
+                    "@type": "Answer",
+                    "text": "The safest approach is to use a translated allergy card rather than relying on spoken communication. Japanese restaurant staff may not understand spoken English, and the words for peanut allergy in Japanese: ピーナッツアレルギ are easy to mispronounce in ways that cause confusion. A visual card showing the allergen name in Japanese script, combined with a clear warning message, removes the ambiguity entirely. Simple Allergy Alert generates this card instantly - select peanuts, choose Japanese, and show the result to your server, or more simply show them a pre-saved card from your home screen widget."
+                }
+            },
+            {
+                "@type": "Question",
+                "name": "What is a food allergy card and do I need one for travel?",
+                "acceptedAnswer": {
+                    "@type": "Answer",
+                    "text": "A food allergy card is a written statement, usually printed, that tells restaurant staff which foods you cannot eat and why. It removes the language barrier that makes dining abroad risky for people with allergies. If your allergy is severe enough to cause anaphylaxis, a card is not optional. Verbal communication across a language barrier is unreliable, and kitchen staff rarely have time to parse a slow conversation. A card can be read, passed to a chef, and acted on in seconds."
+                }
+            },
+            {
+                "@type": "Question",
+                "name": "How do I communicate a gluten intolerance abroad?",
+                "acceptedAnswer": {
+                    "@type": "Answer",
+                    "text": "Gluten intolerance and coeliac disease present two communication challenges abroad. First, the term \"gluten\" does not always translate cleanly - in some languages, staff are more familiar with specific grain names. Second, many countries have lower awareness of cross-contamination risks than you may be used to at home. A translated allergy card that names gluten as an allergen and includes a clear cross-contamination warning gives kitchen staff the full picture in their own language. Simple Allergy Alert lets you customise the warning message to match the severity of your condition."
+                }
+            },
+            {
+                "@type": "Question",
+                "name": "What should I do if I have a severe allergic reaction abroad?",
+                "acceptedAnswer": {
+                    "@type": "Answer",
+                    "text": "Use your epinephrine auto-injector immediately if prescribed, then call the local emergency number. This is where many travellers encounter a problem - the emergency number varies by country and is not always 112 or 911. Simple Allergy Alert includes an Emergency Card that displays the correct emergency services number for whichever country you are visiting, in the local language, so you or a bystander can call for help without delay. The number is tap-to-call directly from the card."
+                }
+            },
+            {
+                "@type": "Question",
+                "name": "Can I use an allergy card if I don't speak the local language?",
+                "acceptedAnswer": {
+                    "@type": "Answer",
+                    "text": "Yes, that is the point. You do not need to speak or read the language for an allergy card to work. You show the card; the restaurant staff read it in their own language. Simple Allergy Alert generates cards in over 100 languages from your selection of allergens. Tap the allergens that apply to you, choose the destination language, and show the result. No typing in a foreign script, no translation apps to fumble with, no risk of mispronunciation. Cards can also be saved offline, so they are available without a signal, and the app can read out the allergy card in the local language."
+                }
+            }
+        ]
+    }
     </script>
 </head>
 <body class="bg-gray-50 text-gray-900 flex flex-col min-h-screen">
