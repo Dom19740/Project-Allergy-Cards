@@ -16,7 +16,10 @@
     <meta name="twitter:title" content="Simple Allergy Alert — Travel Safely with Food Allergies">
     <meta name="twitter:description" content="Create instant food allergy travel cards in 100+ languages. Share offline allergy cards with restaurant staff and stay safe while dining abroad.">
     <meta name="twitter:image" content="https://simpleallergyalert.com/images/screenshot_1.webp">
-    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Precompiled Tailwind output (no CDN, no build step at deploy time).
+         New/changed classes anywhere in marketing_site need `npm run build:marketing-css`
+         from the repo root, or they won't render. -->
+    <link rel="stylesheet" href="tailwind.generated.css">
     <link rel="preload" href="images/screenshot_1.webp" as="image">
     <link rel="icon" href="/favicon.ico">
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -48,8 +51,11 @@
             display: none;
         }
         .carousel-item {
-            width: 100%;
-            flex: 0 0 100%;
+            /* Intrinsic width - the card's own aspect-ratio/height decides how
+               wide it is, so the frame around it (sized in JS, see
+               syncFrameWidth in includes.js) never has slack space to show. */
+            flex: 0 0 auto;
+            width: auto;
             scroll-snap-align: start;
             display: flex;
             align-items: center;
@@ -79,10 +85,6 @@
             object-fit: contain;
         }
         @media (min-width: 640px) {
-            .carousel-item {
-                width: 50%;
-                flex: 0 0 50%;
-            }
             #screenshotCarousel {
                 max-height: 52dvh;
             }
@@ -93,10 +95,6 @@
             .carousel-slide { aspect-ratio: 4 / 7; }
         }
         @media (min-width: 1024px) {
-            .carousel-item {
-                width: 33.3333%;
-                flex: 0 0 33.3333%;
-            }
             #screenshotCarousel {
                 max-height: 54dvh;
             }
@@ -212,17 +210,17 @@
     <div id="scrollArea" class="flex-1 min-h-0 overflow-y-auto">
 
     <!-- Hero Section -->
-    <main id="top" class="min-h-full flex flex-col items-center justify-start overflow-hidden px-4 py-2 text-center max-w-4xl mx-auto">
+    <main id="top" class="min-h-full flex flex-col items-center justify-start overflow-hidden px-4 py-2 text-center max-w-4xl lg:max-w-7xl mx-auto">
 
         <h1 class="text-2xl md:text-4xl font-black text-gray-900 mb-3 tracking-tight">
             Travel Safely. <span class="text-brand-red">Eat with Confidence.</span>
         </h1>
         
-        <p class="text-base md:text-lg text-gray-600 mb-4 max-w-xl leading-relaxed">
-            Food allergy and emergency card translation app. Communicate your allergies instantly and stay safe while travelling.
+        <p class="text-base md:text-lg text-gray-600 mb-2 max-w-xl leading-relaxed">
+            Food allergy and emergency card translation app. Communicate your allergies simply and stay safe while travelling.
         </p>
 
-        <div class="w-full max-w-6xl mx-auto mt-2 flex-grow min-h-0 flex flex-col">
+        <div id="carouselFrame" class="w-full max-w-6xl lg:max-w-7xl mx-auto flex-grow min-h-0 flex flex-col">
             <div class="relative overflow-hidden rounded-[32px] border border-gray-200 bg-white shadow-xl flex-grow min-h-0 flex flex-col justify-center">
                 <div id="screenshotCarousel" class="relative overflow-hidden bg-gray-100">
                     <div id="carouselTrack" class="flex transition-transform duration-500 ease-out">
@@ -302,170 +300,6 @@
         </div>
 
     </main>
-
-    <script>
-        (function () {
-            function initCarousel() {
-                const slideButtons = Array.from(document.querySelectorAll('.carousel-slide'));
-                const slideItems = Array.from(document.querySelectorAll('.carousel-item'));
-                const dots = Array.from(document.querySelectorAll('.carousel-dot'));
-                const prevBtn = document.getElementById('carouselPrev');
-                const nextBtn = document.getElementById('carouselNext');
-                const overlay = document.getElementById('carouselOverlay');
-                const overlayImage = document.getElementById('carouselOverlayImage');
-                const overlayClose = document.getElementById('carouselOverlayClose');
-                const overlayPrevBtn = document.getElementById('carouselOverlayPrev');
-                const overlayNextBtn = document.getElementById('carouselOverlayNext');
-                const track = document.getElementById('carouselTrack');
-                const totalSlides = slideItems.length;
-                let visibleSlides = 3;
-                let maxIndex = Math.max(0, totalSlides - visibleSlides);
-                let currentIndex = 0;
-                let overlayIndex = 0;
-                let autoRotate;
-
-                function getVisibleSlides() {
-                    if (window.innerWidth < 640) return 1;
-                    if (window.innerWidth < 1024) return 2;
-                    return 3;
-                }
-
-                function updateCarouselSettings() {
-                    visibleSlides = getVisibleSlides();
-                    maxIndex = Math.max(0, totalSlides - visibleSlides);
-                    currentIndex = Math.min(maxIndex, currentIndex);
-                }
-
-                function updateTrack(index, smooth = true) {
-                    const slide = slideItems[index];
-                    if (!slide) return;
-                    // Scroll only the horizontal track itself - scrollIntoView() would also
-                    // scroll ancestor containers (e.g. the page's #scrollArea) back into view
-                    // whenever the carousel is off-screen, yanking the whole page to the top.
-                    track.scrollTo({
-                        left: slide.offsetLeft,
-                        behavior: smooth ? 'smooth' : 'auto'
-                    });
-                }
-
-                function handleResize() {
-                    updateCarouselSettings();
-                    showSlide(currentIndex, false);
-                }
-
-                function showSlide(index, smooth = true) {
-                    currentIndex = Math.min(maxIndex, Math.max(0, index));
-                    updateTrack(currentIndex, smooth);
-                    dots.forEach((dot, dotIndex) => {
-                        dot.classList.toggle('bg-white/90', dotIndex === currentIndex);
-                        dot.classList.toggle('bg-white/50', dotIndex !== currentIndex);
-                    });
-                }
-
-                function nextSlide() {
-                    showSlide(currentIndex >= maxIndex ? 0 : currentIndex + 1);
-                }
-
-                function prevSlide() {
-                    showSlide(currentIndex <= 0 ? maxIndex : currentIndex - 1);
-                }
-
-                function startAutoRotate() {
-                    if (autoRotate) clearInterval(autoRotate);
-                    autoRotate = setInterval(nextSlide, 4500);
-                }
-
-                function showOverlaySlide(index) {
-                    overlayIndex = (index + slideButtons.length) % slideButtons.length;
-                    const img = slideButtons[overlayIndex];
-                    overlayImage.src = img.src;
-                    overlayImage.alt = img.alt;
-                }
-
-                function openOverlay(index) {
-                    showOverlaySlide(index);
-                    overlay.classList.remove('hidden');
-                    overlay.classList.add('flex');
-                }
-
-                function closeOverlay() {
-                    overlay.classList.add('hidden');
-                    overlay.classList.remove('flex');
-                    overlayImage.src = '';
-                }
-
-                function overlayNext() {
-                    showOverlaySlide(overlayIndex + 1);
-                }
-
-                function overlayPrev() {
-                    showOverlaySlide(overlayIndex - 1);
-                }
-
-                slideButtons.forEach((slide, index) => {
-                    slide.addEventListener('click', () => {
-                        openOverlay(index);
-                    });
-                });
-
-                dots.forEach(dot => {
-                    dot.addEventListener('click', () => {
-                        showSlide(Number(dot.dataset.index));
-                        startAutoRotate();
-                    });
-                });
-
-                prevBtn.addEventListener('click', () => {
-                    prevSlide();
-                    startAutoRotate();
-                });
-
-                nextBtn.addEventListener('click', () => {
-                    nextSlide();
-                    startAutoRotate();
-                });
-
-                overlayClose.addEventListener('click', closeOverlay);
-                overlayPrevBtn.addEventListener('click', (event) => {
-                    event.stopPropagation();
-                    overlayPrev();
-                });
-                overlayNextBtn.addEventListener('click', (event) => {
-                    event.stopPropagation();
-                    overlayNext();
-                });
-                overlay.addEventListener('click', (event) => {
-                    if (event.target === overlay) {
-                        closeOverlay();
-                    }
-                });
-                document.addEventListener('keydown', (event) => {
-                    if (overlay.classList.contains('hidden')) return;
-                    if (event.key === 'ArrowRight') {
-                        overlayNext();
-                    } else if (event.key === 'ArrowLeft') {
-                        overlayPrev();
-                    } else if (event.key === 'Escape') {
-                        closeOverlay();
-                    }
-                });
-
-                updateCarouselSettings();
-                showSlide(currentIndex, false);
-
-                startAutoRotate();
-
-                window.addEventListener('resize', handleResize);
-            }
-
-            if (document.readyState === 'loading') {
-                document.addEventListener('DOMContentLoaded', initCarousel);
-            } else {
-                initCarousel();
-            }
-        })();
-
-    </script>
 
     <!-- FAQ Section -->
     <section id="faq" class="bg-gray-50 px-4 py-14">
@@ -590,17 +424,6 @@
 
         </div>
     </section>
-
-<div id="videoModal" class="hidden fixed inset-0 z-50 items-center justify-center bg-black/80 p-4">
-    <div class="relative w-full max-w-[900px] aspect-video flex flex-col items-center" id="videoModalFrameWrap">
-        <button id="videoModalClose" class="absolute -top-10 right-0 rounded-full bg-white/90 p-2 text-gray-900 shadow-lg hover:bg-white transition">
-            <span class="sr-only">Close video</span>
-            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
-                <path fill-rule="evenodd" d="M10 8.586l4.95-4.95a1 1 0 111.414 1.414L11.414 10l4.95 4.95a1 1 0 01-1.414 1.414L10 11.414l-4.95 4.95a1 1 0 01-1.414-1.414L8.586 10 3.636 5.05a1 1 0 011.414-1.414L10 8.586z" clip-rule="evenodd">
-            </svg>
-        </button>
-    </div>
-</div>
 
     </div>
 
