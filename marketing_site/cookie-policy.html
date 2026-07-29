@@ -29,9 +29,11 @@
         .prose strong { color: #111827; }
     </style>
 </head>
-<body class="bg-gray-50 text-gray-900 flex flex-col min-h-screen">
+<body class="bg-gray-50 text-gray-900 flex flex-col h-[100dvh] overflow-hidden">
 
-    <div id="site-header"></div>
+    <div id="site-header" class="flex-shrink-0"></div>
+
+    <div id="scrollArea" class="flex-1 min-h-0 overflow-y-auto">
 
     <!-- Hero -->
     <section class="bg-white border-b border-gray-100 py-10 px-4 text-center">
@@ -42,7 +44,7 @@
     </section>
 
     <!-- Content -->
-    <main class="flex-grow max-w-2xl mx-auto w-full px-4 py-10 prose">
+    <main class="max-w-2xl mx-auto w-full px-4 py-10 prose">
 
         <p>This Cookie Policy explains how Simple Allergy Alert (operated by Dominic Buzugbe, trading as Simple Allergy Alert) uses cookies and similar tracking technologies when you visit <a href="https://simpleallergyalert.com" target="_blank">simpleallergyalert.com</a> or use the web app at <a href="https://app.simpleallergyalert.com" target="_blank">app.simpleallergyalert.com</a>.</p>
         <p>For more information about how we handle your personal data more broadly, please see our <a href="/privacy-policy.html">Privacy Policy</a>.</p>
@@ -159,7 +161,9 @@
 
     </main>
 
-    <div id="site-footer"></div>
+    </div>
+
+    <div id="site-footer" class="flex-shrink-0"></div>
     <script src="includes.js"></script>
 </body>
 </html>

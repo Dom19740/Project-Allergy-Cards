@@ -51,8 +51,14 @@ function attachHeaderLogoHandler(container) {
             // If the link points to the same path on the same origin, prevent reload
             if (target.origin === location.origin && targetPath === currentPath) {
                 e.preventDefault();
-                // Smooth scroll to the top instead of reloading the page
-                window.scrollTo({ top: 0, behavior: 'smooth' });
+                // Smooth scroll to the top instead of reloading the page.
+                // Content scrolls inside #scrollArea (fixed header/footer), so scroll that if present.
+                const scrollArea = document.getElementById('scrollArea');
+                if (scrollArea) {
+                    scrollArea.scrollTo({ top: 0, behavior: 'smooth' });
+                } else {
+                    window.scrollTo({ top: 0, behavior: 'smooth' });
+                }
             }
         } catch (err) {
             // any parse errors -> allow default behavior

@@ -115,14 +115,104 @@
         }
         /* Disable any accidental transitions on hero text */
         h1, p { transition: none !important; }
+
+        #faq details summary {
+            cursor: pointer;
+            list-style: none;
+        }
+        #faq details summary::-webkit-details-marker { display: none; }
+
+        #faq details .chevron {
+            transition: transform 0.25s ease;
+        }
+        #faq details[open] .chevron {
+            transform: rotate(180deg);
+        }
+
+        #faq details .answer {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.35s ease, padding 0.25s ease;
+        }
+        #faq details[open] .answer {
+            max-height: 600px;
+        }
     </style>
+
+    <!-- FAQ Schema -->
+    <script type="application/ld+json">
+    {
+        "@context": "https://schema.org",
+        "@type": "FAQPage",
+        "mainEntity": [
+            {
+                "@type": "Question",
+                "name": "Why I built Simple Allergy Alert",
+                "acceptedAnswer": {
+                    "@type": "Answer",
+                    "text": "Simple Allergy Alert was built out of personal experience, having spent over 20 years travelling and living abroad with a severe nut allergy, including Europe, South America and South East Asia. For most of that time, I relied on printed allergy cards, created and reprinted before every trip, one per language, one per destination. That approach works, but it's rigid. A printed card's language can't be updated on the fly to cater for an unplanned stopover in Kuala Lumpur, it's easily worn out from daily use, and easily lost (or stolen, in one case). That gap is what led to building an app that generates a custom card instantly, in over 100 languages, and can be adjusted the moment your plans change, whether that's a new destination or being able to ask for emergency help if something goes wrong."
+                }
+            },
+            {
+                "@type": "Question",
+                "name": "Is my allergy information stored or shared with the app?",
+                "acceptedAnswer": {
+                    "@type": "Answer",
+                    "text": "No. Simple Allergy Alert stores data only on your own device. We do not upload allergy, personal, or medical information to our servers, so your details remain private and secure."
+                }
+            },
+            {
+                "@type": "Question",
+                "name": "How do I explain a peanut allergy in Japanese?",
+                "acceptedAnswer": {
+                    "@type": "Answer",
+                    "text": "The safest approach is to use a translated allergy card rather than relying on spoken communication. Japanese restaurant staff may not understand spoken English, and the words for peanut allergy in Japanese: ピーナッツアレルギ are easy to mispronounce in ways that cause confusion. A visual card showing the allergen name in Japanese script, combined with a clear warning message, removes the ambiguity entirely. Simple Allergy Alert generates this card instantly - select peanuts, choose Japanese, and show the result to your server, or more simply show them a pre-saved card from your home screen widget."
+                }
+            },
+            {
+                "@type": "Question",
+                "name": "What is a food allergy card and do I need one for travel?",
+                "acceptedAnswer": {
+                    "@type": "Answer",
+                    "text": "A food allergy card is a written statement, usually printed, that tells restaurant staff which foods you cannot eat and why. It removes the language barrier that makes dining abroad risky for people with allergies. If your allergy is severe enough to cause anaphylaxis, a card is not optional. Verbal communication across a language barrier is unreliable, and kitchen staff rarely have time to parse a slow conversation. A card can be read, passed to a chef, and acted on in seconds."
+                }
+            },
+            {
+                "@type": "Question",
+                "name": "How do I communicate a gluten intolerance abroad?",
+                "acceptedAnswer": {
+                    "@type": "Answer",
+                    "text": "Gluten intolerance and coeliac disease present two communication challenges abroad. First, the term \"gluten\" does not always translate cleanly - in some languages, staff are more familiar with specific grain names. Second, many countries have lower awareness of cross-contamination risks than you may be used to at home. A translated allergy card that names gluten as an allergen and includes a clear cross-contamination warning gives kitchen staff the full picture in their own language. Simple Allergy Alert lets you customise the warning message to match the severity of your condition."
+                }
+            },
+            {
+                "@type": "Question",
+                "name": "What should I do if I have a severe allergic reaction abroad?",
+                "acceptedAnswer": {
+                    "@type": "Answer",
+                    "text": "Use your epinephrine auto-injector immediately if prescribed, then call the local emergency number. This is where many travellers encounter a problem - the emergency number varies by country and is not always 112 or 911. Simple Allergy Alert includes an Emergency Card that displays the correct emergency services number for whichever country you are visiting, in the local language, so you or a bystander can call for help without delay. The number is tap-to-call directly from the card."
+                }
+            },
+            {
+                "@type": "Question",
+                "name": "Can I use an allergy card if I don't speak the local language?",
+                "acceptedAnswer": {
+                    "@type": "Answer",
+                    "text": "Yes, that is the point. You do not need to speak or read the language for an allergy card to work. You show the card; the restaurant staff read it in their own language. Simple Allergy Alert generates cards in over 100 languages from your selection of allergens. Tap the allergens that apply to you, choose the destination language, and show the result. No typing in a foreign script, no translation apps to fumble with, no risk of mispronunciation. Cards can also be saved offline, so they are available without a signal, and the app can read out the allergy card in the local language."
+                }
+            }
+        ]
+    }
+    </script>
 </head>
 <body class="bg-gray-50 text-gray-900 flex flex-col h-[100dvh] overflow-hidden">
 
-    <div id="site-header"></div>
+    <div id="site-header" class="flex-shrink-0"></div>
+
+    <div id="scrollArea" class="flex-1 min-h-0 overflow-y-auto">
 
     <!-- Hero Section -->
-    <main class="flex-grow min-h-0 flex flex-col items-center justify-start overflow-hidden px-4 py-2 text-center max-w-4xl mx-auto">
+    <main id="top" class="min-h-full flex flex-col items-center justify-start overflow-hidden px-4 py-2 text-center max-w-4xl mx-auto">
 
         <h1 class="text-2xl md:text-4xl font-black text-gray-900 mb-3 tracking-tight">
             Travel Safely. <span class="text-brand-red">Eat with Confidence.</span>
@@ -196,6 +286,18 @@
                     <path fill-rule="evenodd" d="M10 8.586l4.95-4.95a1 1 0 111.414 1.414L11.414 10l4.95 4.95a1 1 0 01-1.414 1.414L10 11.414l-4.95 4.95a1 1 0 01-1.414-1.414L8.586 10 3.636 5.05a1 1 0 011.414-1.414L10 8.586z" clip-rule="evenodd">
                 </svg>
             </button>
+            <button id="carouselOverlayPrev" class="absolute left-3 sm:left-6 top-1/2 -translate-y-1/2 rounded-full bg-white/90 text-gray-900 shadow-lg p-3 hover:bg-white transition">
+                <span class="sr-only">Previous screenshot</span>
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                    <path fill-rule="evenodd" d="M12.293 16.293a1 1 0 010-1.414L7.414 10l4.879-4.879a1 1 0 10-1.414-1.414l-6 6a1 1 0 000 1.414l6 6a1 1 0 001.414 0z" clip-rule="evenodd">
+                </svg>
+            </button>
+            <button id="carouselOverlayNext" class="absolute right-3 sm:right-6 top-1/2 -translate-y-1/2 rounded-full bg-white/90 text-gray-900 shadow-lg p-3 hover:bg-white transition">
+                <span class="sr-only">Next screenshot</span>
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                    <path fill-rule="evenodd" d="M7.707 3.293a1 1 0 011.414 0l6 6a1 1 0 010 1.414l-6 6a1 1 0 11-1.414-1.414L12.586 10 7.707 5.121a1 1 0 010-1.414z" clip-rule="evenodd">
+                </svg>
+            </button>
             <img id="carouselOverlayImage" src="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///ywAAAAAAQABAAACAUwAOw==" alt="Expanded screenshot" class="max-h-full max-w-full rounded-3xl shadow-2xl object-contain">
         </div>
 
@@ -212,11 +314,14 @@
                 const overlay = document.getElementById('carouselOverlay');
                 const overlayImage = document.getElementById('carouselOverlayImage');
                 const overlayClose = document.getElementById('carouselOverlayClose');
+                const overlayPrevBtn = document.getElementById('carouselOverlayPrev');
+                const overlayNextBtn = document.getElementById('carouselOverlayNext');
                 const track = document.getElementById('carouselTrack');
                 const totalSlides = slideItems.length;
                 let visibleSlides = 3;
                 let maxIndex = Math.max(0, totalSlides - visibleSlides);
                 let currentIndex = 0;
+                let overlayIndex = 0;
                 let autoRotate;
 
                 function getVisibleSlides() {
@@ -234,10 +339,12 @@
                 function updateTrack(index, smooth = true) {
                     const slide = slideItems[index];
                     if (!slide) return;
-                    slide.scrollIntoView({
-                        behavior: smooth ? 'smooth' : 'auto',
-                        inline: 'start',
-                        block: 'nearest'
+                    // Scroll only the horizontal track itself - scrollIntoView() would also
+                    // scroll ancestor containers (e.g. the page's #scrollArea) back into view
+                    // whenever the carousel is off-screen, yanking the whole page to the top.
+                    track.scrollTo({
+                        left: slide.offsetLeft,
+                        behavior: smooth ? 'smooth' : 'auto'
                     });
                 }
 
@@ -268,9 +375,15 @@
                     autoRotate = setInterval(nextSlide, 4500);
                 }
 
-                function openOverlay(img) {
+                function showOverlaySlide(index) {
+                    overlayIndex = (index + slideButtons.length) % slideButtons.length;
+                    const img = slideButtons[overlayIndex];
                     overlayImage.src = img.src;
                     overlayImage.alt = img.alt;
+                }
+
+                function openOverlay(index) {
+                    showOverlaySlide(index);
                     overlay.classList.remove('hidden');
                     overlay.classList.add('flex');
                 }
@@ -281,9 +394,17 @@
                     overlayImage.src = '';
                 }
 
-                slideButtons.forEach(slide => {
+                function overlayNext() {
+                    showOverlaySlide(overlayIndex + 1);
+                }
+
+                function overlayPrev() {
+                    showOverlaySlide(overlayIndex - 1);
+                }
+
+                slideButtons.forEach((slide, index) => {
                     slide.addEventListener('click', () => {
-                        openOverlay(slide);
+                        openOverlay(index);
                     });
                 });
 
@@ -305,13 +426,26 @@
                 });
 
                 overlayClose.addEventListener('click', closeOverlay);
+                overlayPrevBtn.addEventListener('click', (event) => {
+                    event.stopPropagation();
+                    overlayPrev();
+                });
+                overlayNextBtn.addEventListener('click', (event) => {
+                    event.stopPropagation();
+                    overlayNext();
+                });
                 overlay.addEventListener('click', (event) => {
                     if (event.target === overlay) {
                         closeOverlay();
                     }
                 });
                 document.addEventListener('keydown', (event) => {
-                    if (event.key === 'Escape') {
+                    if (overlay.classList.contains('hidden')) return;
+                    if (event.key === 'ArrowRight') {
+                        overlayNext();
+                    } else if (event.key === 'ArrowLeft') {
+                        overlayPrev();
+                    } else if (event.key === 'Escape') {
                         closeOverlay();
                     }
                 });
@@ -333,7 +467,129 @@
 
     </script>
 
-</section>
+    <!-- FAQ Section -->
+    <section id="faq" class="bg-gray-50 px-4 py-14">
+        <div class="max-w-2xl mx-auto w-full">
+
+            <div class="text-center mb-8">
+                <h2 class="text-3xl md:text-4xl font-black text-gray-900 tracking-tight mb-3">
+                    Food Allergy Travel <span class="text-brand-red">FAQ</span>
+                </h2>
+                <p class="text-base md:text-lg text-gray-500 max-w-xl mx-auto leading-relaxed">
+                    Common questions about communicating food allergies abroad - and how to stay safe when dining in a foreign language.
+                </p>
+            </div>
+
+            <div class="space-y-3">
+
+                <!-- Q1 -->
+                <details class="bg-white border border-gray-200 rounded-xl overflow-hidden group">
+                    <summary class="flex items-center justify-between gap-4 px-6 py-5 font-bold text-gray-900 text-base md:text-lg hover:bg-gray-50 transition-colors">
+                        <span>Why I built Simple Allergy Alert</span>
+                        <svg class="chevron flex-shrink-0 w-5 h-5 text-brand-red" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7"/>
+                        </svg>
+                    </summary>
+                    <div class="answer px-6 pb-6 pt-2 text-gray-600 leading-relaxed text-sm md:text-base">
+                        <p>Simple Allergy Alert was built out of personal experience, having spent over 20 years travelling and living abroad with a severe nut allergy, including Europe, South America and South East Asia. For most of that time, I relied on printed allergy cards, created and reprinted before every trip, one per language, one per destination.</p>
+                        <p class="mt-3">That approach works, but it's rigid. A printed card's language can't be updated on the fly to cater for an unplanned stopover in Kuala Lumpur, it's easily worn out from daily use, and easily lost (or stolen, in one case). That gap is what led to building an app that generates a custom card instantly, in over 100 languages, and can be adjusted the moment your plans change, whether that's a new destination or being able to ask for emergency help if something goes wrong.</p>
+                    </div>
+                </details>
+
+                <!-- Q2 -->
+                <details class="bg-white border border-gray-200 rounded-xl overflow-hidden group">
+                    <summary class="flex items-center justify-between gap-4 px-6 py-5 font-bold text-gray-900 text-base md:text-lg hover:bg-gray-50 transition-colors">
+                        <span>Is my allergy information stored or shared with the app?</span>
+                        <svg class="chevron flex-shrink-0 w-5 h-5 text-brand-red" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7"/>
+                        </svg>
+                    </summary>
+                    <div class="answer px-6 pb-6 pt-2 text-gray-600 leading-relaxed text-sm md:text-base">
+                        <p>No. Simple Allergy Alert stores data only on your own device. We do not upload allergy, personal, or medical information to our servers, so your details remain private and secure.</p>
+                    </div>
+                </details>
+
+                <!-- Q3 -->
+                <details class="bg-white border border-gray-200 rounded-xl overflow-hidden group">
+                    <summary class="flex items-center justify-between gap-4 px-6 py-5 font-bold text-gray-900 text-base md:text-lg hover:bg-gray-50 transition-colors">
+                        <span>How do I explain a peanut allergy in Japanese?</span>
+                        <svg class="chevron flex-shrink-0 w-5 h-5 text-brand-red" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7"/>
+                        </svg>
+                    </summary>
+                    <div class="answer px-6 pb-6 pt-2 text-gray-600 leading-relaxed text-sm md:text-base">
+                        <p>The safest approach is to use a translated allergy card rather than relying on spoken communication. Japanese restaurant staff may not understand spoken English, and the words for peanut allergy in Japanese: <span class="font-medium text-red-800">ピーナッツアレルギ</span> are easy to mispronounce in ways that cause confusion.</p>
+                        <p class="mt-3">A visual card showing the allergen name in Japanese script, combined with a clear warning message, removes the ambiguity entirely. <a href="https://app.simpleallergyalert.com/" class="text-brand-red font-semibold hover:underline">Simple Allergy Alert</a> generates this card instantly - select peanuts, choose Japanese, and show the result to your server, or more simply show them a pre-saved card from your home screen widget.</p>
+                    </div>
+                </details>
+
+                <!-- Q3 -->
+                <details class="bg-white border border-gray-200 rounded-xl overflow-hidden group">
+                    <summary class="flex items-center justify-between gap-4 px-6 py-5 font-bold text-gray-900 text-base md:text-lg hover:bg-gray-50 transition-colors">
+                        <span>What is a food allergy card and do I need one for travel?</span>
+                        <svg class="chevron flex-shrink-0 w-5 h-5 text-brand-red" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7"/>
+                        </svg>
+                    </summary>
+                    <div class="answer px-6 pb-6 pt-2 text-gray-600 leading-relaxed text-sm md:text-base">
+                        <p>A food allergy card is a written statement, usually printed, that tells restaurant staff which foods you cannot eat and why. It removes the language barrier that makes dining abroad risky for people with allergies.</p>
+                        <p class="mt-3">If your allergy is severe enough to cause anaphylaxis, a card is not optional. Verbal communication across a language barrier is unreliable, and kitchen staff rarely have time to parse a slow conversation. A card can be read, passed to a chef, and acted on in seconds.</p>
+                    </div>
+                </details>
+
+                <!-- Q4 -->
+                <details class="bg-white border border-gray-200 rounded-xl overflow-hidden group">
+                    <summary class="flex items-center justify-between gap-4 px-6 py-5 font-bold text-gray-900 text-base md:text-lg hover:bg-gray-50 transition-colors">
+                        <span>How do I communicate a gluten intolerance abroad?</span>
+                        <svg class="chevron flex-shrink-0 w-5 h-5 text-brand-red" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7"/>
+                        </svg>
+                    </summary>
+                    <div class="answer px-6 pb-6 pt-2 text-gray-600 leading-relaxed text-sm md:text-base">
+                        <p>Gluten intolerance and coeliac disease present two communication challenges abroad. First, the term "gluten" does not always translate cleanly - in some languages, staff are more familiar with specific grain names. Second, many countries have lower awareness of cross-contamination risks than you may be used to at home.</p>
+                        <p class="mt-3">A translated allergy card that names gluten as an allergen and includes a clear cross-contamination warning gives kitchen staff the full picture in their own language. <a href="https://app.simpleallergyalert.com/" class="text-brand-red font-semibold hover:underline">Simple Allergy Alert</a> lets you customise the warning message to match the severity of your condition.</p>
+                    </div>
+                </details>
+
+                <!-- Q5 -->
+                <details class="bg-white border border-gray-200 rounded-xl overflow-hidden group">
+                    <summary class="flex items-center justify-between gap-4 px-6 py-5 font-bold text-gray-900 text-base md:text-lg hover:bg-gray-50 transition-colors">
+                        <span>What should I do if I have a severe allergic reaction abroad?</span>
+                        <svg class="chevron flex-shrink-0 w-5 h-5 text-brand-red" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7"/>
+                        </svg>
+                    </summary>
+                    <div class="answer px-6 pb-6 pt-2 text-gray-600 leading-relaxed text-sm md:text-base">
+                        <p>Use your epinephrine auto-injector immediately if prescribed, then call the local emergency number. This is where many travellers encounter a problem - the emergency number varies by country and is not always 112 or 911.</p>
+                        <p class="mt-3">Simple Allergy Alert includes an <strong class="text-gray-800">Emergency Card</strong> that displays the correct emergency services number for whichever country you are visiting, in the local language, so you or a bystander can call for help without delay. The number is tap-to-call directly from the card.</p>
+                    </div>
+                </details>
+
+                <!-- Q6 -->
+                <details class="bg-white border border-gray-200 rounded-xl overflow-hidden group">
+                    <summary class="flex items-center justify-between gap-4 px-6 py-5 font-bold text-gray-900 text-base md:text-lg hover:bg-gray-50 transition-colors">
+                        <span>Can I use an allergy card if I don't speak the local language?</span>
+                        <svg class="chevron flex-shrink-0 w-5 h-5 text-brand-red" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7"/>
+                        </svg>
+                    </summary>
+                    <div class="answer px-6 pb-6 pt-2 text-gray-600 leading-relaxed text-sm md:text-base">
+                        <p>Yes, that is the point. You do not need to speak or read the language for an allergy card to work. You show the card; the restaurant staff read it in their own language.</p>
+                        <p class="mt-3">Simple Allergy Alert generates cards in over 100 languages from your selection of allergens. Tap the allergens that apply to you, choose the destination language, and show the result. No typing in a foreign script, no translation apps to fumble with, no risk of mispronunciation. Cards can also be saved offline, so they are available without a signal, and the app can read out the allergy card in the local language.</p>
+                    </div>
+                </details>
+
+            </div>
+
+            <!-- CTA -->
+            <div class="mt-10 text-center bg-white border border-gray-200 rounded-xl px-6 py-8">
+                <p class="text-lg font-black text-gray-900 mb-2">Ready to travel with confidence?</p>
+                <p class="text-sm text-gray-500 mb-4">Generate your allergy card in seconds - free to try, no account needed.</p>
+
+            </div>
+
+        </div>
+    </section>
 
 <div id="videoModal" class="hidden fixed inset-0 z-50 items-center justify-center bg-black/80 p-4">
     <div class="relative w-full max-w-[900px] aspect-video flex flex-col items-center" id="videoModalFrameWrap">
@@ -346,8 +602,9 @@
     </div>
 </div>
 
-</div>
-    <div id="site-footer"></div>
+    </div>
+
+    <div id="site-footer" class="flex-shrink-0"></div>
     <script src="includes.js"></script>
 </body>
 

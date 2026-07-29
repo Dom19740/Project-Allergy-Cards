@@ -6,7 +6,7 @@
             http://www.sitemaps.org/schemas/sitemap/0.9/sitemap.xsd">
 <url>
   <loc>https://simpleallergyalert.com/</loc>
-  <lastmod>2026-05-26T01:31:18+00:00</lastmod>
+  <lastmod>2026-07-29T00:00:00+00:00</lastmod>
   <priority>1.00</priority>
 </url>
 <url>
@@ -23,10 +23,5 @@
   <loc>https://simpleallergyalert.com/cookie-policy.html</loc>
   <lastmod>2026-06-10T00:00:00+00:00</lastmod>
   <priority>0.60</priority>
-</url>
-<url>
-  <loc>https://simpleallergyalert.com/faq.html</loc>
-  <lastmod>2026-07-29T00:00:00+00:00</lastmod>
-  <priority>0.80</priority>
 </url>
 </urlset>
