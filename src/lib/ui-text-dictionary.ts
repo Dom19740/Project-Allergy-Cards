@@ -260,7 +260,7 @@ export const UI_TEXT_DICTIONARY: Record<string, Record<string, string>> = {
   },
   // Czech
   'cs': {
-    'allergy alert!': 'pozor na alergie!',
+    'allergy alert!': 'Upozornění na alergeny!',
     'please be careful with my food.': 'prosím, buďte opatrní s mým jídlem.',
     'thank you!': 'děkuju!',
     'i can not eat:': 'nemůžu jíst:',
@@ -268,7 +268,7 @@ export const UI_TEXT_DICTIONARY: Record<string, Record<string, string>> = {
     'attention': 'pozor',
     'i am having a severe allergic reaction.': 'mám silnou alergickou reakci.',
     'i need medical help immediately.': 'potřebuji okamžitě lékařskou pomoc.',
-    'please call emergency services.': 'zavolejte prosím pohotovostní službu.',
+    'please call emergency services.': 'Zavolejte prosím pohotovost.',
     'dial 112': 'volejte 112',
     'call': 'zavolat',
   },
