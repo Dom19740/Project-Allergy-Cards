@@ -236,8 +236,6 @@ function initCarousel(scope) {
     const slideButtons = Array.from(scope.querySelectorAll('.carousel-slide'));
     const slideItems = Array.from(scope.querySelectorAll('.carousel-item'));
     const dots = Array.from(scope.querySelectorAll('.carousel-dot'));
-    const prevBtn = scope.querySelector('#carouselPrev');
-    const nextBtn = scope.querySelector('#carouselNext');
     const overlay = scope.querySelector('#carouselOverlay');
     const overlayImage = scope.querySelector('#carouselOverlayImage');
     const overlayClose = scope.querySelector('#carouselOverlayClose');
@@ -245,7 +243,7 @@ function initCarousel(scope) {
     const overlayNextBtn = scope.querySelector('#carouselOverlayNext');
     const track = scope.querySelector('#carouselTrack');
     const frame = scope.querySelector('#carouselFrame');
-    if (!track || !overlay || !prevBtn || !nextBtn) return null;
+    if (!track || !overlay) return null;
 
     const totalSlides = slideItems.length;
     let visibleSlides = 3;
@@ -313,10 +311,6 @@ function initCarousel(scope) {
         showSlide(currentIndex >= maxIndex ? 0 : currentIndex + 1);
     }
 
-    function prevSlide() {
-        showSlide(currentIndex <= 0 ? maxIndex : currentIndex - 1);
-    }
-
     function startAutoRotate() {
         if (autoRotate) clearInterval(autoRotate);
         autoRotate = setInterval(nextSlide, 4500);
@@ -360,16 +354,6 @@ function initCarousel(scope) {
             showSlide(Number(dot.dataset.index));
             startAutoRotate();
         });
-    });
-
-    prevBtn.addEventListener('click', () => {
-        prevSlide();
-        startAutoRotate();
-    });
-
-    nextBtn.addEventListener('click', () => {
-        nextSlide();
-        startAutoRotate();
     });
 
     overlayClose.addEventListener('click', closeOverlay);
