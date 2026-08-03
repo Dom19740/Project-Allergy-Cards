@@ -207,6 +207,31 @@ const runTotalQuery = async (
   };
 };
 
+// No test-noise cutoff needed here (unlike ALL_TIME_RANGE above): the
+// dev-only SAADEV bypass in PromoCodeDialog.tsx never reaches the server or
+// fires promo_code_redeemed, so there's no equivalent pre-launch noise to
+// exclude - safe to pull the property's full history.
+const PROMO_CODE_RANGE = { startDate: "2020-01-01", endDate: "today" };
+
+// Grouped by the "code" custom dimension (PromoCodeDialog.tsx logs it on
+// every server-validated redemption) - must already be registered in GA4
+// (Admin > Custom definitions) same as "ref" above.
+export const getPromoCodeRedemptionCounts = async (): Promise<Record<string, number>> => {
+  const rows = await runReport({
+    dateRanges: [PROMO_CODE_RANGE],
+    dimensions: [{ name: "customEvent:code" }],
+    metrics: [{ name: "eventCount" }],
+    dimensionFilter: { filter: eventNameFilter("promo_code_redeemed") },
+  });
+
+  const counts: Record<string, number> = {};
+  for (const row of rows) {
+    const code = row.dimensionValues?.[0]?.value;
+    if (code) counts[code] = Number(row.metricValues?.[0]?.value ?? 0);
+  }
+  return counts;
+};
+
 export interface SiteTotals {
   webOpens: number;
   webPurchaseCount: number;

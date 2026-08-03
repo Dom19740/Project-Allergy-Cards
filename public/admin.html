@@ -43,6 +43,7 @@
                 </div>
                 <ul id="codeList" class="divide-y divide-gray-100"></ul>
                 <p id="emptyState" class="text-sm text-gray-400 hidden">No codes yet.</p>
+                <p class="text-xs text-gray-400 mt-4">Usage counts come from GA4 and can lag by a few hours.</p>
             </div>
 
             <h2 class="text-lg font-black text-gray-900">Traffic</h2>
@@ -125,6 +126,11 @@
             var totalWebPurchases = document.getElementById('totalWebPurchases');
             var totalPlayInstalls = document.getElementById('totalPlayInstalls');
             var totalPlayPurchases = document.getElementById('totalPlayPurchases');
+            // Kept around so addCode()/removeCode() can re-render without
+            // waiting on a fresh GA4 query (which has a data-processing
+            // delay anyway, so re-fetching right after a mutation wouldn't
+            // reflect it yet).
+            var lastRedemptionCounts = {};
 
             function getSecret() {
                 return sessionStorage.getItem(SESSION_KEY);
@@ -153,20 +159,28 @@
                 });
             }
 
-            function renderCodes(codes) {
+            function renderCodes(codes, redemptionCounts) {
+                lastRedemptionCounts = redemptionCounts || lastRedemptionCounts;
                 codeList.innerHTML = '';
                 emptyState.classList.toggle('hidden', codes.length > 0);
                 codes.forEach(function (code) {
                     var li = document.createElement('li');
                     li.className = 'flex items-center justify-between py-2.5';
+                    var left = document.createElement('div');
                     var span = document.createElement('span');
                     span.className = 'font-bold text-sm tracking-widest';
                     span.textContent = code;
+                    var count = document.createElement('div');
+                    count.className = 'text-xs text-gray-400';
+                    var used = lastRedemptionCounts[code] || 0;
+                    count.textContent = used === 1 ? 'Used 1 time' : 'Used ' + used + ' times';
+                    left.appendChild(span);
+                    left.appendChild(count);
                     var btn = document.createElement('button');
                     btn.className = 'text-xs font-bold text-gray-400 hover:text-red-600';
                     btn.textContent = 'Remove';
                     btn.onclick = function () { removeCode(code); };
-                    li.appendChild(span);
+                    li.appendChild(left);
                     li.appendChild(btn);
                     codeList.appendChild(li);
                 });
@@ -174,7 +188,7 @@
 
             function loadCodes() {
                 return api('/api/admin/promo-codes').then(function (data) {
-                    renderCodes(data.codes || []);
+                    renderCodes(data.codes || [], data.redemptionCounts || {});
                 });
             }
 
@@ -273,7 +287,7 @@
                     .then(function (data) {
                         authError.classList.add('hidden');
                         showPanel();
-                        renderCodes(data.codes || []);
+                        renderCodes(data.codes || [], data.redemptionCounts || {});
                     })
                     .catch(function () {
                         sessionStorage.removeItem(SESSION_KEY);
