@@ -19,6 +19,7 @@ import EmergencyNumberDialog from '@/components/EmergencyNumberDialog';
 import { toast } from 'sonner';
 import EmergencyCrossIcon from '@/components/EmergencyCrossIcon';
 import { storage, STORAGE_KEYS } from '@/lib/storage';
+import { computeContentSignature } from '@/lib/customMessages';
 import { SelectedAllergens, CustomMessages, TranslatedContent, SavedCard } from '@/lib/types';
 import { TextToSpeech } from '@capacitor-community/text-to-speech';
 import { speakText } from '@/lib/tts';
@@ -31,6 +32,13 @@ const SWIPE_DISTANCE_THRESHOLD = 60;
 const SWIPE_VELOCITY_THRESHOLD = 400;
 const SWIPE_BOUNCE_SPRING = { type: 'spring' as const, stiffness: 500, damping: 40 };
 const SWIPE_SLIDE_TWEEN = { duration: 0.22, ease: 'easeOut' as const };
+
+interface PreEmergencySnapshot {
+  languageCode: string;
+  selectedAllergens: SelectedAllergens;
+  customMessages: CustomMessages;
+  translatedContent: TranslatedContent;
+}
 
 const EmergencyPage = () => {
   usePageSEO({ title: 'Emergency Card | Simple Allergy Alert' });
@@ -110,6 +118,21 @@ const EmergencyPage = () => {
     return () => window.removeEventListener('storage-update', loadCustomAllergenImages);
   }, []);
 
+  // If we got here by swiping from a saved card to the dedicated emergency
+  // card, AllergyCard overwrote SELECTED_ALLERGENS/CUSTOM_MESSAGES/
+  // SELECTED_LANGUAGE with the emergency card's own data (so this page shows
+  // the right thing) and left a snapshot of what was actually active before
+  // that. Swiping back needs to restore that exact card, not whatever's
+  // currently in storage (the emergency card) - and the peek shown while
+  // dragging needs to preview it too, not the emergency card's own allergens
+  // reformatted as an allergy card. If there's no snapshot (arrived via the
+  // plain Emergency button instead, which doesn't touch storage), storage
+  // already reflects the right card and this just stays null.
+  const [returnSnapshot, setReturnSnapshot] = useState<PreEmergencySnapshot | null>(null);
+  useEffect(() => {
+    storage.getEphemeral<PreEmergencySnapshot>(STORAGE_KEYS.PRE_EMERGENCY_SWIPE_SNAPSHOT).then(setReturnSnapshot);
+  }, []);
+
   const dragMovedRef = useRef(false);
   const TAP_TOLERANCE = 8;
 
@@ -123,10 +146,35 @@ const EmergencyPage = () => {
     }
   };
 
+  // If a snapshot exists (we arrived here via a swipe from a saved card),
+  // restore it so the allergy page lands back on the exact card that was
+  // active before - otherwise storage still reflects the emergency card and
+  // AllergyAlertPage would show that instead. No snapshot means we arrived
+  // via the plain Emergency button, which never touched storage, so a plain
+  // navigate already lands on the right card.
+  const handleBackToAllergyCard = async () => {
+    if (returnSnapshot) {
+      await Promise.all([
+        storage.set(STORAGE_KEYS.SELECTED_ALLERGENS, returnSnapshot.selectedAllergens),
+        storage.set(STORAGE_KEYS.CUSTOM_MESSAGES, returnSnapshot.customMessages),
+        storage.set(STORAGE_KEYS.SELECTED_LANGUAGE, returnSnapshot.languageCode)
+      ]);
+      await storage.set(STORAGE_KEYS.SESSION_TRANSLATIONS, {
+        languageCode: returnSnapshot.languageCode,
+        signature: computeContentSignature(returnSnapshot.customMessages, returnSnapshot.selectedAllergens.ids),
+        content: returnSnapshot.translatedContent
+      });
+      await storage.removeEphemeral(STORAGE_KEYS.PRE_EMERGENCY_SWIPE_SNAPSHOT);
+      navigate(`/alert/${returnSnapshot.languageCode}`);
+      return;
+    }
+    navigate(`/alert/${langCode}`);
+  };
+
   const handleCardDragEnd = (_event: MouseEvent | TouchEvent | PointerEvent, info: PanInfo) => {
     const crossedRight = info.offset.x >= SWIPE_DISTANCE_THRESHOLD || info.velocity.x >= SWIPE_VELOCITY_THRESHOLD;
     if (crossedRight && containerWidth) {
-      animate(dragX, containerWidth, SWIPE_SLIDE_TWEEN).then(() => navigate(`/alert/${langCode}`));
+      animate(dragX, containerWidth, SWIPE_SLIDE_TWEEN).then(() => handleBackToAllergyCard());
       return;
     }
     animate(dragX, 0, SWIPE_BOUNCE_SPRING);
@@ -288,11 +336,19 @@ const EmergencyPage = () => {
   // needed. Mirrors AllergyCard's real markup line-for-line (custom message
   // lines, image grid, footer included) - any gap between the two is a
   // visible jump the instant the peek is swapped for the real page.
+  //
+  // Prefers returnSnapshot (the card that was actually active before a
+  // swipe brought us here) over this page's own selectedAllergens/
+  // cardTranslatedContent, which reflect the dedicated emergency card's
+  // data - previewing those would show the wrong card while dragging back.
   const renderAllergyPeek = () => {
-    if (!selectedAllergens) return null;
-    const ui = cardTranslatedContent.ui;
-    const pills = selectedAllergens.ids.map(id => cardTranslatedContent.allergens[id] || id);
-    const allergensWithImages = selectedAllergens.ids
+    const peekLanguageCode = returnSnapshot?.languageCode ?? langCode ?? 'en';
+    const peekAllergens = returnSnapshot?.selectedAllergens ?? selectedAllergens;
+    const peekContent = returnSnapshot?.translatedContent ?? cardTranslatedContent;
+    if (!peekAllergens) return null;
+    const ui = peekContent.ui;
+    const pills = peekAllergens.ids.map(id => peekContent.allergens[id] || id);
+    const allergensWithImages = peekAllergens.ids
       .map(id => {
         const predefined = ALLERGEN_OPTIONS.find(option => option.id === id);
         if (predefined) return predefined;
@@ -357,9 +413,9 @@ const EmergencyPage = () => {
         </div>
 
         <div className="mt-auto pt-2">
-          {langCode && langCode !== 'en' && (
+          {peekLanguageCode !== 'en' && (
             <p className="text-[14px] sm:text-[32px] text-gray-400 font-light mb-1">
-              Translated to {getLanguageName(langCode)}
+              Translated to {getLanguageName(peekLanguageCode)}
             </p>
           )}
           {!isPremium && (
@@ -496,7 +552,7 @@ const EmergencyPage = () => {
       </div>
 
       <EmergencyActions
-        onBack={() => navigate(`/alert/${langCode}`)}
+        onBack={handleBackToAllergyCard}
         onShare={handleShare}
         onDownload={handleDownload}
         onToggleMenu={() => setIsMenuOpen(true)}

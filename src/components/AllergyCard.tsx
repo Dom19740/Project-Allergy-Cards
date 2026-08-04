@@ -252,6 +252,20 @@ const AllergyCard: React.FC<AllergyCardProps> = ({ languageCode: languageCodePro
   };
 
   const goToEmergencyCard = async (card: SavedCard) => {
+    // Switching to the dedicated emergency card overwrites these keys with
+    // its data (so the emergency page shows the right thing) - which would
+    // otherwise permanently lose track of whatever card was actually active,
+    // so swiping back from the emergency page could land on the wrong one.
+    // This snapshot lets that swipe-back restore exactly what was showing.
+    if (fullSelectedData) {
+      await storage.setEphemeral(STORAGE_KEYS.PRE_EMERGENCY_SWIPE_SNAPSHOT, {
+        languageCode,
+        selectedAllergens: fullSelectedData,
+        customMessages,
+        translatedContent: currentTranslatedContent
+      });
+    }
+
     await Promise.all([
       storage.set(STORAGE_KEYS.SELECTED_ALLERGENS, card.selectedAllergens),
       storage.set(STORAGE_KEYS.CUSTOM_MESSAGES, card.customMessages),
@@ -812,6 +826,12 @@ const AllergyCard: React.FC<AllergyCardProps> = ({ languageCode: languageCodePro
   }, []);
 
   const handleEmergencyClick = () => {
+    // This is the "view my own emergency info" path (uses the current
+    // card's own data, doesn't touch storage) rather than the swipe-to-
+    // dedicated-emergency-card path - any snapshot left over from an
+    // earlier swipe is now stale and must not be used if the user later
+    // swipes back from wherever this leads.
+    storage.removeEphemeral(STORAGE_KEYS.PRE_EMERGENCY_SWIPE_SNAPSHOT);
     if (verifiedEmergencyNumber) {
       navigate(`/emergency/${languageCode}?num=${encodeURIComponent(verifiedEmergencyNumber)}`);
       return;

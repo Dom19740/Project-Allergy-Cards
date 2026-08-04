@@ -12,6 +12,7 @@ export const STORAGE_KEYS = {
   PREFERENCES_LOCK: 'preferencesLock',
   VERIFIED_EMERGENCY_NUMBER: 'verifiedEmergencyNumber',
   OPEN_EMERGENCY_DIALOG_FLAG: 'openEmergencyDialogFlag',
+  PRE_EMERGENCY_SWIPE_SNAPSHOT: 'preEmergencySwipeSnapshot',
   INSTALL_BANNER_DISMISSED: 'installBannerDismissed',
   HAS_COMPLETED_ONBOARDING: 'hasCompletedOnboarding',
   CUSTOM_ALLERGEN_IMAGES: 'customAllergenImages',
