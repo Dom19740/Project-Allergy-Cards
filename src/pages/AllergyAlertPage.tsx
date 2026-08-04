@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { useParams, useLocation } from 'react-router-dom';
 import AllergyCard from '../components/AllergyCard';
 import { CustomMessages, LanguageCode, TranslatedContent } from '@/lib/types';
@@ -17,11 +17,19 @@ const AllergyAlertPage = () => {
   const [selectedAllergens, setSelectedAllergens] = useState<string[]>([]);
   const [initialTranslations, setInitialTranslations] = useState<TranslatedContent | null>(null);
   const [isLoading, setIsLoading] = useState(true);
+  // Swiping/tapping between cards re-runs this effect (langCode or
+  // location.key changes) just like the very first visit does. Without this,
+  // every card switch would replace the whole page with the loading screen
+  // below - even though the data is already cached - which is what made
+  // swipe transitions feel like a hard interrupt instead of a continuation.
+  // Only the true first load should show that screen; later loads just keep
+  // rendering the current card until the fresh data is ready.
+  const hasLoadedOnceRef = useRef(false);
 
   useEffect(() => {
     const loadData = async () => {
-      setIsLoading(true);
-      
+      if (!hasLoadedOnceRef.current) setIsLoading(true);
+
       // Load allergens
       const storedData = await storage.get<any>(STORAGE_KEYS.SELECTED_ALLERGENS);
       let allergens: string[] = [];
@@ -62,6 +70,7 @@ const AllergyAlertPage = () => {
         setInitialTranslations(null);
       }
 
+      hasLoadedOnceRef.current = true;
       setIsLoading(false);
     };
     loadData();
