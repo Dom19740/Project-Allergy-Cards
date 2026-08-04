@@ -2,7 +2,7 @@
 
 import React, { useRef, useState, useEffect, useCallback, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { motion, type PanInfo } from 'framer-motion';
+import { motion, useMotionValue, useTransform, animate, type PanInfo } from 'framer-motion';
 import { toast } from 'sonner';
 import { Loader2, Utensils, AlertTriangle } from 'lucide-react';
 import { LanguageCode, SelectedAllergens, CustomMessages, TranslatedContent, SavedCard } from '@/lib/types';
@@ -14,6 +14,7 @@ import SaveCardDialog from './SaveCardDialog';
 import CardActions from './CardActions';
 import CardMenu from './CardMenu';
 import CardSelectorMenu from './CardSelectorMenu';
+import EmergencyCrossIcon from './EmergencyCrossIcon';
 import DisclaimerDialog from './DisclaimerDialog';
 import UnderstandCardDialog from './UnderstandCardDialog';
 import EmergencyNumberDialog from './EmergencyNumberDialog';
@@ -35,6 +36,11 @@ interface AllergyCardProps {
   selectedAllergens: string[];
   initialTranslations?: TranslatedContent | null;
 }
+
+const SWIPE_DISTANCE_THRESHOLD = 60;
+const SWIPE_VELOCITY_THRESHOLD = 400;
+const SWIPE_BOUNCE_SPRING = { type: 'spring' as const, stiffness: 500, damping: 40 };
+const SWIPE_SLIDE_TWEEN = { duration: 0.22, ease: 'easeOut' as const };
 
 const AllergyCard: React.FC<AllergyCardProps> = ({ languageCode, selectedAllergens, initialTranslations }) => {
   const cardRef = useRef<HTMLDivElement>(null);
@@ -106,6 +112,68 @@ const AllergyCard: React.FC<AllergyCardProps> = ({ languageCode, selectedAllerge
     });
   }, [savedCards, languageCode, selectedAllergens]);
 
+  // If the displayed card isn't part of the saved stack, the first swipe
+  // lands on the nearest end of the stack instead of an arbitrary card.
+  const prevCard = useMemo(() => {
+    if (savedCards.length < 2) return null;
+    const idx = currentCardIndex === -1 ? savedCards.length - 1 : currentCardIndex - 1;
+    return idx >= 0 && idx < savedCards.length ? savedCards[idx] : null;
+  }, [savedCards, currentCardIndex]);
+
+  const nextCard = useMemo(() => {
+    if (savedCards.length < 2) return null;
+    const idx = currentCardIndex === -1 ? 0 : currentCardIndex + 1;
+    return idx >= 0 && idx < savedCards.length ? savedCards[idx] : null;
+  }, [savedCards, currentCardIndex]);
+
+  const [emergencyCard, setEmergencyCard] = useState<SavedCard | null>(null);
+
+  useEffect(() => {
+    const loadEmergencyCard = async () => {
+      const card = await storage.get<SavedCard>(STORAGE_KEYS.SAVED_EMERGENCY_CARD);
+      setEmergencyCard(card);
+    };
+    loadEmergencyCard();
+
+    window.addEventListener('storage-update', loadEmergencyCard);
+    return () => window.removeEventListener('storage-update', loadEmergencyCard);
+  }, []);
+
+  const hasEmergencyForLang = !!emergencyCard && emergencyCard.languageCode === languageCode;
+  const canSwipe = !!(prevCard || nextCard || hasEmergencyForLang);
+
+  // Measures the visible card area so the drag/peek math below can work in
+  // real pixels (how far to drag before a card is fully off-screen, how far
+  // off-screen a peeking neighbour starts). A callback ref (rather than
+  // useRef + useLayoutEffect) is needed because this element doesn't exist
+  // on the very first render whenever the card is still translating (it
+  // renders a loading screen instead) - a effect with an empty deps array
+  // would only ever see that first, element-less render and never re-measure
+  // once the real content mounts.
+  const resizeObserverRef = useRef<ResizeObserver | null>(null);
+  const [containerSize, setContainerSize] = useState({ width: 0, height: 0 });
+
+  const swipeAreaRef = useCallback((el: HTMLDivElement | null) => {
+    resizeObserverRef.current?.disconnect();
+    resizeObserverRef.current = null;
+    if (!el) return;
+    const updateSize = () => setContainerSize({ width: el.clientWidth, height: el.clientHeight });
+    updateSize();
+    const observer = new ResizeObserver(updateSize);
+    observer.observe(el);
+    resizeObserverRef.current = observer;
+  }, []);
+
+  // Drives both the active card and the peeking neighbours from the same
+  // values, so a neighbour slides fully into place exactly as the active
+  // card slides fully out - the same technique behind the homepage's
+  // vertical card carousel, just driven by hand instead of embla.
+  const dragX = useMotionValue(0);
+  const dragY = useMotionValue(0);
+  const prevPeekY = useTransform(dragY, (v) => v - containerSize.height);
+  const nextPeekY = useTransform(dragY, (v) => v + containerSize.height);
+  const emergencyPeekX = useTransform(dragX, (v) => v + containerSize.width);
+
   const switchToCard = async (card: SavedCard) => {
     await Promise.all([
       storage.set(STORAGE_KEYS.SELECTED_ALLERGENS, card.selectedAllergens),
@@ -124,17 +192,22 @@ const AllergyCard: React.FC<AllergyCardProps> = ({ languageCode, selectedAllerge
     navigate(`/alert/${card.languageCode}`, { replace: true });
   };
 
-  // direction 1 = next card (swipe up), -1 = previous card (swipe down).
-  // If the displayed card isn't part of the saved stack, the first swipe
-  // lands on the nearest end of the stack instead of an arbitrary card.
-  const goToAdjacentCard = (direction: 1 | -1) => {
-    if (savedCards.length < 2) return;
-    const baseIndex = currentCardIndex === -1
-      ? (direction === 1 ? -1 : savedCards.length)
-      : currentCardIndex;
-    const nextIndex = baseIndex + direction;
-    if (nextIndex < 0 || nextIndex >= savedCards.length) return;
-    switchToCard(savedCards[nextIndex]);
+  const goToEmergencyCard = async (card: SavedCard) => {
+    await Promise.all([
+      storage.set(STORAGE_KEYS.SELECTED_ALLERGENS, card.selectedAllergens),
+      storage.set(STORAGE_KEYS.CUSTOM_MESSAGES, card.customMessages),
+      storage.set(STORAGE_KEYS.SELECTED_LANGUAGE, card.languageCode)
+    ]);
+
+    if (card.translatedContent) {
+      await storage.set(STORAGE_KEYS.SESSION_TRANSLATIONS, {
+        languageCode: card.languageCode,
+        signature: computeContentSignature(card.customMessages, card.selectedAllergens.ids),
+        content: card.translatedContent
+      });
+    }
+
+    navigate(`/emergency/${card.languageCode}`);
   };
 
   // A partial/aborted swipe still moves the pointer over the food image or an
@@ -157,18 +230,124 @@ const AllergyCard: React.FC<AllergyCardProps> = ({ languageCode, selectedAllerge
   };
 
   const handleCardDragEnd = (_event: MouseEvent | TouchEvent | PointerEvent, info: PanInfo) => {
-    const SWIPE_DISTANCE_THRESHOLD = 60;
-    const SWIPE_VELOCITY_THRESHOLD = 400;
-    if (info.offset.y <= -SWIPE_DISTANCE_THRESHOLD || info.velocity.y <= -SWIPE_VELOCITY_THRESHOLD) {
-      goToAdjacentCard(1);
-    } else if (info.offset.y >= SWIPE_DISTANCE_THRESHOLD || info.velocity.y >= SWIPE_VELOCITY_THRESHOLD) {
-      goToAdjacentCard(-1);
+    const horizontalDominant = Math.abs(info.offset.x) > Math.abs(info.offset.y);
+
+    if (horizontalDominant) {
+      const crossedLeft = info.offset.x <= -SWIPE_DISTANCE_THRESHOLD || info.velocity.x <= -SWIPE_VELOCITY_THRESHOLD;
+      if (crossedLeft && hasEmergencyForLang && emergencyCard && containerSize.width) {
+        const card = emergencyCard;
+        animate(dragX, -containerSize.width, SWIPE_SLIDE_TWEEN).then(() => goToEmergencyCard(card));
+        return;
+      }
+      animate(dragX, 0, SWIPE_BOUNCE_SPRING);
+      return;
     }
+
+    const crossedUp = info.offset.y <= -SWIPE_DISTANCE_THRESHOLD || info.velocity.y <= -SWIPE_VELOCITY_THRESHOLD;
+    const crossedDown = info.offset.y >= SWIPE_DISTANCE_THRESHOLD || info.velocity.y >= SWIPE_VELOCITY_THRESHOLD;
+
+    if (crossedUp && nextCard && containerSize.height) {
+      const card = nextCard;
+      animate(dragY, -containerSize.height, SWIPE_SLIDE_TWEEN).then(() => {
+        dragY.set(0);
+        switchToCard(card);
+      });
+      return;
+    }
+    if (crossedDown && prevCard && containerSize.height) {
+      const card = prevCard;
+      animate(dragY, containerSize.height, SWIPE_SLIDE_TWEEN).then(() => {
+        dragY.set(0);
+        switchToCard(card);
+      });
+      return;
+    }
+    animate(dragY, 0, SWIPE_BOUNCE_SPRING);
   };
 
   const withTapGuard = (action: () => void) => () => {
     if (dragMovedRef.current) return;
     action();
+  };
+
+  const getPeekAllergensWithImages = (card: SavedCard) =>
+    card.selectedAllergens.ids
+      .map(id => {
+        const predefined = ALLERGEN_OPTIONS.find(option => option.id === id);
+        if (predefined) return predefined;
+        const customImage = customAllergenImages[id];
+        return customImage ? { id, name: id, image: customImage } : null;
+      })
+      .filter(Boolean) as typeof ALLERGEN_OPTIONS;
+
+  // Condensed, non-interactive preview of a neighbouring saved card, built
+  // entirely from its own stored translatedContent - no live translation
+  // needed, so it can render instantly as soon as it starts peeking in.
+  const renderCardPeek = (card: SavedCard) => {
+    const pills = card.selectedAllergens.ids.map(id => card.translatedContent?.allergens?.[id] || id);
+    const previewAllergens = getPeekAllergensWithImages(card);
+    const gridStyle = getAllergenGridStyle(previewAllergens.length);
+    return (
+      <div className="w-full h-full flex flex-col items-center justify-start text-center overflow-hidden p-4 sm:p-6 md:p-8 pt-[calc(1rem+env(safe-area-inset-top))] bg-white select-none">
+        <div className="h-6 sm:h-10 md:h-14" />
+        <h1 className="text-2xl sm:text-4xl md:text-5xl lg:text-6xl font-black leading-tight mb-4 sm:mb-8 md:mb-12 text-red-600 uppercase tracking-tighter break-words">
+          {card.translatedContent?.ui?.allergyAlert || 'ALLERGY ALERT!'}
+        </h1>
+        <div className="flex flex-wrap justify-center gap-1 sm:gap-2 mb-4 sm:mb-8 md:mb-12">
+          {pills.map((allergen, i) => (
+            <span
+              key={i}
+              className="bg-red-600 text-white px-3 py-1 sm:px-4 sm:py-2 rounded-full text-base sm:text-lg md:text-xl font-normal uppercase"
+            >
+              {allergen}
+            </span>
+          ))}
+        </div>
+        <div className="relative w-full flex-1 min-h-0 flex items-center justify-center">
+          <div className="relative h-full max-h-[400px] w-auto max-w-full aspect-square">
+            <div className="absolute inset-0 flex items-center justify-center">
+              {previewAllergens.length > 0 ? (
+                <div className="absolute inset-0 grid gap-1 sm:gap-2 items-center justify-items-center z-0 p-4" style={gridStyle}>
+                  {previewAllergens.map((allergen) => (
+                    <div key={allergen.id} className="w-full h-full flex items-center justify-center">
+                      <img src={allergen.image} alt={allergen.name} draggable={false} className="max-w-full max-h-full object-contain" />
+                    </div>
+                  ))}
+                </div>
+              ) : (
+                <div className="absolute inset-0 flex items-center justify-center z-0">
+                  <Utensils className="w-1/2 h-1/2 text-red-600 opacity-20" />
+                </div>
+              )}
+              <img src="/noentry.png" alt="" draggable={false} className="absolute inset-0 w-full h-full object-contain z-10 opacity-90 pointer-events-none" />
+            </div>
+          </div>
+        </div>
+        <div className="mt-auto pt-2 h-6" />
+      </div>
+    );
+  };
+
+  // Condensed, non-interactive preview of the emergency card for the
+  // horizontal swipe-left peek.
+  const renderEmergencyPeek = (card: SavedCard) => {
+    const emergency = card.translatedContent?.emergency;
+    return (
+      <div className="w-full h-full flex flex-col items-center justify-start text-center overflow-hidden p-4 sm:p-6 md:p-8 pt-[calc(1rem+env(safe-area-inset-top))] bg-white select-none">
+        <div className="h-4 sm:h-10 md:h-14 shrink-0" />
+        <div className="bg-white border-4 border-black p-3 sm:p-6 rounded-full shadow-lg mb-4 sm:mb-10 shrink-0">
+          <EmergencyCrossIcon className="h-8 w-8 sm:h-16 sm:w-16" />
+        </div>
+        <div className="border-b-4 border-red-600 pb-2 sm:pb-4 mb-3 sm:mb-10 w-full max-w-2xl">
+          <h1 className="text-3xl sm:text-6xl font-black tracking-tighter uppercase text-red-600">
+            {emergency?.attention || 'ATTENTION'}
+          </h1>
+        </div>
+        <p className="text-lg sm:text-2xl font-bold text-gray-800 px-4 leading-snug">
+          {emergency?.emergency || 'I am having a severe allergic reaction.'}
+        </p>
+      </div>
+    );
   };
 
   useEffect(() => {
@@ -591,90 +770,114 @@ const AllergyCard: React.FC<AllergyCardProps> = ({ languageCode, selectedAllerge
 
   return (
     <div className="flex flex-col w-full h-screen bg-white overflow-hidden">
-      <motion.div
-        className="flex-1 min-h-0 w-full flex flex-col"
-        drag={hasMultipleCards ? 'y' : false}
-        dragConstraints={{ top: 0, bottom: 0 }}
-        dragElastic={0.5}
-        onDragStart={handleCardDragStart}
-        onDrag={handleCardDrag}
-        onDragEnd={handleCardDragEnd}
-      >
-        <div
-          ref={cardRef}
-          className="print-card flex-1 w-full flex flex-col items-center justify-start text-center overflow-hidden p-4 sm:p-6 md:p-8 pt-[calc(1rem+env(safe-area-inset-top))] bg-white border-none"
+      <div ref={swipeAreaRef} className="relative flex-1 min-h-0 w-full overflow-hidden">
+        {prevCard && (
+          <motion.div className="absolute inset-0 z-10" style={{ y: prevPeekY }} aria-hidden="true">
+            {renderCardPeek(prevCard)}
+          </motion.div>
+        )}
+        {nextCard && (
+          <motion.div className="absolute inset-0 z-10" style={{ y: nextPeekY }} aria-hidden="true">
+            {renderCardPeek(nextCard)}
+          </motion.div>
+        )}
+        {hasEmergencyForLang && emergencyCard && (
+          <motion.div className="absolute inset-0 z-10" style={{ x: emergencyPeekX }} aria-hidden="true">
+            {renderEmergencyPeek(emergencyCard)}
+          </motion.div>
+        )}
+        <motion.div
+          className="absolute inset-0 z-20 w-full h-full flex flex-col bg-white"
+          style={{ x: dragX, y: dragY }}
+          drag={canSwipe}
+          dragDirectionLock
+          dragConstraints={{
+            top: nextCard ? -containerSize.height : 0,
+            bottom: prevCard ? containerSize.height : 0,
+            left: hasEmergencyForLang ? -containerSize.width : 0,
+            right: 0
+          }}
+          dragElastic={0.15}
+          onDragStart={handleCardDragStart}
+          onDrag={handleCardDrag}
+          onDragEnd={handleCardDragEnd}
         >
-          <div className="h-6 sm:h-10 md:h-14" />
-          <h1 className="text-2xl sm:text-4xl md:text-5xl lg:text-6xl font-black leading-tight mb-4 sm:mb-8 md:mb-12 text-red-600 uppercase tracking-tighter break-words">
-            {displayUIText.allergyAlert}
-          </h1>
+          <div
+            ref={cardRef}
+            className="print-card flex-1 w-full flex flex-col items-center justify-start text-center overflow-hidden p-4 sm:p-6 md:p-8 pt-[calc(1rem+env(safe-area-inset-top))] bg-white border-none"
+          >
+            <div className="h-6 sm:h-10 md:h-14" />
+            <h1 className="text-2xl sm:text-4xl md:text-5xl lg:text-6xl font-black leading-tight mb-4 sm:mb-8 md:mb-12 text-red-600 uppercase tracking-tighter break-words">
+              {displayUIText.allergyAlert}
+            </h1>
 
-          {displayUIText.iAmAllergicTo && (
-            <p className="text-2xl sm:text-3xl md:text-4xl font-normal text-gray-800 mb-4 sm:mb-8 md:mb-12">
-              {displayUIText.iAmAllergicTo}
+            {displayUIText.iAmAllergicTo && (
+              <p className="text-2xl sm:text-3xl md:text-4xl font-normal text-gray-800 mb-4 sm:mb-8 md:mb-12">
+                {displayUIText.iAmAllergicTo}
+              </p>
+            )}
+
+            <div className="flex flex-wrap justify-center gap-1 sm:gap-2 mb-4 sm:mb-8 md:mb-12">
+              {displayAllergenList.map((allergen, index) => (
+                <span
+                  key={index}
+                  onClick={withTapGuard(() => setSelectedPillIndex(index))}
+                  className="bg-red-600 text-white px-3 py-1 sm:px-4 sm:py-2 rounded-full text-base sm:text-lg md:text-xl font-normal uppercase cursor-pointer transition-transform duration-150 hover:scale-105"
+                >
+                  {allergen}
+                </span>
+              ))}
+            </div>
+
+            {displayUIText.theyMakeMeSick && (
+              <p className="text-2xl sm:text-3xl md:text-4xl font-normal text-gray-800 mb-2 sm:mb-3 leading-tight max-w-2xl">
+                {displayUIText.theyMakeMeSick}
+              </p>
+            )}
+
+            <p className="text-2xl sm:text-3xl md:text-4xl font-normal text-gray-600 italic mb-4 sm:mb-6">
+              {displayUIText.thankYou}
             </p>
-          )}
 
-          <div className="flex flex-wrap justify-center gap-1 sm:gap-2 mb-4 sm:mb-8 md:mb-12">
-            {displayAllergenList.map((allergen, index) => (
-              <span
-                key={index}
-                onClick={withTapGuard(() => setSelectedPillIndex(index))}
-                className="bg-red-600 text-white px-3 py-1 sm:px-4 sm:py-2 rounded-full text-base sm:text-lg md:text-xl font-normal uppercase cursor-pointer transition-transform duration-150 hover:scale-105"
+            <div className="relative w-full flex-1 min-h-0 flex items-center justify-center">
+              <div
+                className="relative h-full max-h-[400px] w-auto max-w-full aspect-square cursor-pointer"
+                onClick={withTapGuard(() => setIsImageFullscreen(true))}
               >
-                {allergen}
-              </span>
-            ))}
-          </div>
-
-          {displayUIText.theyMakeMeSick && (
-            <p className="text-2xl sm:text-3xl md:text-4xl font-normal text-gray-800 mb-2 sm:mb-3 leading-tight max-w-2xl">
-              {displayUIText.theyMakeMeSick}
-            </p>
-          )}
-
-          <p className="text-2xl sm:text-3xl md:text-4xl font-normal text-gray-600 italic mb-4 sm:mb-6">
-            {displayUIText.thankYou}
-          </p>
-
-          <div className="relative w-full flex-1 min-h-0 flex items-center justify-center">
-            <div
-              className="relative h-full max-h-[400px] w-auto max-w-full aspect-square cursor-pointer"
-              onClick={withTapGuard(() => setIsImageFullscreen(true))}
-            >
-              <div className="absolute inset-0 flex items-center justify-center">
-                {allergensWithImages.length > 0 ? (
-                  <div className="absolute inset-0 grid gap-1 sm:gap-2 items-center justify-items-center z-0 p-4" style={imageGridStyle}>
-                    {allergensWithImages.map((allergen) => (
-                      <div key={allergen.id} className="w-full h-full flex items-center justify-center">
-                        <img src={allergen.image} alt={allergen.name} draggable={false} className="max-w-full max-h-full object-contain" />
-                      </div>
-                    ))}
-                  </div>
-                ) : (
-                  <div className="absolute inset-0 flex items-center justify-center z-0">
-                    <Utensils className="w-1/2 h-1/2 text-red-600 opacity-20" />
-                  </div>
-                )}
-                <img src="/noentry.png" alt="No entry" draggable={false} className="absolute inset-0 w-full h-full object-contain z-10 opacity-90 pointer-events-none" />
+                <div className="absolute inset-0 flex items-center justify-center">
+                  {allergensWithImages.length > 0 ? (
+                    <div className="absolute inset-0 grid gap-1 sm:gap-2 items-center justify-items-center z-0 p-4" style={imageGridStyle}>
+                      {allergensWithImages.map((allergen) => (
+                        <div key={allergen.id} className="w-full h-full flex items-center justify-center">
+                          <img src={allergen.image} alt={allergen.name} draggable={false} className="max-w-full max-h-full object-contain" />
+                        </div>
+                      ))}
+                    </div>
+                  ) : (
+                    <div className="absolute inset-0 flex items-center justify-center z-0">
+                      <Utensils className="w-1/2 h-1/2 text-red-600 opacity-20" />
+                    </div>
+                  )}
+                  <img src="/noentry.png" alt="No entry" draggable={false} className="absolute inset-0 w-full h-full object-contain z-10 opacity-90 pointer-events-none" />
+                </div>
               </div>
             </div>
-          </div>
 
-          <div className="mt-auto pt-2">
-            {languageCode !== 'en' && (
-              <p className="text-[14px] sm:text-[32px] text-gray-400 font-light mb-1">
-                Translated to {getLanguageName(languageCode)}
-              </p>
-            )}
-            {!isPremium && (
-              <p className="text-[13px] sm:text-base text-gray-400 font-light">
-                created with Simple Allergy Alert © 2026
-              </p>
-            )}
+            <div className="mt-auto pt-2">
+              {languageCode !== 'en' && (
+                <p className="text-[14px] sm:text-[32px] text-gray-400 font-light mb-1">
+                  Translated to {getLanguageName(languageCode)}
+                </p>
+              )}
+              {!isPremium && (
+                <p className="text-[13px] sm:text-base text-gray-400 font-light">
+                  created with Simple Allergy Alert © 2026
+                </p>
+              )}
+            </div>
           </div>
-        </div>
-      </motion.div>
+        </motion.div>
+      </div>
       <CardActions
         onShare={handleShare}
         onDownload={handleDownload}

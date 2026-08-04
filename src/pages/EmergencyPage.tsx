@@ -2,6 +2,7 @@
 
 import React, { useEffect, useState, useRef, useCallback } from 'react';
 import { useParams, useNavigate, useSearchParams } from 'react-router-dom';
+import { motion, useMotionValue, useTransform, animate, type PanInfo } from 'framer-motion';
 import { AlertTriangle, Loader2, Phone } from 'lucide-react';
 import { translateText, TranslationError } from '@/lib/translator';
 import { getEmergencyNumber } from '@/lib/emergencyNumbers';
@@ -23,6 +24,11 @@ import { useBilling } from '@/hooks/useBilling';
 import { useNetworkStatus } from '@/hooks/useNetworkStatus';
 import { useShrinkToFit } from '@/hooks/useShrinkToFit';
 import { usePageSEO } from '@/hooks/usePageSEO';
+
+const SWIPE_DISTANCE_THRESHOLD = 60;
+const SWIPE_VELOCITY_THRESHOLD = 400;
+const SWIPE_BOUNCE_SPRING = { type: 'spring' as const, stiffness: 500, damping: 40 };
+const SWIPE_SLIDE_TWEEN = { duration: 0.22, ease: 'easeOut' as const };
 
 const EmergencyPage = () => {
   usePageSEO({ title: 'Emergency Card | Simple Allergy Alert' });
@@ -70,6 +76,55 @@ const EmergencyPage = () => {
   const [translatedText, setTranslatedText] = useState(englishText);
 
   const displayText = showOriginal ? englishText : translatedText;
+
+  // Swipe right to go back to the allergy card, with a peek of it sliding in
+  // from the left as you drag - mirrors the swipe-left-to-emergency gesture
+  // on the allergy card itself. Callback ref (not useRef + useEffect) so the
+  // measurement re-runs once the card actually mounts, since it's still a
+  // loading screen on the very first render.
+  const resizeObserverRef = useRef<ResizeObserver | null>(null);
+  const [containerWidth, setContainerWidth] = useState(0);
+  const swipeAreaRef = useCallback((el: HTMLDivElement | null) => {
+    resizeObserverRef.current?.disconnect();
+    resizeObserverRef.current = null;
+    if (!el) return;
+    const updateSize = () => setContainerWidth(el.clientWidth);
+    updateSize();
+    const observer = new ResizeObserver(updateSize);
+    observer.observe(el);
+    resizeObserverRef.current = observer;
+  }, []);
+
+  const dragX = useMotionValue(0);
+  const allergyPeekX = useTransform(dragX, (v) => v - containerWidth);
+
+  const dragMovedRef = useRef(false);
+  const TAP_TOLERANCE = 8;
+
+  const handleCardDragStart = () => {
+    dragMovedRef.current = false;
+  };
+
+  const handleCardDrag = (_event: MouseEvent | TouchEvent | PointerEvent, info: PanInfo) => {
+    if (Math.abs(info.offset.x) > TAP_TOLERANCE) {
+      dragMovedRef.current = true;
+    }
+  };
+
+  const handleCardDragEnd = (_event: MouseEvent | TouchEvent | PointerEvent, info: PanInfo) => {
+    const crossedRight = info.offset.x >= SWIPE_DISTANCE_THRESHOLD || info.velocity.x >= SWIPE_VELOCITY_THRESHOLD;
+    if (crossedRight && containerWidth) {
+      animate(dragX, containerWidth, SWIPE_SLIDE_TWEEN).then(() => navigate(`/alert/${langCode}`));
+      return;
+    }
+    animate(dragX, 0, SWIPE_BOUNCE_SPRING);
+  };
+
+  // A partial/aborted swipe still moves the pointer over the "CALL" link -
+  // without this, an interrupted swipe attempt could dial emergency services.
+  const handleCallLinkClick = (e: React.MouseEvent) => {
+    if (dragMovedRef.current) e.preventDefault();
+  };
 
   const getLanguageName = (code: string) => {
     if (!code || code === 'en') return 'English';
@@ -216,6 +271,32 @@ const EmergencyPage = () => {
     emergency: { ...translatedText, dial112: `${translatedText.dialText} ${emergencyNumber}` }
   };
 
+  // Condensed, non-interactive preview of the allergy card for the
+  // swipe-right peek - built from data already loaded for this page, no
+  // extra translation needed.
+  const renderAllergyPeek = () => {
+    if (!selectedAllergens) return null;
+    const pills = selectedAllergens.ids.map(id => cardTranslatedContent.allergens[id] || id);
+    return (
+      <div className="w-full h-full flex flex-col items-center justify-start text-center overflow-hidden p-4 sm:p-6 md:p-8 pt-[calc(1rem+env(safe-area-inset-top))] bg-white select-none">
+        <div className="h-6 sm:h-10 md:h-14" />
+        <h1 className="text-2xl sm:text-4xl md:text-5xl lg:text-6xl font-black leading-tight mb-4 sm:mb-8 md:mb-12 text-red-600 uppercase tracking-tighter break-words">
+          {cardTranslatedContent.ui.allergyAlert || 'ALLERGY ALERT!'}
+        </h1>
+        <div className="flex flex-wrap justify-center gap-1 sm:gap-2 mb-4 sm:mb-8 md:mb-12">
+          {pills.map((allergen, i) => (
+            <span
+              key={i}
+              className="bg-red-600 text-white px-3 py-1 sm:px-4 sm:py-2 rounded-full text-base sm:text-lg md:text-xl font-normal uppercase"
+            >
+              {allergen}
+            </span>
+          ))}
+        </div>
+      </div>
+    );
+  };
+
   useEffect(() => {
     return () => {
       TextToSpeech.stop();
@@ -284,39 +365,59 @@ const EmergencyPage = () => {
 
   return (
     <div className="flex flex-col w-full h-screen bg-white overflow-hidden">
-      <div ref={cardRef} className="flex-1 min-h-0 w-full flex flex-col items-center justify-start text-center overflow-hidden p-4 sm:p-6 md:p-8 pt-[calc(1rem+env(safe-area-inset-top))] bg-white border-none">
-        <div className="h-4 sm:h-10 md:h-14 shrink-0" />
-        <div className="bg-white border-4 border-black p-3 sm:p-6 rounded-full shadow-lg mb-4 sm:mb-10 shrink-0">
-          <EmergencyCrossIcon className="h-8 w-8 sm:h-16 sm:w-16" />
-        </div>
-        <div className="w-full max-w-2xl flex-1 min-h-0 flex flex-col shrink">
-          <div className="border-b-4 border-red-600 pb-2 sm:pb-4 mb-3 sm:mb-10 shrink-0">
-            <h1 className="text-3xl sm:text-6xl font-black tracking-tighter uppercase text-red-600">{displayText.attention}</h1>
-          </div>
-          <div ref={messageContainerRef} className="flex-1 min-h-0 flex flex-col items-center justify-start overflow-hidden">
-            <div ref={messageContentRef} className="w-full space-y-[0.5em]">
-              <p className="text-[2rem] sm:text-[4.5rem] font-bold text-gray-900 leading-tight break-words">{displayText.emergency}</p>
-              <p className="text-[2rem] sm:text-[4.5rem] font-bold text-gray-900 leading-tight break-words">{displayText.needHelp}</p>
-              <p className="text-[2rem] sm:text-[4.5rem] font-bold text-red-700 leading-tight break-words">{displayText.callServices}</p>
+      <div ref={swipeAreaRef} className="relative flex-1 min-h-0 w-full overflow-hidden">
+        <motion.div className="absolute inset-0 z-10" style={{ x: allergyPeekX }} aria-hidden="true">
+          {renderAllergyPeek()}
+        </motion.div>
+        <motion.div
+          className="absolute inset-0 z-20 w-full h-full flex flex-col bg-white"
+          style={{ x: dragX }}
+          drag="x"
+          dragConstraints={{ left: 0, right: containerWidth }}
+          dragElastic={0.15}
+          onDragStart={handleCardDragStart}
+          onDrag={handleCardDrag}
+          onDragEnd={handleCardDragEnd}
+        >
+          <div ref={cardRef} className="flex-1 min-h-0 w-full flex flex-col items-center justify-start text-center overflow-hidden p-4 sm:p-6 md:p-8 pt-[calc(1rem+env(safe-area-inset-top))] bg-white border-none">
+            <div className="h-4 sm:h-10 md:h-14 shrink-0" />
+            <div className="bg-white border-4 border-black p-3 sm:p-6 rounded-full shadow-lg mb-4 sm:mb-10 shrink-0">
+              <EmergencyCrossIcon className="h-8 w-8 sm:h-16 sm:w-16" />
             </div>
-          </div>
-        </div>
-        <div className="mt-auto w-full max-w-md pt-4 shrink-0">
-          <a href={`tel:${emergencyNumber}`} className="flex items-center justify-center w-full py-2.5 sm:py-6 px-6 bg-red-700 hover:bg-red-800 active:bg-red-600 text-white rounded-2xl font-black shadow-xl transition-transform active:scale-95 text-center overflow-hidden">
-            <div ref={dialContainerRef} className="w-full min-w-0 flex items-center justify-center overflow-hidden">
-              <div ref={dialContentRef} className="flex items-center justify-center gap-2 sm:gap-4">
-                <Phone className="h-8 w-8 sm:h-14 sm:w-14 fill-current shrink-0" />
-                <span className="text-[2.5rem] sm:text-[3.75rem] leading-tight whitespace-nowrap">{displayText.dialText} {emergencyNumber}</span>
+            <div className="w-full max-w-2xl flex-1 min-h-0 flex flex-col shrink">
+              <div className="border-b-4 border-red-600 pb-2 sm:pb-4 mb-3 sm:mb-10 shrink-0">
+                <h1 className="text-3xl sm:text-6xl font-black tracking-tighter uppercase text-red-600">{displayText.attention}</h1>
+              </div>
+              <div ref={messageContainerRef} className="flex-1 min-h-0 flex flex-col items-center justify-start overflow-hidden">
+                <div ref={messageContentRef} className="w-full space-y-[0.5em]">
+                  <p className="text-[2rem] sm:text-[4.5rem] font-bold text-gray-900 leading-tight break-words">{displayText.emergency}</p>
+                  <p className="text-[2rem] sm:text-[4.5rem] font-bold text-gray-900 leading-tight break-words">{displayText.needHelp}</p>
+                  <p className="text-[2rem] sm:text-[4.5rem] font-bold text-red-700 leading-tight break-words">{displayText.callServices}</p>
+                </div>
               </div>
             </div>
-          </a>
-          {langCode && langCode !== 'en' && (
-            <p className="text-[14px] sm:text-[32px] text-gray-400 font-light mt-2">
-              Translated to {getLanguageName(langCode)}
-            </p>
-          )}
+            <div className="mt-auto w-full max-w-md pt-4 shrink-0">
+              <a
+                href={`tel:${emergencyNumber}`}
+                onClick={handleCallLinkClick}
+                className="flex items-center justify-center w-full py-2.5 sm:py-6 px-6 bg-red-700 hover:bg-red-800 active:bg-red-600 text-white rounded-2xl font-black shadow-xl transition-transform active:scale-95 text-center overflow-hidden"
+              >
+                <div ref={dialContainerRef} className="w-full min-w-0 flex items-center justify-center overflow-hidden">
+                  <div ref={dialContentRef} className="flex items-center justify-center gap-2 sm:gap-4">
+                    <Phone className="h-8 w-8 sm:h-14 sm:w-14 fill-current shrink-0" />
+                    <span className="text-[2.5rem] sm:text-[3.75rem] leading-tight whitespace-nowrap">{displayText.dialText} {emergencyNumber}</span>
+                  </div>
+                </div>
+              </a>
+              {langCode && langCode !== 'en' && (
+                <p className="text-[14px] sm:text-[32px] text-gray-400 font-light mt-2">
+                  Translated to {getLanguageName(langCode)}
+                </p>
+              )}
 
-        </div>
+            </div>
+          </div>
+        </motion.div>
       </div>
 
       <EmergencyActions
