@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useCallback, useEffect, useRef, useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { GripVertical, X } from 'lucide-react';
 import { SavedCard } from '@/lib/types';
@@ -25,6 +25,14 @@ const CardSelectorMenu: React.FC<CardSelectorMenuProps> = ({ isOpen, onClose }) 
   const cardsRef = useRef<SavedCard[]>([]);
   const itemRefs = useRef<Map<string, HTMLDivElement>>(new Map());
   const dragInfoRef = useRef<{ id: string; originalIndex: number; itemHeight: number; startY: number } | null>(null);
+  // The whole row is the drag handle (not just the grip icon) so a
+  // press-and-drag anywhere on it reorders the card instead of Android
+  // occasionally falling into text selection. Since the row also has to stay
+  // tappable to select the card, dragMovedRef distinguishes a real drag from
+  // a tap: it only flips once the pointer moves past TAP_TOLERANCE, and both
+  // the reorder logic and the tap's onClick check it before acting.
+  const dragMovedRef = useRef(false);
+  const TAP_TOLERANCE = 8;
 
   useEffect(() => {
     cardsRef.current = cards;
@@ -39,10 +47,43 @@ const CardSelectorMenu: React.FC<CardSelectorMenuProps> = ({ isOpen, onClose }) 
     loadCards();
   }, [isOpen]);
 
+  // Which saved card matches the currently displayed one, so it can be
+  // highlighted in the list - same id-less matching AllergyCard uses, since
+  // the active card's data lives in loose storage keys, not a SavedCard id.
+  const [activeSelection, setActiveSelection] = useState<{ ids: string[]; languageCode: string } | null>(null);
+
+  useEffect(() => {
+    if (!isOpen) return;
+    const loadActiveSelection = async () => {
+      const [selected, lang] = await Promise.all([
+        storage.get<{ ids?: string[] }>(STORAGE_KEYS.SELECTED_ALLERGENS),
+        storage.get<string>(STORAGE_KEYS.SELECTED_LANGUAGE)
+      ]);
+      setActiveSelection({ ids: selected?.ids || [], languageCode: lang || '' });
+    };
+    loadActiveSelection();
+  }, [isOpen]);
+
+  const activeCardId = useMemo(() => {
+    if (!activeSelection) return null;
+    const sortedSelected = [...activeSelection.ids].sort();
+    const match = cards.find(card => {
+      if (card.languageCode !== activeSelection.languageCode) return false;
+      const cardIds = [...(card.selectedAllergens?.ids || [])].sort();
+      return cardIds.length === sortedSelected.length && cardIds.every((id, i) => id === sortedSelected[i]);
+    });
+    return match?.id ?? null;
+  }, [cards, activeSelection]);
+
   const handlePointerMove = useCallback((e: PointerEvent) => {
     const info = dragInfoRef.current;
     if (!info) return;
     const delta = e.clientY - info.startY;
+    if (!dragMovedRef.current && Math.abs(delta) > TAP_TOLERANCE) {
+      dragMovedRef.current = true;
+    }
+    if (!dragMovedRef.current) return;
+
     const rawIndex = info.originalIndex + Math.round(delta / info.itemHeight);
     const maxIndex = cardsRef.current.length - 1;
     const targetIndex = Math.max(0, Math.min(maxIndex, rawIndex));
@@ -63,17 +104,22 @@ const CardSelectorMenu: React.FC<CardSelectorMenuProps> = ({ isOpen, onClose }) 
     window.removeEventListener('pointerup', handlePointerUp);
     dragInfoRef.current = null;
     setDragState(null);
-    storage.set(STORAGE_KEYS.SAVED_CARDS, cardsRef.current);
+    if (dragMovedRef.current) {
+      storage.set(STORAGE_KEYS.SAVED_CARDS, cardsRef.current);
+    }
   }, [handlePointerMove]);
 
+  // The whole row (not just the grip icon) starts a potential drag, so
+  // there's a much bigger, easier-to-hit target on mobile. Whether it turns
+  // into a reorder or a tap-to-select is decided by movement, in
+  // handlePointerMove/the button's onClick below.
   const handleDragStart = (e: React.PointerEvent, card: SavedCard) => {
-    e.preventDefault();
     const index = cardsRef.current.findIndex(c => c.id === card.id);
     if (index === -1) return;
     const el = itemRefs.current.get(card.id);
     const itemHeight = el?.getBoundingClientRect().height ?? 56;
+    dragMovedRef.current = false;
     dragInfoRef.current = { id: card.id, originalIndex: index, itemHeight, startY: e.clientY };
-    setDragState({ id: card.id, offset: 0 });
     window.addEventListener('pointermove', handlePointerMove);
     window.addEventListener('pointerup', handlePointerUp);
   };
@@ -128,6 +174,7 @@ const CardSelectorMenu: React.FC<CardSelectorMenuProps> = ({ isOpen, onClose }) 
             <div className="max-h-64 overflow-y-auto">
               {cards.map((card) => {
                 const isDragging = dragState?.id === card.id;
+                const isActive = card.id === activeCardId;
                 const shortLangCode = card.languageCode.split('-')[0].toUpperCase();
                 return (
                   <div
@@ -141,19 +188,18 @@ const CardSelectorMenu: React.FC<CardSelectorMenuProps> = ({ isOpen, onClose }) 
                       position: 'relative',
                       zIndex: 10
                     } : undefined}
+                    onPointerDown={(e) => handleDragStart(e, card)}
                     className={cn(
-                      "w-full flex items-center space-x-2 px-2 py-3 rounded-xl transition-colors",
+                      "w-full flex items-center space-x-2 px-2 py-3 border-2 transition-colors select-none touch-none cursor-grab active:cursor-grabbing",
+                      isActive ? "rounded-full border-red-500" : "rounded-xl border-transparent",
                       isDragging ? "bg-gray-100 dark:bg-gray-700 shadow-lg" : "hover:bg-gray-50 dark:hover:bg-gray-700"
                     )}
                   >
-                    <div
-                      onPointerDown={(e) => handleDragStart(e, card)}
-                      className="shrink-0 p-2 -m-2 text-gray-400 hover:text-gray-600 cursor-grab active:cursor-grabbing touch-none"
-                    >
+                    <div className="shrink-0 text-gray-400 pointer-events-none">
                       <GripVertical className="h-4 w-4" />
                     </div>
                     <button
-                      onClick={() => handleSelect(card)}
+                      onClick={() => { if (!dragMovedRef.current) handleSelect(card); }}
                       className="flex-1 min-w-0 text-left text-sm font-medium text-gray-700 dark:text-gray-200"
                     >
                       <span className="truncate block">{card.name} ({shortLangCode})</span>

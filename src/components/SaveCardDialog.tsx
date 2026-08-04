@@ -52,11 +52,12 @@ const SaveCardDialog: React.FC<SaveCardDialogProps> = ({
   const isAtCardLimit = !isEmergency && existingCards.length >= maxSavedCards;
   const isLocked = isAtCardLimit && !selectedCardId;
   
-  const [emblaRef, emblaApi] = useEmblaCarousel({ 
-    loop: false, 
+  const [emblaRef, emblaApi] = useEmblaCarousel({
+    loop: false,
     align: 'center',
     containScroll: 'trimSnaps',
-    dragFree: false
+    dragFree: false,
+    axis: 'y'
   });
 
   const onSelect = useCallback(() => {
@@ -225,54 +226,57 @@ const SaveCardDialog: React.FC<SaveCardDialogProps> = ({
 
           {!isEmergency && existingCards.length > 0 && (
             <div className="flex flex-col gap-1 overflow-hidden min-w-0">
-              <div className="flex items-center justify-between px-1 min-w-0">
-                <Label className="text-[11px] font-bold text-gray-400 uppercase tracking-wider shrink-0">
-                  Or Overwrite Existing
-                </Label>
+              <Label className="text-[11px] font-bold text-gray-400 uppercase tracking-wider px-1">
+                Or Overwrite Existing
+              </Label>
+
+              <div className="relative w-full max-w-[260px] mx-auto">
+                <div className="h-16 overflow-hidden cursor-grab active:cursor-grabbing" ref={emblaRef}>
+                  <div className="flex flex-col h-full">
+                    {existingCards.map((card) => (
+                      <div key={card.id} className="flex-[0_0_100%] min-h-0 flex justify-center">
+                        <button
+                          onClick={() => toggleCardSelection(card)}
+                          className={cn(
+                            "w-full flex items-center justify-between p-2.5 rounded-xl border transition-all text-left",
+                            selectedCardId === card.id
+                              ? 'border-red-500 bg-red-50 text-red-700 dark:bg-red-900/20 dark:text-red-400'
+                              // Overwriting is always a real, clickable option (not a fallback), even
+                              // while the card-name field above is locked at the save limit - so it
+                              // needs to read as active/interactive, not washed-out like a disabled
+                              // control. White background + solid border + full-contrast text instead
+                              // of the previous all-gray palette.
+                              : 'border-gray-200 bg-white text-gray-800 hover:border-red-300 hover:bg-red-50/50 dark:bg-gray-800 dark:border-gray-600 dark:text-gray-100 dark:hover:border-red-900/50'
+                          )}
+                        >
+                          <div className="flex flex-col overflow-hidden">
+                            <span className="font-semibold text-sm truncate">
+                              {card.name} ({card.languageCode.split('-')[0].toUpperCase()})
+                            </span>
+                            <span className="text-[10px] opacity-60">
+                              Saved {new Date(card.createdAt).toLocaleDateString()}
+                            </span>
+                          </div>
+                          {selectedCardId === card.id && <Check size={16} className="shrink-0 ml-2" />}
+                        </button>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+
                 {existingCards.length > 1 && (
-                  <div className="flex justify-end gap-1.5 shrink-0">
+                  <div className="absolute -right-5 top-1/2 -translate-y-1/2 flex flex-col items-center gap-1.5">
                     {existingCards.map((_, i) => (
                       <div
                         key={i}
                         className={cn(
-                          "h-1 rounded-full transition-all duration-300 shrink-0",
-                          i === selectedIndex ? "w-3 bg-red-600" : "w-1 bg-gray-300 dark:bg-gray-700"
+                          "w-1 rounded-full transition-all duration-300",
+                          i === selectedIndex ? "h-3 bg-red-600" : "h-1 bg-gray-300 dark:bg-gray-700"
                         )}
                       />
                     ))}
                   </div>
                 )}
-              </div>
-
-              <div className="w-full min-w-0 overflow-hidden cursor-grab active:cursor-grabbing" ref={emblaRef}>
-                <div className="flex">
-                  {existingCards.map((card) => (
-                    <div key={card.id} className="flex-[0_0_100%] min-w-0 flex justify-center px-1">
-                      <button
-                        onClick={() => toggleCardSelection(card)}
-                        className={cn(
-                          "w-full flex items-center justify-between p-2.5 rounded-xl border transition-all text-left",
-                          selectedCardId === card.id
-                            ? 'border-red-500 bg-red-50 text-red-700 dark:bg-red-900/20 dark:text-red-400'
-                            // Overwriting is always a real, clickable option (not a fallback), even
-                            // while the card-name field above is locked at the save limit - so it
-                            // needs to read as active/interactive, not washed-out like a disabled
-                            // control. White background + solid border + full-contrast text instead
-                            // of the previous all-gray palette.
-                            : 'border-gray-200 bg-white text-gray-800 hover:border-red-300 hover:bg-red-50/50 dark:bg-gray-800 dark:border-gray-600 dark:text-gray-100 dark:hover:border-red-900/50'
-                        )}
-                      >
-                        <div className="flex flex-col overflow-hidden">
-                          <span className="font-semibold text-sm truncate">{card.name}</span>
-                          <span className="text-[10px] opacity-60">
-                            Saved {new Date(card.createdAt).toLocaleDateString()}
-                          </span>
-                        </div>
-                        {selectedCardId === card.id && <Check size={16} className="shrink-0 ml-2" />}
-                      </button>
-                    </div>
-                  ))}
-                </div>
               </div>
             </div>
           )}
