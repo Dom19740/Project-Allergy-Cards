@@ -191,7 +191,7 @@ const CardSelectorMenu: React.FC<CardSelectorMenuProps> = ({ isOpen, onClose }) 
                     onPointerDown={(e) => handleDragStart(e, card)}
                     className={cn(
                       "w-full flex items-center space-x-2 px-2 py-3 border-2 transition-colors select-none touch-none cursor-grab active:cursor-grabbing",
-                      isActive ? "rounded-full border-red-500" : "rounded-xl border-transparent",
+                      isActive ? "rounded-xl border-red-500" : "rounded-xl border-transparent",
                       isDragging ? "bg-gray-100 dark:bg-gray-700 shadow-lg" : "hover:bg-gray-50 dark:hover:bg-gray-700"
                     )}
                   >
