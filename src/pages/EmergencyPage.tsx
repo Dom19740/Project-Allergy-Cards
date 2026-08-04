@@ -3,9 +3,11 @@
 import React, { useEffect, useState, useRef, useCallback } from 'react';
 import { useParams, useNavigate, useSearchParams } from 'react-router-dom';
 import { motion, useMotionValue, useTransform, animate, type PanInfo } from 'framer-motion';
-import { AlertTriangle, Loader2, Phone } from 'lucide-react';
+import { AlertTriangle, Loader2, Phone, Utensils } from 'lucide-react';
 import { translateText, TranslationError } from '@/lib/translator';
 import { getEmergencyNumber } from '@/lib/emergencyNumbers';
+import { ALLERGEN_OPTIONS, getAllergenGridStyle } from '@/lib/allergens';
+import { getCustomAllergenImages } from '@/lib/customAllergenImages';
 import { SUPPORTED_LANGUAGES } from '@/lib/supportedLanguages';
 import { shareCard, downloadCard } from '@/lib/card-utils';
 import EmergencyActions from '@/components/EmergencyActions';
@@ -97,6 +99,16 @@ const EmergencyPage = () => {
 
   const dragX = useMotionValue(0);
   const allergyPeekX = useTransform(dragX, (v) => v - containerWidth);
+
+  // Needed only to render the allergy-card peek's image grid identically to
+  // the real AllergyCard - see renderAllergyPeek below.
+  const [customAllergenImages, setCustomAllergenImages] = useState<Record<string, string>>({});
+  useEffect(() => {
+    const loadCustomAllergenImages = () => getCustomAllergenImages().then(setCustomAllergenImages);
+    loadCustomAllergenImages();
+    window.addEventListener('storage-update', loadCustomAllergenImages);
+    return () => window.removeEventListener('storage-update', loadCustomAllergenImages);
+  }, []);
 
   const dragMovedRef = useRef(false);
   const TAP_TOLERANCE = 8;
@@ -271,18 +283,37 @@ const EmergencyPage = () => {
     emergency: { ...translatedText, dial112: `${translatedText.dialText} ${emergencyNumber}` }
   };
 
-  // Condensed, non-interactive preview of the allergy card for the
-  // swipe-right peek - built from data already loaded for this page, no
-  // extra translation needed.
+  // Non-interactive preview of the allergy card for the swipe-right peek -
+  // built from data already loaded for this page, no extra translation
+  // needed. Mirrors AllergyCard's real markup line-for-line (custom message
+  // lines, image grid, footer included) - any gap between the two is a
+  // visible jump the instant the peek is swapped for the real page.
   const renderAllergyPeek = () => {
     if (!selectedAllergens) return null;
+    const ui = cardTranslatedContent.ui;
     const pills = selectedAllergens.ids.map(id => cardTranslatedContent.allergens[id] || id);
+    const allergensWithImages = selectedAllergens.ids
+      .map(id => {
+        const predefined = ALLERGEN_OPTIONS.find(option => option.id === id);
+        if (predefined) return predefined;
+        const customImage = customAllergenImages[id];
+        return customImage ? { id, name: id, image: customImage } : null;
+      })
+      .filter(Boolean) as typeof ALLERGEN_OPTIONS;
+    const imageGridStyle = getAllergenGridStyle(allergensWithImages.length);
     return (
       <div className="w-full h-full flex flex-col items-center justify-start text-center overflow-hidden p-4 sm:p-6 md:p-8 pt-[calc(1rem+env(safe-area-inset-top))] bg-white select-none">
         <div className="h-6 sm:h-10 md:h-14" />
         <h1 className="text-2xl sm:text-4xl md:text-5xl lg:text-6xl font-black leading-tight mb-4 sm:mb-8 md:mb-12 text-red-600 uppercase tracking-tighter break-words">
-          {cardTranslatedContent.ui.allergyAlert || 'ALLERGY ALERT!'}
+          {ui.allergyAlert || 'ALLERGY ALERT!'}
         </h1>
+
+        {ui.iAmAllergicTo && (
+          <p className="text-2xl sm:text-3xl md:text-4xl font-normal text-gray-800 mb-4 sm:mb-8 md:mb-12">
+            {ui.iAmAllergicTo}
+          </p>
+        )}
+
         <div className="flex flex-wrap justify-center gap-1 sm:gap-2 mb-4 sm:mb-8 md:mb-12">
           {pills.map((allergen, i) => (
             <span
@@ -292,6 +323,50 @@ const EmergencyPage = () => {
               {allergen}
             </span>
           ))}
+        </div>
+
+        {ui.theyMakeMeSick && (
+          <p className="text-2xl sm:text-3xl md:text-4xl font-normal text-gray-800 mb-2 sm:mb-3 leading-tight max-w-2xl">
+            {ui.theyMakeMeSick}
+          </p>
+        )}
+
+        <p className="text-2xl sm:text-3xl md:text-4xl font-normal text-gray-600 italic mb-4 sm:mb-6">
+          {ui.thankYou || 'Thank you!'}
+        </p>
+
+        <div className="relative w-full flex-1 min-h-0 flex items-center justify-center">
+          <div className="relative h-full max-h-[400px] w-auto max-w-full aspect-square">
+            <div className="absolute inset-0 flex items-center justify-center">
+              {allergensWithImages.length > 0 ? (
+                <div className="absolute inset-0 grid gap-1 sm:gap-2 items-center justify-items-center z-0 p-4" style={imageGridStyle}>
+                  {allergensWithImages.map((allergen) => (
+                    <div key={allergen.id} className="w-full h-full flex items-center justify-center">
+                      <img src={allergen.image} alt={allergen.name} draggable={false} className="max-w-full max-h-full object-contain" />
+                    </div>
+                  ))}
+                </div>
+              ) : (
+                <div className="absolute inset-0 flex items-center justify-center z-0">
+                  <Utensils className="w-1/2 h-1/2 text-red-600 opacity-20" />
+                </div>
+              )}
+              <img src="/noentry.png" alt="" draggable={false} className="absolute inset-0 w-full h-full object-contain z-10 opacity-90 pointer-events-none" />
+            </div>
+          </div>
+        </div>
+
+        <div className="mt-auto pt-2">
+          {langCode && langCode !== 'en' && (
+            <p className="text-[14px] sm:text-[32px] text-gray-400 font-light mb-1">
+              Translated to {getLanguageName(langCode)}
+            </p>
+          )}
+          {!isPremium && (
+            <p className="text-[13px] sm:text-base text-gray-400 font-light">
+              created with Simple Allergy Alert © 2026
+            </p>
+          )}
         </div>
       </div>
     );

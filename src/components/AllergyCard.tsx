@@ -4,9 +4,10 @@ import React, { useRef, useState, useEffect, useCallback, useMemo } from 'react'
 import { useNavigate } from 'react-router-dom';
 import { motion, useMotionValue, useTransform, animate, type PanInfo } from 'framer-motion';
 import { toast } from 'sonner';
-import { Loader2, Utensils, AlertTriangle } from 'lucide-react';
+import { Loader2, Utensils, AlertTriangle, Phone } from 'lucide-react';
 import { LanguageCode, SelectedAllergens, CustomMessages, TranslatedContent, SavedCard } from '@/lib/types';
 import { ALLERGEN_OPTIONS, getAllergenGridStyle } from '@/lib/allergens';
+import { getEmergencyNumber } from '@/lib/emergencyNumbers';
 import { translateText, TranslationError } from '@/lib/translator';
 import { SUPPORTED_LANGUAGES } from '@/lib/supportedLanguages';
 import { shareCard, downloadCard } from '@/lib/card-utils';
@@ -42,12 +43,42 @@ const SWIPE_VELOCITY_THRESHOLD = 400;
 const SWIPE_BOUNCE_SPRING = { type: 'spring' as const, stiffness: 500, damping: 40 };
 const SWIPE_SLIDE_TWEEN = { duration: 0.22, ease: 'easeOut' as const };
 
-const AllergyCard: React.FC<AllergyCardProps> = ({ languageCode, selectedAllergens, initialTranslations }) => {
+const AllergyCard: React.FC<AllergyCardProps> = ({ languageCode: languageCodeProp, selectedAllergens: selectedAllergensProp, initialTranslations }) => {
   const cardRef = useRef<HTMLDivElement>(null);
   const navigate = useNavigate();
   const isOnline = useNetworkStatus();
   const { isPremium } = useBilling();
-  
+
+  // Swiping between saved cards writes the target card's data to storage and
+  // navigates, but that flows back down as new languageCode/selectedAllergens
+  // props asynchronously (through AllergyAlertPage's own storage read) - on
+  // a real device, that round-trip goes through the native storage bridge
+  // and has genuine latency, not just a local variable read. Waiting for it
+  // to land before revealing the card (an earlier approach) meant briefly
+  // showing the OLD card's content at the new position, which is invisible
+  // when the two cards are identical but very visible when they differ.
+  //
+  // Since we already have the target SavedCard's full data in memory the
+  // instant a swipe completes, there's no need to wait on that round-trip at
+  // all: swipeOverride lets the swipe set languageCode/selectedAllergens (and
+  // the rest of the card's state) synchronously and instantly, with the
+  // storage write + navigate happening in the background purely for
+  // persistence/deep-linking. It's cleared once the real props catch up to
+  // match it, which is a no-op by then since the content already agrees.
+  const [swipeOverride, setSwipeOverride] = useState<{ languageCode: string; ids: string[] } | null>(null);
+  const languageCode = swipeOverride?.languageCode ?? languageCodeProp;
+  const selectedAllergens = swipeOverride?.ids ?? selectedAllergensProp;
+
+  useEffect(() => {
+    if (!swipeOverride) return;
+    const sortedProp = [...selectedAllergensProp].sort();
+    const sortedOverride = [...swipeOverride.ids].sort();
+    const matches = languageCodeProp === swipeOverride.languageCode &&
+      sortedProp.length === sortedOverride.length &&
+      sortedProp.every((id, i) => id === sortedOverride[i]);
+    if (matches) setSwipeOverride(null);
+  }, [languageCodeProp, selectedAllergensProp, swipeOverride]);
+
   const [isSharing, setIsSharing] = useState(false);
   const [isDownloading, setIsDownloading] = useState(false);
   const [isSpeaking, setIsSpeaking] = useState(false);
@@ -174,69 +205,31 @@ const AllergyCard: React.FC<AllergyCardProps> = ({ languageCode, selectedAllerge
   const nextPeekY = useTransform(dragY, (v) => v + containerSize.height);
   const emergencyPeekX = useTransform(dragX, (v) => v + containerSize.width);
 
-  // switchToCard swaps data via storage + navigate(), which flows back down
-  // as new props asynchronously (through AllergyAlertPage's own storage
-  // read). Resetting dragY to 0 as soon as the slide-away animation finishes
-  // - before that data has actually landed - snaps the OLD card straight
-  // back into view for a frame, since the active card is still rendering
-  // the old data at that point.
-  //
-  // Matching languageCode/selectedAllergens alone isn't enough either: those
-  // props updating just means AllergyAlertPage's reload has landed, but the
-  // *translated* text/pills (translatedUIText/translatedAllergens) are
-  // populated by a separate effect (translateAllContent) that hasn't
-  // necessarily caught up yet. Revealing the card at that point can flash
-  // the OLD card's translated text for a frame at the NEW position - which
-  // is invisible when swiping between two cards with identical content, but
-  // very visible the moment the cards actually differ. So this waits for
-  // the live translated state to match the target's known values too, not
-  // just the input props.
-  const pendingSwipeTargetRef = useRef<{
-    languageCode: string;
-    ids: string[];
-    ui: TranslatedContent['ui'];
-    allergens: Record<string, string>;
-  } | null>(null);
-
-  useEffect(() => {
-    const target = pendingSwipeTargetRef.current;
-    if (!target) return;
-
-    const sortedCurrent = [...selectedAllergens].sort();
-    const sortedTarget = [...target.ids].sort();
-    const propsMatch = languageCode === target.languageCode &&
-      sortedCurrent.length === sortedTarget.length &&
-      sortedCurrent.every((id, i) => id === sortedTarget[i]);
-    if (!propsMatch) return;
-
-    const allergensMatch = target.ids.every(id => translatedAllergens[id] === target.allergens[id]);
-    const uiMatch = translatedUIText.allergyAlert === target.ui.allergyAlert &&
-      translatedUIText.iAmAllergicTo === target.ui.iAmAllergicTo &&
-      translatedUIText.theyMakeMeSick === target.ui.theyMakeMeSick &&
-      translatedUIText.thankYou === target.ui.thankYou;
-    if (!allergensMatch || !uiMatch) return;
-
-    pendingSwipeTargetRef.current = null;
-    dragY.set(0);
-  }, [languageCode, selectedAllergens, translatedAllergens, translatedUIText]);
+  // The target SavedCard already carries everything needed to display it -
+  // translatedContent, customMessages, selectedAllergens - so the reveal
+  // doesn't need to wait on anything async. swipeOverride updates
+  // languageCode/selectedAllergens (see above) and these calls update the
+  // rest of the displayed state, all synchronously in one batch, so the
+  // card that becomes visible when dragY resets is correct from the very
+  // first frame. switchToCard/goToEmergencyCard still run in the background
+  // to persist the choice and update the URL, but nothing visible depends on
+  // them finishing.
+  const applyCardData = (card: SavedCard) => {
+    setSwipeOverride({ languageCode: card.languageCode, ids: [...card.selectedAllergens.ids] });
+    setTranslatedUIText(card.translatedContent.ui);
+    setTranslatedAllergens(card.translatedContent.allergens);
+    setEmergencyTranslations(card.translatedContent.emergency);
+    setCustomMessages(card.customMessages);
+    setFullSelectedData(card.selectedAllergens);
+    setCustomAllergenTranslations(card.selectedAllergens.custom || {});
+    setShowOriginal(false);
+  };
 
   const completeVerticalSwipe = (card: SavedCard, direction: 1 | -1) => {
     animate(dragY, direction === 1 ? -containerSize.height : containerSize.height, SWIPE_SLIDE_TWEEN).then(() => {
-      const target = {
-        languageCode: card.languageCode,
-        ids: [...card.selectedAllergens.ids],
-        ui: card.translatedContent.ui,
-        allergens: card.translatedContent.allergens
-      };
-      pendingSwipeTargetRef.current = target;
+      applyCardData(card);
+      dragY.set(0);
       switchToCard(card);
-      // Safety net: if the prop/translation update never lands (e.g. a
-      // failed navigation), don't leave the card stuck off-screen forever.
-      setTimeout(() => {
-        if (pendingSwipeTargetRef.current !== target) return;
-        pendingSwipeTargetRef.current = null;
-        dragY.set(0);
-      }, 1500);
     });
   };
 
@@ -421,24 +414,54 @@ const AllergyCard: React.FC<AllergyCardProps> = ({ languageCode, selectedAllerge
     );
   };
 
-  // Condensed, non-interactive preview of the emergency card for the
-  // horizontal swipe-left peek.
+  // Non-interactive preview of the emergency card for the horizontal
+  // swipe-left peek. Mirrors EmergencyPage's real markup line-for-line
+  // (needHelp/callServices lines, the CALL button, the footer) - any gap
+  // between the two is a visible jump the instant the swipe lands on the
+  // real page.
   const renderEmergencyPeek = (card: SavedCard) => {
     const emergency = card.translatedContent?.emergency;
+    const dialText = emergency?.dial112?.replace(/\d+/g, '').trim() || 'CALL';
+    const emergencyNumber = verifiedEmergencyNumber || getEmergencyNumber(card.languageCode);
     return (
       <div className="w-full h-full flex flex-col items-center justify-start text-center overflow-hidden p-4 sm:p-6 md:p-8 pt-[calc(1rem+env(safe-area-inset-top))] bg-white select-none">
         <div className="h-4 sm:h-10 md:h-14 shrink-0" />
         <div className="bg-white border-4 border-black p-3 sm:p-6 rounded-full shadow-lg mb-4 sm:mb-10 shrink-0">
           <EmergencyCrossIcon className="h-8 w-8 sm:h-16 sm:w-16" />
         </div>
-        <div className="border-b-4 border-red-600 pb-2 sm:pb-4 mb-3 sm:mb-10 w-full max-w-2xl">
-          <h1 className="text-3xl sm:text-6xl font-black tracking-tighter uppercase text-red-600">
-            {emergency?.attention || 'ATTENTION'}
-          </h1>
+        <div className="w-full max-w-2xl flex-1 min-h-0 flex flex-col shrink">
+          <div className="border-b-4 border-red-600 pb-2 sm:pb-4 mb-3 sm:mb-10 shrink-0">
+            <h1 className="text-3xl sm:text-6xl font-black tracking-tighter uppercase text-red-600">
+              {emergency?.attention || 'ATTENTION'}
+            </h1>
+          </div>
+          <div className="flex-1 min-h-0 flex flex-col items-center justify-start overflow-hidden">
+            <div className="w-full space-y-[0.5em]">
+              <p className="text-[2rem] sm:text-[4.5rem] font-bold text-gray-900 leading-tight break-words">
+                {emergency?.emergency || 'I am having a severe allergic reaction.'}
+              </p>
+              <p className="text-[2rem] sm:text-[4.5rem] font-bold text-gray-900 leading-tight break-words">
+                {emergency?.needHelp || 'I need medical help immediately.'}
+              </p>
+              <p className="text-[2rem] sm:text-[4.5rem] font-bold text-red-700 leading-tight break-words">
+                {emergency?.callServices || 'Please call emergency services.'}
+              </p>
+            </div>
+          </div>
         </div>
-        <p className="text-lg sm:text-2xl font-bold text-gray-800 px-4 leading-snug">
-          {emergency?.emergency || 'I am having a severe allergic reaction.'}
-        </p>
+        <div className="mt-auto w-full max-w-md pt-4 shrink-0">
+          <div className="flex items-center justify-center w-full py-2.5 sm:py-6 px-6 bg-red-700 text-white rounded-2xl font-black shadow-xl text-center overflow-hidden">
+            <div className="flex items-center justify-center gap-2 sm:gap-4">
+              <Phone className="h-8 w-8 sm:h-14 sm:w-14 fill-current shrink-0" />
+              <span className="text-[2.5rem] sm:text-[3.75rem] leading-tight whitespace-nowrap">{dialText} {emergencyNumber}</span>
+            </div>
+          </div>
+          {card.languageCode !== 'en' && (
+            <p className="text-[14px] sm:text-[32px] text-gray-400 font-light mt-2">
+              Translated to {getLanguageName(card.languageCode)}
+            </p>
+          )}
+        </div>
       </div>
     );
   };
@@ -500,12 +523,18 @@ const AllergyCard: React.FC<AllergyCardProps> = ({ languageCode, selectedAllerge
   };
 
   useEffect(() => {
-    loadData();
+    // While swipeOverride is active, applyCardData has already set this
+    // state directly from the known-correct target card - re-reading
+    // storage here could win a race against switchToCard's still-in-flight
+    // writes (especially on native, where that's a real bridge call) and
+    // clobber it with the previous card's data. Once the override clears
+    // this runs normally again as a final, by-then-consistent sync.
+    if (!swipeOverride) loadData();
 
     const handleUpdate = () => loadData();
     window.addEventListener('storage-update', handleUpdate);
     return () => window.removeEventListener('storage-update', handleUpdate);
-  }, [languageCode, selectedAllergens]);
+  }, [languageCode, selectedAllergens, swipeOverride]);
 
   useEffect(() => {
     setShowOriginal(false);
@@ -673,8 +702,12 @@ const AllergyCard: React.FC<AllergyCardProps> = ({ languageCode, selectedAllerge
   }, [languageCode, selectedAllergens, customMessages, customAllergenTranslations, initialTranslations, isOnline]);
 
   useEffect(() => {
-    translateAllContent();
-  }, [translateAllContent]);
+    // Same reasoning as the loadData effect above: applyCardData already set
+    // the translated text/pills directly for a swipe-driven change, so skip
+    // the (possibly stale, if switchToCard's writes haven't landed yet)
+    // re-derivation until the override clears.
+    if (!swipeOverride) translateAllContent();
+  }, [translateAllContent, swipeOverride]);
 
   const waitForNextPaint = () =>
     new Promise<void>(resolve => requestAnimationFrame(() => requestAnimationFrame(() => resolve())));

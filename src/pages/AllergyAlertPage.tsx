@@ -35,18 +35,25 @@ const AllergyAlertPage = () => {
       let allergens: string[] = [];
 
       if (storedData) {
-        if (storedData.standard && Array.isArray(storedData.standard)) {
-          allergens = [...allergens, ...storedData.standard];
-        }
-        if (storedData.custom) {
-          if (Array.isArray(storedData.custom)) {
-            allergens = [...allergens, ...storedData.custom];
-          } else if (typeof storedData.custom === 'object') {
-            allergens = [...allergens, ...Object.keys(storedData.custom)];
+        if (Array.isArray(storedData.ids)) {
+          // ids is the canonical, order-preserving list - every writer of
+          // this key includes it. Re-deriving from standard+custom instead
+          // (the old fallback below) can produce a different order, which
+          // showed up as allergen pills/images visibly reshuffling right
+          // after a card switch, once this page's own reload caught up.
+          allergens = [...storedData.ids];
+        } else if (storedData.standard || storedData.custom) {
+          if (storedData.standard && Array.isArray(storedData.standard)) {
+            allergens = [...allergens, ...storedData.standard];
           }
-        }
-        
-        if (Array.isArray(storedData) && allergens.length === 0) {
+          if (storedData.custom) {
+            if (Array.isArray(storedData.custom)) {
+              allergens = [...allergens, ...storedData.custom];
+            } else if (typeof storedData.custom === 'object') {
+              allergens = [...allergens, ...Object.keys(storedData.custom)];
+            }
+          }
+        } else if (Array.isArray(storedData)) {
           allergens = storedData;
         }
       }
