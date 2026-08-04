@@ -34,6 +34,25 @@ const CardSelectorMenu: React.FC<CardSelectorMenuProps> = ({ isOpen, onClose }) 
   const dragMovedRef = useRef(false);
   const TAP_TOLERANCE = 8;
 
+  // Dragging only engages after a long press. Reordering and scrolling the
+  // list both start as a vertical drag on the same rows, so without this a
+  // normal scroll attempt gets grabbed as a reorder instead - the row stays
+  // scrollable (touch-action: pan-y) until the hold completes, and only
+  // switches into drag mode if the pointer hasn't moved and hasn't lifted by
+  // then. A real move or release before that just cancels the pending timer.
+  const LONG_PRESS_MS = 400;
+  const MOVE_CANCEL_TOLERANCE = 10;
+  const longPressTimerRef = useRef<number | null>(null);
+  const pressStartRef = useRef<{ x: number; y: number; card: SavedCard; pointerId: number; target: Element } | null>(null);
+
+  const clearPendingLongPress = () => {
+    if (longPressTimerRef.current !== null) {
+      window.clearTimeout(longPressTimerRef.current);
+      longPressTimerRef.current = null;
+    }
+    pressStartRef.current = null;
+  };
+
   useEffect(() => {
     cardsRef.current = cards;
   }, [cards]);
@@ -109,23 +128,58 @@ const CardSelectorMenu: React.FC<CardSelectorMenuProps> = ({ isOpen, onClose }) 
     }
   }, [handlePointerMove]);
 
-  // The whole row (not just the grip icon) starts a potential drag, so
-  // there's a much bigger, easier-to-hit target on mobile. Whether it turns
-  // into a reorder or a tap-to-select is decided by movement, in
-  // handlePointerMove/the button's onClick below.
-  const handleDragStart = (e: React.PointerEvent, card: SavedCard) => {
+  // The whole row (not just the grip icon) is the drag handle once engaged,
+  // so there's a much bigger, easier-to-hit target on mobile than the grip
+  // alone. Whether it turns into a reorder or a tap-to-select is decided by
+  // movement, in handlePointerMove/the button's onClick below.
+  const engageDrag = (card: SavedCard, startY: number) => {
     const index = cardsRef.current.findIndex(c => c.id === card.id);
     if (index === -1) return;
     const el = itemRefs.current.get(card.id);
     const itemHeight = el?.getBoundingClientRect().height ?? 56;
-    dragMovedRef.current = false;
-    dragInfoRef.current = { id: card.id, originalIndex: index, itemHeight, startY: e.clientY };
+    dragInfoRef.current = { id: card.id, originalIndex: index, itemHeight, startY };
     window.addEventListener('pointermove', handlePointerMove);
     window.addEventListener('pointerup', handlePointerUp);
   };
 
+  const handleRowPointerDown = (e: React.PointerEvent, card: SavedCard) => {
+    dragMovedRef.current = false;
+    clearPendingLongPress();
+    const { clientX, clientY, pointerId, currentTarget } = e;
+    pressStartRef.current = { x: clientX, y: clientY, card, pointerId, target: currentTarget };
+    longPressTimerRef.current = window.setTimeout(() => {
+      longPressTimerRef.current = null;
+      const pending = pressStartRef.current;
+      if (!pending) return;
+      pressStartRef.current = null;
+      try {
+        (pending.target as Element & { setPointerCapture?: (id: number) => void }).setPointerCapture?.(pending.pointerId);
+      } catch {
+        // Pointer may already be gone (finger lifted right at the boundary) - fine to ignore.
+      }
+      engageDrag(pending.card, pending.y);
+    }, LONG_PRESS_MS);
+  };
+
+  const handleRowPointerMove = (e: React.PointerEvent) => {
+    const pending = pressStartRef.current;
+    if (!pending) return;
+    const dx = e.clientX - pending.x;
+    const dy = e.clientY - pending.y;
+    if (Math.hypot(dx, dy) > MOVE_CANCEL_TOLERANCE) {
+      // Real movement before the hold completed - this is a scroll attempt,
+      // not a long press, so let the native scroll (touch-pan-y) carry on.
+      clearPendingLongPress();
+    }
+  };
+
+  const handleRowPointerEnd = () => {
+    clearPendingLongPress();
+  };
+
   useEffect(() => {
     return () => {
+      clearPendingLongPress();
       window.removeEventListener('pointermove', handlePointerMove);
       window.removeEventListener('pointerup', handlePointerUp);
     };
@@ -171,7 +225,7 @@ const CardSelectorMenu: React.FC<CardSelectorMenuProps> = ({ isOpen, onClose }) 
               </button>
             </div>
 
-            <div className="max-h-64 overflow-y-auto">
+            <div className="max-h-64 overflow-y-auto space-y-1.5">
               {cards.map((card) => {
                 const isDragging = dragState?.id === card.id;
                 const isActive = card.id === activeCardId;
@@ -188,9 +242,13 @@ const CardSelectorMenu: React.FC<CardSelectorMenuProps> = ({ isOpen, onClose }) 
                       position: 'relative',
                       zIndex: 10
                     } : undefined}
-                    onPointerDown={(e) => handleDragStart(e, card)}
+                    onPointerDown={(e) => handleRowPointerDown(e, card)}
+                    onPointerMove={handleRowPointerMove}
+                    onPointerUp={handleRowPointerEnd}
+                    onPointerCancel={handleRowPointerEnd}
                     className={cn(
-                      "w-full flex items-center space-x-2 px-2 py-3 border-2 transition-colors select-none touch-none cursor-grab active:cursor-grabbing",
+                      "w-full flex items-center space-x-2 px-2 py-2 border-2 transition-colors select-none cursor-grab active:cursor-grabbing",
+                      isDragging ? "touch-none" : "touch-pan-y",
                       isActive ? "rounded-xl border-red-500" : "rounded-xl border-gray-200 dark:border-gray-700",
                       isDragging ? "bg-gray-100 dark:bg-gray-700 shadow-lg" : "hover:bg-gray-50 dark:hover:bg-gray-700"
                     )}

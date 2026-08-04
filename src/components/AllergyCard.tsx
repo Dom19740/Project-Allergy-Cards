@@ -179,32 +179,59 @@ const AllergyCard: React.FC<AllergyCardProps> = ({ languageCode, selectedAllerge
   // read). Resetting dragY to 0 as soon as the slide-away animation finishes
   // - before that data has actually landed - snaps the OLD card straight
   // back into view for a frame, since the active card is still rendering
-  // the old props at that point. This ref/effect pair holds the card
-  // off-screen until languageCode/selectedAllergens actually match the
-  // target, so the reset only ever happens once the content underneath is
-  // already correct and is therefore invisible.
-  const pendingSwipeTargetRef = useRef<{ languageCode: string; ids: string[] } | null>(null);
+  // the old data at that point.
+  //
+  // Matching languageCode/selectedAllergens alone isn't enough either: those
+  // props updating just means AllergyAlertPage's reload has landed, but the
+  // *translated* text/pills (translatedUIText/translatedAllergens) are
+  // populated by a separate effect (translateAllContent) that hasn't
+  // necessarily caught up yet. Revealing the card at that point can flash
+  // the OLD card's translated text for a frame at the NEW position - which
+  // is invisible when swiping between two cards with identical content, but
+  // very visible the moment the cards actually differ. So this waits for
+  // the live translated state to match the target's known values too, not
+  // just the input props.
+  const pendingSwipeTargetRef = useRef<{
+    languageCode: string;
+    ids: string[];
+    ui: TranslatedContent['ui'];
+    allergens: Record<string, string>;
+  } | null>(null);
 
   useEffect(() => {
     const target = pendingSwipeTargetRef.current;
     if (!target) return;
+
     const sortedCurrent = [...selectedAllergens].sort();
     const sortedTarget = [...target.ids].sort();
-    const matches = languageCode === target.languageCode &&
+    const propsMatch = languageCode === target.languageCode &&
       sortedCurrent.length === sortedTarget.length &&
       sortedCurrent.every((id, i) => id === sortedTarget[i]);
-    if (!matches) return;
+    if (!propsMatch) return;
+
+    const allergensMatch = target.ids.every(id => translatedAllergens[id] === target.allergens[id]);
+    const uiMatch = translatedUIText.allergyAlert === target.ui.allergyAlert &&
+      translatedUIText.iAmAllergicTo === target.ui.iAmAllergicTo &&
+      translatedUIText.theyMakeMeSick === target.ui.theyMakeMeSick &&
+      translatedUIText.thankYou === target.ui.thankYou;
+    if (!allergensMatch || !uiMatch) return;
+
     pendingSwipeTargetRef.current = null;
     dragY.set(0);
-  }, [languageCode, selectedAllergens]);
+  }, [languageCode, selectedAllergens, translatedAllergens, translatedUIText]);
 
   const completeVerticalSwipe = (card: SavedCard, direction: 1 | -1) => {
     animate(dragY, direction === 1 ? -containerSize.height : containerSize.height, SWIPE_SLIDE_TWEEN).then(() => {
-      const target = { languageCode: card.languageCode, ids: [...card.selectedAllergens.ids] };
+      const target = {
+        languageCode: card.languageCode,
+        ids: [...card.selectedAllergens.ids],
+        ui: card.translatedContent.ui,
+        allergens: card.translatedContent.allergens
+      };
       pendingSwipeTargetRef.current = target;
       switchToCard(card);
-      // Safety net: if the prop update never lands (e.g. a failed
-      // navigation), don't leave the card stuck off-screen forever.
+      // Safety net: if the prop/translation update never lands (e.g. a
+      // failed navigation), don't leave the card stuck off-screen forever.
       setTimeout(() => {
         if (pendingSwipeTargetRef.current !== target) return;
         pendingSwipeTargetRef.current = null;
