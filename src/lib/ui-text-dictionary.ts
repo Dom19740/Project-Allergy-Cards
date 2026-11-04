@@ -386,17 +386,17 @@ export const UI_TEXT_DICTIONARY: Record<string, Record<string, string>> = {
   },
   // French
   'fr': {
-    'allergy alert!': 'alerte aux allergies !',
-    'please be careful with my food.': 's\'il vous plaît, soyez prudent avec ma nourriture.',
+    'allergy alert!': 'attention aux allergies !',
+    'please be careful with my food.': 's\'il vous plaît, faites attention à ma nourriture.',
     'thank you!': 'merci!',
-    'i can not eat:': 'je ne peux pas manger :',
-    'they make me very sick and i could die': 'ils me rendent très malade et je pourrais mourir',
+    'i can not eat': 'je ne peux pas manger:',
+    'they make me very sick and i could die': 'ça me rend très malade et je pourrais en mourir',
     'attention': 'attention',
     'i am having a severe allergic reaction.': 'j\'ai une réaction allergique grave.',
     'i need medical help immediately.': 'j\'ai besoin d\'une aide médicale immédiatement.',
-    'please call emergency services.': 'veuillez appeler les services d\'urgence.',
+    'please call emergency services.': 'appelez les services d\'urgence s\'il vous plait.',
     'dial 112': 'composez le 112',
-    'call': 'appeler',
+    'call': 'appelez',
   },
   // Frisian
   'fy': {
