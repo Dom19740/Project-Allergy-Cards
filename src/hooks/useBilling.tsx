@@ -5,6 +5,7 @@ import { isPremiumUser, purchasePremium, restorePurchases, PREMIUM_PRODUCT_ID, L
 import { getAffiliateRef } from '@/lib/affiliate';
 import { toast } from 'sonner';
 import { Capacitor } from '@capacitor/core';
+import { applyPremiumFeatureAccess, PREMIUM_FEATURES_ENABLED } from '@/lib/premium-config';
 
 interface BillingContextType {
   isPremium: boolean;
@@ -17,14 +18,20 @@ interface BillingContextType {
 const BillingContext = createContext<BillingContextType | undefined>(undefined);
 
 export const BillingProvider = ({ children }: { children: ReactNode }): React.ReactElement => {
-  const [isPremium, setIsPremium] = useState<boolean>(false);
+  const [isPremium, setIsPremium] = useState<boolean>(applyPremiumFeatureAccess(false));
   const [isLoading, setIsLoading] = useState<boolean>(true);
   const [price, setPrice] = useState<string>("$4.99"); // Fallback price
 
   useEffect(() => {
+    if (!PREMIUM_FEATURES_ENABLED) {
+      setIsPremium(true);
+      setIsLoading(false);
+      return;
+    }
+
     const checkStatus = async () => {
       const status = await isPremiumUser();
-      setIsPremium(status);
+      setIsPremium(applyPremiumFeatureAccess(status));
       setIsLoading(false);
     };
 
@@ -50,12 +57,12 @@ export const BillingProvider = ({ children }: { children: ReactNode }): React.Re
 
     const handleStatusChange = async (e: any) => {
       if (typeof e.detail === 'boolean') {
-        setIsPremium(e.detail);
+        setIsPremium(applyPremiumFeatureAccess(e.detail));
         return;
       }
 
       const status = await refreshPremiumStatus();
-      setIsPremium(status);
+      setIsPremium(applyPremiumFeatureAccess(status));
     };
 
     window.addEventListener('premium-status-changed', handleStatusChange);

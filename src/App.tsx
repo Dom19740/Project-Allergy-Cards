@@ -15,6 +15,7 @@ import { captureAffiliateRef, consumeInstallReferrerRef } from "./lib/affiliate"
 import { sendTrackEvent, sendOrQueueTrackEvent, getOrCreatePersistedEventId } from "./lib/trackEvent";
 import { useTrackEventQueueFlush } from "./hooks/useTrackEventQueueFlush";
 import { BillingProvider } from "./hooks/useBilling";
+import { PREMIUM_FEATURES_ENABLED } from "./lib/premium-config";
 import { FirebaseCrashlytics } from '@capacitor-firebase/crashlytics';
 import { FirebaseAnalytics } from '@capacitor-firebase/analytics';
 import { Capacitor } from '@capacitor/core';
@@ -72,7 +73,9 @@ const AppContent = () => {
 
   useEffect(() => {
     // Initialize billing system
-    initBilling();
+    if (PREMIUM_FEATURES_ENABLED) {
+      initBilling();
+    }
 
     // Reduce the chance Safari auto-evicts saved cards after inactivity.
     if (Capacitor.getPlatform() === 'web' && navigator.storage?.persist) {
