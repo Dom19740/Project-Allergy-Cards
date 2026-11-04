@@ -20,6 +20,7 @@ import { FirebaseCrashlytics } from '@capacitor-firebase/crashlytics';
 import { FirebaseAnalytics } from '@capacitor-firebase/analytics';
 import { Capacitor } from '@capacitor/core';
 import "./lib/firebase-web"; // Initialize Firebase for Web
+import PremiumFreeAnnouncement from "./components/PremiumFreeAnnouncement";
 
 // Lazy load pages
 const Home = lazy(() => import("./pages/Home"));
@@ -180,6 +181,7 @@ const AppContent = () => {
   
   return (
     <ErrorBoundary>
+    <PremiumFreeAnnouncement />
     <Suspense fallback={<LoadingFallback />}>
       <Routes>
         <Route path="/" element={<Home />} />

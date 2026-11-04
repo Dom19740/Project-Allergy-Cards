@@ -19,6 +19,7 @@ export const STORAGE_KEYS = {
   CUSTOM_ALLERGEN_NAMES: 'customAllergenNames',
   CUSTOM_ALERT_PRESETS: 'customAlertPresets',
   PENDING_BACKUP_RESTORE: 'pendingBackupRestore',
+  PREMIUM_FREE_ANNOUNCEMENT_SEEN: 'premiumFreeAnnouncementSeen',
 };
 
 export const storage = {
