@@ -14,6 +14,10 @@ import org.json.JSONObject;
 
 public class AllergyWidgetProvider extends AppWidgetProvider {
 
+    // Keep in sync with src/lib/premium-config.ts.
+    // Set this to true to restore native widget entitlement checks.
+    private static final boolean PREMIUM_FEATURES_ENABLED = false;
+
     public static final String ACTION_OPEN_CARD = "com.dpbcreative.simpleallergyalert.ACTION_OPEN_CARD";
     public static final String ACTION_REFRESH = "com.dpbcreative.simpleallergyalert.ACTION_REFRESH";
     public static final String EXTRA_CARD_ID = "com.dpbcreative.simpleallergyalert.EXTRA_CARD_ID";
@@ -32,7 +36,7 @@ public class AllergyWidgetProvider extends AppWidgetProvider {
         // Check Premium Status
         SharedPreferences prefs = context.getSharedPreferences("CapacitorStorage", Context.MODE_PRIVATE);
         String isPremiumStr = prefs.getString("isPremium", "false");
-        boolean isPremium = "true".equals(isPremiumStr);
+        boolean isPremium = !PREMIUM_FEATURES_ENABLED || "true".equals(isPremiumStr);
 
         if (isPremium) {
             views.setViewVisibility(R.id.active_container, View.VISIBLE);
