@@ -14,6 +14,7 @@ import com.android.installreferrer.api.InstallReferrerClient;
 import com.android.installreferrer.api.InstallReferrerStateListener;
 import com.android.installreferrer.api.ReferrerDetails;
 import com.getcapacitor.BridgeActivity;
+import androidx.activity.EdgeToEdge;
 import java.util.regex.Pattern;
 
 public class MainActivity extends BridgeActivity {
@@ -29,6 +30,7 @@ public class MainActivity extends BridgeActivity {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        EdgeToEdge.enable(this);
         captureInstallReferrer();
     }
 
